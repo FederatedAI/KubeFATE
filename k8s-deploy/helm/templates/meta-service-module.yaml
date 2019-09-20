@@ -1,0 +1,66 @@
+########################################################
+# Copyright 2019-2020 program was created VMware, Inc. #
+# SPDX-License-Identifier: Apache-2.0                  #
+########################################################
+
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    {{ .Values.partyId }}: meta-service
+  name: meta-service
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        {{ .Values.partyId }}: meta-service
+    spec:
+      containers:
+        - image: {{ .Values.image.registry }}/meta-service:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          name: meta-service
+          ports:
+            - containerPort: 8590
+          resources: {}
+          volumeMounts:
+            - mountPath: /data/projects/fate/meta-service/conf/meta-service.properties
+              name: meta-service-confs
+              subPath: meta-service.properties
+            - mountPath: /data/projects/fate/meta-service/conf/jdbc.properties
+              name: meta-service-confs
+              subPath: jdbc.properties
+      {{ if .Values.nodeSelector.metaService.value}}
+      nodeSelector:
+        {{ .Values.nodeSelector.metaService.nodeLabel }}: {{ .Values.nodeSelector.metaService.value }}
+      {{ end }}
+      restartPolicy: Always
+      volumes:
+        - name: meta-service-confs
+          configMap:
+            name: meta-service-config
+status: {}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    {{ .Values.partyId }}: meta-service
+  name: meta-service
+spec:
+  ports:
+    - name: "8590"
+      port: 8590
+      targetPort: 8590
+      protocol: TCP
+  type: ClusterIP
+  selector:
+    {{ .Values.partyId }}: meta-service
+status:
+  loadBalancer: {}

@@ -1,0 +1,115 @@
+########################################################
+# Copyright 2019-2020 program was created VMware, Inc. #
+# SPDX-License-Identifier: Apache-2.0                  #
+########################################################
+
+{{- $root := . -}}
+{{- range .Values.eggList }}
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    {{ $root.Values.partyId }}: {{ .egg }}
+  name: {{ .egg }}
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        {{ $root.Values.partyId }}: {{ .egg }}
+    spec:
+      containers:
+        - env:
+            - name: PYTHONPATH
+              value: python.path=/data/projects/fate/python
+          image: {{ $root.Values.image.registry }}/egg:{{ $root.Values.image.tag }}
+          imagePullPolicy: {{ $root.Values.image.pullPolicy }}
+          name: {{ .egg }}
+          ports:
+            - containerPort: 7888
+            - containerPort: 7778
+            - containerPort: 50001
+            - containerPort: 50002
+            - containerPort: 50003
+            - containerPort: 50004
+          resources: {}
+          volumeMounts:
+            - mountPath: /data/projects/fate/egg/conf/egg.properties
+              name: egg-confs
+              subPath: egg.properties
+            - mountPath: /data/projects/fate/python/arch/conf/server_conf.json
+              name: python-confs
+              subPath: server_conf.json
+            - mountPath: /data/projects/fate/python/conf/server_conf.json
+              name: python-confs
+              subPath: server_conf.json
+            {{- if and $root.Values.nfspath ( $root.Values.nfsserver ) }}
+            - mountPath: /data/projects/fate/data-dir
+              subPath: {{ .egg }}-data-dir
+              name: modules-data-persistent-storage
+            {{- end }}
+      {{ if .value}}
+      nodeSelector:
+        {{ .nodeLabel }}: {{ .value }}
+      {{ end }}
+      restartPolicy: Always
+      volumes:
+        - name: egg-confs
+          configMap:
+            name: egg-config
+        - name: python-confs
+          configMap:
+            name: python-config
+        {{- if and $root.Values.nfspath ( $root.Values.nfsserver ) }}
+        - name: modules-data-persistent-storage
+          hostPath: 
+            path: /data/projects/fate/data-dir
+            type: DirectoryOrCreate
+        {{- end }}
+status: {}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    {{ $root.Values.partyId }}: {{ .egg }}
+  name: {{ .egg }}
+spec:
+  ports:
+    - name: "7888"
+      port: 7888
+      targetPort: 7888
+      protocol: TCP
+    - name: "7778"
+      port: 7778
+      targetPort: 7778
+      protocol: TCP
+    - name: "50001"
+      port: 50001
+      targetPort: 50001
+      protocol: TCP
+    - name: "50002"
+      port: 50002
+      targetPort: 50002
+      protocol: TCP
+    - name: "50003"
+      port: 50003
+      targetPort: 50003
+      protocol: TCP
+    - name: "50004"
+      port: 50004
+      targetPort: 50004
+      protocol: TCP
+  type: ClusterIP
+  selector:
+    {{ $root.Values.partyId }}: {{ .egg }}
+status:
+  loadBalancer: {}
+---
+{{- end }}

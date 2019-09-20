@@ -1,0 +1,79 @@
+########################################################
+# Copyright 2019-2020 program was created VMware, Inc. #
+# SPDX-License-Identifier: Apache-2.0                  #
+########################################################
+
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: mysql
+  labels:
+    {{ .Values.partyId }}: mysql
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        {{ .Values.partyId }}: mysql
+    spec:
+      containers:
+        - image: mysql
+          name: mysql
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: {{ .Values.mysql.mysql_root_password }}
+            - name: MYSQL_DATABASE
+              value: {{ .Values.mysql.mysql_database }}
+            - name: MYSQL_USER
+              value: {{ .Values.mysql.mysql_user }}
+            - name: MYSQL_PASSWORD
+              value: {{ .Values.mysql.mysql_password }}
+            - name: user
+              value: root
+          ports:
+            - containerPort: 3306
+              name: mysql
+          volumeMounts:
+            - name: mysql-confs
+              subPath: config.sql
+              mountPath: /docker-entrypoint-initdb.d/config.sql
+            {{- if and .Values.nfspath ( .Values.nfsserver ) }}
+            - name: mysql-persistent-storage
+              subPath: mysql
+              mountPath: /var/lib/mysql
+            {{- end }}
+      {{ if .Values.nodeSelector.mysql.value}}
+      nodeSelector:
+        {{ .Values.nodeSelector.mysql.nodeLabel }}: {{ .Values.nodeSelector.mysql.value }}
+      {{ end }}
+      volumes:
+        - name: mysql-confs
+          configMap:
+            name: mysql-config
+        {{- if and .Values.nfspath ( .Values.nfsserver ) }}
+        - name: mysql-persistent-storage
+          persistentVolumeClaim:
+            claimName: {{ .Values.partyId }}-pv-claim
+        {{- end }}
+status: {}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+  labels:
+    {{ .Values.partyId }}: mysql
+spec:
+  ports:
+    - name: "3306"
+      port: 3306
+      targetPort: 3306
+      protocol: TCP
+  type: ClusterIP
+  selector:
+    {{ .Values.partyId }}: mysql
+status:
+  loadBalancer: {}

@@ -1,0 +1,63 @@
+########################################################
+# Copyright 2019-2020 program was created VMware, Inc. #
+# SPDX-License-Identifier: Apache-2.0                  #
+########################################################
+
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    {{ .Values.partyId }}: serving-server
+  name: serving-server
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        {{ .Values.partyId }}: serving-server
+    spec:
+      containers:
+        - image: {{ .Values.image.registry }}/serving-server:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          name: serving-server
+          ports:
+            - containerPort: 8001
+          resources: {}
+          volumeMounts:
+            - mountPath: /data/projects/fate/serving-server/conf/serving-server.properties
+              name: serving-server-confs
+              subPath: serving-server.properties
+      {{ if .Values.nodeSelector.servingServer.value}}
+      nodeSelector:
+        {{ .Values.nodeSelector.servingServer.nodeLabel }}: {{ .Values.nodeSelector.servingServer.value }}
+      {{ end }}
+      restartPolicy: Always
+      volumes:
+        - name: serving-server-confs
+          configMap:
+            name: serving-server-config
+status: {}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    {{ .Values.partyId }}: serving-server
+  name: serving-server
+spec:
+  ports:
+    - name: "8001"
+      port: 8001
+      targetPort: 8001
+      protocol: TCP
+  type: ClusterIP
+  selector:
+    {{ .Values.partyId }}: serving-server
+status:
+  loadBalancer: {}

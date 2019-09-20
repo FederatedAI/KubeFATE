@@ -1,0 +1,66 @@
+########################################################
+# Copyright 2019-2020 program was created VMware, Inc. #
+# SPDX-License-Identifier: Apache-2.0                  #
+########################################################
+
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    {{ .Values.partyId }}: proxy
+  name: proxy
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        {{ .Values.partyId }}: proxy
+    spec:
+      containers:
+        - image: {{ .Values.image.registry }}/proxy:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          name: proxy
+          ports:
+            - containerPort: 9370
+          resources: {}
+          volumeMounts:
+            - mountPath: /data/projects/fate/proxy/conf/proxy.properties
+              name: proxy-confs
+              subPath: proxy.properties
+            - mountPath: /data/projects/fate/proxy/conf/route_table.json
+              name: proxy-confs
+              subPath: route_table.json
+      {{ if .Values.nodeSelector.proxy.value}}
+      nodeSelector:
+        {{ .Values.nodeSelector.proxy.nodeLabel }}: {{ .Values.nodeSelector.proxy.value }}
+      {{ end }}
+      restartPolicy: Always
+      volumes:
+        - name: proxy-confs
+          configMap:
+            name: proxy-config
+status: {}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    {{ .Values.partyId }}: proxy
+  name: proxy
+spec:
+  ports:
+    - name: "9370"
+      port: 9370
+      targetPort: 9370
+      protocol: TCP
+  type: ClusterIP
+  selector:
+    {{ .Values.partyId }}: proxy
+status:
+  loadBalancer: {}

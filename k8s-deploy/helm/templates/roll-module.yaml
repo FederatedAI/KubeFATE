@@ -1,0 +1,63 @@
+########################################################
+# Copyright 2019-2020 program was created VMware, Inc. #
+# SPDX-License-Identifier: Apache-2.0                  #
+########################################################
+
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    {{ .Values.partyId }}: roll
+  name: roll
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        {{ .Values.partyId }}: roll
+    spec:
+      containers:
+        - image: {{ .Values.image.registry }}/roll:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          name: roll
+          ports:
+            - containerPort: 8011
+          resources: {}
+          volumeMounts:
+            - mountPath: /data/projects/fate/roll/conf/roll.properties
+              name: roll-confs
+              subPath: roll.properties
+      {{ if .Values.nodeSelector.roll.value}}
+      nodeSelector:
+        {{ .Values.nodeSelector.roll.nodeLabel }}: {{ .Values.nodeSelector.roll.value }}
+      {{ end }}
+      volumes:
+        - name: roll-confs
+          configMap:
+            name: roll-config
+      restartPolicy: Always
+status: {}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    {{ .Values.partyId }}: roll
+  name: roll
+spec:
+  ports:
+    - name: "8011"
+      port: 8011
+      targetPort: 8011
+      protocol: TCP
+  type: ClusterIP
+  selector:
+    {{ .Values.partyId }}: roll
+status:
+  loadBalancer: {}

@@ -1,0 +1,27 @@
+########################################################
+# Copyright 2019-2020 program was created VMware, Inc. #
+# SPDX-License-Identifier: Apache-2.0                  #
+########################################################
+#
+#nfspath: /data/fate-data
+#nfsserver: 192.168.0.2
+
+# image:
+#   tag: 1.0-release
+#   prefix: federatedai
+#   pullPolicy: IfNotPresent
+  
+# partyId: 10000
+
+# partyList:
+#   - partyId: 9999
+#     partyIp: proxy.fate-9999
+# mysql:
+#   mysql_root_password: fate_dev
+#   mysql_database: fate
+#   mysql_user: fate
+#   mysql_password: fate_dev
+# redis:
+#   requirepass: fate_dev
+# eggList:
+#   - egg: egg0
