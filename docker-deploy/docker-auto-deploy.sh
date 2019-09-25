@@ -110,8 +110,8 @@ do
   sed -ie "s/PARTY_ID =.*/PARTY_ID = \"$partyid\"/g" ./confs-$partyid/confs/python/fate_flow/settings.py
   sed -ie "s/'user':.*/'user': '$jdbcuser',/g" ./confs-$partyid/confs/python/fate_flow/settings.py
   sed -ie "s/'passwd':.*/'passwd': '$jdbcpasswd',/g" ./confs-$partyid/confs/python/fate_flow/settings.py
-  sed -ie "56s/'host':.*/'host': '$jdbcip',/g" ./confs-$partyid/confs/python/fate_flow/settings.py
-  sed -ie "65s/'password':.*/'password': '$redispass',/g" ./confs-$partyid/confs/python/fate_flow/settings.py
+  sed -ie "64s/'host':.*/'host': '$jdbcip',/g" ./confs-$partyid/confs/python/fate_flow/settings.py
+  sed -ie "73s/'password':.*/'password': '$redispass',/g" ./confs-$partyid/confs/python/fate_flow/settings.py
   sed -ie "s/localhost/0.0.0.0/g" ./confs-$partyid/confs/python/fate_flow/settings.py
 
   # generate conf dir
