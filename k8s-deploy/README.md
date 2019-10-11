@@ -1,6 +1,27 @@
 # Deployment on Kubernetes
 In a multi-node deployment scenario, a user can use [Kubernetes](https://kubernetes.io/) as their underlying infrastructure to create and manage the FATE cluster. To facilitate the deployment on Kubernetes, FATE provides scripts to generate deployment files automatically for users.
 
+## Summary
+
+<div style="text-align:center", align=center>
+<img src="./images/k8s-summary.jpg" />
+</div>
+
+Package the FATE component into a Pod, deploy two FATE parties to two namespaces, and each party has 8 pods.
+The relationship between the FATE component and the pod is as follows:
+
+Pod            | Service URL                 | FATE component          | Expose Port
+---------------|-----------------------------|-------------------------|------------
+egg            | egg.\<namespace>            | egg/Storage-Service-cxx | 7888,7778,50001,50002,50003,50004
+federation     | federation.\<namespace>     | federation              | 9394
+meta-service   | meta-service.\<namespace>   | meta-service            | 8590
+proxy          | proxy.\<namespace>          | proxy                   | 9370
+roll           | roll.\<namespace>           | roll                    | 8011
+redis          | redis.\<namespace>          | redis                   | 6379
+serving-server | serving-server.\<namespace> | serving-server          | 8001
+mysql          | mysql.\<namespace>          | mysql                   | 3306
+python         | python.\<namespace>         | fate-flow/fateboard     | 9360,9380,8080
+
 ## Prerequisites
 - A Linux laptop can run the installation command
 - A working Kubernetes cluster.
@@ -75,7 +96,7 @@ $ helm install --set nfspath=${NfsPath} --set nfsserver=${NfsIp} --name=fate-* -
 ```
 
 ### Verifying the Deployment
-To verify the deployment, the user can log in the `python` pod of any party and run example cases.
+To verify the deployment, the user can log in the `python` pod of his or her party and runs example cases.
 The following steps illustrate how to perform a test on `party-10000`:
 1. Log into the python container
 ```bash
@@ -91,12 +112,12 @@ $ python run_toy_example.py 10000 9999 1
 ```
 "2019-08-29 07:21:34,118 - secure_add_guest.py[line:121] - INFO: success to calculate secure_sum, it is 2000.0000000000002"
 ```
-The above example also shows that communication between two parties is working as intended, since the guest and host of the example are `party-10000` and `party-9999`, respectively.
+The above example also shows that communication between two parties is working as intended, since the guest and the host of the example are `party-10000` and `party-9999`, respectively.
 
 ## Custom Deployment (Optional)
-By default, the Kubernetes scheduler will balance the deployment among the whole Kubernetes cluster. However, a user can also deploy a service to a specified node by using the [Node Seloctor](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector). This is useful when a service requires resource like GPU, Huge size hard disk ect. that only exists on a few machines.
+By default, the Kubernetes scheduler will balance the workload among the whole Kubernetes cluster. However, a user can deploy a service to a specified node by using [Node Selector](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector). This is useful when a service requires resources like GPU, or large size hard disk which are only available on some hosts.
 
-View your nodes by using this command:  
+View your nodes by this command:  
 `$ kubectl get nodes`
 ```bash
 NAME      STATUS    AGE       VERSION
@@ -107,31 +128,33 @@ node-2    Ready     5d        v1.15.3
 node-3    Ready     5d        v1.15.3
 ```
 
-A user can also tag a specified node with lables by using this command:  
-`$ kubectl label nodes <node-name> <label-key>=<label-value>`
+A user can tag a specified node with labels, for example:  
 ```bash
-$ kubectl label nodes node-0 fedai.org=egg0
+$ kubectl label nodes node-0 fedai.hostname=egg0
 
 node "node-0" labeled
 ```
+The above command tagged node-0 with a label `fedai.hostname=egg`.
 
 After tagging all nodes, verify that they are worked by running:  
 `$ kubectl get nodes --show-labels`
 ```bash
 NAME      STATUS    AGE       VERSION   LABELS
 master    Ready     5d        v1.15.3   kubernetes.io/arch=amd64,kubernetes.io/hostname=master,kubernetes.io/os=linux,name=master,node-role.kubernetes.io/master=
-node-0    Ready     5d        v1.15.3   ..., fedai.org=egg0, ...
-node-1    Ready     5d        v1.15.3   ..., fedai.org=egg1, ...
-node-2    Ready     5d        v1.15.3   ..., fedai.org=worker1, ...
-node-3    Ready     5d        v1.15.3   ..., fedai.org=worker2, ...
+node-0    Ready     5d        v1.15.3   ..., fedai.hostname=egg0, ...
+node-1    Ready     5d        v1.15.3   ..., fedai.hostname=egg1, ...
+node-2    Ready     5d        v1.15.3   ..., fedai.hostname=worker1, ...
+node-3    Ready     5d        v1.15.3   ..., fedai.hostname=worker2, ...
 ```
 
-With the info of the node labels, a user could customize the deployment by configuring the "KubeFATE/k8s-deploy/kube.cfg". A sample is as follows:
+With the use of node labels, a user can customize the deployment by configuring the "KubeFATE/k8s-deploy/kube.cfg". A sample is as follows:
 ```bash
-# Specify k8s node selector, default use fedai.org
-nodeLabel=fedai.org
+...
+
+# Specify k8s node selector, default use fedai.hostname
+nodeLabel=fedai.hostname
 # Please fill in multiple label value for multiple eggs, and split with spaces
-eggList=(egg0 egg1 egg1) # This will deploy two egg services in node-1 and an egg module in node-0. If you only need one egg service, just fill one value.
+eggList=(egg0 egg1) # This will deploy an egg service in node-0 and an egg service in node-1. If you only need one egg service, just fill one value.
 federation=worker1
 metaService=worker1
 mysql=worker1
@@ -141,6 +164,11 @@ redis=worker2
 roll=worker2
 servingServer=worker2
 ```
-The above sample will deploy `federation`, `metaService`, `mysql`, `proxy` service to node-2 and `python`, `redis`, `roll`, `servingServer` to node-3. If no value is filled in for the services will be deployed randomly among the cluster according to the strategy of the scheduler.
 
-By default, only one egg service will be deployed. To deploy multiple egg services, please fill in the `eggList` with the label of the Kubernetes nodes (Split with spaces), the Helm will deploy one egg to each node.
+<div style="text-align:center", align=center>
+<img src="./images/k8s-cluster.jpg" />
+</div>
+
+The above sample will deploy an `egg` service in node-0 and, an `egg` service in node-1, `federation`, `metaService`, `mysql`, `proxy` services to node-2 and `python`, `redis`, `roll`, `servingServer` services to node-3. If no value is given, a service will be deployed in the cluster according to the strategy of the scheduler.
+
+By default, only one egg service will be deployed. To deploy multiple egg services, please fill in the `eggList` with the label of the Kubernetes nodes (Separated with spaces). Helm will deploy one egg service to each node.
