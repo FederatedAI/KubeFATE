@@ -66,6 +66,13 @@ fate-*
 - The "values.yaml" file defines the value used to render the templates.
 
 ### Launching Deployment
+
+First make sure that the Kubernetes cluster has two namespaces, fate-9999 and fate-10000. If there is no corresponding namespace, you can create it with the following command：
+```bash
+$ kubectl create namespace fate-9999
+$ kubectl create namespace fate-10000
+```
+
 Use the following commands to deploy parties.
 
 - Party-10000:
