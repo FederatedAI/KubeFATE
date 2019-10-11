@@ -10,132 +10,179 @@
 - 已经完成了 FATE [docker 镜像的制作](../)
 - 已经安装 helm（[如何安装 helm](https://helm.sh/docs/using_helm/#installing-helm)）
 
-## 修改配置文件 kube.cfg
+## 部署概要
 
-    partylist=(10000 9999)
-    partyiplist=(proxy.fate-10000 proxy.fate-9999)
+<div style="text-align:center", align=center>
+<img src="./images/k8s-summary.jpg" />
+</div>
 
-> partA 实例 id 10000, namespace fate-10000<br>
-> partB 实例 id 9999, namespace fate-9999
+将FATE的组件封装成Pod，部署两个FATE parties到两个namespaces上，每个party有8个pod。
+FATE组件和pod的关系如下：
 
+Pod            | Service URL                 | FATE component          | Expose Port
+---------------|-----------------------------|-------------------------|------------
+egg            | egg.\<namespace>            | egg/Storage-Service-cxx | 7888,7778,50001,50002,50003,50004
+federation     | federation.\<namespace>     | federation              | 9394
+meta-service   | meta-service.\<namespace>   | meta-service            | 8590
+proxy          | proxy.\<namespace>          | proxy                   | 9370
+roll           | roll.\<namespace>           | roll                    | 8011
+redis          | redis.\<namespace>          | redis                   | 6379
+serving-server | serving-server.\<namespace> | serving-server          | 8001
+mysql          | mysql.\<namespace>          | mysql                   | 3306
+python         | python.\<namespace>         | fate-flow/fateboard     | 9360,9380,8080
+
+## 准备FATE镜像
+
+如果你可以连上Docker Hub，可以直接从Docker Hub下载FATE镜像。如果你的集群环境不能连接互联网。可以自己构建镜像或者采用离线镜像，[请参文章](https://github.com/FederatedAI/FATE/tree/master/docker-build)
+
+## 克隆KubeFATE项目
+
+通过以下命令克隆远端代码块：
+```bash
+$ git clone git@github.com:FederatedAI/KubeFATE.git
+```
+
+## 修改配置文件
+
+KubeFATE项目将大部分的配置项放在了KubeFATE/k8s-deploy/kube.cfg里面，下面是一个简单的配置：
+```bash
+partylist=(10000 9999)
+partyiplist=(proxy.fate-10000 proxy.fate-9999)
+```
+
+```bash
+partA 实例 id 10000, namespace fate-10000
+partB 实例 id 9999, namespace fate-9999
+```
 当前配置默认在同一个集群部署两个 FATE 实例，两个实例部署在不同的 namespace 上。
 
 ## 定制化部署（可选项）
-通过填写 `nodeSelector` 指定某个模块安装在某个 kubernetes 节点上面，默认使用 hostname 作为 `label-key`。  
-通过运行 `kubectl get nodes --show-labels` 来查看所有node的label。也可以运行 `kubectl describe node "nodename"` 来查看某个node的所有 `label` 。  
-如果想使用自定义的 `label` ，运行 `kubectl label nodes <node-name> <label-key>=<label-value>` 给node增加新的 `label` 。  更多信息请参考[nodeSelector](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector)。
 
-默认只部署一个egg节点。如果想部署多个egg节点，请填写多个与 egg 对应的 `nodeSelector` （用空格进行分割）。  
+在一些实际的部署中，Kubernetes集群可能有很多节点。这些节点的配置也许不同。例如有的节点有GPU，有的节点内存大等等。默认情况下，Kubernetes会自动把服务分别部署到各个节点上。如果想在特定节点上部署特定的服务，KubeFATE通过Kubernetes的 [nodeSelector](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector) 来实现这个目标，当一些资源（比如GPU，大容量存储）只能在某个节点上使用的时候，定制化部署很有用。
 
-    # Specify k8s node selector, default use hostname
-    # Label key
-    nodeLabel=kubernetes.io/hostname
-    # Please fill in multiple hostname for multiple eggs
-    # Label value
-    eggList=()
-    federation=
-    metaService=
-    mysql=
-    proxy=
-    python=
-    redis=
-    roll=
-    servingServer=
+用这个命令查看Kubernetes节点:  
+`$ kubectl get nodes`
+```bash
+NAME      STATUS    AGE       VERSION
+master    Ready     5d        v1.15.3
+node-0    Ready     5d        v1.15.3
+node-1    Ready     5d        v1.15.3
+node-2    Ready     5d        v1.15.3
+node-3    Ready     5d        v1.15.3
+```
+
+选定一个节点，添加一个标签（label）：
+```bash
+$ kubectl label nodes node-0 fedai.hostname=egg0
+
+node "node-0" labeled
+```
+这个命令会给node-0添加一个 fedai.hostname=egg0的标签，标签是键值对的形式，fedai.hostname是key，它的value是egg0。
+
+当所有的工作节点都添加过标签后，用下面的命令来查看：  
+`$ kubectl get nodes --show-labels`
+```bash
+NAME      STATUS    AGE       VERSION   LABELS
+master    Ready     5d        v1.15.3   kubernetes.io/arch=amd64,kubernetes.io/hostname=master,kubernetes.io/os=linux,name=master,node-role.kubernetes.io/master=
+node-0    Ready     5d        v1.15.3   ..., fedai.hostname=egg0, ...
+node-1    Ready     5d        v1.15.3   ..., fedai.hostname=egg1, ...
+node-2    Ready     5d        v1.15.3   ..., fedai.hostname=worker1, ...
+node-3    Ready     5d        v1.15.3   ..., fedai.hostname=worker2, ...
+```
+
+配置文件kube.cfg里面还有一部分配置项，可定制服务部署的节点，例如下面配置：
+```bash
+...
+
+# 指定打算使用Kubernetes的label，默认用fedai.hostname
+nodeLabel=fedai.hostname
+# 如果想部署多个egg服务，需要添多个egg值，用空格分割
+eggList=(egg0 egg1) #这个例子会在node-0和node-1上分别部署一个egg服务，如果只需要一个egg服务，填一个值就好了
+federation=worker1
+metaService=worker1
+mysql=worker1
+proxy=worker1
+python=worker2
+redis=worker2
+roll=worker2
+servingServer=worker2
+```
+
+在这个例子里面，会在节点node-0上面部署一个`egg`服务，节点node-1上面部署一个`egg`服务，在节点node-2上面部署`federation`,`metaService`,`mysql`,`proxy`服务，在node-3上面部署`python`,`redis`,`roll`,`servingServer`服务。示意图如下：
+
+<div style="text-align:center", align=center>
+<img src="./images/k8s-cluster.jpg" />
+</div>
+如果没有给服务配置节点，这个服务会交给Kubernetes选择一个节点来部署。
 
 ## 生成 helm 部署文件
 
 根据 kube.cfg 生成 helm chart 部署文件
-`bash create-helm-deploy.sh`
-在当前目录生成若干个`fate-*`的目录，例如：
+```bash
+$ cd KubeFATE/k8s-deploy/
+$ bash create-helm-deploy.sh
+```
+根据kube.cfg的内容，将会在当前目录生成两个文件夹，fate-9999/和fate-10000/。结构是这样的：
+```bash
+fate-*
+|-- templates   
+|-- Chart.yaml   
+|-- values.yaml
+```
 
-    drwxr-xr-x. 2 root root   60 9月   9 18:21 fate-10000
-    drwxr-xr-x. 2 root root   60 9月   9 18:21 fate-9999
+- templates: 目录里面包含用来部署fate集群的Helm模版。
+- Chart.yaml: 描述这个Helm chart的信息。
+- values.yaml: 声明用于渲染Helm模版的变量。
+
 
 ## 部署
+先确保Kubernetes集群有fate-9999和fate-10000两个namespaces，如果没有相应的namespace，可以用下面的命令创建：
+```bash
+$ kubectl create namespace fate-9999
+$ kubectl create namespace fate-10000
+```
 
 执行 helm 部署命令
+- Party-10000:
+```
+$ helm install --name=fate-10000 --namespace=fate-10000 ./fate-10000/
+```
 
-partA:
+- Party-9999:
+```
+$ helm install --name=fate-9999 --namespace=fate-9999 ./fate-9999/
+```
+运行完这两个命令之后，可以用`helm list`来查看部署的状态：
+```bash
+NAME          REVISION    UPDATED                     STATUS      CHART         APP VERSION    NAMESPACE
+fate-10000    1           Tue Sep 10 10:48:47 2019    DEPLOYED    fate-0.1.0    1.0            fate-10000
+fate-9999     1           Tue Sep 10 10:49:18 2019    DEPLOYED    fate-0.1.0    1.0            fate-9999
+```
 
-    $ helm install --name=fate-10000 --namespace=fate-10000 ./fate-10000/
+在这次部署中，”MySQL”, ”Redis”, ”egg”的数据将留在服务所在的本地节点上。如果以后某个服务迁移到其他节点上了，那么以前的数据就不能用了，这是因为数据不会同步迁移。  
+针对这个问题，使用NFS共享存储是一个简单的持久化方案。可以搭建一个NFS服务器，然后用下面的命令部署FATE集群。
+```bash
+helm install --set nfspath=${NfsPath} --set nfsserver=${NfsIp} --name=fate-* --namespace=fate-* ./fate-*/
+```
+需要注意的一点，NFS的路径需要no_root_squash权限。
 
-partB:
+## 验证部署
 
-    $ helm install --name=fate-9999 --namespace=fate-9999 ./fate-9999/
-
-执行上述命令后如果出现
-
-    NAME: fate-10000
-    LAST DEPLOYED: Mon Sep 9 18:50:49 2019
-    NAMESPACE: fate-10000
-    STATUS: DEPLOYED
-
-说明部署成功。
-
-## 持久化
-
-如果需要永久化 MySQL、redis 和 egg 的数据,
-你需要一个 nfs 服务。
-
-安装 nfs 服务,服务端代表存储数据的节点，客户端是所有 kubernetes 节点。
-
-    # 服务端
-    $ yum install -y nfs-utils rpcbind
-    # 客户端
-    $ yum install -y nfs-utils
-
-    # 服务端
-    # 创建共享目录
-    $ mkdir -p /data/fate-data
-    $ chmod 755 /data/fate-data
-    # 修改 NFS 配置文件 `/etc/exports`
-    $ vim /etc/exports
-    /data/fate-data *(rw,sync,insecure,no_subtree_check,no_root_squash)
-
-    # 启动 RPC 服务
-    $ systemctl start rpcbind
-
-    # 启动 NFS 服务
-    $ systemctl start nfs
-
-    # 客户端
-    $ showmount -e 192.168.0.2
-    Export list for 192.168.0.2:
-    /data/fate-data *
-
-    $ NfsPath=/data/fate-data
-    $ NfsIp=192.168.0.2
-
-部署可以持久化的 FATE 实例
-
-    $ helm install --set nfspath=${NfsPath} --set nfsserver=${NfsIp} --name=fate-10000 --namespace=fate-10000 ./fate-10000/
-然后就可以启动 MySQL 持久化的 FATE
-提示：当前持久化是 MySQL 和 Redis 的数据存储在 nfs 服务器，egg 数据存储在 pod 所在节点的本地磁盘上。
-如果对部署有更进一步的需求可以手动修改 values.yaml 配置文件
-
-## 测试部署成功
-
-查看 namespace 部署
-
-    $ kubectl get all -n fate-10000
-
-进入 python 节点
-
-    $ kubectl exec -it svc/python bash -n fate-10000
-
-当只部署 partA 时执行测试
-
-    $ source /data/projects/fate/venv/bin/activate
-    $ cd /data/projects/fate/python/examples/toy_example/
-    $ python run_toy_example.py 10000 10000 1
-
-如果同时部署 partA partB
-
+登录到名称为python的pod中跑一些例子来验证是否部署成功。
+- 登录到python container
+    ```bash
+     $ kubectl exec -it svc/python bash -n fate-10000
+    ```
+- 运行toy_example
+    ```bash
     $ source /data/projects/fate/venv/bin/activate
     $ cd /data/projects/fate/python/examples/toy_example/
     $ python run_toy_example.py 10000 9999 1
-
-如果没有返回错误，说明 FATE 实例已经成功部署。
+    ```
+- 查看输出的内容，看到这个就证明成功了
+    ```bash
+    "2019-09-10 07:21:34,118 - secure_add_guest.py[line:121] – INFO: success to calculate secure_sum, it 2000.0000000000002"
+    ```
 
 ## 删除部署
 
