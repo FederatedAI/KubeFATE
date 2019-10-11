@@ -16,7 +16,7 @@ Compose可在所有环境中工作：生产，登台，开发，测试以及CI�
 
 两个可以互通的FATE实例，每个实例均包括FATE所有组件。
 
-![](images\images.png)
+![](images/images.png)
 
 ### 准备工作
 
