@@ -18,6 +18,40 @@ spec:
       labels:
         {{ .Values.partyId }}: python
     spec:
+      initContainers:
+      - image: mysql
+        name: mysql
+        env:
+        - name: MYSQL_DATABASE
+          value: {{ .Values.mysql.mysql_database }}
+        - name: MYSQL_USER
+          value: {{ .Values.mysql.mysql_user }}
+        - name: MYSQL_PASSWORD
+          value: {{ .Values.mysql.mysql_password }}
+        - name: MYSQL_HOST
+          value: mysql
+        command:
+        - /bin/bash
+        - -c
+        - |
+          set -x
+
+          function checkMySQL(){
+            checkMySQLCount=0
+            while true ; do
+              checkMySQLCount=$[checkMySQLCount+1]
+              echo "Waiting for mysql started. check count: $checkMySQLCount"
+              sleep 2
+
+              state=`mysqladmin ping -h ${MYSQL_HOST} -u${MYSQL_USER} -p${MYSQL_PASSWORD}| awk '{print $3}'`
+              if [ "$state" == "alive" ]; then
+                echo "mysql server has been already started."
+              break
+              fi
+           done
+          }
+          echo "Waiting for mysql started..."
+          checkMySQL
       containers:
         - image: {{ .Values.image.registry }}/python:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
