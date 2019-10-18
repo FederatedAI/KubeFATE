@@ -1,8 +1,11 @@
 #!/bin/bash
 
-user=root
+user=luke
 dir=/data/projects/fate
-partylist=(10000) 
-partyiplist=(0.0.0.0)
+partylist=(3 4) 
+partyiplist=(10.160.102.71 10.161.41.191)
 venvdir=/data/projects/fate/venv
-exchangeip=proxy
+
+# party 1 will host the exchange by default
+exchangeip=${partyiplist[0]}
+
