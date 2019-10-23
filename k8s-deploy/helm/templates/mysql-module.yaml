@@ -19,7 +19,11 @@ spec:
         {{ .Values.partyId }}: mysql
     spec:
       containers:
+        {{ if .Values.image.isThridParty}}
+        - image: {{ .Values.image.registry }}/mysql
+        {{ else }}
         - image: mysql
+        {{- end }}
           name: mysql
           env:
             - name: MYSQL_ROOT_PASSWORD
