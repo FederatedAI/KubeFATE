@@ -78,9 +78,13 @@ BUILDER_TAG=1.0.2-release
 
 ### 离线部署
 
-当我们的运行机器处于无法连接外部网络的时候，就无法从Docker Hub下载镜像，这时候我们需要打包镜像文件，然后在运行机上导入镜像。一个简单的办法是在部署机上下载镜像，如果无法从Docker Hub下载镜像，可以自己构建镜像，如何构建参考[构建镜像](https://github.com/FederatedAI/FATE/tree/contributor_1.0_docker/docker-build)。如何从Docker Hub下载所需镜像可以参考[准备工作](#准备工作)中部署机下载镜像。
+当我们的运行机器处于无法连接外部网络的时候，就无法从Docker Hub下载镜像，建议使用[Harbor](https://goharbor.io/)作为第三方仓库。安装Harbor请参考: https://github.com/FederatedAI/KubeFATE/blob/master/registry/install_harbor.md。在`.env`文件中，将`THIRDPARTYPREFIX`更改为Harbor的IP。 192.168.10.1是Harbor IP的示例。
+```bash
+$ cd KubeFATE/
+$ vi .env
 
-如果部署机已经拥有了所需的镜像，镜像的导入参考[构建镜像](https://github.com/FederatedAI/FATE/tree/master/docker-build#package-the-docker-images-for-transfer-optional)。
+THIRDPARTYPREFIX=192.168.10.1/federatedai
+```
 
 ### 用docker compose部署FATE
 
@@ -107,6 +111,10 @@ exchangeip=proxy                      #通信组件标识
 
 ```bash
 $ bash docker-auto-deploy.sh
+```
+如果使用第三方仓库，请使用这个命令：
+```bash
+$ bash docker-auto-deploy.sh useThirdParty
 ```
 
 脚本将会生成10000和9999两个组织（Party）的部署文件，然后打包成两个tar文件。接着把两个文件`10000-confs.tar`和`9999-confs.tar`分别复制到主机`192.168.7.1`和`192.168.7.2`上并解包，解包后的文件默认在`/data/projects/fate`目录下。然后脚本将远程登录到这些主机并使用docker compose命令启动FATE实例。

@@ -13,7 +13,7 @@ $ git clone git@github.com:FederatedAI/KubeFATE.git
 By default, the script pulls the images from [Docker Hub](https://hub.docker.com/search?q=federatedai&type=image) during the deployment.
 
 ### Use Third Party Registry (Optional)
-It is recommended that non-Internet clusters use Harbor as a third-party registry. Change the `THIRDPARTYPREFIX` to [Harbor](https://goharbor.io/) hostname in the `.env` file. `192.168.10.1` is an example of Harbor IP.
+It is recommended that non-Internet clusters use Harbor as a third-party registry. Please refer to [this guide](https://github.com/FederatedAI/KubeFATE/blob/master/registry/install_harbor.md) to install Harbor. Change the `THIRDPARTYPREFIX` to [Harbor](https://goharbor.io/) hostname in the `.env` file. `192.168.10.1` is an example of Harbor IP.
 ```bash
 $ cd KubeFATE/
 $ vi .env
