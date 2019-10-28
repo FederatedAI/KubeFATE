@@ -21,6 +21,10 @@ spec:
       labels:
         {{ .Values.partyId }}: python
     spec:
+      hostAliases:
+      - ip: "127.0.0.1"
+        hostnames:
+        - "fateflow"
       initContainers:
       - image: mysql
         name: mysql
@@ -66,7 +70,7 @@ spec:
             - /bin/bash
             - -c
           args:
-            - echo "127.0.0.1  python" >> /etc/hosts && source /data/projects/fate/venv/bin/activate && cd python/fate_flow && python fate_flow_server.py
+            - source /data/projects/fate/venv/bin/activate && cd python/fate_flow && python fate_flow_server.py
           volumeMounts:
             - mountPath: /data/projects/fate/python/arch/conf/server_conf.json
               name: python-confs
@@ -109,7 +113,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: python
+  name: fateflow
   labels:
     {{ .Values.partyId }}: python
 spec:
@@ -122,6 +126,18 @@ spec:
       port: 9380
       targetPort: 9380
       protocol: TCP
+  type: ClusterIP
+  selector:
+    {{ .Values.partyId }}: python
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fateboard
+  labels:
+    {{ .Values.partyId }}: python
+spec:
+  ports:
     - name: "8080"
       port: 8080
       targetPort: 8080
