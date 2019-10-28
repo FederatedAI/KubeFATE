@@ -24,7 +24,7 @@ python         | python.\<namespace>         | fate-flow/fateboard     | 9360,93
 
 ## Prerequisites
 - A Linux laptop can run the installation command
-- A working Kubernetes cluster.
+- A working Kubernetes cluster(v1.9+).
 - [The FATE Images](https://github.com/FederatedAI/FATE/tree/contributor_1.0_docker/docker-build) have been built and downloaded by nodes of Kubernetes cluster.
 - Helm v2.14.0 or above installed
 
@@ -107,7 +107,7 @@ To verify the deployment, the user can log in the `python` pod of his or her par
 The following steps illustrate how to perform a test on `party-10000`:
 1. Log into the python container
 ```bash
-$ kubectl exec -it svc/python bash -n fate-10000
+$ kubectl exec -it -c python svc/fateflow bash -n fate-10000
 ```
 2. Run the test toy_example
 ```bash
@@ -126,6 +126,7 @@ By default, the Kubernetes scheduler will balance the workload among the whole K
 
 View your nodes by this command:  
 `$ kubectl get nodes`
+
 ```bash
 NAME      STATUS    AGE       VERSION
 master    Ready     5d        v1.15.3
