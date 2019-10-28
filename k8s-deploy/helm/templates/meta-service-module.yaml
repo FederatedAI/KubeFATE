@@ -3,10 +3,9 @@
 # SPDX-License-Identifier: Apache-2.0                  #
 ########################################################
 
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
-  creationTimestamp: null
   labels:
     {{ .Values.partyId }}: meta-service
   name: meta-service
@@ -14,9 +13,11 @@ spec:
   replicas: 1
   strategy:
     type: Recreate
+  selector:
+    matchLabels:
+      {{ .Values.partyId }}: meta-service
   template:
     metadata:
-      creationTimestamp: null
       labels:
         {{ .Values.partyId }}: meta-service
     spec:
@@ -26,7 +27,6 @@ spec:
           name: meta-service
           ports:
             - containerPort: 8590
-          resources: {}
           volumeMounts:
             - mountPath: /data/projects/fate/meta-service/conf/meta-service.properties
               name: meta-service-confs
@@ -43,13 +43,11 @@ spec:
         - name: meta-service-confs
           configMap:
             name: meta-service-config
-status: {}
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  creationTimestamp: null
   labels:
     {{ .Values.partyId }}: meta-service
   name: meta-service
@@ -62,5 +60,3 @@ spec:
   type: ClusterIP
   selector:
     {{ .Values.partyId }}: meta-service
-status:
-  loadBalancer: {}
