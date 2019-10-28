@@ -185,7 +185,7 @@ helm install --set nfspath=${NfsPath} --set nfsserver=${NfsIp} --name=fate-* --n
 登录到名称为python的pod中跑一些例子来验证是否部署成功。
 - 登录到python container
     ```bash
-     $ kubectl exec -it svc/python bash -n fate-10000
+     $ kubectl exec -it -c python svc/fateflow bash -n fate-10000
     ```
 - 运行toy_example
     ```bash
@@ -205,10 +205,6 @@ helm install --set nfspath=${NfsPath} --set nfsserver=${NfsIp} --name=fate-* --n
     $ helm del --purge fate-10000
 
 ## 常见问题
-
-- **Q: python 的 pod 状态一直不是 Running。**<br>
-  A: `pod/python-\*` 的运行会依赖 MySQL。MySQL 第一次启动会有初始化数据库的过程，必须等待 MySQL 服务正常运行。
-  等待一会即可。
 
 - **Q: 所有的 pod 一直处于 ContainerCreating 状态**<br>
   A: 由于 image 体积较大，第一次下载需要一点时间。如果长时间没有改变，请检查网络。
