@@ -12,8 +12,8 @@ volumes:
 services:
   federation:
     image: "${PREFIX}/federation:${TAG}"
-    expose:
-      - 9394
+    ports:
+      - "9394:9394"
     volumes:
       - ./confs/federation/conf:/data/projects/fate/federation/conf
     networks:
@@ -22,7 +22,7 @@ services:
   proxy:
     image: "${PREFIX}/proxy:${TAG}"
     ports:
-      - "9370:9370"
+      - "9371:9370"
     volumes:
       - ./confs/proxy/conf:/data/projects/fate/proxy/conf
     networks:
@@ -30,8 +30,8 @@ services:
 
   serving-server:
     image: "${PREFIX}/serving-server:${TAG}"
-    expose:
-      - 8001
+    ports:
+      - "8001:8001"
     volumes:
       - ./confs/serving-server/conf:/data/projects/fate/serving-server/conf
     depends_on:
@@ -83,9 +83,9 @@ services:
 
   python:
     image: "${PREFIX}/python:${TAG}"
-    expose:
-      - 9360
-      - 9380
+    ports:
+      - "9360:9360"
+      - "9380:9380"
     restart: always
     volumes:
       - ./confs/python/arch/conf:/data/projects/fate/python/arch/conf

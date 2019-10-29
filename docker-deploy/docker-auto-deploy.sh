@@ -122,7 +122,7 @@ do
   sed -ie "s/party.id=.*/party.id=$partyid/g" ./confs-$partyid/confs/egg/conf/egg.properties
   sed -ie "s/fip=.*/fip=\"$fip\"/g" ./confs-$partyid/confs/python/modify_json.py
   sed -ie "s/rip=.*/rip=\"$rip\"/g" ./confs-$partyid/confs/python/modify_json.py
-  sed -ie "s/pip=.*/pip=\"$pip\"/g" ./confs-$partyid/confs/python/modify_json.py
+  sed -ie "s/pip=.*/pip=\"$exchangeip\"/g" ./confs-$partyid/confs/python/modify_json.py
   sed -ie "11s/sip1=.*/sip1=\"$sip1\"/g" ./confs-$partyid/confs/python/modify_json.py
   sed -ie "s/tmip=.*/tmip=\"$tmip\"/g" ./confs-$partyid/confs/python/modify_json.py
   sed -ie "s/partyId=.*/partyId=\"$partyid\"/g" ./confs-$partyid/confs/python/modify_json.py
@@ -132,6 +132,7 @@ do
   docker cp ./confs-$partyid/confs/python/modify_json.py ${CONTAINER_ID}:/data/projects/fate/modify_json.py
   docker cp ./confs-$partyid/confs/python/conf/server_conf.json ${CONTAINER_ID}:/data/projects/fate/server_conf.json
   docker cp ./confs-$partyid/confs/proxy/conf/route_table.json ${CONTAINER_ID}:/data/projects/fate/route_table.json
+  docker cp ./confs-$partyid/confs/proxy/conf/route_table.json ${CONTAINER_ID}:/data/projects/fate/route_table_exchange.json
 
   echo "Generating configuration files within container"
   docker exec ${CONTAINER_ID} /bin/sh -c "python /data/projects/fate/modify_json.py proxy /data/projects/fate/route_table.json;"
@@ -140,14 +141,12 @@ do
   # Add info of other parties to route_table
   for ((j=0;j<${#partylist[*]};j++))
   do
-    if [ "${partylist[${j}]}" != "${partyid}" ]
-    then
-      sed -ie "s/partyId=.*/partyId=\"${partylist[${j}]}\"/g" ./confs-$partyid/confs/python/modify_json.py
-      sed -ie "s/pip=.*/pip=\"${partyiplist[${j}]}\"/g" ./confs-$partyid/confs/python/modify_json.py
-      docker cp ./confs-$partyid/confs/python/modify_json.py ${CONTAINER_ID}:/data/projects/fate/modify_json.py
-      docker exec ${CONTAINER_ID} /bin/sh -c "python /data/projects/fate/modify_json.py exchange /data/projects/fate/route_table.json;"
-    fi
+    sed -ie "s/partyId=.*/partyId=\"${partylist[${j}]}\"/g" ./confs-$partyid/confs/python/modify_json.py
+    sed -ie "s/pip=.*/pip=\"${partyiplist[${j}]}\"/g" ./confs-$partyid/confs/python/modify_json.py
+    docker cp ./confs-$partyid/confs/python/modify_json.py ${CONTAINER_ID}:/data/projects/fate/modify_json.py
+    docker exec ${CONTAINER_ID} /bin/sh -c "python /data/projects/fate/modify_json.py exchange /data/projects/fate/route_table_exchange.json;"
   done
+
   # route_table.json and server_conf.json as outputs
   docker cp ${CONTAINER_ID}:/data/projects/fate/route_table.json ./confs-$partyid/confs/proxy/conf/route_table.json
   docker cp ${CONTAINER_ID}:/data/projects/fate/server_conf.json ./confs-$partyid/confs/python/arch/conf/server_conf.json
@@ -168,7 +167,25 @@ exit
 eeooff
   rm -f confs-$partyid.tar 
   echo "party $partyid deploy is ok!"
-
 done
+
+# handle exchange
+cp -r confs-${partylist[0]}/confs/proxy ${WORKINGDIR}/exchange
+cp ${WORKINGDIR}/../.env ${WORKINGDIR}/exchange
+cp ${WORKINGDIR}/docker-compose-exchange.yml ${WORKINGDIR}/exchange/
+docker cp ${CONTAINER_ID}:/data/projects/fate/route_table_exchange.json ${WORKINGDIR}/exchange/conf/route_table.json
+
+echo $exchangeip
+# copy exchange to remote host and start
+echo "Starting exchange"
+scp -r ${WORKINGDIR}/exchange $user@$exchangeip:~/
+ssh -tt $user@$exchangeip<< eeooff
+mv ~/exchange $dir
+cd $dir
+cd exchange
+docker-compose -f docker-compose-exchange.yml up -d
+exit
+eeooff
+
 docker stop ${CONTAINER_ID}
 docker rm ${CONTAINER_ID}
