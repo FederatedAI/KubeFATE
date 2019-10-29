@@ -59,7 +59,14 @@ do
   mkdir -p confs-$partyid/confs
   cp -r docker-example-dir-tree/* confs-$partyid/confs/
   cp ./docker-compose.yml confs-$partyid/
-  
+
+  if [ "$1" == "useThirdParty" ]
+  then
+    sed -i "s#PREFIX#THIRDPARTYPREFIX#g" ./confs-$partyid/docker-compose.yml
+    sed -i 's#image: "mysql"#image: "${THIRDPARTYPREFIX}/mysql"#g' ./confs-$partyid/docker-compose.yml
+    sed -i 's#image: "redis"#image: "${THIRDPARTYPREFIX}/redis"#g' ./confs-$partyid/docker-compose.yml
+  fi
+
   sed -ie "s/party.id=.*/party.id=$partyid/g" ./confs-$partyid/confs/federation/conf/federation.properties
   sed -ie "s/meta.service.ip=.*/meta.service.ip=$mip/g" ./confs-$partyid/confs/federation/conf/federation.properties
   echo federation module of $partyid done!

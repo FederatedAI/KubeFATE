@@ -37,7 +37,17 @@ Use the following command to clone repo if you did not clone before:
 $ git clone git@github.com:FederatedAI/KubeFATE.git
 ```
 
-By default, the script pulls the images from [Docker Hub](https://hub.docker.com/search?q=federatedai&type=image) during the deployment. A user could also modify `KubeFATE/.env` to specify a registry to pull images from.
+By default, the script pulls the images from [Docker Hub](https://hub.docker.com/search?q=federatedai&type=image) during the deployment.
+
+### Use Third Party Registry (Optional)
+It is recommended that non-Internet clusters use [Harbor](https://goharbor.io/) as a third-party registry. Please refer to [this guide](https://github.com/FederatedAI/KubeFATE/blob/master/registry/install_harbor.md) to install Harbor. Change the `THIRDPARTYPREFIX` to Harbor hostname in the `.env` file. `192.168.10.1` is an example of Harbor ip.
+
+```bash
+$ cd KubeFATE/
+$ vi .env
+
+THIRDPARTYPREFIX=192.168.10.1/federatedai
+```
 
 ### Configure Parties
 Before deployment, a user needs to define the FATE parties in `KubeFATE/k8s-deploy/kube.cfg`, a sample is as follows:
@@ -52,6 +62,11 @@ After finished the definition, use the following command to generate deployment 
 ```bash
 $ cd KubeFATE/k8s-deploy/
 $ bash create-helm-deploy.sh
+```
+If using a third-party registry, use the following command to generate deployment files:
+```bash
+$ cd KubeFATE/k8s-deploy/
+$ bash create-helm-deploy.sh useThirdParty
 ```
 According to the `kube.cfg`, the script creates two directories “fate-10000” and “fate-9999” under the current path. The structure of each directory is as follows:
 ```
