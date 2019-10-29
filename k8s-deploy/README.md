@@ -12,7 +12,7 @@ The relationship between the FATE component and the pod is as follows:
 
 Pod            | Service URL                 | FATE component          | Expose Port
 ---------------|-----------------------------|-------------------------|------------
-egg            | egg.\<namespace>            | egg/Storage-Service-cxx | 7888,7778,50001,50002,50003,50004
+egg            | egg.\<namespace>            | egg/Storage-Service-cxx | 7888,7778,<br/>50001,50002,<br/>50003,50004 
 federation     | federation.\<namespace>     | federation              | 9394
 meta-service   | meta-service.\<namespace>   | meta-service            | 8590
 proxy          | proxy.\<namespace>          | proxy                   | 9370
@@ -20,7 +20,7 @@ roll           | roll.\<namespace>           | roll                    | 8011
 redis          | redis.\<namespace>          | redis                   | 6379
 serving-server | serving-server.\<namespace> | serving-server          | 8001
 mysql          | mysql.\<namespace>          | mysql                   | 3306
-python         | python.\<namespace>         | fate-flow/fateboard     | 9360,9380,8080
+python         | fateflow.\<namespace><br/>fateboard.\<namespace> | fate-flow/fateboard     | 9360,9380,8080
 
 ## Prerequisites
 - A Linux laptop can run the installation command
@@ -52,8 +52,9 @@ THIRDPARTYPREFIX=192.168.10.1/federatedai
 ### Configure Parties
 Before deployment, a user needs to define the FATE parties in `KubeFATE/k8s-deploy/kube.cfg`, a sample is as follows:
 ```bash
-partylist=(10000 9999)
-partyiplist=(proxy.fate-10000 proxy.fate-9999)
+partylist=(10000 9999)                              # partyid
+partyiplist=(192.168.11.2:30010 192.168.11.3:30009) # deploy parties Cluster any node iP/Port
+exchangeip=192.168.11.4:30000                       # deploy exchange Cluster any node iP/Port
 ```
 The above sample defines two parties, these parties will be deployed on the same Kubernetes cluster but isolated by the namespace. Moreover, each party contains one Egg service.
 
@@ -68,7 +69,7 @@ If using a third-party registry, use the following command to generate deploymen
 $ cd KubeFATE/k8s-deploy/
 $ bash create-helm-deploy.sh useThirdParty
 ```
-According to the `kube.cfg`, the script creates two directories “fate-10000” and “fate-9999” under the current path. The structure of each directory is as follows:
+According to the `kube.cfg`, the script creates three directories “fate-10000” 、“fate-9999”  and “fate-exchange” under the current path. The structure of each directory is as follows:
 ```
 fate-*
 |-- templates   
@@ -82,10 +83,11 @@ fate-*
 
 ### Launching Deployment
 
-First make sure that the Kubernetes cluster has two namespaces, fate-9999 and fate-10000. If there is no corresponding namespace, you can create it with the following command：
+First make sure that the Kubernetes cluster has three namespaces, fate-9999 fate-10000 and fate-exchange. If there is no corresponding namespace, you can create it with the following command：
 ```bash
 $ kubectl create namespace fate-9999
 $ kubectl create namespace fate-10000
+$ kubectl create namespace fate-exchange
 ```
 
 Use the following commands to deploy parties.
@@ -100,11 +102,17 @@ $ helm install --name=fate-10000 --namespace=fate-10000 ./fate-10000/
 $ helm install --name=fate-9999 --namespace=fate-9999 ./fate-9999/ 
 ```
 
+- Party-exchange:
+```
+$ helm install --name=fate-exchange --namespace=fate-exchange ./fate-exchange/ 
+```
+
 After the command returns, use `helm list` to fetch the status of deployment, an example output is as follows:
 ```
-NAME          REVISION    UPDATED                     STATUS      CHART         APP VERSION    NAMESPACE 
-fate-10000    1           Tue Sep 10 10:48:47 2019    DEPLOYED    fate-0.1.0    1.0            fate-10000
-fate-9999     1           Tue Sep 10 10:49:18 2019    DEPLOYED    fate-0.1.0    1.0            fate-9999 
+NAME         	REVISION	UPDATED                 	STATUS  	CHART              	APP VERSION	NAMESPACE    
+fate-10000   	1       	Tue Oct 29 03:47:05 2019	DEPLOYED	fate-party-0.2.0   	1.0.2      	fate-10000   
+fate-9999    	1       	Tue Oct 29 03:46:58 2019	DEPLOYED	fate-party-0.2.0   	1.0.2      	fate-9999    
+fate-exchange	1       	Tue Oct 29 03:46:53 2019	DEPLOYED	fate-exchange-0.2.0	1.0.2      	fate-exchange
 ```
 
 In the above deployment, the data of "mysql", "redis" and "egg" will be persisted to the worker node that hosting the services(Pod). Which means if a service shifted to the other worker node, the service will be unable to read the previous data.
@@ -140,15 +148,15 @@ The above example also shows that communication between two parties is working a
 By default, the Kubernetes scheduler will balance the workload among the whole Kubernetes cluster. However, a user can deploy a service to a specified node by using [Node Selector](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector). This is useful when a service requires resources like GPU, or large size hard disk which are only available on some hosts.
 
 View your nodes by this command:  
-`$ kubectl get nodes`
+`$ kubectl get nodes -o wide`
 
 ```bash
-NAME      STATUS    AGE       VERSION
-master    Ready     5d        v1.15.3
-node-0    Ready     5d        v1.15.3
-node-1    Ready     5d        v1.15.3
-node-2    Ready     5d        v1.15.3
-node-3    Ready     5d        v1.15.3
+NAME      STATUS    AGE       VERSION       INTERNAL-IP
+master    Ready     5d        v1.15.3       192.168.11.1
+node-0    Ready     5d        v1.15.3       192.168.11.2
+node-1    Ready     5d        v1.15.3       192.168.11.3
+node-2    Ready     5d        v1.15.3       192.168.11.4
+node-3    Ready     5d        v1.15.3       192.168.11.5
 ```
 
 A user can tag a specified node with labels, for example:  

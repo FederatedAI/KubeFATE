@@ -55,8 +55,9 @@ spec:
   ports:
     - name: "9370"
       port: 9370
+      nodePort: {{ .Values.nodePort }}
       targetPort: 9370
       protocol: TCP
-  type: ClusterIP
+  type: NodePort
   selector:
     {{ .Values.partyId }}: proxy

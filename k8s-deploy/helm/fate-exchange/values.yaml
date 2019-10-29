@@ -1,0 +1,27 @@
+########################################################
+# Copyright 2019-2020 program was created VMware, Inc. #
+# SPDX-License-Identifier: Apache-2.0                  #
+########################################################
+#
+
+image:
+  registry: federatedai
+  tag: 1.0.2-release
+  pullPolicy: IfNotPresent
+
+partyId: 0000
+
+nodePort: 30000
+
+partyList:
+  - partyId: 10000
+    partyIp: 192.180.1.10
+    partyPort: 30010
+  - partyId: 9999
+    partyIp: 192.180.1.9
+    partyPort: 30009
+
+nodeSelector:
+  proxy:
+    nodeLabel: fedai.org
+    value: 

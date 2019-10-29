@@ -1,0 +1,42 @@
+########################################################
+# Copyright 2019-2020 program was created VMware, Inc. #
+# SPDX-License-Identifier: Apache-2.0                  #
+########################################################
+
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: proxy-config
+data:
+  proxy.properties: |
+    coordinator={{ .Values.partyId }}
+    ip=0.0.0.0
+    port=9370
+    route.table=/data/projects/fate/proxy/conf/route_table.json
+    #server.crt=/Users/max-webank/Projects/fdn/fdn-proxy/src/main/resources/certs/server.crt
+    #server.key=/Users/max-webank/Projects/fdn/fdn-proxy/src/main/resources/certs/server-private.pem
+    root.crt=
+  route_table.json: |
+    {
+        "route_table": {
+            {{- range .Values.partyList }}
+            "{{ .partyId }}": {
+                "default": [
+                    {
+                        "ip": "{{ .partyIp }}",
+                        "port": {{ .partyPort }}
+                    }
+                ]
+            },
+            {{- end }}
+            "default": {
+                "default": [
+                    {}
+                ]
+            }
+        },
+        "permission": {
+            "default_allow": true
+        }
+    }
+---
