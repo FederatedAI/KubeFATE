@@ -44,7 +44,8 @@ $( if [[ $1 == "useThirdParty" ]]
   tag: ${TAG}
   pullPolicy: IfNotPresent
 partyId: ${partyid}
-
+host:
+  fateboard: ${partyid}.fateboard.fedai.org
 nodePort: ${partyiplist[${i}]#*:}
 
 exchange:

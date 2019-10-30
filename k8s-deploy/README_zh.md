@@ -214,6 +214,19 @@ helm install --set nfspath=${NfsPath} --set nfsserver=${NfsIp} --name=fate-* --n
 
     $ helm del --purge fate-10000
 
+## 可视化
+
+如果你的k8s集群部署了ingress controller ( [ingress-nginx](https://kubernetes.github.io/ingress-nginx/deploy/) )，那么就可以通过 URL http://<partyid>.fateboard.fedai.org 访问可视化组件fateboard。
+
+在这之前，你需要修改自己的hosts文件，
+
+```bash
+<node-iP> <party-id>.fateboard.fedai.org     # 增加这条记录
+```
+
+> <node-iP>：集群任一节点的IP
+><party-id>：部署FATE的partyId
+
 ## 常见问题
 
 - **Q: 所有的 pod 一直处于 ContainerCreating 状态**<br>
