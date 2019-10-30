@@ -6,7 +6,7 @@
 
 ## 在你开始之前
 
-- 有一个 kubernetes 集群或者 minikube（[如何安装 kubernetes](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/)，[如何安装 minikube](https://kubernetes.io/docs/tasks/tools/install-minikube/)）
+- 有一个 kubernetes 集群或者 minikube [v1.9+]（[如何安装 kubernetes](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/)，[如何安装 minikube](https://kubernetes.io/docs/tasks/tools/install-minikube/)）
 - 已经完成了 FATE [docker 镜像的制作](../)
 - 已经安装 helm（[如何安装 helm](https://helm.sh/docs/using_helm/#installing-helm)）
 
@@ -21,7 +21,7 @@ FATE组件和pod的关系如下：
 
 Pod            | Service URL                 | FATE component          | Expose Port
 ---------------|-----------------------------|-------------------------|------------
-egg            | egg.\<namespace>            | egg/Storage-Service-cxx | 7888,7778,50001,50002,50003,50004
+egg            | egg.\<namespace>            | egg/Storage-Service-cxx | 7888,7778,<br/>50001,50002,<br/>50003,50004 
 federation     | federation.\<namespace>     | federation              | 9394
 meta-service   | meta-service.\<namespace>   | meta-service            | 8590
 proxy          | proxy.\<namespace>          | proxy                   | 9370
@@ -29,7 +29,7 @@ roll           | roll.\<namespace>           | roll                    | 8011
 redis          | redis.\<namespace>          | redis                   | 6379
 serving-server | serving-server.\<namespace> | serving-server          | 8001
 mysql          | mysql.\<namespace>          | mysql                   | 3306
-python         | python.\<namespace>         | fate-flow/fateboard     | 9360,9380,8080
+python         | fateflow.\<namespace><br>fateboard.\<namespace> | fate-flow/fateboard     | 9360,9380,8080
 
 ## 准备FATE镜像
 
@@ -55,29 +55,31 @@ THIRDPARTYPREFIX=192.168.10.1/federatedai
 
 KubeFATE项目将大部分的配置项放在了KubeFATE/k8s-deploy/kube.cfg里面，下面是一个简单的配置：
 ```bash
-partylist=(10000 9999)
-partyiplist=(proxy.fate-10000 proxy.fate-9999)
+partylist=(10000 9999)                              # partyid
+partyiplist=(192.168.11.2:30010 192.168.11.3:30009) # 部署partyid的集群任一node的iP和Port
+exchangeip=192.168.11.4:30000                       # 部署exchange的集群任一node的iP和Port
 ```
 
 ```bash
 partA 实例 id 10000, namespace fate-10000
 partB 实例 id 9999, namespace fate-9999
+exchange 实例 id 0000, namespace fate-exchange
 ```
-当前配置默认在同一个集群部署两个 FATE 实例，两个实例部署在不同的 namespace 上。
+当前配置默认在同一个集群部署两个 FATE party实例，一个exchange实例，所有实例部署在不同的 namespace 上。
 
 ## 定制化部署（可选项）
 
 在一些实际的部署中，Kubernetes集群可能有很多节点。这些节点的配置也许不同。例如有的节点有GPU，有的节点内存大等等。默认情况下，Kubernetes会自动把服务分别部署到各个节点上。如果想在特定节点上部署特定的服务，KubeFATE通过Kubernetes的 [nodeSelector](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector) 来实现这个目标，当一些资源（比如GPU，大容量存储）只能在某个节点上使用的时候，定制化部署很有用。
 
 用这个命令查看Kubernetes节点:  
-`$ kubectl get nodes`
+`$ kubectl get nodes -o wide`
 ```bash
-NAME      STATUS    AGE       VERSION
-master    Ready     5d        v1.15.3
-node-0    Ready     5d        v1.15.3
-node-1    Ready     5d        v1.15.3
-node-2    Ready     5d        v1.15.3
-node-3    Ready     5d        v1.15.3
+NAME      STATUS    AGE       VERSION       INTERNAL-IP
+master    Ready     5d        v1.15.3       192.168.11.1
+node-0    Ready     5d        v1.15.3       192.168.11.2
+node-1    Ready     5d        v1.15.3       192.168.11.3
+node-2    Ready     5d        v1.15.3       192.168.11.4
+node-3    Ready     5d        v1.15.3       192.168.11.5
 ```
 
 选定一个节点，添加一个标签（label）：
@@ -150,10 +152,11 @@ fate-*
 
 
 ## 部署
-先确保Kubernetes集群有fate-9999和fate-10000两个namespaces，如果没有相应的namespace，可以用下面的命令创建：
+先确保Kubernetes集群有fate-9999、fate-10000和fate-exchange三个namespaces，如果没有相应的namespace，可以用下面的命令创建：
 ```bash
 $ kubectl create namespace fate-9999
 $ kubectl create namespace fate-10000
+$ kubectl create namespace fate-exchange
 ```
 
 执行 helm 部署命令
@@ -166,11 +169,18 @@ $ helm install --name=fate-10000 --namespace=fate-10000 ./fate-10000/
 ```
 $ helm install --name=fate-9999 --namespace=fate-9999 ./fate-9999/
 ```
-运行完这两个命令之后，可以用`helm list`来查看部署的状态：
+
+- Party-exchange:
+```
+$ helm install --name=fate-exchange --namespace=fate-exchange ./fate-exchange/
+```
+
+运行完这三个命令之后，可以用`helm list`来查看部署的状态：
 ```bash
-NAME          REVISION    UPDATED                     STATUS      CHART         APP VERSION    NAMESPACE
-fate-10000    1           Tue Sep 10 10:48:47 2019    DEPLOYED    fate-0.1.0    1.0            fate-10000
-fate-9999     1           Tue Sep 10 10:49:18 2019    DEPLOYED    fate-0.1.0    1.0            fate-9999
+NAME         	REVISION	UPDATED                 	STATUS  	CHART              	APP VERSION	NAMESPACE    
+fate-10000   	1       	Tue Oct 29 03:47:05 2019	DEPLOYED	fate-party-0.2.0   	1.0.2      	fate-10000   
+fate-9999    	1       	Tue Oct 29 03:46:58 2019	DEPLOYED	fate-party-0.2.0   	1.0.2      	fate-9999    
+fate-exchange	1       	Tue Oct 29 03:46:53 2019	DEPLOYED	fate-exchange-0.2.0	1.0.2      	fate-exchange
 ```
 
 在这次部署中，”MySQL”, ”Redis”, ”egg”的数据将留在服务所在的本地节点上。如果以后某个服务迁移到其他节点上了，那么以前的数据就不能用了，这是因为数据不会同步迁移。  
@@ -185,7 +195,7 @@ helm install --set nfspath=${NfsPath} --set nfsserver=${NfsIp} --name=fate-* --n
 登录到名称为python的pod中跑一些例子来验证是否部署成功。
 - 登录到python container
     ```bash
-     $ kubectl exec -it svc/python bash -n fate-10000
+     $ kubectl exec -it -c python svc/fateflow bash -n fate-10000
     ```
 - 运行toy_example
     ```bash
@@ -204,11 +214,20 @@ helm install --set nfspath=${NfsPath} --set nfsserver=${NfsIp} --name=fate-* --n
 
     $ helm del --purge fate-10000
 
-## 常见问题
+## 可视化
 
-- **Q: python 的 pod 状态一直不是 Running。**<br>
-  A: `pod/python-\*` 的运行会依赖 MySQL。MySQL 第一次启动会有初始化数据库的过程，必须等待 MySQL 服务正常运行。
-  等待一会即可。
+如果你的k8s集群部署了ingress controller ( [ingress-nginx](https://kubernetes.github.io/ingress-nginx/deploy/) )，那么就可以通过 URL http://<partyid>.fateboard.fedai.org 访问可视化组件fateboard。
+
+在这之前，你需要修改自己的hosts文件，
+
+```bash
+<node-iP> <party-id>.fateboard.fedai.org     # 增加这条记录
+```
+
+> <node-iP>：集群任一节点的IP
+><party-id>：部署FATE的partyId
+
+## 常见问题
 
 - **Q: 所有的 pod 一直处于 ContainerCreating 状态**<br>
   A: 由于 image 体积较大，第一次下载需要一点时间。如果长时间没有改变，请检查网络。

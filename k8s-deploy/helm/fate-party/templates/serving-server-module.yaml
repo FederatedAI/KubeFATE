@@ -3,10 +3,9 @@
 # SPDX-License-Identifier: Apache-2.0                  #
 ########################################################
 
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
-  creationTimestamp: null
   labels:
     {{ .Values.partyId }}: serving-server
   name: serving-server
@@ -14,9 +13,11 @@ spec:
   replicas: 1
   strategy:
     type: Recreate
+  selector:
+    matchLabels:
+      {{ .Values.partyId }}: serving-server
   template:
     metadata:
-      creationTimestamp: null
       labels:
         {{ .Values.partyId }}: serving-server
     spec:
@@ -26,7 +27,6 @@ spec:
           name: serving-server
           ports:
             - containerPort: 8001
-          resources: {}
           volumeMounts:
             - mountPath: /data/projects/fate/serving-server/conf/serving-server.properties
               name: serving-server-confs
@@ -40,13 +40,11 @@ spec:
         - name: serving-server-confs
           configMap:
             name: serving-server-config
-status: {}
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  creationTimestamp: null
   labels:
     {{ .Values.partyId }}: serving-server
   name: serving-server
@@ -59,5 +57,3 @@ spec:
   type: ClusterIP
   selector:
     {{ .Values.partyId }}: serving-server
-status:
-  loadBalancer: {}
