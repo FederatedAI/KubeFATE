@@ -42,6 +42,15 @@ python         | python.\<namespace>         | fate-flow/fateboard     | 9360,93
 $ git clone git@github.com:FederatedAI/KubeFATE.git
 ```
 
+## 使用第三方Docker仓库
+非互联网集群建议使用[Harbor](https://goharbor.io/)作为第三方仓库。安装Harbor请参考: https://github.com/FederatedAI/KubeFATE/blob/master/registry/install_harbor.md。在`.env`文件中，将`THIRDPARTYPREFIX`更改为Harbor的IP。 192.168.10.1是Harbor IP的示例。
+```bash
+$ cd KubeFATE/
+$ vi .env
+
+THIRDPARTYPREFIX=192.168.10.1/federatedai
+```
+
 ## 修改配置文件
 
 KubeFATE项目将大部分的配置项放在了KubeFATE/k8s-deploy/kube.cfg里面，下面是一个简单的配置：
@@ -121,6 +130,11 @@ servingServer=worker2
 ```bash
 $ cd KubeFATE/k8s-deploy/
 $ bash create-helm-deploy.sh
+```
+如果使用第三方仓库，请使用这个命令：
+```bash
+$ cd KubeFATE/k8s-deploy/
+$ bash create-helm-deploy.sh useThirdParty
 ```
 根据kube.cfg的内容，将会在当前目录生成两个文件夹，fate-9999/和fate-10000/。结构是这样的：
 ```bash

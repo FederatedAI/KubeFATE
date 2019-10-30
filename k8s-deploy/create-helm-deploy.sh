@@ -33,7 +33,14 @@ do
 #nfsserver: 192.168.0.2
 
 image:
-  registry: ${PREFIX}
+$( if [[ $1 == "useThirdParty" ]]
+   then
+     echo "  registry: ${THIRDPARTYPREFIX}"
+     echo "  isThridParty: true"
+   else
+     echo "  registry: ${PREFIX}"
+     echo "  isThridParty:"
+   fi )
   tag: ${TAG}
   pullPolicy: IfNotPresent
 partyId: ${partyid}

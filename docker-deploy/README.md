@@ -10,7 +10,16 @@ Use the following command to clone repo if you did not clone before:
 ```bash
 $ git clone git@github.com:FederatedAI/KubeFATE.git
 ```
-By default, the script pulls the images from [Docker Hub](https://hub.docker.com/search?q=federatedai&type=image) during the deployment. A user could also modify `KubeFate/.env` to specify a registry to pull images from.
+By default, the script pulls the images from [Docker Hub](https://hub.docker.com/search?q=federatedai&type=image) during the deployment.
+
+### Use Third Party Registry (Optional)
+It is recommended that non-Internet clusters use Harbor as a third-party registry. Please refer to [this guide](https://github.com/FederatedAI/KubeFATE/blob/master/registry/install_harbor.md) to install Harbor. Change the `THIRDPARTYPREFIX` to [Harbor](https://goharbor.io/) hostname in the `.env` file. `192.168.10.1` is an example of Harbor IP.
+```bash
+$ cd KubeFATE/
+$ vi .env
+
+THIRDPARTYPREFIX=192.168.10.1/federatedai
+```
 
 ### Configure Parties
 The following steps will illustrate how to deploy two parties on different hosts.
@@ -31,6 +40,10 @@ exchangeip=proxy
 Use the following command to deploy each party. Before running the command, ***please make sure host 192.168.7.1 and 192.168.7.2 allow password-less SSH access with SSH key***:
 ```bash
 $ bash docker-auto-deploy.sh
+```
+If using a third-party registry, use the following command to generate deployment files:
+```bash
+$ bash docker-auto-deploy.sh useThirdParty
 ```
 
 The script will copy "10000-confs.tar" and "9999-confs.tar" to host 192.168.7.1 and 192.168.7.2.

@@ -19,7 +19,11 @@ spec:
         {{ .Values.partyId }}: redis
     spec:
       containers:
+        {{ if .Values.image.isThridParty}}
+        - image: {{ .Values.image.registry }}/redis
+        {{ else }}
         - image: redis
+        {{- end }}
           name: redis
           ports:
             - containerPort: 6379
