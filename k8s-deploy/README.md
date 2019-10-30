@@ -203,3 +203,14 @@ servingServer=worker2
 The above sample will deploy an `egg` service in node-0 and, an `egg` service in node-1, `federation`, `metaService`, `mysql`, `proxy` services to node-2 and `python`, `redis`, `roll`, `servingServer` services to node-3. If no value is given, a service will be deployed in the cluster according to the strategy of the scheduler.
 
 By default, only one egg service will be deployed. To deploy multiple egg services, please fill in the `eggList` with the label of the Kubernetes nodes (Separated with spaces). Helm will deploy one egg service to each node.
+
+### **The Visualizations**
+
+if you kubernetes cluster deployment Ingress controller ( [ingress-nginx](https://kubernetes.github.io/ingress-nginx/deploy/) ), you can also access the FATEBoard through http://<partyid>.fateboard.fedai.org 
+
+You have to modify hosts before that
+
+```bash
+<node-iP> <party-id>.fateboard.fedai.org     # Add this record to hosts
+```
+
