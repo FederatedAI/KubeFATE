@@ -5,10 +5,9 @@
 
 {{- $root := . -}}
 {{- range .Values.eggList }}
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
-  creationTimestamp: null
   labels:
     {{ $root.Values.partyId }}: {{ .egg }}
   name: {{ .egg }}
@@ -16,9 +15,11 @@ spec:
   replicas: 1
   strategy:
     type: Recreate
+  selector:
+    matchLabels:
+      {{ $root.Values.partyId }}: {{ .egg }}
   template:
     metadata:
-      creationTimestamp: null
       labels:
         {{ $root.Values.partyId }}: {{ .egg }}
     spec:
@@ -36,7 +37,6 @@ spec:
             - containerPort: 50002
             - containerPort: 50003
             - containerPort: 50004
-          resources: {}
           volumeMounts:
             - mountPath: /data/projects/fate/egg/conf/egg.properties
               name: egg-confs
@@ -70,13 +70,11 @@ spec:
             path: /data/projects/fate/data-dir
             type: DirectoryOrCreate
         {{- end }}
-status: {}
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  creationTimestamp: null
   labels:
     {{ $root.Values.partyId }}: {{ .egg }}
   name: {{ .egg }}
@@ -109,7 +107,5 @@ spec:
   type: ClusterIP
   selector:
     {{ $root.Values.partyId }}: {{ .egg }}
-status:
-  loadBalancer: {}
 ---
 {{- end }}

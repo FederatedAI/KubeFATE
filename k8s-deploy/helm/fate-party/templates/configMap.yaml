@@ -22,21 +22,11 @@ data:
             "default": {
                 "default": [
                     {
-                        "ip": "proxy",
-                        "port": 9370
+                        "ip": "{{ .Values.exchange.partyIp }}",
+                        "port": {{ .Values.exchange.partyPort }}
                     }
                 ]
             },
-            {{- range .Values.partyList }}
-            "{{ .partyId }}": {
-                "default": [
-                    {
-                        "ip": "{{ .partyIp }}",
-                        "port": 9370
-                    }
-                ]
-            },
-            {{- end }}
             "{{ .Values.partyId }}": {
                 "serving": [
                     {
@@ -52,7 +42,7 @@ data:
                 ],
                 "fateflow": [
                     {
-                        "ip": "python",
+                        "ip": "fateflow",
                         "port": 9360
                     }
                 ]
@@ -107,7 +97,7 @@ data:
                 "port": 8011
             },
             "fateflow": {
-                "host": "python",
+                "host": "fateflow",
                 "grpc.port": 9360,
                 "http.port": 9380
             }
@@ -284,7 +274,7 @@ metadata:
 data:
   application.properties: |
     server.port=8080
-    fateflow.url=http://python:9380
+    fateflow.url=http://fateflow:9380
     spring.datasource.driverClassName=com.mysql.cj.jdbc.Driver
     management.endpoints.web.exposure.include=*
     spring.http.encoding.charset=UTF-8
