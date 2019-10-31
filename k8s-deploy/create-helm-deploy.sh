@@ -25,8 +25,8 @@ do
   rm -rf fate-$partyid/
   mkdir -p fate-$partyid/
   
-  ln -sf ../helm/Chart.yaml fate-$partyid/Chart.yaml
-  ln -sf ../helm/templates fate-$partyid/templates
+  ln -sf ../helm/fate-party/Chart.yaml fate-$partyid/Chart.yaml
+  ln -sf ../helm/fate-party/templates fate-$partyid/templates
   
   cat > fate-$partyid/values.yaml << EOF
 #nfspath: /data/fate-data
@@ -44,16 +44,13 @@ $( if [[ $1 == "useThirdParty" ]]
   tag: ${TAG}
   pullPolicy: IfNotPresent
 partyId: ${partyid}
-partyList:
-$( for ((j=0;j<${#partylist[*]};j++))
-   do
-     if [ ${i} -eq ${j} ]
-     then
-       continue
-     fi
-     echo "  - partyId: ${partylist[${j}]}"
-     echo "    partyIp: ${partyiplist[${j}]}"
-   done )
+host:
+  fateboard: ${partyid}.fateboard.fedai.org
+nodePort: ${partyiplist[${i}]#*:}
+
+exchange:
+  partyIp: ${exchangeip%:*}
+  partyPort: ${exchangeip#*:}
 mysql:
   mysql_root_password: ${jdbcrootpassword}
   mysql_database: ${jdbcdbname}
@@ -107,3 +104,46 @@ EOF
 
   echo fate-$partyid done!
 done
+
+# exchange
+
+rm -rf fate-exchange/
+mkdir -p fate-exchange/
+
+ln -sf ../helm/fate-exchange/Chart.yaml fate-exchange/Chart.yaml
+ln -sf ../helm/fate-exchange/templates fate-exchange/templates
+
+cat > fate-exchange/values.yaml << EOF
+image:
+$( if [[ $1 == "useThirdParty" ]]
+   then
+     echo "  registry: ${THIRDPARTYPREFIX}"
+     echo "  isThridParty: true"
+   else
+     echo "  registry: ${PREFIX}"
+     echo "  isThridParty:"
+   fi )
+  tag: ${TAG}
+  pullPolicy: IfNotPresent
+partyId: 0000
+
+nodePort: ${exchangeip#*:}
+
+partyList:
+$( for ((j=0;j<${#partylist[*]};j++))
+   do
+     if [ ${i} -eq ${j} ]
+     then
+       continue
+     fi
+     echo "  - partyId: ${partylist[${j}]}"
+     echo "    partyIp: ${partyiplist[${j}]%:*}"
+     echo "    partyPort: ${partyiplist[${j}]#*:}"
+   done )
+
+nodeSelector:
+  proxy:
+    nodeLabel: fedai.org
+    value: 
+EOF
+echo fate-exchange done!

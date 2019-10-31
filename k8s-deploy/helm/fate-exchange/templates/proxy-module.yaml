@@ -3,10 +3,9 @@
 # SPDX-License-Identifier: Apache-2.0                  #
 ########################################################
 
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
-  creationTimestamp: null
   labels:
     {{ .Values.partyId }}: proxy
   name: proxy
@@ -14,9 +13,11 @@ spec:
   replicas: 1
   strategy:
     type: Recreate
+  selector:
+    matchLabels:
+      {{ .Values.partyId }}: proxy
   template:
     metadata:
-      creationTimestamp: null
       labels:
         {{ .Values.partyId }}: proxy
     spec:
@@ -26,7 +27,6 @@ spec:
           name: proxy
           ports:
             - containerPort: 9370
-          resources: {}
           volumeMounts:
             - mountPath: /data/projects/fate/proxy/conf/proxy.properties
               name: proxy-confs
@@ -43,13 +43,11 @@ spec:
         - name: proxy-confs
           configMap:
             name: proxy-config
-status: {}
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  creationTimestamp: null
   labels:
     {{ .Values.partyId }}: proxy
   name: proxy
@@ -57,10 +55,9 @@ spec:
   ports:
     - name: "9370"
       port: 9370
+      nodePort: {{ .Values.nodePort }}
       targetPort: 9370
       protocol: TCP
-  type: ClusterIP
+  type: NodePort
   selector:
     {{ .Values.partyId }}: proxy
-status:
-  loadBalancer: {}

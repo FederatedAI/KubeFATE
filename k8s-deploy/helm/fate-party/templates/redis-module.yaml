@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0                  #
 ########################################################
 
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: redis
@@ -13,6 +13,9 @@ spec:
   replicas: 1
   strategy:
     type: Recreate
+  selector:
+    matchLabels:
+      {{ .Values.partyId }}: redis
   template:
     metadata:
       labels:
@@ -57,7 +60,6 @@ spec:
           persistentVolumeClaim:
             claimName: {{ .Values.partyId }}-pv-claim
         {{- end }}
-status: {}
 
 ---
 apiVersion: v1
@@ -75,5 +77,3 @@ spec:
   type: ClusterIP
   selector:
     {{ .Values.partyId }}: redis
-status:
-  loadBalancer: {}
