@@ -20,7 +20,7 @@ def get_new_json(module_name,filepath):
 		json_data = json.load(f)
 		a = json_data
 		if module_name == "exchange":
-			a["route_table"][partyId]={"default":[{"ip": pip,"port": 9370}]}
+			a["route_table"][partyId]={"default":[{"ip": pip,"port": 9371}]}
 		elif module_name == "proxy":
 			a["route_table"]={"default":{"default":[{"ip": exchangeip,"port": 9370}]},\
 			partyId:{"fate":[{"ip": fip,"port": 9394}],"fateflow":[{"ip": flip,"port": 9360}]}}
