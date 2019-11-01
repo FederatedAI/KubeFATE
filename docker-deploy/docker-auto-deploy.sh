@@ -50,7 +50,7 @@ eval proxy_port=9370
 eval fateboard_ip=fateboard
 eval fateboard_port=8080
 
-eval fate_flow_ip=fate_flow
+eval fate_flow_ip=python
 eval fate_flow_grpc_port=9360
 eval fate_flow_http_port=9380
 
@@ -73,7 +73,7 @@ eval federation_port=9394
 eval serving_ip1=
 eval eval serving_ip2=
 
-
+  rm -rf confs-$party_id/
   mkdir -p confs-$party_id/confs
   cp -r docker-example-dir-tree/* confs-$party_id/confs/
   cp ./docker-compose.yml confs-$party_id/
@@ -263,6 +263,7 @@ eeooff
 done
 
 # handle exchange
+rm -rf ${WORKINGDIR}/exchange/
 mkdir -p ${WORKINGDIR}/exchange/confs
 cp ${WORKINGDIR}/../.env ${WORKINGDIR}/exchange
 cp ${WORKINGDIR}/docker-compose-exchange.yml ${WORKINGDIR}/exchange/

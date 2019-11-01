@@ -70,7 +70,7 @@ services:
     networks:
       - fate-network
 
-  fateflow:
+  python:
     image: "${PREFIX}/python:${TAG}"
     ports:
       - "9360:9360"
@@ -87,7 +87,7 @@ services:
       - proxy
       - roll
       - egg
-    command: /bin/bash -c "sleep 10; source /data/projects/fate/venv/bin/activate; cd python/fate_flow && python fate_flow_server.py"
+    cmd: bash -c "cd /data/projects/fate/fate_flow && python3 fate_flow_server.py"
     networks:
       - fate-network
 
