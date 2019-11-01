@@ -28,17 +28,6 @@ services:
     networks:
       - fate-network
 
-  serving-server:
-    image: "${PREFIX}/serving-server:${TAG}"
-    ports:
-      - "8001:8001"
-    volumes:
-      - ./confs/serving-server/conf:/data/projects/fate/serving-server/conf
-    depends_on:
-      - redis
-    networks:
-      - fate-network
-
   fateboard:
     image: "${PREFIX}/fateboard:${TAG}"
     ports:
@@ -81,7 +70,7 @@ services:
     networks:
       - fate-network
 
-  python:
+  fateflow:
     image: "${PREFIX}/python:${TAG}"
     ports:
       - "9360:9360"
@@ -121,10 +110,10 @@ services:
       - ./confs/mysql/init:/docker-entrypoint-initdb.d/
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: Fate123#$$
+      MYSQL_ROOT_PASSWORD: fate_dev
       MYSQL_DATABASE: fate
       MYSQL_USER: fate
-      MYSQL_PASSWORD: Fate123#$$
+      MYSQL_PASSWORD: fate_dev
     networks:
       - fate-network
 
@@ -132,7 +121,7 @@ services:
     image: "redis"
     expose:
       - 6379
-    command: redis-server --requirepass fate1234
+    command: redis-server --requirepass fate_dev
     volumes:
       - ./confs/redis/data:/data"
     networks:
