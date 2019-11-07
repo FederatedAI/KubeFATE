@@ -61,7 +61,7 @@ done
 source ${venv}/bin/activate
 export PYTHONPATH=$PYTHONPATH:${python_path}
 PYTHON=${venv}/bin/python
-cmd="python ${engine_path} -p ${port} -d ${data_dir} -m ${node_manager} -a ${engine_addr}"
+cmd="python ${engine_path} -p ${port} -d ${data_dir} -m ${node_manager} -a $(hostname -I | awk '{print $1}')"
 
 mkdir -p ${logs_dir}
 ${cmd} >> ${logs_dir}/processor-${port}.log 2>&1

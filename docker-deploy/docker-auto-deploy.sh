@@ -30,10 +30,10 @@ eval party_ip=\${partyiplist[${i}]%:*}
 eval party_port=\${partyiplist[${i}]#*:}
 
 eval processor_port=50000
-eval processor_count=16
-eval venv_dir=${deploy_dir}/common/python/venv
+eval processor_count=1
+eval venv_dir=/data/projects/python/venv
 eval python_path=${deploy_dir}/python:${deploy_dir}/eggroll/python
-eval data_dir=$dir/data-dir
+eval data_dir=${dir}/data-dir
 
 eval egg_ip=egg
 eval egg_port=7888
@@ -76,6 +76,7 @@ eval eval serving_ip2=
   rm -rf confs-$party_id/
   mkdir -p confs-$party_id/confs
   cp -r docker-example-dir-tree/* confs-$party_id/confs/
+  cp -r federatedml_examples confs-$party_id/examples
   cp ./docker-compose.yml confs-$party_id/
   
   # generate conf dir
@@ -89,20 +90,20 @@ eval eval serving_ip2=
     sed -i 's#image: "redis"#image: "${THIRDPARTYPREFIX}/redis"#g' ./confs-$party_id/docker-compose.yml
   fi
 
-
 # egg config
+module_name=eggroll
 sed -i.bak "s/party.id=.*/party.id=${party_id}/g" ./confs-$party_id/confs/egg/conf/egg.properties
 sed -i.bak "s/service.port=.*/service.port=${egg_port}/g" ./confs-$party_id/confs/egg/conf/egg.properties
 sed -i.bak "s/engine.names=.*/engine.names=processor/g" ./confs-$party_id/confs/egg/conf/egg.properties
-sed -i.bak "s#bootstrap.script=.*#bootstrap.script=${deploy_dir}/${module_name}/processor-starter.sh#g" ./confs-$party_id/confs/egg/conf/egg.properties
+sed -i.bak "s#bootstrap.script=.*#bootstrap.script=${deploy_dir}/${module_name}/egg/conf/processor-starter.sh#g" ./confs-$party_id/confs/egg/conf/egg.properties
 sed -i.bak "s#start.port=.*#start.port=${processor_port}#g" ./confs-$party_id/confs/egg/conf/egg.properties
 sed -i.bak "s#processor.venv=.*#processor.venv=${venv_dir}#g" ./confs-$party_id/confs/egg/conf/egg.properties
 sed -i.bak "s#processor.python-path=.*#processor.python-path=${python_path}#g" ./confs-$party_id/confs/egg/conf/egg.properties
-sed -i.bak "s#processor.engine-path=.*#processor.engine-path=${deploy_dir}/python/eggroll/computing/processor.py#g" ./confs-$party_id/confs/egg/conf/egg.properties
+sed -i.bak "s#processor.engine-path=.*#processor.engine-path=${deploy_dir}/eggroll/python/eggroll/computing/processor.py#g" ./confs-$party_id/confs/egg/conf/egg.properties
 sed -i.bak "s#data-dir=.*#data-dir=${data_dir}#g" ./confs-$party_id/confs/egg/conf/egg.properties
-sed -i.bak "s#processor.logs-dir=.*#processor.logs-dir=${deploy_dir}/logs/processor#g" ./confs-$party_id/confs/egg/conf/egg.properties
+sed -i.bak "s#processor.logs-dir=.*#processor.logs-dir=${deploy_dir}/eggroll/python/eggroll/logs/processor#g" ./confs-$party_id/confs/egg/conf/egg.properties
 sed -i.bak "s#count=.*#count=${processor_count}#g" ./confs-$party_id/confs/egg/conf/egg.properties
-echo >> ./confs-$party_id/confs/egg/conf/egg.properties
+echo  >> ./confs-$party_id/confs/egg/conf/egg.properties
 echo "eggroll.computing.processor.python-path=${python_path}" >> ./confs-$party_id/confs/egg/conf/egg.properties
 echo egg module of $party_id done!
 
@@ -154,17 +155,17 @@ sed -i.bak "s/databases 16/databases 50/g" ./confs-$party_id/confs/redis/conf/re
 echo redis module of $party_id done!
 
 # fate_flow
-sed -i.bak "s/WORK_MODE =.*/WORK_MODE = 1/g" ./confs-$party_id/confs/fate_flow/settings.py
-sed -i.bak "s/'user':.*/'user': '${db_user}',/g" ./confs-$party_id/confs/fate_flow/settings.py
-sed -i.bak "s/'passwd':.*/'passwd': '${db_password}',/g" ./confs-$party_id/confs/fate_flow/settings.py
-sed -i.bak "s/'host':.*/'host': '${db_ip}',/g" ./confs-$party_id/confs/fate_flow/settings.py
-sed -i.bak "s/'name':.*/'name': '${db_name}',/g" ./confs-$party_id/confs/fate_flow/settings.py
-sed -i.bak "s/'password':.*/'password': '${redis_password}',/g" ./confs-$party_id/confs/fate_flow/settings.py
-sed -i.bak "/'host':.*/{x;s/^/./;/^\.\{2\}$/{x;s/.*/    'host': '${redis_ip}',/;x};x;}" ./confs-$party_id/confs/fate_flow/settings.py
+sed -i.bak "s/WORK_MODE =.*/WORK_MODE = 1/g" ./confs-$party_id/confs/fate_flow/conf/settings.py
+sed -i.bak "s/'user':.*/'user': '${db_user}',/g" ./confs-$party_id/confs/fate_flow/conf/settings.py
+sed -i.bak "s/'passwd':.*/'passwd': '${db_password}',/g" ./confs-$party_id/confs/fate_flow/conf/settings.py
+sed -i.bak "s/'host':.*/'host': '${db_ip}',/g" ./confs-$party_id/confs/fate_flow/conf/settings.py
+sed -i.bak "s/'name':.*/'name': '${db_name}',/g" ./confs-$party_id/confs/fate_flow/conf/settings.py
+sed -i.bak "s/'password':.*/'password': '${redis_password}',/g" ./confs-$party_id/confs/fate_flow/conf/settings.py
+sed -i.bak "/'host':.*/{x;s/^/./;/^\.\{2\}$/{x;s/.*/    'host': '${redis_ip}',/;x};x;}" ./confs-$party_id/confs/fate_flow/conf/settings.py
 echo fate_flow module of $party_id done!
 
 # federatedml
-cat >> ./confs-$party_id/confs/federatedml/conf/server_conf.json <<EOF
+cat > ./confs-$party_id/confs/federatedml/conf/server_conf.json <<EOF
 {
     "servers": {
         "proxy": {
@@ -187,6 +188,10 @@ cat >> ./confs-$party_id/confs/federatedml/conf/server_conf.json <<EOF
         "federation": {
             "host": "${federation_ip}", 
             "port": ${federation_port}
+        },
+        "clustercomm": {
+            "host": "${federation_ip}", 
+            "port": ${federation_port}
         }
     }
 }
@@ -207,20 +212,19 @@ module_name="proxy"
 sed -i.bak "s/port=.*/port=${proxy_port}/g" ./confs-$party_id/confs/proxy/conf/${module_name}.properties
 sed -i.bak "s#route.table=.*#route.table=${deploy_dir}/${module_name}/conf/route_table.json#g" ./confs-$party_id/confs/proxy/conf/${module_name}.properties
 sed -i.bak "s/coordinator=.*/coordinator=${party_id}/g" ./confs-$party_id/confs/proxy/conf/${module_name}.properties
-sed -i.bak "s/ip=.*/ip=${proxy_ip}/g" ./confs-$party_id/confs/proxy/conf/${module_name}.properties
 
-cat >> ./confs-$party_id/confs/proxy/conf/route_table.json <<EOF
+cat > ./confs-$party_id/confs/proxy/conf/route_table.json <<EOF
 {
     "route_table": {
         "default": {
             "default": [
                 {
                     "ip": "${exchange_ip}",
-                    "port": 9370
+                    "port": 9371
                 }
             ]
         },
-        "10000": {
+        "${party_id}": {
             "fateflow": [
                 {
                     "ip": "${fate_flow_ip}",
@@ -229,52 +233,58 @@ cat >> ./confs-$party_id/confs/proxy/conf/route_table.json <<EOF
             ],
             "fate": [
                 {
-                    "ip": "{federation_ip}",
-                    "port": {federation_port}
+                    "ip": "${federation_ip}",
+                    "port": ${federation_port}
+                }
+            ],
+            "eggroll": [
+                {
+                    "ip": "${federation_ip}",
+                    "port": ${federation_port}
                 }
             ]
-        }
+		}
     },
     "permission": {
         "default_allow": true
     }
 }
 EOF
-
 echo proxy module of $party_id done!
-
-
-  tar -czf ./confs-$party_id.tar ./confs-$party_id
-  scp confs-$party_id.tar $user@$party_ip:~/
-  echo "$ip copy is ok!"
-  ssh -tt $user@$party_ip<< eeooff
-mkdir -p $dir
-mv ~/confs-$party_id.tar $dir
-cd $dir
-tar -xzf confs-$party_id.tar
-cd confs-$party_id
-docker-compose up -d
-cd ../
-rm -f confs-$party_id.tar 
-exit
-eeooff
-  rm -f confs-$party_id.tar 
-  echo "party $party_id deploy is ok!"
+#
+#  tar -czf ./confs-$party_id.tar ./confs-$party_id
+#  scp confs-$party_id.tar $user@$party_ip:~/
+#  echo "$ip copy is ok!"
+#  ssh -tt $user@$party_ip<< eeooff
+#mkdir -p $dir
+#mv ~/confs-$party_id.tar $dir
+#cd $dir
+#tar -xzf confs-$party_id.tar
+#cd confs-$party_id
+#docker-compose up -d
+#cd ../
+#rm -f confs-$party_id.tar 
+#exit
+#eeooff
+#  rm -f confs-$party_id.tar 
+#  echo "party $party_id deploy is ok!"
 done
 
 # handle exchange
+echo "handle exchange"
+module_name=exchange
 rm -rf ${WORKINGDIR}/exchange/
-mkdir -p ${WORKINGDIR}/exchange/confs
+mkdir ${WORKINGDIR}/exchange
 cp ${WORKINGDIR}/../.env ${WORKINGDIR}/exchange
 cp ${WORKINGDIR}/docker-compose-exchange.yml ${WORKINGDIR}/exchange/
-cp -r docker-example-dir-tree/proxy/conf ${WORKINGDIR}/exchange/conf/
-# proxy
+cp -r docker-example-dir-tree/proxy/conf ${WORKINGDIR}/exchange/conf
+
 sed -i.bak "s/port=.*/port=${proxy_port}/g" ${WORKINGDIR}/exchange/conf/proxy.properties
 sed -i.bak "s#route.table=.*#route.table=${deploy_dir}/${module_name}/conf/route_table.json#g" ${WORKINGDIR}/exchange/conf/proxy.properties
 sed -i.bak "s/coordinator=.*/coordinator=${party_id}/g" ${WORKINGDIR}/exchange/conf/proxy.properties
-sed -i.bak "s/ip=.*/ip=${proxy_ip}/g" ${WORKINGDIR}/exchange/conf/proxy.properties
+sed -i.bak "s/ip=.*/ip=0.0.0.0/g" ${WORKINGDIR}/exchange/conf/proxy.properties
 
-cat >> ${WORKINGDIR}/exchange/conf/route_table.json <<EOF
+cat > ${WORKINGDIR}/exchange/conf/route_table.json <<EOF
 {
     "route_table": {
         
@@ -283,7 +293,7 @@ echo "        \"${partylist[${j}]}\": {
             \"proxy\": [
                 {
                     \"ip\": \"${partyiplist[${j}]%:*}\",
-                    \"port\": 9371
+                    \"port\": 9370
                 }
             ]
         }," 

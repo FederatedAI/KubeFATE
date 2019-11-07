@@ -12,8 +12,8 @@ volumes:
 services:
   federation:
     image: "${PREFIX}/federation:${TAG}"
-    ports:
-      - "9394:9394"
+    expose:
+      - 9394
     volumes:
       - ./confs/federation/conf:/data/projects/fate/federation/conf
     networks:
@@ -22,7 +22,9 @@ services:
   proxy:
     image: "${PREFIX}/proxy:${TAG}"
     ports:
-      - "9371:9370"
+      - "9370:9370"
+    environment:
+      PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION: python
     volumes:
       - ./confs/proxy/conf:/data/projects/fate/proxy/conf
     networks:
@@ -39,6 +41,7 @@ services:
       - fate-network
     depends_on:
       - meta-service
+      - python
 
   roll:
     image: "${PREFIX}/roll:${TAG}"
@@ -46,6 +49,8 @@ services:
       - 8011
     volumes:
       - ./confs/roll/conf:/data/projects/fate/roll/conf
+    environment:
+      PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION: python
     networks:
       - fate-network
     depends_on:
@@ -56,17 +61,16 @@ services:
     expose:
       - 7888
       - 7778
-      - 50001
-      - 50002
-      - 50003
-      - 50004
+      - "50000-60000"
     environment:
-      - PYTHONPATH=python.path=/data/projects/fate/python
+      PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION: cpp 
+      LD_LIBRARY_PATH: $LD_LIBRARY_PATH:/usr/local/lib:/data/projects/fate/eggroll/storage-service-cxx/third_party/lib
+      PYTHONPATH: /data/projects/fate/eggroll/python
+      GLOG_log_dir: /data/projects/fate/eggroll/storage-service-cxx/logs
     volumes:
-      - ./confs/egg/conf:/data/projects/fate/egg/conf
-      - ./confs/python/arch/conf/server_conf.json:/data/projects/fate/python/arch/conf/server_conf.json
-      - ./confs/python/arch/conf/settings.py:/data/projects/fate/python/arch/conf/settings.py
-      - ./confs/python/conf:/data/projects/fate/python/conf
+        - ./confs/egg/conf:/data/projects/fate/eggroll/egg/conf
+        - ./confs/egg/conf/transfer_conf.json:/data/projects/fate/eggroll/python/eggroll/conf/transfer_conf.json
+        - ./confs/federatedml/conf/server_conf.json:/data/projects/fate/eggroll/python/eggroll/conf/server_conf.json
     networks:
       - fate-network
 
@@ -77,9 +81,10 @@ services:
       - "9380:9380"
     restart: always
     volumes:
-      - ./confs/python/arch/conf:/data/projects/fate/python/arch/conf
-      - ./confs/python/conf:/data/projects/fate/python/conf
-      - ./confs/python/fate_flow/settings.py:/data/projects/fate/python/fate_flow/settings.py
+      - ./confs/federatedml/conf:/data/projects/fate/python/arch/conf
+      - ./confs/federatedml/conf:/data/projects/fate/python/eggroll/conf
+      - ./confs/fate_flow/conf/settings.py:/data/projects/fate/python/fate_flow/settings.py
+      - ./examples:/data/projects/fate/python/examples
       - fate_flow_logs:/data/projects/fate/python/logs
     depends_on:
       - redis
@@ -87,7 +92,7 @@ services:
       - proxy
       - roll
       - egg
-    cmd: bash -c "cd /data/projects/fate/fate_flow && python3 fate_flow_server.py"
+      - mysql
     networks:
       - fate-network
 
@@ -95,6 +100,8 @@ services:
     image: "${PREFIX}/meta-service:${TAG}"
     expose:
       - 8590
+    environment:
+      PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION: python
     volumes:
       - ./confs/meta-service/conf:/data/projects/fate/meta-service/conf
     depends_on:
@@ -103,7 +110,7 @@ services:
       - fate-network
 
   mysql:
-    image: "mysql"
+    image: "mysql:8"
     expose:
       - 3306
     volumes:
@@ -118,12 +125,12 @@ services:
       - fate-network
 
   redis:
-    image: "redis"
+    image: "redis:5"
     expose:
       - 6379
     command: redis-server --requirepass fate_dev
     volumes:
-      - ./confs/redis/data:/data"
+      - ./confs/redis/data:/data
     networks:
       - fate-network
 
