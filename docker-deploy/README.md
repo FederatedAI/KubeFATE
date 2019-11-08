@@ -72,7 +72,7 @@ Since the `confs-10000_python_1` container hosts the `fate-flow` service, so we 
 ```bash
 $ docker exec -it confs-10000_python_1 bash
 $ source /data/projects/python/venv/bin/activate
-$ cd python/examples/toy_example/
+$ cd /data/projects/python/examples/toy_example/
 $ python run_toy_example.py 10000 9999 1
 ```
 If the test passed, the screen will print some messages like the follows:
