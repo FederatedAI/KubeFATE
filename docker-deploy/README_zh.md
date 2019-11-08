@@ -77,7 +77,7 @@ BUILDER_TAG=1.1-release
 
 ### 离线部署
 
-当我们的运行机器处于无法连接外部网络的时候，就无法从Docker Hub下载镜像，建议使用[Harbor](https://goharbor.io/)作为第三方仓库。安装Harbor请参考: https://github.com/FederatedAI/KubeFATE/blob/master/registry/install_harbor.md。在`.env`文件中，将`THIRDPARTYPREFIX`更改为Harbor的IP。 192.168.10.1是Harbor IP的示例。
+当我们的运行机器处于无法连接外部网络的时候，就无法从Docker Hub下载镜像，建议使用[Harbor](https://goharbor.io/)作为第三方仓库。安装Harbor请参考[文章](https://github.com/FederatedAI/KubeFATE/blob/master/registry/install_harbor.md)。在`.env`文件中，将`THIRDPARTYPREFIX`更改为Harbor的IP。 192.168.10.1是Harbor IP的示例。
 ```bash
 $ cd KubeFATE/
 $ vi .env
