@@ -99,8 +99,10 @@ venvdir=/data/projects/fate/venv      #默认就好
 dir=/data/projects/fate               #docker-compose部署目录
 partylist=(10000 9999)                #组织id
 partyiplist=(192.168.7.1 192.168.7.2) #id对应节点ip
-exchangeip=proxy                      #通信组件标识
+exchangeip=192.168.7.1                      #通信组件标识
 ```
+
+**注意**: 默认情况下，运行partylist中第一个party的主机会同时运行exchange组件，该组件的默认监听端口为9371
 
 在运行部署脚本之前，需要确保部署机器可以ssh免密登录到两个运行节点主机上。user代表免密的用户。
 
@@ -138,7 +140,6 @@ d72995355962        fatetest/python:1.1-release           "/bin/bash -c 'sourc�
 dffc70fc68ac        fatetest/egg:1.1-release              "/bin/sh -c 'cd /dat…"   7 days ago          Up 7 days           7778/tcp, 7888/tcp, 50001-50004/tcp   confs-10000_egg_1
 dc23d75692b0        fatetest/roll:1.1-release             "/bin/sh -c 'cd roll…"   7 days ago          Up 7 days           8011/tcp                              confs-10000_roll_1
 7e52b1b06d1a        fatetest/meta-service:1.1-release     "/bin/sh -c 'java -c…"   7 days ago          Up 7 days           8590/tcp                              confs-10000_meta-service_1
-f680247a986c        fatetest/serving-server:1.1-release   "/bin/sh -c 'java -c…"   7 days ago          Up 7 days           6379/tcp, 8001/tcp                    confs-10000_serving-server_1
 50a6323f5cb8        fatetest/proxy:1.1-release            "/bin/sh -c 'cd /dat…"   7 days ago          Up 7 days           0.0.0.0:9370->9370/tcp                confs-10000_proxy_1
 4526f8e57004        redis                                 "docker-entrypoint.s…"   7 days ago          Up 7 days           6379/tcp                              confs-10000_redis_1
 586f3f2fe191        fatetest/federation:1.1-release       "/bin/sh -c 'cd /dat…"   7 days ago          Up 7 days           9394/tcp                              confs-10000_federation_1
