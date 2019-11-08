@@ -78,7 +78,6 @@ eval eval serving_ip2=
   cp -r docker-example-dir-tree/* confs-$party_id/confs/
   cp -r federatedml_examples confs-$party_id/examples
   cp ./docker-compose.yml confs-$party_id/
-  
   # generate conf dir
   cp ${WORKINGDIR}/../.env ./confs-$party_id
   
@@ -124,7 +123,7 @@ echo roll module of $party_id done!
 
 # fateboard
 sed -i.bak "s#^server.port=.*#server.port=${fateboard_port}#g" ./confs-$party_id/confs/fateboard/conf/application.properties
-sed -i.bak "s#^fateflow.url=.*#fateflow.url=http://${fate_flow_ip}:${fate_flow_port}#g" ./confs-$party_id/confs/fateboard/conf/application.properties
+sed -i.bak "s#^fateflow.url=.*#fateflow.url=http://${fate_flow_ip}:${fate_flow_http_port}#g" ./confs-$party_id/confs/fateboard/conf/application.properties
 sed -i.bak "s#^spring.datasource.driver-Class-Name=.*#spring.datasource.driver-Class-Name=com.mysql.cj.jdbc.Driver#g" ./confs-$party_id/confs/fateboard/conf/application.properties
 sed -i.bak "s#^spring.datasource.url=.*#spring.datasource.url=jdbc:mysql://${db_ip}:3306/${db_name}?characterEncoding=utf8\&characterSetResults=utf8\&autoReconnect=true\&failOverReadOnly=false\&serverTimezone=GMT%2B8#g" ./confs-$party_id/confs/fateboard/conf/application.properties
 sed -i.bak "s/^spring.datasource.username=.*/spring.datasource.username=${db_user}/g" ./confs-$party_id/confs/fateboard/conf/application.properties
@@ -251,23 +250,23 @@ cat > ./confs-$party_id/confs/proxy/conf/route_table.json <<EOF
 }
 EOF
 echo proxy module of $party_id done!
-#
-#  tar -czf ./confs-$party_id.tar ./confs-$party_id
-#  scp confs-$party_id.tar $user@$party_ip:~/
-#  echo "$ip copy is ok!"
-#  ssh -tt $user@$party_ip<< eeooff
-#mkdir -p $dir
-#mv ~/confs-$party_id.tar $dir
-#cd $dir
-#tar -xzf confs-$party_id.tar
-#cd confs-$party_id
-#docker-compose up -d
-#cd ../
-#rm -f confs-$party_id.tar 
-#exit
-#eeooff
-#  rm -f confs-$party_id.tar 
-#  echo "party $party_id deploy is ok!"
+
+  tar -czf ./confs-$party_id.tar ./confs-$party_id
+  scp confs-$party_id.tar $user@$party_ip:~/
+  echo "$ip copy is ok!"
+  ssh -tt $user@$party_ip<< eeooff
+mkdir -p $dir
+mv ~/confs-$party_id.tar $dir
+cd $dir
+tar -xzf confs-$party_id.tar
+cd confs-$party_id
+docker-compose up -d
+cd ../
+rm -f confs-$party_id.tar
+exit
+eeooff
+  rm -f confs-$party_id.tar
+  echo "party $party_id deploy is ok!"
 done
 
 # handle exchange
