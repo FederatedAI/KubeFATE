@@ -4,6 +4,6 @@ services:
   exchange:
     image: "${PREFIX}/proxy:${TAG}"
     ports:
-      - "9370:9370"
+      - "9371:9370"
     volumes:
       - ./conf:/data/projects/fate/proxy/conf

@@ -3,7 +3,7 @@
 ## Prerequisites
 1. Docker: 18
 2. Docker-Compose: 1.24
-3. [The FATE Images](https://github.com/FederatedAI/FATE/tree/contributor_1.0_docker/docker-build) have been built and downloaded by nodes.
+3. [The FATE Images](https://github.com/FederatedAI/FATE/tree/docker_1.1_contribution/docker-build) have been built and downloaded by nodes.
 
 ## Deploying FATE
 Use the following command to clone repo if you did not clone before:
@@ -28,14 +28,16 @@ The following steps will illustrate how to deploy two parties on different hosts
 Before starting the FATE system, the user needs to define their parties in configuration file `./docker-configuration.sh`. 
 
 The following sample of `docker-configuration.sh` defines two parities, they are party `10000` hosted on a machine *192.168.7.1* and `9999` hosted on a machine *192.168.7.2*.
+
 ```bash
 user=root
-venvdir=/data/projects/fate/venv
 dir=/data/projects/fate
 partylist=(10000 9999)
 partyiplist=(192.168.7.1 192.168.7.2)
-exchangeip=proxy
+exchangeip=192.168.7.1
 ```
+
+**NOTE**: By default, the machine of the first party will also host the exchange on the 9371 port. A user can change the exchange IP if needed.
 
 Use the following command to deploy each party. Before running the command, ***please make sure host 192.168.7.1 and 192.168.7.2 allow password-less SSH access with SSH key***:
 ```bash
@@ -54,24 +56,23 @@ Once the command returns, log in to any host and use `docker ps` to verify the s
 
 ```
 CONTAINER ID        IMAGE                                 COMMAND                  CREATED              STATUS              PORTS                                 NAMES
-d4686d616965        federatedai/python:1.0-release           "/bin/bash -c 'sourc…"   About a minute ago   Up 52 seconds       9360/tcp, 9380/tcp                    confs-10000_python_1
-fbb9d7fdbb8f        federatedai/serving-server:1.0-release   "/bin/sh -c 'java -c…"   About a minute ago   Up About a minute   6379/tcp, 8001/tcp                    confs-10000_serving-server_1
-4086ef0dc2de        federatedai/fateboard:1.0-release        "/bin/sh -c 'cd /dat…"   About a minute ago   Up About a minute   0.0.0.0:8080->8080/tcp                confs-10000_fateboard_1
-5cf3e1f1731a        federatedai/roll:1.0-release             "/bin/sh -c 'cd roll…"   About a minute ago   Up About a minute   8011/tcp                              confs-10000_roll_1
-11c01143540b        federatedai/meta-service:1.0-release     "/bin/sh -c 'java -c…"   About a minute ago   Up About a minute   8590/tcp                              confs-10000_meta-service_1
-f0976f48f0f7        federatedai/proxy:1.0-release            "/bin/sh -c 'cd /dat…"   About a minute ago   Up About a minute   0.0.0.0:9370->9370/tcp                confs-10000_proxy_1
+d4686d616965        federatedai/python:1.1-release           "/bin/bash -c 'sourc…"   About a minute ago   Up 52 seconds       9360/tcp, 9380/tcp                    confs-10000_python_1
+4086ef0dc2de        federatedai/fateboard:1.1-release        "/bin/sh -c 'cd /dat…"   About a minute ago   Up About a minute   0.0.0.0:8080->8080/tcp                confs-10000_fateboard_1
+5cf3e1f1731a        federatedai/roll:1.1-release             "/bin/sh -c 'cd roll…"   About a minute ago   Up About a minute   8011/tcp                              confs-10000_roll_1
+11c01143540b        federatedai/meta-service:1.1-release     "/bin/sh -c 'java -c…"   About a minute ago   Up About a minute   8590/tcp                              confs-10000_meta-service_1
+f0976f48f0f7        federatedai/proxy:1.1-release            "/bin/sh -c 'cd /dat…"   About a minute ago   Up About a minute   0.0.0.0:9370->9370/tcp                confs-10000_proxy_1
 7354af787036        redis                                 "docker-entrypoint.s…"   About a minute ago   Up About a minute   6379/tcp                              confs-10000_redis_1
-ed11ce8eb20d        federatedai/egg:1.0-release              "/bin/sh -c 'cd /dat…"   About a minute ago   Up About a minute   7778/tcp, 7888/tcp, 50001-50004/tcp   confs-10000_egg_1
+ed11ce8eb20d        federatedai/egg:1.1-release              "/bin/sh -c 'cd /dat…"   About a minute ago   Up About a minute   7778/tcp, 7888/tcp, 50001-50004/tcp   confs-10000_egg_1
 6802d1e2bd21        mysql                                 "docker-entrypoint.s…"   About a minute ago   Up About a minute   3306/tcp, 33060/tcp                   confs-10000_mysql_1
-5386bcb7565f        federatedai/federation:1.0-release       "/bin/sh -c 'cd /dat…"   About a minute ago   Up About a minute   9394/tcp                              confs-10000_federation_1
+5386bcb7565f        federatedai/federation:1.1-release       "/bin/sh -c 'cd /dat…"   About a minute ago   Up About a minute   9394/tcp                              confs-10000_federation_1
 ```
 
 ### Verify the Deployment
 Since the `confs-10000_python_1` container hosts the `fate-flow` service, so we need to perform the test within that container. Use the following commands to launch:
 ```bash
 $ docker exec -it confs-10000_python_1 bash
-$ source venv/bin/activate
-$ cd python/examples/toy_example/
+$ source /data/projects/python/venv/bin/activate
+$ cd /data/projects/python/examples/toy_example/
 $ python run_toy_example.py 10000 9999 1
 ```
 If the test passed, the screen will print some messages like the follows:

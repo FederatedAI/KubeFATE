@@ -43,7 +43,7 @@ $ git clone git@github.com:FederatedAI/KubeFATE.git
 ```
 
 ## 使用第三方Docker仓库
-非互联网集群建议使用[Harbor](https://goharbor.io/)作为第三方仓库。安装Harbor请参考: https://github.com/FederatedAI/KubeFATE/blob/master/registry/install_harbor.md。在`.env`文件中，将`THIRDPARTYPREFIX`更改为Harbor的IP。 192.168.10.1是Harbor IP的示例。
+非互联网集群建议使用[Harbor](https://goharbor.io/)作为第三方仓库。安装Harbor请参考[文章](https://github.com/FederatedAI/KubeFATE/blob/master/registry/install_harbor.md)。在`.env`文件中，将`THIRDPARTYPREFIX`更改为Harbor的IP。 192.168.10.1是Harbor IP的示例。
 ```bash
 $ cd KubeFATE/
 $ vi .env

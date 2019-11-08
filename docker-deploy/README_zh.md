@@ -2,15 +2,13 @@
 
 ### 前言
 
-联邦学习[FATE](https://www.fedai.org/ )是一个机器学习框架，能有效帮助多个机构在满足用户隐私保护、数据安全和政府法规的要求下，进行数据使用和建模。项目地址（https://github.com/FederatedAI/FATE/）。
+[FATE](https://www.fedai.org/ )是一个联邦学习框架，能有效帮助多个机构在满足用户隐私保护、数据安全和政府法规的要求下，进行数据使用和建模。项目地址：（https://github.com/FederatedAI/FATE/） 本文档介绍使用Docker Compose部署FATE集群的方法。
 
-### Docker compose 简介
+### Docker Compose 简介
 
-Compose是用于定义和运行多容器Docker应用程序的工具。通过Compose，您可以使用YAML文件来配置应用程序的服务。然后，使用一个命令，就可以从配置中创建并启动所有服务。要了解有关Compose的所有功能的更多信息，请参阅[功能列表](https://docs.docker.com/compose/#features)。
+Compose是用于定义和运行多容器Docker应用程序的工具。通过Compose，您可以使用YAML文件来配置应用程序的服务。然后，使用一个命令，就可以从配置中创建并启动所有服务。要了解有关Compose的所有功能的更多信息，请参阅[相关文档](https://docs.docker.com/compose/#features)。
 
-Compose可在所有环境中工作：生产，登台，开发，测试以及CI工作流。
-
-使用Docker compose 可以方便的部署FATE，用来开发测试和生产。
+使用Docker compose 可以方便的部署FATE，下面是使用步骤。
 
 ### 目标
 
@@ -26,33 +24,32 @@ Compose可在所有环境中工作：生产，登台，开发，测试以及CI�
 4. 部署机可以联网，所以主机相互之间可以网络互通；
 5. 运行机已经下载FATE 的各组件镜像（离线构建镜像参考文档[构建镜像](https://github.com/FederatedAI/FATE/tree/contributor_1.0_docker/docker-build)）。
 
-运行机可以通过以下命令从Docker Hub获取镜像，
+如果运行机没有FATE组件的镜像，可以通过以下命令从Docker Hub获取镜像：
 
 ```bash
-$ docker pull federatedai/egg:1.0.2-release
-$ docker pull federatedai/fateboard:1.0.2-release
-$ docker pull federatedai/serving-server:1.0.2-release
-$ docker pull federatedai/meta-service:1.0.2-release
-$ docker pull federatedai/python:1.0.2-release
-$ docker pull federatedai/roll:1.0.2-release
-$ docker pull federatedai/proxy:1.0.2-release
-$ docker pull federatedai/federation:1.0.2-release
-$ docker pull redis
-$ docker pull mysql
+$ docker pull federatedai/egg:1.1-release
+$ docker pull federatedai/fateboard:1.1-release
+$ docker pull federatedai/meta-service:1.1-release
+$ docker pull federatedai/python:1.1-release
+$ docker pull federatedai/roll:1.1-release
+$ docker pull federatedai/proxy:1.1-release
+$ docker pull federatedai/federation:1.1-release
+$ docker pull redis:5
+$ docker pull mysql:8
 ```
 
 检查所有镜像是否下载成功。
 ```bash
 $ docker images
 REPOSITORY                         TAG 
-federatedai/egg                    1.0.2-release
-federatedai/fateboard              1.0.2-release
-federatedai/serving-server         1.0.2-release
-federatedai/meta-service           1.0.2-release
-federatedai/python                 1.0.2-release
-federatedai/roll                   1.0.2-release
-federatedai/proxy                  1.0.2-release
-federatedai/federation             1.0.2-release
+federatedai/egg                    1.1-release
+federatedai/fateboard              1.1-release
+federatedai/serving-server         1.1-release
+federatedai/meta-service           1.1-release
+federatedai/python                 1.1-release
+federatedai/roll                   1.1-release
+federatedai/proxy                  1.1-release
+federatedai/federation             1.1-release
 redis                              latest
 mysql                              latest
 ```
@@ -66,27 +63,29 @@ git clone git@github.com:FederatedAI/KubeFATE.git
 
 ### 修改镜像配置文件
 
-默认情况下，脚本在部署期间会从 [Docker Hub](https://hub.docker.com/search?q=federatedai&type=image)中下载镜像。当然我们也可以修改`kubefate/.env` 使用自己的镜像。
+默认情况下，脚本在部署期间会从 [Docker Hub](https://hub.docker.com/search?q=federatedai&type=image)中下载镜像。
 
 ```bash
 PREFIX=federatedai
-TAG=1.0.2-release
-BASE_TAG=1.0.2-release
-BUILDER_TAG=1.0.2-release
+TAG=1.1-release
+BASE_TAG=1.1-release
+BUILDER_TAG=1.1-release
 ```
 我们这里采用从Docker Hub下载镜像。如果在运行机器上已经下载或导入了所需镜像，部署将会变得非常容易。
 
 ### 离线部署
 
-当我们的运行机器处于无法连接外部网络的时候，就无法从Docker Hub下载镜像，建议使用[Harbor](https://goharbor.io/)作为第三方仓库。安装Harbor请参考: https://github.com/FederatedAI/KubeFATE/blob/master/registry/install_harbor.md。在`.env`文件中，将`THIRDPARTYPREFIX`更改为Harbor的IP。 192.168.10.1是Harbor IP的示例。
+当我们的运行机器处于无法连接外部网络的时候，就无法从Docker Hub下载镜像，建议使用[Harbor](https://goharbor.io/)作为本地镜像仓库。安装Harbor请参考[文档](https://github.com/FederatedAI/KubeFATE/blob/master/registry/install_harbor.md)。在`.env`文件中，将`THIRDPARTYPREFIX`变量更改为Harbor的IP。如下面 192.168.10.1是Harbor IP的示例。
 ```bash
 $ cd KubeFATE/
 $ vi .env
 
+...
 THIRDPARTYPREFIX=192.168.10.1/federatedai
+...
 ```
 
-### 用docker compose部署FATE
+### 用Docker Compose部署FATE
 
 ####  配置需要部署的实例数目
 
@@ -100,8 +99,10 @@ venvdir=/data/projects/fate/venv      #默认就好
 dir=/data/projects/fate               #docker-compose部署目录
 partylist=(10000 9999)                #组织id
 partyiplist=(192.168.7.1 192.168.7.2) #id对应节点ip
-exchangeip=proxy                      #通信组件标识
+exchangeip=192.168.7.1                      #通信组件标识
 ```
+
+**注意**: 默认情况下，运行partylist中第一个party的主机会同时运行exchange组件，该组件的默认监听端口为9371
 
 在运行部署脚本之前，需要确保部署机器可以ssh免密登录到两个运行节点主机上。user代表免密的用户。
 
@@ -112,7 +113,7 @@ exchangeip=proxy                      #通信组件标识
 ```bash
 $ bash docker-auto-deploy.sh
 ```
-如果使用第三方仓库，请使用这个命令：
+如果使用本地镜像仓库，请使用这个命令：
 ```bash
 $ bash docker-auto-deploy.sh useThirdParty
 ```
@@ -134,15 +135,14 @@ $ docker ps
 
 ```
 CONTAINER ID        IMAGE                                 COMMAND                  CREATED             STATUS              PORTS                                 NAMES
-f8ae11a882ba        fatetest/fateboard:1.0.2-release        "/bin/sh -c 'cd /dat…"   5 days ago          Up 5 days           0.0.0.0:8080->8080/tcp                confs-10000_fateboard_1
-d72995355962        fatetest/python:1.0.2-release           "/bin/bash -c 'sourc…"   5 days ago          Up 5 days           9360/tcp, 9380/tcp                    confs-10000_python_1
-dffc70fc68ac        fatetest/egg:1.0.2-release              "/bin/sh -c 'cd /dat…"   7 days ago          Up 7 days           7778/tcp, 7888/tcp, 50001-50004/tcp   confs-10000_egg_1
-dc23d75692b0        fatetest/roll:1.0.2-release             "/bin/sh -c 'cd roll…"   7 days ago          Up 7 days           8011/tcp                              confs-10000_roll_1
-7e52b1b06d1a        fatetest/meta-service:1.0.2-release     "/bin/sh -c 'java -c…"   7 days ago          Up 7 days           8590/tcp                              confs-10000_meta-service_1
-f680247a986c        fatetest/serving-server:1.0.2-release   "/bin/sh -c 'java -c…"   7 days ago          Up 7 days           6379/tcp, 8001/tcp                    confs-10000_serving-server_1
-50a6323f5cb8        fatetest/proxy:1.0.2-release            "/bin/sh -c 'cd /dat…"   7 days ago          Up 7 days           0.0.0.0:9370->9370/tcp                confs-10000_proxy_1
+f8ae11a882ba        fatetest/fateboard:1.1-release        "/bin/sh -c 'cd /dat…"   5 days ago          Up 5 days           0.0.0.0:8080->8080/tcp                confs-10000_fateboard_1
+d72995355962        fatetest/python:1.1-release           "/bin/bash -c 'sourc…"   5 days ago          Up 5 days           9360/tcp, 9380/tcp                    confs-10000_python_1
+dffc70fc68ac        fatetest/egg:1.1-release              "/bin/sh -c 'cd /dat…"   7 days ago          Up 7 days           7778/tcp, 7888/tcp, 50001-50004/tcp   confs-10000_egg_1
+dc23d75692b0        fatetest/roll:1.1-release             "/bin/sh -c 'cd roll…"   7 days ago          Up 7 days           8011/tcp                              confs-10000_roll_1
+7e52b1b06d1a        fatetest/meta-service:1.1-release     "/bin/sh -c 'java -c…"   7 days ago          Up 7 days           8590/tcp                              confs-10000_meta-service_1
+50a6323f5cb8        fatetest/proxy:1.1-release            "/bin/sh -c 'cd /dat…"   7 days ago          Up 7 days           0.0.0.0:9370->9370/tcp                confs-10000_proxy_1
 4526f8e57004        redis                                 "docker-entrypoint.s…"   7 days ago          Up 7 days           6379/tcp                              confs-10000_redis_1
-586f3f2fe191        fatetest/federation:1.0.2-release       "/bin/sh -c 'cd /dat…"   7 days ago          Up 7 days           9394/tcp                              confs-10000_federation_1
+586f3f2fe191        fatetest/federation:1.1-release       "/bin/sh -c 'cd /dat…"   7 days ago          Up 7 days           9394/tcp                              confs-10000_federation_1
 ec434dcbbff1        mysql                                 "docker-entrypoint.s…"   7 days ago          Up 7 days           3306/tcp, 33060/tcp                   confs-10000_mysql_1
 ```
 
@@ -155,8 +155,8 @@ docker-compose上的FATE启动成功之后需要验证各个服务是否都正�
 ```bash
 #在192.168.7.1上执行下列命令
 $ docker exec -it confs-10000_python_1 bash     #进入python组件容器内部
-$ source venv/bin/activate                      #进入python虚拟环境
-$ cd python/examples/toy_example/               #toy_example目录
+$ source /data/projects/python/venv/bin/activate                      #进入python虚拟环境
+$ cd /data/projects/python/examples/toy_example/               #toy_example目录
 $ python run_toy_example.py 10000 9999 1        #验证
 ```
 
