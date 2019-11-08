@@ -92,4 +92,4 @@ The terms supported in the pattern used by name filter and tag filter are as fol
 * **?**: Matches any single non-separator character `/`.
 * **{alt1,...}**: Matches a sequence of characters if one of the comma-separated alternatives matches.
 
-Select a replication rule and click REPLICATE, the resources which the rule is applied to will be replicated from the source registry to the destination immediately. Depending on the network bandwidth under porject federatedai after the images have been replicated. Then the resources will appear in Projects.
+Select a replication rule and click REPLICATE, the resources which the rule is applied to will be replicated from the source registry to the destination immediately. Depending on the network bandwidth, the resources will appear under porject `federatedai` after the images have been replicated.
