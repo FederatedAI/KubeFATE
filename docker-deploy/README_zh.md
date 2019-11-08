@@ -29,30 +29,29 @@ Compose可在所有环境中工作：生产，登台，开发，测试以及CI�
 运行机可以通过以下命令从Docker Hub获取镜像，
 
 ```bash
-$ docker pull federatedai/egg:1.0.2-release
-$ docker pull federatedai/fateboard:1.0.2-release
-$ docker pull federatedai/serving-server:1.0.2-release
-$ docker pull federatedai/meta-service:1.0.2-release
-$ docker pull federatedai/python:1.0.2-release
-$ docker pull federatedai/roll:1.0.2-release
-$ docker pull federatedai/proxy:1.0.2-release
-$ docker pull federatedai/federation:1.0.2-release
-$ docker pull redis
-$ docker pull mysql
+$ docker pull federatedai/egg:1.1-release
+$ docker pull federatedai/fateboard:1.1-release
+$ docker pull federatedai/meta-service:1.1-release
+$ docker pull federatedai/python:1.1-release
+$ docker pull federatedai/roll:1.1-release
+$ docker pull federatedai/proxy:1.1-release
+$ docker pull federatedai/federation:1.1-release
+$ docker pull redis:5
+$ docker pull mysql:8
 ```
 
 检查所有镜像是否下载成功。
 ```bash
 $ docker images
 REPOSITORY                         TAG 
-federatedai/egg                    1.0.2-release
-federatedai/fateboard              1.0.2-release
-federatedai/serving-server         1.0.2-release
-federatedai/meta-service           1.0.2-release
-federatedai/python                 1.0.2-release
-federatedai/roll                   1.0.2-release
-federatedai/proxy                  1.0.2-release
-federatedai/federation             1.0.2-release
+federatedai/egg                    1.1-release
+federatedai/fateboard              1.1-release
+federatedai/serving-server         1.1-release
+federatedai/meta-service           1.1-release
+federatedai/python                 1.1-release
+federatedai/roll                   1.1-release
+federatedai/proxy                  1.1-release
+federatedai/federation             1.1-release
 redis                              latest
 mysql                              latest
 ```
@@ -70,9 +69,9 @@ git clone git@github.com:FederatedAI/KubeFATE.git
 
 ```bash
 PREFIX=federatedai
-TAG=1.0.2-release
-BASE_TAG=1.0.2-release
-BUILDER_TAG=1.0.2-release
+TAG=1.1-release
+BASE_TAG=1.1-release
+BUILDER_TAG=1.1-release
 ```
 我们这里采用从Docker Hub下载镜像。如果在运行机器上已经下载或导入了所需镜像，部署将会变得非常容易。
 
@@ -134,15 +133,15 @@ $ docker ps
 
 ```
 CONTAINER ID        IMAGE                                 COMMAND                  CREATED             STATUS              PORTS                                 NAMES
-f8ae11a882ba        fatetest/fateboard:1.0.2-release        "/bin/sh -c 'cd /dat…"   5 days ago          Up 5 days           0.0.0.0:8080->8080/tcp                confs-10000_fateboard_1
-d72995355962        fatetest/python:1.0.2-release           "/bin/bash -c 'sourc…"   5 days ago          Up 5 days           9360/tcp, 9380/tcp                    confs-10000_python_1
-dffc70fc68ac        fatetest/egg:1.0.2-release              "/bin/sh -c 'cd /dat…"   7 days ago          Up 7 days           7778/tcp, 7888/tcp, 50001-50004/tcp   confs-10000_egg_1
-dc23d75692b0        fatetest/roll:1.0.2-release             "/bin/sh -c 'cd roll…"   7 days ago          Up 7 days           8011/tcp                              confs-10000_roll_1
-7e52b1b06d1a        fatetest/meta-service:1.0.2-release     "/bin/sh -c 'java -c…"   7 days ago          Up 7 days           8590/tcp                              confs-10000_meta-service_1
-f680247a986c        fatetest/serving-server:1.0.2-release   "/bin/sh -c 'java -c…"   7 days ago          Up 7 days           6379/tcp, 8001/tcp                    confs-10000_serving-server_1
-50a6323f5cb8        fatetest/proxy:1.0.2-release            "/bin/sh -c 'cd /dat…"   7 days ago          Up 7 days           0.0.0.0:9370->9370/tcp                confs-10000_proxy_1
+f8ae11a882ba        fatetest/fateboard:1.1-release        "/bin/sh -c 'cd /dat…"   5 days ago          Up 5 days           0.0.0.0:8080->8080/tcp                confs-10000_fateboard_1
+d72995355962        fatetest/python:1.1-release           "/bin/bash -c 'sourc…"   5 days ago          Up 5 days           9360/tcp, 9380/tcp                    confs-10000_python_1
+dffc70fc68ac        fatetest/egg:1.1-release              "/bin/sh -c 'cd /dat…"   7 days ago          Up 7 days           7778/tcp, 7888/tcp, 50001-50004/tcp   confs-10000_egg_1
+dc23d75692b0        fatetest/roll:1.1-release             "/bin/sh -c 'cd roll…"   7 days ago          Up 7 days           8011/tcp                              confs-10000_roll_1
+7e52b1b06d1a        fatetest/meta-service:1.1-release     "/bin/sh -c 'java -c…"   7 days ago          Up 7 days           8590/tcp                              confs-10000_meta-service_1
+f680247a986c        fatetest/serving-server:1.1-release   "/bin/sh -c 'java -c…"   7 days ago          Up 7 days           6379/tcp, 8001/tcp                    confs-10000_serving-server_1
+50a6323f5cb8        fatetest/proxy:1.1-release            "/bin/sh -c 'cd /dat…"   7 days ago          Up 7 days           0.0.0.0:9370->9370/tcp                confs-10000_proxy_1
 4526f8e57004        redis                                 "docker-entrypoint.s…"   7 days ago          Up 7 days           6379/tcp                              confs-10000_redis_1
-586f3f2fe191        fatetest/federation:1.0.2-release       "/bin/sh -c 'cd /dat…"   7 days ago          Up 7 days           9394/tcp                              confs-10000_federation_1
+586f3f2fe191        fatetest/federation:1.1-release       "/bin/sh -c 'cd /dat…"   7 days ago          Up 7 days           9394/tcp                              confs-10000_federation_1
 ec434dcbbff1        mysql                                 "docker-entrypoint.s…"   7 days ago          Up 7 days           3306/tcp, 33060/tcp                   confs-10000_mysql_1
 ```
 
@@ -155,7 +154,7 @@ docker-compose上的FATE启动成功之后需要验证各个服务是否都正�
 ```bash
 #在192.168.7.1上执行下列命令
 $ docker exec -it confs-10000_python_1 bash     #进入python组件容器内部
-$ source venv/bin/activate                      #进入python虚拟环境
+$ source /data/projects/python/venv/bin/activate                      #进入python虚拟环境
 $ cd python/examples/toy_example/               #toy_example目录
 $ python run_toy_example.py 10000 9999 1        #验证
 ```
