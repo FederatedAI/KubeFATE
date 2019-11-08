@@ -37,6 +37,8 @@ partyiplist=(192.168.7.1 192.168.7.2)
 exchangeip=192.168.7.1
 ```
 
+**NOTE**: By default, the machine of the first party will also host the exchange on the 9371 port. A user can change the exchange IP if needed.
+
 Use the following command to deploy each party. Before running the command, ***please make sure host 192.168.7.1 and 192.168.7.2 allow password-less SSH access with SSH key***:
 ```bash
 $ bash docker-auto-deploy.sh
