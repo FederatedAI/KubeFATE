@@ -2,15 +2,13 @@
 
 ### 前言
 
-联邦学习[FATE](https://www.fedai.org/ )是一个机器学习框架，能有效帮助多个机构在满足用户隐私保护、数据安全和政府法规的要求下，进行数据使用和建模。项目地址（https://github.com/FederatedAI/FATE/）。
+[FATE](https://www.fedai.org/ )是一个联邦学习框架，能有效帮助多个机构在满足用户隐私保护、数据安全和政府法规的要求下，进行数据使用和建模。项目地址：（https://github.com/FederatedAI/FATE/） 本文档介绍使用Docker Compose部署FATE集群的方法。
 
-### Docker compose 简介
+### Docker Compose 简介
 
-Compose是用于定义和运行多容器Docker应用程序的工具。通过Compose，您可以使用YAML文件来配置应用程序的服务。然后，使用一个命令，就可以从配置中创建并启动所有服务。要了解有关Compose的所有功能的更多信息，请参阅[功能列表](https://docs.docker.com/compose/#features)。
+Compose是用于定义和运行多容器Docker应用程序的工具。通过Compose，您可以使用YAML文件来配置应用程序的服务。然后，使用一个命令，就可以从配置中创建并启动所有服务。要了解有关Compose的所有功能的更多信息，请参阅[相关文档](https://docs.docker.com/compose/#features)。
 
-Compose可在所有环境中工作：生产，登台，开发，测试以及CI工作流。
-
-使用Docker compose 可以方便的部署FATE，用来开发测试和生产。
+使用Docker compose 可以方便的部署FATE，下面是使用步骤。
 
 ### 目标
 
@@ -26,7 +24,7 @@ Compose可在所有环境中工作：生产，登台，开发，测试以及CI�
 4. 部署机可以联网，所以主机相互之间可以网络互通；
 5. 运行机已经下载FATE 的各组件镜像（离线构建镜像参考文档[构建镜像](https://github.com/FederatedAI/FATE/tree/contributor_1.0_docker/docker-build)）。
 
-运行机可以通过以下命令从Docker Hub获取镜像，
+如果运行机没有FATE组件的镜像，可以通过以下命令从Docker Hub获取镜像：
 
 ```bash
 $ docker pull federatedai/egg:1.1-release
@@ -65,7 +63,7 @@ git clone git@github.com:FederatedAI/KubeFATE.git
 
 ### 修改镜像配置文件
 
-默认情况下，脚本在部署期间会从 [Docker Hub](https://hub.docker.com/search?q=federatedai&type=image)中下载镜像。当然我们也可以修改`kubefate/.env` 使用自己的镜像。
+默认情况下，脚本在部署期间会从 [Docker Hub](https://hub.docker.com/search?q=federatedai&type=image)中下载镜像。
 
 ```bash
 PREFIX=federatedai
@@ -77,15 +75,17 @@ BUILDER_TAG=1.1-release
 
 ### 离线部署
 
-当我们的运行机器处于无法连接外部网络的时候，就无法从Docker Hub下载镜像，建议使用[Harbor](https://goharbor.io/)作为第三方仓库。安装Harbor请参考[文章](https://github.com/FederatedAI/KubeFATE/blob/master/registry/install_harbor.md)。在`.env`文件中，将`THIRDPARTYPREFIX`更改为Harbor的IP。 192.168.10.1是Harbor IP的示例。
+当我们的运行机器处于无法连接外部网络的时候，就无法从Docker Hub下载镜像，建议使用[Harbor](https://goharbor.io/)作为本地镜像仓库。安装Harbor请参考[文档](https://github.com/FederatedAI/KubeFATE/blob/master/registry/install_harbor.md)。在`.env`文件中，将`THIRDPARTYPREFIX`变量更改为Harbor的IP。如下面 192.168.10.1是Harbor IP的示例。
 ```bash
 $ cd KubeFATE/
 $ vi .env
 
+...
 THIRDPARTYPREFIX=192.168.10.1/federatedai
+...
 ```
 
-### 用docker compose部署FATE
+### 用Docker Compose部署FATE
 
 ####  配置需要部署的实例数目
 
@@ -113,7 +113,7 @@ exchangeip=192.168.7.1                      #通信组件标识
 ```bash
 $ bash docker-auto-deploy.sh
 ```
-如果使用第三方仓库，请使用这个命令：
+如果使用本地镜像仓库，请使用这个命令：
 ```bash
 $ bash docker-auto-deploy.sh useThirdParty
 ```
