@@ -299,13 +299,14 @@ Deploy() {
 	while [ "$1" != "" ]; do
     case $1 in
 		 all)
-			 for ((i=0;i<${#partylist[*]};i++))
+			 for party in ${partylist[*]}
 			 do
-				 DeployPartyInternal ${partylist[$i]}
+				 DeployPartyInternal $party
 			 done
 
 			 DeployPartyInternal exchange
-			 break
+
+			 return
 			 ;;
          *)
 			 DeployPartyInternal $1
