@@ -77,11 +77,8 @@ GenerateConfig() {
 	    cp -r docker-example-dir-tree/* confs-$party_id/confs/
 	    cp -r federatedml_examples confs-$party_id/examples
 	    cp ./docker-compose.yml confs-$party_id/
-	  
 	    # generate conf dir
 	    cp ${WORKINGDIR}/../.env ./confs-$party_id
-	  
-	 
 	    if [ "$1" == "useThirdParty" ]
 	    then
 	      sed -i "s#PREFIX#THIRDPARTYPREFIX#g" ./confs-$party_id/docker-compose.yml
@@ -168,28 +165,28 @@ GenerateConfig() {
 {
     "servers": {
         "proxy": {
-            "host": "${proxy_ip}", 
+            "host": "${proxy_ip}",
             "port": ${proxy_port}
-        }, 
+        },
         "fateboard": {
-            "host": "${fateboard_ip}", 
+            "host": "${fateboard_ip}",
             "port": ${fateboard_port}
-        }, 
+        },
         "roll": {
-            "host": "${roll_ip}", 
+            "host": "${roll_ip}",
             "port": ${roll_port}
-        }, 
+        },
         "fateflow": {
-            "host": "${fate_flow_ip}", 
+            "host": "${fate_flow_ip}",
             "grpc.port": ${fate_flow_grpc_port},
             "http.port": ${fate_flow_http_port}
-        }, 
+        },
         "federation": {
-            "host": "${federation_ip}", 
+            "host": "${federation_ip}",
             "port": ${federation_port}
         },
         "clustercomm": {
-            "host": "${federation_ip}", 
+            "host": "${federation_ip}",
             "port": ${federation_port}
         }
     }
@@ -255,7 +252,7 @@ EOF
 	rm -rf confs-exchange/
 	mkdir -p confs-exchange/conf
 	cp ${WORKINGDIR}/../.env confs-exchange/
-	cp docker-compose-exchange.yml confs-exchange/
+	cp docker-compose-exchange.yml confs-exchange/docker-compose.yml
 	cp -r docker-example-dir-tree/proxy/conf confs-exchange/
 	
 	sed -i.bak "s/port=.*/port=${proxy_port}/g" ./confs-exchange/conf/proxy.properties
@@ -274,7 +271,7 @@ echo "        \"${partylist[${j}]}\": {
                     \"port\": 9370
                 }
             ]
-        }," 
+        },"
         done)
         "default": {
             "default": [
@@ -303,7 +300,7 @@ Deploy() {
     case $1 in
 		 all)
 			 for ((i=0;i<${#partylist[*]};i++))
-			 do 
+			 do
 				 DeployPartyInternal ${partylist[$i]}
 			 done
 
@@ -322,13 +319,13 @@ Deploy() {
 DeployPartyInternal() {
 
 	target_party_id=$1
-	# should not use localhost at any case 
+	# should not use localhost at any case
 	target_party_ip="127.0.0.1"
 
 	# check configuration files
 	if [ ! -d ${WORKINGDIR}/outputs ];then
 		echo "Unable to find outputs dir, please generate config files first."
-		exit 1 
+		exit 1
 	fi
 
 	if [ ! -f ${WORKINGDIR}/outputs/confs-${target_party_id}.tar ];then
@@ -354,10 +351,9 @@ DeployPartyInternal() {
 		exit 1
 	fi
 
-    scp confs-$target_party_id.tar $user@$target_party_ip:~/
-    rm -f confs-$target_party_id.tar 
+    scp ${WORKINGDIR}/outputs/confs-$target_party_id.tar $user@$target_party_ip:~/
+    rm -f ${WORKINGDIR}/outputs/confs-$target_party_id.tar
     echo "$target_party_ip copy is ok!"
-    
     ssh -tt $user@$target_party_ip<< eeooff
 mkdir -p $dir
 mv ~/confs-$target_party_id.tar $dir
@@ -399,7 +395,7 @@ main() {
 				 Deploy ${@:2}
 				 break
 				 ;;
-		     *) 
+		     *)
 				 ShowUsage
 				;;
 	    esac
