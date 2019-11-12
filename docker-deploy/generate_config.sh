@@ -79,11 +79,11 @@ GenerateConfig() {
 	    cp ./docker-compose.yml confs-$party_id/
 	    # generate conf dir
 	    cp ${WORKINGDIR}/../.env ./confs-$party_id
-	    if [ "$1" == "useThirdParty" ]
+	    if [ "$RegistryURI" != "" ]
 	    then
-	      sed -i "s#PREFIX#THIRDPARTYPREFIX#g" ./confs-$party_id/docker-compose.yml
-	      sed -i 's#image: "mysql"#image: "${THIRDPARTYPREFIX}/mysql"#g' ./confs-$party_id/docker-compose.yml
-	      sed -i 's#image: "redis"#image: "${THIRDPARTYPREFIX}/redis"#g' ./confs-$party_id/docker-compose.yml
+	      sed -i "s#PREFIX#RegistryURI#g" ./confs-$party_id/docker-compose.yml
+	      sed -i 's#image: "mysql:8"#image: "${RegistryURI}/mysql:8"#g' ./confs-$party_id/docker-compose.yml
+	      sed -i 's#image: "redis:5"#image: "${RegistryURI}/redis:5"#g' ./confs-$party_id/docker-compose.yml
 	    fi
 	
 	    # egg config
@@ -255,6 +255,9 @@ EOF
 	cp docker-compose-exchange.yml confs-exchange/docker-compose.yml
 	cp -r docker-example-dir-tree/proxy/conf confs-exchange/
 	
+	if [ "$RegistryURI" != "" ]; then
+		sed -i "s#PREFIX#RegistryURI#g" ./confs-exchange/docker-compose.yml
+	fi
 	sed -i.bak "s/port=.*/port=${proxy_port}/g" ./confs-exchange/conf/proxy.properties
 	sed -i.bak "s#route.table=.*#route.table=${deploy_dir}/proxy/conf/route_table.json#g" ./confs-exchange/conf/proxy.properties
 	sed -i.bak "s/coordinator=.*/coordinator=${party_id}/g" ./confs-exchange/conf/proxy.properties
@@ -290,118 +293,23 @@ EOF
 	echo exchange module done!
 }
 
-Deploy() {
-	if [ "$1" = "" ];then
-		echo "No party id was provided, please check your arguments "
-		exit 1
-	fi
-
-	while [ "$1" != "" ]; do
-    case $1 in
-		 all)
-			 for party in ${partylist[*]}
-			 do
-				 DeployPartyInternal $party
-			 done
-
-			 DeployPartyInternal exchange
-
-			 return
-			 ;;
-         *)
-			 DeployPartyInternal $1
-			 break
-             ;;
-    esac
-    shift
-	done
-}
-
-DeployPartyInternal() {
-
-	target_party_id=$1
-	# should not use localhost at any case
-	target_party_ip="127.0.0.1"
-
-	# check configuration files
-	if [ ! -d ${WORKINGDIR}/outputs ];then
-		echo "Unable to find outputs dir, please generate config files first."
-		exit 1
-	fi
-
-	if [ ! -f ${WORKINGDIR}/outputs/confs-${target_party_id}.tar ];then
-		echo "Unable to find deployment file for party $target_party_id, please generate it first."
-		exit 1
-	fi
-
-	# extract the ip address of the target party
-	if [ "$target_party_id" = "exchange" ];then
-		target_party_ip=${exchangeip}
-	else
-		for ((i=0;i<${#partylist[*]};i++))
-		do
-			if [ "${partylist[$i]}" = "$target_party_id" ];then
-				target_party_ip=${partyiplist[$i]}
-			fi
-		done
-	fi
-
-	# verify the target_party_ip
-	if [ "$target_party_ip" = "127.0.0.1" ]; then
-		echo "Unable to find Party: $target_party_id, please check you input."
-		exit 1
-	fi
-
-    scp ${WORKINGDIR}/outputs/confs-$target_party_id.tar $user@$target_party_ip:~/
-    rm -f ${WORKINGDIR}/outputs/confs-$target_party_id.tar
-    echo "$target_party_ip copy is ok!"
-    ssh -tt $user@$target_party_ip<< eeooff
-mkdir -p $dir
-mv ~/confs-$target_party_id.tar $dir
-cd $dir
-tar -xzf confs-$target_party_id.tar
-cd confs-$target_party_id
-docker-compose down
-docker-compose up -d
-cd ../
-rm -f confs-$target_party_id.tar
-exit
-eeooff
-    echo "party $target_party_id deploy is ok!"
-}
-
 ShowUsage() {
 	echo "Usage: "
-    echo "Generate configuration: bash docker-auto-deploy.sh generate_config"
-    echo "Deploy all parties or specified partie(s): bash docker-auto-deploy.sh deploy partyid1[partyid2...] | all"
+    echo "Generate configuration: bash generate_config.sh"
 }
 
 main() {
-	if [ "$1" = "" ]; then
+	if [ "$1" != "" ]; then
 		ShowUsage
 		exit 1
-	fi
+	else
+		if [ -d ${WORKINGDIR}/outputs ];then
+			rm -rf ${WORKINGDIR}/outputs
+		fi
 
-	while [ "$1" != "" ]; do
-	    case $1 in
-	         generate_config)
-				 if [ -d ${WORKINGDIR}/outputs ]; then
-				   	rm -rf -d ${WORKINGDIR}/outputs
-				 fi
-				 mkdir -p ${WORKINGDIR}/outputs
-				 GenerateConfig
-				 break
-	             ;;
-			 deploy)
-				 Deploy ${@:2}
-				 break
-				 ;;
-		     *)
-				 ShowUsage
-				;;
-	    esac
-	    shift
-	done
+		mkdir ${WORKINGDIR}/outputs
+		GenerateConfig
+	fi
 
 	exit 0
 }
