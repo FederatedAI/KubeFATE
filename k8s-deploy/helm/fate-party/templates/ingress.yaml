@@ -1,3 +1,8 @@
+########################################################
+# Copyright 2019-2020 program was created VMware, Inc. #
+# SPDX-License-Identifier: Apache-2.0                  #
+########################################################
+
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:

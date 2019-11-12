@@ -34,6 +34,12 @@ spec:
             - mountPath: /data/projects/fate/meta-service/conf/jdbc.properties
               name: meta-service-confs
               subPath: jdbc.properties
+            - mountPath: /data/projects/fate/meta-service/conf/applicationContext-meta-service.xml
+              name: other-confs
+              subPath: applicationContext-meta-service.xml
+            - mountPath: /data/projects/fate/meta-service/conf/log4j2.properties
+              name: other-confs
+              subPath: log4j2.properties
       {{ if .Values.nodeSelector.metaService.value}}
       nodeSelector:
         {{ .Values.nodeSelector.metaService.nodeLabel }}: {{ .Values.nodeSelector.metaService.value }}
@@ -43,7 +49,9 @@ spec:
         - name: meta-service-confs
           configMap:
             name: meta-service-config
-
+        - name: other-confs
+          configMap:
+            name: meta-service-config-other
 ---
 apiVersion: v1
 kind: Service

@@ -23,25 +23,31 @@ spec:
       labels:
         {{ $root.Values.partyId }}: {{ .egg }}
     spec:
+      hostAliases:
+      - ip: "127.0.0.1"
+        hostnames:
+        - "egg"
       containers:
         - env:
-            - name: PYTHONPATH
-              value: python.path=/data/projects/fate/python
+          - name: PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION
+            value: cpp 
+          - name: LD_LIBRARY_PATH
+            value: $LD_LIBRARY_PATH:/usr/local/lib:/data/projects/fate/eggroll/storage-service-cxx/third_party/lib
+          - name: PYTHONPATH
+            value: /data/projects/fate/eggroll/python
+          - name: GLOG_log_dir
+            value: /data/projects/fate/eggroll/storage-service-cxx/logs
           image: {{ $root.Values.image.registry }}/egg:{{ $root.Values.image.tag }}
           imagePullPolicy: {{ $root.Values.image.pullPolicy }}
           name: {{ .egg }}
           ports:
             - containerPort: 7888
             - containerPort: 7778
-            - containerPort: 50001
-            - containerPort: 50002
-            - containerPort: 50003
-            - containerPort: 50004
           volumeMounts:
-            - mountPath: /data/projects/fate/egg/conf/egg.properties
+            - mountPath: /data/projects/fate/eggroll/egg/conf/egg.properties
               name: egg-confs
               subPath: egg.properties
-            - mountPath: /data/projects/fate/python/arch/conf/server_conf.json
+            - mountPath: /data/projects/fate/eggroll/python/eggroll/conf/server_conf.json
               name: python-confs
               subPath: server_conf.json
             - mountPath: /data/projects/fate/python/conf/server_conf.json
@@ -52,6 +58,15 @@ spec:
               subPath: {{ .egg }}-data-dir
               name: modules-data-persistent-storage
             {{- end }}
+            - mountPath: /data/projects/fate/eggroll/egg/conf/applicationContext-egg.xml
+              name: other-confs
+              subPath: applicationContext-egg.xml
+            - mountPath: /data/projects/fate/eggroll/egg/conf/log4j2.properties
+              name: other-confs
+              subPath: log4j2.properties
+            - mountPath: /data/projects/fate/eggroll/egg/conf/processor-starter.sh
+              name: other-confs
+              subPath: processor-starter.sh
       {{ if .value}}
       nodeSelector:
         {{ .nodeLabel }}: {{ .value }}
@@ -70,7 +85,9 @@ spec:
             path: /data/projects/fate/data-dir
             type: DirectoryOrCreate
         {{- end }}
-
+        - name: other-confs
+          configMap:
+            name: egg-config-other
 ---
 apiVersion: v1
 kind: Service
@@ -87,22 +104,6 @@ spec:
     - name: "7778"
       port: 7778
       targetPort: 7778
-      protocol: TCP
-    - name: "50001"
-      port: 50001
-      targetPort: 50001
-      protocol: TCP
-    - name: "50002"
-      port: 50002
-      targetPort: 50002
-      protocol: TCP
-    - name: "50003"
-      port: 50003
-      targetPort: 50003
-      protocol: TCP
-    - name: "50004"
-      port: 50004
-      targetPort: 50004
       protocol: TCP
   type: ClusterIP
   selector:
