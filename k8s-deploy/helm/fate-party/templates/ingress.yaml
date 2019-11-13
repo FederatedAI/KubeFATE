@@ -1,7 +1,14 @@
+########################################################
+# Copyright 2019-2020 program was created VMware, Inc. #
+# SPDX-License-Identifier: Apache-2.0                  #
+########################################################
+
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: fateboard-ingress
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
 spec:
   rules:
   - host: {{ .Values.host.fateboard }}

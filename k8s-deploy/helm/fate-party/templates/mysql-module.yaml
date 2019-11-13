@@ -44,8 +44,7 @@ spec:
               name: mysql
           volumeMounts:
             - name: mysql-confs
-              subPath: config.sql
-              mountPath: /docker-entrypoint-initdb.d/config.sql
+              mountPath: /docker-entrypoint-initdb.d/
             {{- if and .Values.nfspath ( .Values.nfsserver ) }}
             - name: mysql-persistent-storage
               subPath: mysql

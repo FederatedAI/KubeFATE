@@ -21,7 +21,7 @@ FATE组件和pod的关系如下：
 
 Pod            | Service URL                 | FATE component          | Expose Port
 ---------------|-----------------------------|-------------------------|------------
-egg            | egg.\<namespace>            | egg/Storage-Service-cxx | 7888,7778,<br/>50001,50002,<br/>50003,50004 
+egg            | egg.\<namespace>            | egg/Storage-Service-cxx | 7888,7778
 federation     | federation.\<namespace>     | federation              | 9394
 meta-service   | meta-service.\<namespace>   | meta-service            | 8590
 proxy          | proxy.\<namespace>          | proxy                   | 9370
@@ -45,7 +45,7 @@ $ git clone git@github.com:FederatedAI/KubeFATE.git
 ## 使用第三方Docker仓库
 非互联网集群建议使用[Harbor](https://goharbor.io/)作为第三方仓库。安装Harbor请参考[文章](https://github.com/FederatedAI/KubeFATE/blob/master/registry/install_harbor.md)。在`.env`文件中，将`THIRDPARTYPREFIX`更改为Harbor的IP。 192.168.10.1是Harbor IP的示例。
 ```bash
-$ cd KubeFATE/
+$ cd KubeFATE/k8s-deploy/
 $ vi .env
 
 THIRDPARTYPREFIX=192.168.10.1/federatedai
@@ -178,9 +178,9 @@ $ helm install --name=fate-exchange --namespace=fate-exchange ./fate-exchange/
 运行完这三个命令之后，可以用`helm list`来查看部署的状态：
 ```bash
 NAME         	REVISION	UPDATED                 	STATUS  	CHART              	APP VERSION	NAMESPACE    
-fate-10000   	1       	Tue Oct 29 03:47:05 2019	DEPLOYED	fate-party-0.2.0   	1.0.2      	fate-10000   
-fate-9999    	1       	Tue Oct 29 03:46:58 2019	DEPLOYED	fate-party-0.2.0   	1.0.2      	fate-9999    
-fate-exchange	1       	Tue Oct 29 03:46:53 2019	DEPLOYED	fate-exchange-0.2.0	1.0.2      	fate-exchange
+fate-10000   	1       	Tue Oct 29 03:47:05 2019	DEPLOYED	fate-party-0.3.0   	1.1      	fate-10000   
+fate-9999    	1       	Tue Oct 29 03:46:58 2019	DEPLOYED	fate-party-0.3.0   	1.1      	fate-9999    
+fate-exchange	1       	Tue Oct 29 03:46:53 2019	DEPLOYED	fate-exchange-0.3.0	1.1      	fate-exchange
 ```
 
 在这次部署中，”MySQL”, ”Redis”, ”egg”的数据将留在服务所在的本地节点上。如果以后某个服务迁移到其他节点上了，那么以前的数据就不能用了，这是因为数据不会同步迁移。  
@@ -199,7 +199,7 @@ helm install --set nfspath=${NfsPath} --set nfsserver=${NfsIp} --name=fate-* --n
     ```
 - 运行toy_example
     ```bash
-    $ source /data/projects/fate/venv/bin/activate
+    $ source /data/projects/python/venv/bin/activate
     $ cd /data/projects/fate/python/examples/toy_example/
     $ python run_toy_example.py 10000 9999 1
     ```
@@ -216,15 +216,15 @@ helm install --set nfspath=${NfsPath} --set nfsserver=${NfsIp} --name=fate-* --n
 
 ## 可视化
 
-如果你的k8s集群部署了ingress controller ( [ingress-nginx](https://kubernetes.github.io/ingress-nginx/deploy/) )，那么就可以通过 URL http://<partyid>.fateboard.fedai.org 访问可视化组件fateboard。
+如果你的k8s集群部署了ingress controller ( [ingress-nginx](https://kubernetes.github.io/ingress-nginx/deploy/) )，那么就可以通过 URL http://\<partyid\>.fateboard.fedai.org 访问可视化组件fateboard。
 
 在这之前，你需要修改自己的hosts文件，
 
 ```bash
-<node-iP> <party-id>.fateboard.fedai.org     # 增加这条记录
+<node-ip> <party-id>.fateboard.fedai.org     # 增加这条记录
 ```
 
-> <node-iP>：集群任一节点的IP
+> <node-ip>：集群任一节点的IP
 ><party-id>：部署FATE的partyId
 
 ## 常见问题

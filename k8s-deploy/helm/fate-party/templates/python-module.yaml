@@ -42,7 +42,16 @@ spec:
         - -c
         - |
           set -x
-
+          
+          apt-get update;
+          apt-get install -y git;
+          git clone https://github.com/FederatedAI/FATE.git;
+          cd FATE;
+          git checkout v1.1;
+          cd ..;
+          mkdir -p /examples;
+          cp -r FATE/examples/* /examples/;
+          
           function checkMySQL(){
             checkMySQLCount=0
             while true ; do
@@ -59,6 +68,10 @@ spec:
           }
           echo "Waiting for mysql started..."
           checkMySQL
+          
+        volumeMounts:
+          - name: examples
+            mountPath: /examples
       containers:
         - image: {{ .Values.image.registry }}/python:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -66,23 +79,20 @@ spec:
           ports:
             - containerPort: 9360
             - containerPort: 9380
-          command:
-            - /bin/bash
-            - -c
-          args:
-            - source /data/projects/fate/venv/bin/activate && cd python/fate_flow && python fate_flow_server.py
           volumeMounts:
+            - mountPath: /data/projects/fate/python/eggroll/conf/server_conf.json
+              name: python-confs
+              subPath: server_conf.json
             - mountPath: /data/projects/fate/python/arch/conf/server_conf.json
               name: python-confs
               subPath: server_conf.json
-            - mountPath: /data/projects/fate/python/conf/server_conf.json
-              subPath: server_conf.json
-              name: python-confs
             - mountPath: /data/projects/fate/python/fate_flow/settings.py
               subPath: settings.py
               name: python-confs
             - name: logs
               mountPath: /data/projects/fate/python/logs
+            - name: examples
+              mountPath: /data/projects/fate/python/examples
         - image: {{ .Values.image.registry }}/fateboard:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           name: fateboard
@@ -107,6 +117,8 @@ spec:
           configMap:
             name: fateboard-config
         - name: logs
+          emptyDir: {}
+        - name: examples
           emptyDir: {}
 
 ---

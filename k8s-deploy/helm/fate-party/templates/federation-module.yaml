@@ -31,6 +31,12 @@ spec:
             - mountPath: /data/projects/fate/federation/conf/federation.properties
               name: federation-confs
               subPath: federation.properties
+            - mountPath: /data/projects/fate/federation/conf/applicationContext-federation.xml
+              name: other-confs
+              subPath: applicationContext-federation.xml
+            - mountPath: /data/projects/fate/federation/conf/log4j2.properties
+              name: other-confs
+              subPath: log4j2.properties
       {{ if .Values.nodeSelector.federation.value}}
       nodeSelector:
         {{ .Values.nodeSelector.federation.nodeLabel }}: {{ .Values.nodeSelector.federation.value }}
@@ -40,7 +46,9 @@ spec:
         - name: federation-confs
           configMap:
             name: federation-config
-
+        - name: other-confs
+          configMap:
+            name: federation-config-other
 ---
 apiVersion: v1
 kind: Service
