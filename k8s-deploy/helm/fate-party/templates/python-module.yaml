@@ -46,6 +46,9 @@ spec:
           apt-get update;
           apt-get install -y git;
           git clone https://github.com/FederatedAI/FATE.git;
+          cd FATE;
+          git checkout v1.1;
+          cd ..;
           mkdir -p /examples;
           cp -r FATE/examples/* /examples/;
           

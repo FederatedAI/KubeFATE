@@ -25,8 +25,8 @@ do
   rm -rf fate-$partyid/
   mkdir -p fate-$partyid/
   
-  ln -sf ../helm/fate-party/Chart.yaml fate-$partyid/Chart.yaml
-  ln -sf ../helm/fate-party/templates fate-$partyid/templates
+  cp -r helm/fate-party/Chart.yaml fate-$partyid/Chart.yaml
+  cp -r helm/fate-party/templates fate-$partyid/templates
   
   cat > fate-$partyid/values.yaml << EOF
 #nfspath: /data/fate-data
@@ -110,8 +110,8 @@ done
 rm -rf fate-exchange/
 mkdir -p fate-exchange/
 
-ln -sf ../helm/fate-exchange/Chart.yaml fate-exchange/Chart.yaml
-ln -sf ../helm/fate-exchange/templates fate-exchange/templates
+cp -r helm/fate-exchange/Chart.yaml fate-exchange/Chart.yaml
+cp -r helm/fate-exchange/templates fate-exchange/templates
 
 cat > fate-exchange/values.yaml << EOF
 image:

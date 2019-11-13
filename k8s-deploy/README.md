@@ -206,11 +206,11 @@ By default, only one egg service will be deployed. To deploy multiple egg servic
 
 ### **The Visualizations**
 
-if you kubernetes cluster deployment Ingress controller ( [ingress-nginx](https://kubernetes.github.io/ingress-nginx/deploy/) ), you can also access the FATEBoard through http://<partyid>.fateboard.fedai.org 
+if you kubernetes cluster deployment Ingress controller ( [ingress-nginx](https://kubernetes.github.io/ingress-nginx/deploy/) ), you can also access the FATEBoard through http://\<party-id\>.fateboard.fedai.org 
 
 You have to modify hosts before that
 
 ```bash
-<node-iP> <party-id>.fateboard.fedai.org     # Add this record to hosts
+<node-ip> <party-id>.fateboard.fedai.org     # Add this record to hosts
 ```
 

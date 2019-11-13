@@ -50,9 +50,6 @@ spec:
             - mountPath: /data/projects/fate/eggroll/python/eggroll/conf/server_conf.json
               name: python-confs
               subPath: server_conf.json
-            - mountPath: /data/projects/fate/python/conf/server_conf.json
-              name: python-confs
-              subPath: server_conf.json
             {{- if and $root.Values.nfspath ( $root.Values.nfsserver ) }}
             - mountPath: /data/projects/fate/data-dir
               subPath: {{ .egg }}-data-dir

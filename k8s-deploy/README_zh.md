@@ -216,15 +216,15 @@ helm install --set nfspath=${NfsPath} --set nfsserver=${NfsIp} --name=fate-* --n
 
 ## 可视化
 
-如果你的k8s集群部署了ingress controller ( [ingress-nginx](https://kubernetes.github.io/ingress-nginx/deploy/) )，那么就可以通过 URL http://<partyid>.fateboard.fedai.org 访问可视化组件fateboard。
+如果你的k8s集群部署了ingress controller ( [ingress-nginx](https://kubernetes.github.io/ingress-nginx/deploy/) )，那么就可以通过 URL http://\<partyid\>.fateboard.fedai.org 访问可视化组件fateboard。
 
 在这之前，你需要修改自己的hosts文件，
 
 ```bash
-<node-iP> <party-id>.fateboard.fedai.org     # 增加这条记录
+<node-ip> <party-id>.fateboard.fedai.org     # 增加这条记录
 ```
 
-> <node-iP>：集群任一节点的IP
+> <node-ip>：集群任一节点的IP
 ><party-id>：部署FATE的partyId
 
 ## 常见问题
