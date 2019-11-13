@@ -10,7 +10,7 @@ cd $BASEDIR
 WORKINGDIR=`pwd`
 
 # fetch fate-python image
-source ${WORKINGDIR}/../.env
+source ${WORKINGDIR}/.env
 source ${WORKINGDIR}/kube.cfg
 
 for ((i=0;i<${#partylist[*]};i++))

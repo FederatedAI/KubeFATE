@@ -43,7 +43,7 @@ By default, the script pulls the images from [Docker Hub](https://hub.docker.com
 It is recommended that non-Internet clusters use [Harbor](https://goharbor.io/) as a third-party registry. Please refer to [this guide](https://github.com/FederatedAI/KubeFATE/blob/master/registry/install_harbor.md) to install Harbor. Change the `THIRDPARTYPREFIX` to Harbor hostname in the `.env` file. `192.168.10.1` is an example of Harbor ip.
 
 ```bash
-$ cd KubeFATE/
+$ cd KubeFATE/k8s-deploy/
 $ vi .env
 
 THIRDPARTYPREFIX=192.168.10.1/federatedai
