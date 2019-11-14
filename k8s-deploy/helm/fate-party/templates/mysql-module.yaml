@@ -23,9 +23,9 @@ spec:
     spec:
       containers:
         {{ if .Values.image.isThridParty}}
-        - image: {{ .Values.image.registry }}/mysql
+        - image: {{ .Values.image.registry }}/mysql:8
         {{ else }}
-        - image: mysql
+        - image: mysql:8
         {{- end }}
           name: mysql
           env:

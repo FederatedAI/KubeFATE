@@ -10,7 +10,7 @@ cd $BASEDIR
 WORKINGDIR=`pwd`
 
 # fetch fate-python image
-source ${WORKINGDIR}/.env
+source ${WORKINGDIR}/../.env
 source ${WORKINGDIR}/kube.cfg
 
 for ((i=0;i<${#partylist[*]};i++))
@@ -33,9 +33,9 @@ do
 #nfsserver: 192.168.0.2
 
 image:
-$( if [[ $1 == "useThirdParty" ]]
+$( if [[ "$RegistryURI" != "" ]]
    then
-     echo "  registry: ${THIRDPARTYPREFIX}"
+     echo "  registry: ${RegistryURI}"
      echo "  isThridParty: true"
    else
      echo "  registry: ${PREFIX}"
@@ -115,9 +115,9 @@ cp -r helm/fate-exchange/templates fate-exchange/templates
 
 cat > fate-exchange/values.yaml << EOF
 image:
-$( if [[ $1 == "useThirdParty" ]]
+$( if [[ "$RegistryURI" != "" ]]
    then
-     echo "  registry: ${THIRDPARTYPREFIX}"
+     echo "  registry: ${RegistryURI}"
      echo "  isThridParty: true"
    else
      echo "  registry: ${PREFIX}"

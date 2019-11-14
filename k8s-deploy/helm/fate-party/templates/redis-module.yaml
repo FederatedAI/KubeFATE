@@ -23,9 +23,9 @@ spec:
     spec:
       containers:
         {{ if .Values.image.isThridParty}}
-        - image: {{ .Values.image.registry }}/redis
+        - image: {{ .Values.image.registry }}/redis:5
         {{ else }}
-        - image: redis
+        - image: redis:5
         {{- end }}
           name: redis
           ports:
