@@ -13,21 +13,21 @@ $ git clone git@github.com:FederatedAI/KubeFATE.git
 By default, the script pulls the images from [Docker Hub](https://hub.docker.com/search?q=federatedai&type=image) during the deployment.
 
 ### Use Third Party Registry (Optional)
-It is recommended that non-Internet clusters use Harbor as a third-party registry. Please refer to [this guide](https://github.com/FederatedAI/KubeFATE/blob/master/registry/install_harbor.md) to install Harbor. Change the `THIRDPARTYPREFIX` to [Harbor](https://goharbor.io/) hostname in the `.env` file. `192.168.10.1` is an example of Harbor IP.
+It is recommended that non-Internet clusters use Harbor as a third-party registry. Please refer to [this guide](https://github.com/FederatedAI/KubeFATE/blob/master/registry/install_harbor.md) to install Harbor. Change the `RegistryURI` to [Harbor](https://goharbor.io/) hostname in the `.env` file. `192.168.10.1` is an example of Harbor IP.
 ```bash
 $ cd KubeFATE/
 $ vi .env
 
-THIRDPARTYPREFIX=192.168.10.1/federatedai
+RegistryURI=192.168.10.1/federatedai
 ```
 
 ### Configure Parties
 The following steps will illustrate how to deploy two parties on different hosts.
 
 ### Generate startup files
-Before starting the FATE system, the user needs to define their parties in configuration file `./docker-configuration.sh`. 
+Before starting the FATE system, the user needs to define their parties in configuration file `./parties.conf`. 
 
-The following sample of `docker-configuration.sh` defines two parities, they are party `10000` hosted on a machine *192.168.7.1* and `9999` hosted on a machine *192.168.7.2*.
+The following sample of `parties.conf` defines two parities, they are party `10000` hosted on a machine *192.168.7.1* and `9999` hosted on a machine *192.168.7.2*.
 
 ```bash
 user=root
@@ -40,12 +40,10 @@ exchangeip=192.168.7.1
 **NOTE**: By default, the machine of the first party will also host the exchange on the 9371 port. A user can change the exchange IP if needed.
 
 Use the following command to deploy each party. Before running the command, ***please make sure host 192.168.7.1 and 192.168.7.2 allow password-less SSH access with SSH key***:
+
 ```bash
-$ bash docker-auto-deploy.sh
-```
-If using a third-party registry, use the following command to generate deployment files:
-```bash
-$ bash docker-auto-deploy.sh useThirdParty
+$ bash generate_config.sh  # generate the config file
+$ bash docker_deploy.sh    # launch the deployment
 ```
 
 The script will copy "10000-confs.tar" and "9999-confs.tar" to host 192.168.7.1 and 192.168.7.2.
@@ -72,7 +70,7 @@ Since the `confs-10000_python_1` container hosts the `fate-flow` service, so we 
 ```bash
 $ docker exec -it confs-10000_python_1 bash
 $ source /data/projects/python/venv/bin/activate
-$ cd /data/projects/python/examples/toy_example/
+$ cd /data/projects/fate/python/examples/toy_example
 $ python run_toy_example.py 10000 9999 1
 ```
 If the test passed, the screen will print some messages like the follows:
@@ -86,4 +84,4 @@ If the test passed, the screen will print some messages like the follows:
 "2019-08-29 07:21:33,920 - secure_add_guest.py[line:114] - INFO: receive host sum from guest"
 "2019-08-29 07:21:34,118 - secure_add_guest.py[line:121] - INFO: success to calculate secure_sum, it is 2000.0000000000002"
 ```
-For more details about the testing result, please refer to "python/examples/toy_example/README.md" 
+For more details about the testing result, please refer to "/data/projects/fate/python/examples/toy_example/README.md" 
