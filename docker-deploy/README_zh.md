@@ -75,13 +75,13 @@ BUILDER_TAG=1.1-release
 
 ### 离线部署
 
-当我们的运行机器处于无法连接外部网络的时候，就无法从Docker Hub下载镜像，建议使用[Harbor](https://goharbor.io/)作为本地镜像仓库。安装Harbor请参考[文档](https://github.com/FederatedAI/KubeFATE/blob/master/registry/install_harbor.md)。在`.env`文件中，将`THIRDPARTYPREFIX`变量更改为Harbor的IP。如下面 192.168.10.1是Harbor IP的示例。
+当我们的运行机器处于无法连接外部网络的时候，就无法从Docker Hub下载镜像，建议使用[Harbor](https://goharbor.io/)作为本地镜像仓库。安装Harbor请参考[文档](https://github.com/FederatedAI/KubeFATE/blob/master/registry/install_harbor.md)。在`.env`文件中，将`RegistryURI`变量更改为Harbor的IP。如下面 192.168.10.1是Harbor IP的示例。
 ```bash
 $ cd KubeFATE/
 $ vi .env
 
 ...
-THIRDPARTYPREFIX=192.168.10.1/federatedai
+RegistryURI=192.168.10.1/federatedai
 ...
 ```
 
@@ -89,7 +89,7 @@ THIRDPARTYPREFIX=192.168.10.1/federatedai
 
 ####  配置需要部署的实例数目
 
-部署脚本提供了部署多个FATE实例的功能，下面的例子我们部署在两个机器上，每个机器运行一个FATE实例。根据需求修改配置文件`kubeFATE\docker-deploy\docker-configuration.sh`。
+部署脚本提供了部署多个FATE实例的功能，下面的例子我们部署在两个机器上，每个机器运行一个FATE实例。根据需求修改配置文件`kubeFATE\docker-deploy\parties.conf`。
 
 下面是修改好的文件，分别是在主机*192.168.7.1*上的节点`10000`和主机*192.168.7.2*上的`9999`。
 
@@ -111,14 +111,10 @@ exchangeip=192.168.7.1                      #通信组件标识
 进入目录`kubeFATE\docker-deploy`，然后运行：
 
 ```bash
-$ bash docker-auto-deploy.sh
+$ bash generate_config.sh          # 生成部署文件
+$ bash docker_deploy.sh all        # 在各个party上部署FATE
 ```
-如果使用本地镜像仓库，请使用这个命令：
-```bash
-$ bash docker-auto-deploy.sh useThirdParty
-```
-
-脚本将会生成10000和9999两个组织（Party）的部署文件，然后打包成两个tar文件。接着把两个文件`10000-confs.tar`和`9999-confs.tar`分别复制到主机`192.168.7.1`和`192.168.7.2`上并解包，解包后的文件默认在`/data/projects/fate`目录下。然后脚本将远程登录到这些主机并使用docker compose命令启动FATE实例。
+脚本将会生成10000、9999两个组织（Party）和exchange的部署文件，然后打包成tar文件。接着把tar文件`confs-10000.tar`、`confs-9999.tar`和``confs-exchange.tar`分别复制到party对应的主机上并解包，解包后的文件默认在`/data/projects/fate`目录下。然后脚本将远程登录到这些主机并使用docker compose命令启动FATE实例。
 
 命令成功执行返回后，登录其中任意一个主机：
 
@@ -156,7 +152,7 @@ docker-compose上的FATE启动成功之后需要验证各个服务是否都正�
 #在192.168.7.1上执行下列命令
 $ docker exec -it confs-10000_python_1 bash     #进入python组件容器内部
 $ source /data/projects/python/venv/bin/activate                      #进入python虚拟环境
-$ cd /data/projects/python/examples/toy_example/               #toy_example目录
+$ cd /data/projects/fate/python/examples/toy_example               #toy_example目录
 $ python run_toy_example.py 10000 9999 1        #验证
 ```
 
@@ -204,14 +200,6 @@ $ docker exec -it confs-10000_python_1 bash
 
 解决办法：可以自己构建镜像，自己构建镜像参考[这里](https://github.com/FederatedAI/FATE/tree/contributor_1.0_docker/docker-build)。
 
-3.运行脚本`bash docker-auto-deploy.sh`的时候提示需要输入密码
+3.运行脚本`bash docker_deploy.sh all`的时候提示需要输入密码
 
 解决办法：检查免密登陆是否正常。ps:直接输入对应主机的用户密码也可以继续运行。
-
-4.如果提示错误是“job running time exceed, please check federation or eggroll log”，可能是计算超时。
-
-解决办法：检查防火墙是否打开6370端口。然后修改`run_toy_example.py`文件24行
-
-`MAX_TIME = 10`
-
-把10修改为30，如果主机计算性能和网络性能较差，运行测试就会超时。
