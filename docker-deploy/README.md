@@ -42,11 +42,11 @@ exchangeip=192.168.7.1
 Use the following command to deploy each party. Before running the command, ***please make sure host 192.168.7.1 and 192.168.7.2 allow password-less SSH access with SSH key***:
 
 ```bash
-$ bash generate_config.sh  # generate the config file
-$ bash docker_deploy.sh    # launch the deployment
+$ bash generate_config.sh      # generate the config file
+$ bash docker_deploy.sh all    # launch the deployment
 ```
 
-The script will copy "10000-confs.tar" and "9999-confs.tar" to host 192.168.7.1 and 192.168.7.2.
+The script will copy `confs-10000.tar` and `confs-9999.tar` to host 192.168.7.1 and 192.168.7.2.
 
 Afterward the script will log in to these hosts and use docker-compose command to start the FATE cluster.
 
