@@ -114,7 +114,7 @@ exchangeip=192.168.7.1                      #通信组件标识
 $ bash generate_config.sh          # 生成部署文件
 $ bash docker_deploy.sh all        # 在各个party上部署FATE
 ```
-脚本将会生成10000、9999两个组织（Party）和exchange的部署文件，然后打包成tar文件。接着把tar文件`confs-10000.tar`、`confs-9999.tar`和``confs-exchange.tar`分别复制到party对应的主机上并解包，解包后的文件默认在`/data/projects/fate`目录下。然后脚本将远程登录到这些主机并使用docker compose命令启动FATE实例。
+脚本将会生成10000、9999两个组织（Party）和exchange的部署文件，然后打包成tar文件。接着把tar文件`confs-10000.tar`、`confs-9999.tar`和`confs-exchange.tar`分别复制到party对应的主机上并解包，解包后的文件默认在`/data/projects/fate`目录下。然后脚本将远程登录到这些主机并使用docker compose命令启动FATE实例。
 
 命令成功执行返回后，登录其中任意一个主机：
 
