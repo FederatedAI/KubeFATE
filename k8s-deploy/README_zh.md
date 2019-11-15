@@ -27,7 +27,6 @@ meta-service   | meta-service.\<namespace>   | meta-service            | 8590
 proxy          | proxy.\<namespace>          | proxy                   | 9370
 roll           | roll.\<namespace>           | roll                    | 8011
 redis          | redis.\<namespace>          | redis                   | 6379
-serving-server | serving-server.\<namespace> | serving-server          | 8001
 mysql          | mysql.\<namespace>          | mysql                   | 3306
 python         | fateflow.\<namespace><br>fateboard.\<namespace> | fate-flow/fateboard     | 9360,9380,8080
 
@@ -84,21 +83,21 @@ node-3    Ready     5d        v1.15.3       192.168.11.5
 
 选定一个节点，添加一个标签（label）：
 ```bash
-$ kubectl label nodes node-0 fedai.hostname=egg0
+$ kubectl label nodes node-0 fedai.hostname=fate-node-0
 
 node "node-0" labeled
 ```
-这个命令会给node-0添加一个 fedai.hostname=egg0的标签，标签是键值对的形式，fedai.hostname是key，它的value是egg0。
+这个命令会给node-0添加一个 fedai.hostname=fate-node-0的标签，标签是键值对的形式，fedai.hostname是key，它的value是fate-node-0。
 
 当所有的工作节点都添加过标签后，用下面的命令来查看：  
 `$ kubectl get nodes --show-labels`
 ```bash
 NAME      STATUS    AGE       VERSION   LABELS
 master    Ready     5d        v1.15.3   kubernetes.io/arch=amd64,kubernetes.io/hostname=master,kubernetes.io/os=linux,name=master,node-role.kubernetes.io/master=
-node-0    Ready     5d        v1.15.3   ..., fedai.hostname=egg0, ...
-node-1    Ready     5d        v1.15.3   ..., fedai.hostname=egg1, ...
-node-2    Ready     5d        v1.15.3   ..., fedai.hostname=worker1, ...
-node-3    Ready     5d        v1.15.3   ..., fedai.hostname=worker2, ...
+node-0    Ready     5d        v1.15.3   ..., fedai.hostname=fate-node-0, ...
+node-1    Ready     5d        v1.15.3   ..., fedai.hostname=fate-node-1, ...
+node-2    Ready     5d        v1.15.3   ..., fedai.hostname=fate-node-2, ...
+node-3    Ready     5d        v1.15.3   ..., fedai.hostname=fate-node-3, ...
 ```
 
 配置文件kube.cfg里面还有一部分配置项，可定制服务部署的节点，例如下面配置：
@@ -108,18 +107,17 @@ node-3    Ready     5d        v1.15.3   ..., fedai.hostname=worker2, ...
 # 指定打算使用Kubernetes的label，默认用fedai.hostname
 nodeLabel=fedai.hostname
 # 如果想部署多个egg服务，需要添多个egg值，用空格分割
-eggList=(egg0 egg1) #这个例子会在node-0和node-1上分别部署一个egg服务，如果只需要一个egg服务，填一个值就好了
-federation=worker1
-metaService=worker1
-mysql=worker1
-proxy=worker1
-python=worker2
-redis=worker2
-roll=worker2
-servingServer=worker2
+eggList=(fate-node-0 fate-node-1) #这个例子会在node-0和node-1上分别部署一个egg服务，如果只需要一个egg服务，填一个值就好了
+federation=fate-node-2
+metaService=fate-node-2
+mysql=fate-node-2
+proxy=fate-node-2
+python=fate-node-3
+redis=fate-node-3
+roll=fate-node-3
 ```
 
-在这个例子里面，会在节点node-0上面部署一个`egg`服务，节点node-1上面部署一个`egg`服务，在节点node-2上面部署`federation`,`metaService`,`mysql`,`proxy`服务，在node-3上面部署`python`,`redis`,`roll`,`servingServer`服务。示意图如下：
+在这个例子里面，会在节点node-0上面部署一个`egg`服务，节点node-1上面部署一个`egg`服务，在节点node-2上面部署`federation`,`metaService`,`mysql`,`proxy`服务，在node-3上面部署`python`,`redis`,`roll`服务。示意图如下：
 
 <div style="text-align:center", align=center>
 <img src="./images/k8s-cluster.jpg" />

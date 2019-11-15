@@ -18,7 +18,6 @@ meta-service   | meta-service.\<namespace>   | meta-service            | 8590
 proxy          | proxy.\<namespace>          | proxy                   | 9370
 roll           | roll.\<namespace>           | roll                    | 8011
 redis          | redis.\<namespace>          | redis                   | 6379
-serving-server | serving-server.\<namespace> | serving-server          | 8001
 mysql          | mysql.\<namespace>          | mysql                   | 3306
 python         | fateflow.\<namespace><br/>fateboard.\<namespace> | fate-flow/fateboard     | 9360,9380,8080
 
@@ -161,21 +160,21 @@ node-3    Ready     5d        v1.15.3       192.168.11.5
 
 A user can tag a specified node with labels, for example:  
 ```bash
-$ kubectl label nodes node-0 fedai.hostname=egg0
+$ kubectl label nodes node-0 fedai.hostname=fate-node-0
 
 node "node-0" labeled
 ```
-The above command tagged node-0 with a label `fedai.hostname=egg`.
+The above command tagged node-0 with a label `fedai.hostname=fate-node-0`.
 
 After tagging all nodes, verify that they are worked by running:  
 `$ kubectl get nodes --show-labels`
 ```bash
 NAME      STATUS    AGE       VERSION   LABELS
 master    Ready     5d        v1.15.3   kubernetes.io/arch=amd64,kubernetes.io/hostname=master,kubernetes.io/os=linux,name=master,node-role.kubernetes.io/master=
-node-0    Ready     5d        v1.15.3   ..., fedai.hostname=egg0, ...
-node-1    Ready     5d        v1.15.3   ..., fedai.hostname=egg1, ...
-node-2    Ready     5d        v1.15.3   ..., fedai.hostname=worker1, ...
-node-3    Ready     5d        v1.15.3   ..., fedai.hostname=worker2, ...
+node-0    Ready     5d        v1.15.3   ..., fedai.hostname=fate-node-0, ...
+node-1    Ready     5d        v1.15.3   ..., fedai.hostname=fate-node-1, ...
+node-2    Ready     5d        v1.15.3   ..., fedai.hostname=fate-node-2, ...
+node-3    Ready     5d        v1.15.3   ..., fedai.hostname=fate-node-3, ...
 ```
 
 With the use of node labels, a user can customize the deployment by configuring the "KubeFATE/k8s-deploy/kube.cfg". A sample is as follows:
@@ -185,22 +184,21 @@ With the use of node labels, a user can customize the deployment by configuring 
 # Specify k8s node selector, default use fedai.hostname
 nodeLabel=fedai.hostname
 # Please fill in multiple label value for multiple eggs, and split with spaces
-eggList=(egg0 egg1) # This will deploy an egg service in node-0 and an egg service in node-1. If you only need one egg service, just fill one value.
-federation=worker1
-metaService=worker1
-mysql=worker1
-proxy=worker1
-python=worker2
-redis=worker2
-roll=worker2
-servingServer=worker2
+eggList=(fate-node-0 fate-node-1) # This will deploy an egg service in node-0 and an egg service in node-1. If you only need one egg service, just fill one value.
+federation=fate-node-2
+metaService=fate-node-2
+mysql=fate-node-2
+proxy=fate-node-2
+python=fate-node-3
+redis=fate-node-3
+roll=fate-node-3
 ```
 
 <div style="text-align:center", align=center>
 <img src="./images/k8s-cluster.jpg" />
 </div>
 
-The above sample will deploy an `egg` service in node-0 and, an `egg` service in node-1, `federation`, `metaService`, `mysql`, `proxy` services to node-2 and `python`, `redis`, `roll`, `servingServer` services to node-3. If no value is given, a service will be deployed in the cluster according to the strategy of the scheduler.
+The above sample will deploy an `egg` service in node-0 and, an `egg` service in node-1, `federation`, `metaService`, `mysql`, `proxy` services to node-2 and `python`, `redis`, `roll` services to node-3. If no value is given, a service will be deployed in the cluster according to the strategy of the scheduler.
 
 By default, only one egg service will be deployed. To deploy multiple egg services, please fill in the `eggList` with the label of the Kubernetes nodes (Separated with spaces). Helm will deploy one egg service to each node.
 
