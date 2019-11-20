@@ -71,6 +71,7 @@ services:
         - ./confs/egg/conf:/data/projects/fate/eggroll/egg/conf
         - ./confs/egg/conf/transfer_conf.json:/data/projects/fate/eggroll/python/eggroll/conf/transfer_conf.json
         - ./confs/federatedml/conf/server_conf.json:/data/projects/fate/eggroll/python/eggroll/conf/server_conf.json
+        - ./confs/egg/data-dir:/data/projects/fate/data-dir
     networks:
       - fate-network
 
@@ -115,6 +116,7 @@ services:
       - 3306
     volumes:
       - ./confs/mysql/init:/docker-entrypoint-initdb.d/
+      - ./confs/mysql/data:/var/lib/mysql
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: fate_dev
