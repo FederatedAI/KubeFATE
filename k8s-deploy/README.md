@@ -88,7 +88,7 @@ $ kubectl create namespace fate-9999
 $ kubectl create namespace fate-10000
 $ kubectl create namespace fate-exchange
 ```
-Then check if you have permission  to deploy tiller. If not, please add an account for it with the following command:
+Then check if you have permission to deploy tiller. If not, please add an account for it with the following command:
 ```bash
 kubectl --namespace kube-system create serviceaccount tiller
 
