@@ -25,7 +25,7 @@ Deploy() {
     	case $1 in
 			splitting_proxy)
 				shift
-				DeployPartyInternal $1 $2
+				DeployPartyInternal $@
 				break
 				;;
 			all)
@@ -78,6 +78,11 @@ DeployPartyInternal() {
 		echo "Unable to find Party: $target_party_id, please check you input."
 		exit 1
 	fi
+
+	if [ "$3" != "" ]; then
+		user=$3
+	fi
+
     scp ${WORKINGDIR}/outputs/confs-$target_party_id.tar $user@$target_party_ip:~/
     #rm -f ${WORKINGDIR}/outputs/confs-$target_party_id.tar
     echo "$target_party_ip copy is ok!"
