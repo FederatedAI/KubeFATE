@@ -209,40 +209,39 @@ EOF
 	    sed -i.bak "s#route.table=.*#route.table=${deploy_dir}/${module_name}/conf/route_table.json#g" ./confs-$party_id/confs/proxy/conf/${module_name}.properties
 	    sed -i.bak "s/coordinator=.*/coordinator=${party_id}/g" ./confs-$party_id/confs/proxy/conf/${module_name}.properties
 	
-	    cat > ./confs-$party_id/confs/proxy/conf/route_table.json <<EOF
+	cat > ./confs-$party_id/confs/proxy/conf/route_table.json <<EOF
 {
-    "route_table": {
-        "default": {
-            "default": [
-                {
-                    "ip": "${exchange_ip}",
-                    "port": 9371
-                }
-            ]
-        },
-        "${party_id}": {
-            "fateflow": [
-                {
-                    "ip": "${fate_flow_ip}",
-                    "port": ${fate_flow_grpc_port}
-                }
-            ],
-            "fate": [
-                {
-                    "ip": "${federation_ip}",
-                    "port": ${federation_port}
-                }
-            ]
+	"route_table": {
+		"default": {
+			"default": [
+				{
+					"ip": "${exchange_ip}",
+					"port": 9371
+				}
+			]
+		},
+		"${party_id}": {
+			"fateflow": [
+			{
+				"ip": "${fate_flow_ip}",
+				"port": ${fate_flow_grpc_port}
+			}],
+			"fate": [
+			{
+				"ip": "${federation_ip}",
+				"port": ${federation_port}
+			}
+			]
 		}
-    },
-    "permission": {
-        "default_allow": true
-    }
+	},
+	"permission": {
+		"default_allow": true
+	}
 }
 EOF
-	    tar -czf ./outputs/confs-$party_id.tar ./confs-$party_id
-		rm -rf ./confs-$party_id
-	    echo proxy module of $party_id done!
+	tar -czf ./outputs/confs-$party_id.tar ./confs-$party_id
+	rm -rf ./confs-$party_id
+	echo proxy module of $party_id done!
 	done
 
 	# handle exchange

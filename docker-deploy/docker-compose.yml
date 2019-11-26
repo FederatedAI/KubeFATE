@@ -64,7 +64,7 @@ services:
       - "50000-60000"
     environment:
       PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION: cpp 
-      LD_LIBRARY_PATH: $LD_LIBRARY_PATH:/usr/local/lib:/data/projects/fate/eggroll/storage-service-cxx/third_party/lib
+      LD_LIBRARY_PATH: $$LD_LIBRARY_PATH:/usr/local/lib:/data/projects/fate/eggroll/storage-service-cxx/third_party/lib
       PYTHONPATH: /data/projects/fate/eggroll/python
       GLOG_log_dir: /data/projects/fate/eggroll/storage-service-cxx/logs
     volumes:
