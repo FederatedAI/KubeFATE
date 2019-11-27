@@ -59,3 +59,45 @@ nodeSelector:
   servingServer:
     nodeLabel: fedai.org
     value: 
+
+modules:
+  proxy: 
+    include: true
+    ip: proxy
+    type: NodePort
+  egg: 
+    include: true
+    ip: egg
+    type: ClusterIP
+  fateboard: 
+    include: true
+    ip: fateboard
+    type: ClusterIP
+  fateflow: 
+    include: true
+    ip: fateflow
+    type: ClusterIP
+  federation: 
+    include: true
+    ip: federation
+    type: ClusterIP
+  metaService: 
+    include: true
+    ip: meta-service
+    type: ClusterIP
+  mysql: 
+    include: true
+    ip: mysql
+    type: ClusterIP
+  redis: 
+    include: true
+    ip: redis
+    type: ClusterIP
+  roll: 
+    include: true
+    ip: roll
+    type: ClusterIP
+  python: 
+    include: true
+    ip: python
+    type: ClusterIP

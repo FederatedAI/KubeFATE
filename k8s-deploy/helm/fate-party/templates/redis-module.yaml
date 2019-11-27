@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0                  #
 ########################################################
 
+{{ if .Values.modules.redis.include }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -74,6 +75,8 @@ spec:
       port: 6379
       targetPort: 6379
       protocol: TCP
-  type: ClusterIP
+  type: {{ .Values.modules.redis.type }}
   selector:
     {{ .Values.partyId }}: redis
+---
+{{ end }}

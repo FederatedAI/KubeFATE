@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0                  #
 ########################################################
 
+{{ if .Values.modules.roll.include }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -63,6 +64,8 @@ spec:
       port: 8011
       targetPort: 8011
       protocol: TCP
-  type: ClusterIP
+  type: {{ .Values.modules.roll.type }}
   selector:
     {{ .Values.partyId }}: roll
+---
+{{ end }}

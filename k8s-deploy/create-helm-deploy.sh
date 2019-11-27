@@ -100,11 +100,74 @@ nodeSelector:
   servingServer:
     nodeLabel: ${nodeLabel}
     value: ${servingServer}
-EOF
 
+modules:
+  proxy: 
+$( if [ $DeployPartyInternal = "true" ]
+  then
+    proxyip=${proxyIpList[${i}]}
+    echo "    include: false"
+    echo "    ip: ${proxyip}"
+  else
+    echo "    include: true"
+    echo "    ip: proxy"
+  fi )
+    type: NodePort
+  egg: 
+    include: true
+    ip: egg
+    type: ClusterIP
+  fateboard: 
+    include: true
+    ip: fateboard
+    type: ClusterIP
+  fateflow: 
+    include: true
+    ip: fateflow
+    type: $( if [ $DeployPartyInternal = "true" ]
+  then
+    echo "NodePort"
+  else
+    echo "ClusterIP"
+  fi )
+  federation: 
+    include: true
+    ip: federation
+    type: $( if [ $DeployPartyInternal = "true" ]
+  then
+    echo "NodePort"
+  else
+    echo "ClusterIP"
+  fi )
+  metaService: 
+    include: true
+    ip: meta-service
+    type: ClusterIP
+  mysql: 
+    include: true
+    ip: mysql
+    type: ClusterIP
+  redis: 
+    include: true
+    ip: redis
+    type: ClusterIP
+  roll: 
+    include: true
+    ip: roll
+    type: ClusterIP
+  python: 
+    include: true
+    ip: python
+    type: ClusterIP
+EOF
+  
   echo fate-$partyid done!
 done
 
+if [ $DeployPartyInternal = "true" ]
+then
+  exit
+fi
 # exchange
 
 rm -rf fate-exchange/
