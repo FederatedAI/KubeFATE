@@ -88,8 +88,28 @@ $ kubectl create namespace fate-9999
 $ kubectl create namespace fate-10000
 $ kubectl create namespace fate-exchange
 ```
+Then check if you have permission to deploy tiller. If not, please add an account for it with the following command:
+```bash
+kubectl --namespace kube-system create serviceaccount tiller
 
-Use the following commands to deploy parties.
+kubectl create clusterrolebinding tiller-cluster-rule \
+--clusterrole=cluster-admin --serviceaccount=kube-system:tiller
+
+kubectl --namespace kube-system patch deploy tiller-deploy \
+-p '{"spec":{"template":{"spec":{"serviceAccount":"tiller"}}}}' 
+```
+the console output should be:
+```
+serviceaccount "tiller" created
+clusterrolebinding "tiller-cluster-rule" created
+deployment "tiller-deploy" patched
+```
+Then run command to update:
+```bash
+helm repo update
+```
+
+After successfully updated, use the following commands to deploy parties.
 
 - Party-10000:
 ```
