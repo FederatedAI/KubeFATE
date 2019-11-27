@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0                  #
 ########################################################
 
+{{ if .Values.modules.mysql.include }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -77,6 +78,8 @@ spec:
       port: 3306
       targetPort: 3306
       protocol: TCP
-  type: ClusterIP
+  type: {{ .Values.modules.mysql.type }}
   selector:
     {{ .Values.partyId }}: mysql
+---
+{{ end }}

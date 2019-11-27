@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0                  #
 ########################################################
 
+{{ if .Values.modules.python.include }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -138,7 +139,7 @@ spec:
       port: 9380
       targetPort: 9380
       protocol: TCP
-  type: ClusterIP
+  type: {{ .Values.modules.fateflow.type }}
   selector:
     {{ .Values.partyId }}: python
 ---
@@ -154,6 +155,8 @@ spec:
       port: 8080
       targetPort: 8080
       protocol: TCP
-  type: ClusterIP
+  type: {{ .Values.modules.fateboard.type }}
   selector:
     {{ .Values.partyId }}: python
+---
+{{ end }}
