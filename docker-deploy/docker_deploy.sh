@@ -23,6 +23,11 @@ Deploy() {
 
 	while [ "$1" != "" ]; do
     	case $1 in
+			splitting_proxy)
+				shift
+				DeployPartyInternal $@
+				break
+				;;
 			all)
 				for party in ${partylist[*]}
 				do
@@ -42,7 +47,6 @@ Deploy() {
 }
 
 DeployPartyInternal() {
-
 	target_party_id=$1
 	# should not use localhost at any case
 	target_party_ip="127.0.0.1"
@@ -52,15 +56,15 @@ DeployPartyInternal() {
 		echo "Unable to find outputs dir, please generate config files first."
 		exit 1
 	fi
-
 	if [ ! -f ${WORKINGDIR}/outputs/confs-${target_party_id}.tar ];then
 		echo "Unable to find deployment file for party $target_party_id, please generate it first."
 		exit 1
 	fi
-
 	# extract the ip address of the target party
 	if [ "$target_party_id" = "exchange" ];then
 		target_party_ip=${exchangeip}
+	elif [ "$2" != "" ]; then
+		target_party_ip="$2"
 	else
 		for ((i=0;i<${#partylist[*]};i++))
 		do
@@ -69,11 +73,14 @@ DeployPartyInternal() {
 			fi
 		done
 	fi
-
 	# verify the target_party_ip
 	if [ "$target_party_ip" = "127.0.0.1" ]; then
 		echo "Unable to find Party: $target_party_id, please check you input."
 		exit 1
+	fi
+
+	if [ "$3" != "" ]; then
+		user=$3
 	fi
 
     scp ${WORKINGDIR}/outputs/confs-$target_party_id.tar $user@$target_party_ip:~/
