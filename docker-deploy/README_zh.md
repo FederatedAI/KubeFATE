@@ -176,9 +176,8 @@ $ python run_toy_example.py 10000 9999 1        #验证
 如果想要彻底删除在运行机器上部署的FATE，可以分别登录节点，然后运行命令：
 
 ```bash
-$ cd /data/projects/fate/confs-<id>/  # <id> 组织的id，本例中代表10000或者9999
-$ docker-compose stop
-$ docker-compose rm
+$ cd ~/confs-<id>/  # <id> 组织的id，本例中代表10000或者9999
+$ docker-compose down
 $ rm -rf ../confs-<id>/               # 删除docker-compose部署文件
 ```
 
@@ -198,7 +197,7 @@ $ docker exec -it confs-10000_python_1 bash
 
 2.采用docker hub下载镜像速度可能较慢。
 
-解决办法：可以自己构建镜像，自己构建镜像参考[这里](https://github.com/FederatedAI/FATE/tree/contributor_1.0_docker/docker-build)。
+解决办法：可以自己构建镜像，自己构建镜像参考[这里](https://github.com/FederatedAI/FATE/tree/master/docker-build)。
 
 3.运行脚本`bash docker_deploy.sh all`的时候提示需要输入密码
 
