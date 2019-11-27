@@ -28,21 +28,15 @@ data:
                 ]
             },
             "{{ .Values.partyId }}": {
-                "serving": [
-                    {
-                        "ip": "serving-server",
-                        "port": 8001
-                    }
-                ],
                 "fate": [
                     {
-                        "ip": "federation",
+                        "ip": "{{ .Values.modules.federation.ip }}",
                         "port": 9394
                     }
                 ],
                 "fateflow": [
                     {
-                        "ip": "fateflow",
+                        "ip": "{{ .Values.modules.fateflow.ip }}",
                         "port": 9360
                     }
                 ]
@@ -80,28 +74,28 @@ data:
     {
         "servers": {
             "proxy": {
-                "host": "proxy", 
+                "host": "{{ .Values.modules.proxy.ip }}", 
                 "port": 9370
             }, 
             "fateboard": {
-                "host": "fateboard", 
+                "host": "{{ .Values.modules.fateboard.ip }}", 
                 "port": 8080
             }, 
             "roll": {
-                "host": "roll", 
+                "host": "{{ .Values.modules.roll.ip }}", 
                 "port": 8011
             }, 
             "fateflow": {
-                "host": "fateflow", 
+                "host": "{{ .Values.modules.fateflow.ip }}", 
                 "grpc.port": 9360,
                 "http.port": 9380
             }, 
             "federation": {
-                "host": "federation", 
+                "host": "{{ .Values.modules.federation.ip }}", 
                 "port": 9394
             },
             "clustercomm": {
-                "host": "federation", 
+                "host": "{{ .Values.modules.federation.ip }}", 
                 "port": 9394
             }
         }
@@ -156,14 +150,14 @@ data:
         'name': '{{ .Values.mysql.mysql_database | default "fate" }}',
         'user': '{{ .Values.mysql.mysql_user | default "fate" }}',
         'passwd': '{{ .Values.mysql.mysql_password | default "fate_dev" }}',
-        'host': 'mysql',
+        'host': '{{ .Values.modules.mysql.ip }}',
         'port': 3306,
         'max_connections': 100,
         'stale_timeout': 30,
     }
     
     REDIS = {
-        'host': 'redis',
+        'host': '{{ .Values.modules.redis.ip }}',
         'port': 6379,
         'password': '{{ .Values.redis.requirepass | default "fate_dev" }}',
         'max_connections': 500
@@ -207,7 +201,7 @@ data:
     service.port=8590
     
     jdbc.driver.classname=com.mysql.cj.jdbc.Driver
-    jdbc.url=jdbc:mysql://mysql:3306/{{ .Values.mysql.mysql_database | default "fate" }}?useSSL=false&serverTimezone=UTC&characterEncoding=utf8&allowPublicKeyRetrieval=true
+    jdbc.url=jdbc:mysql://{{ .Values.modules.mysql.ip }}:3306/{{ .Values.mysql.mysql_database | default "fate" }}?useSSL=false&serverTimezone=UTC&characterEncoding=utf8&allowPublicKeyRetrieval=true
     jdbc.username={{ .Values.mysql.mysql_user | default "fate" }}
     jdbc.password={{ .Values.mysql.mysql_password | default "fate_dev" }}
     target.project=meta-service
@@ -220,9 +214,9 @@ data:
   federation.properties: |
     party.id={{ .Values.partyId }}
     service.port=9394
-    meta.service.ip=meta-service
+    meta.service.ip={{ .Values.modules.metaService.ip }}
     meta.service.port=8590
-    proxy.ip=proxy
+    proxy.ip={{ .Values.modules.proxy.ip }}
     proxy.port=9370
 ---
 kind: ConfigMap
@@ -233,13 +227,13 @@ metadata:
 data:
   application.properties: |
     server.port=8080
-    fateflow.url=http://fateflow:9380
+    fateflow.url=http://{{ .Values.modules.fateflow.ip }}:9380
     spring.datasource.driver-Class-Name=com.mysql.cj.jdbc.Driver
     management.endpoints.web.exposure.include=*
     spring.http.encoding.charset=UTF-8
     spring.http.encoding.enabled=true
     server.tomcat.uri-encoding=UTF-8
-    spring.datasource.url=jdbc:mysql://mysql:3306/{{ .Values.mysql.mysql_database | default "fate" }}?characterEncoding=utf8&characterSetResults=utf8&autoReconnect=true&failOverReadOnly=false&serverTimezone=GMT%2B8
+    spring.datasource.url=jdbc:mysql://{{ .Values.modules.mysql.ip }}:3306/{{ .Values.mysql.mysql_database | default "fate" }}?characterEncoding=utf8&characterSetResults=utf8&autoReconnect=true&failOverReadOnly=false&serverTimezone=GMT%2B8
     spring.datasource.username={{ .Values.mysql.mysql_user | default "fate" }}
     spring.datasource.password={{ .Values.mysql.mysql_password | default "fate_dev" }}
     server.tomcat.max-threads=1000
@@ -253,7 +247,7 @@ data:
   roll.properties: |
     party.id={{ .Values.partyId }}
     service.port=8011
-    meta.service.ip=meta-service
+    meta.service.ip={{ .Values.modules.metaService.ip }}
     meta.service.port=8590
 ---
 kind: ConfigMap
@@ -361,8 +355,8 @@ data:
     
   insert-node.sql: |
     use {{ .Values.mysql.mysql_database | default "fate" }};
-    INSERT INTO node (ip, port, type, status) values ('roll', '8011', 'ROLL', 'HEALTHY');
-    INSERT INTO node (ip, port, type, status) values ('proxy', '9370', 'PROXY', 'HEALTHY');
+    INSERT INTO node (ip, port, type, status) values ('{{ .Values.modules.roll.ip }}', '8011', 'ROLL', 'HEALTHY');
+    INSERT INTO node (ip, port, type, status) values ('{{ .Values.modules.proxy.ip }}', '9370', 'PROXY', 'HEALTHY');
     {{- range .Values.eggList }}
     INSERT INTO node (ip, port, type, status) values ('{{ .egg }}', '7888', 'EGG', 'HEALTHY');
     INSERT INTO node (ip, port, type, status) values ('{{ .egg }}', '7778', 'STORAGE', 'HEALTHY');

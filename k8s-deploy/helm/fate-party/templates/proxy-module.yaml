@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0                  #
 ########################################################
 
+{{ if .Values.modules.proxy.include}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -66,6 +67,8 @@ spec:
       nodePort: {{ .Values.nodePort }}
       targetPort: 9370
       protocol: TCP
-  type: NodePort
+  type: {{ .Values.modules.proxy.type }}
   selector:
     {{ .Values.partyId }}: proxy
+---
+{{ end }}

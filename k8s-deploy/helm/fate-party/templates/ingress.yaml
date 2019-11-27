@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0                  #
 ########################################################
 
+{{ if .Values.modules.python.include }}
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
@@ -18,3 +19,5 @@ spec:
         backend:
           serviceName: fateboard
           servicePort: 8080
+---
+{{ end }}
