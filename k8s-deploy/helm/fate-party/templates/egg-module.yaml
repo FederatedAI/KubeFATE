@@ -52,7 +52,7 @@ spec:
               subPath: server_conf.json
             {{- if and $root.Values.nfspath ( $root.Values.nfsserver ) }}
             - mountPath: /data/projects/fate/data-dir
-              subPath: {{ .egg }}-data-dir
+              subPath: {{ .egg }}-data-dir-{{ $root.Values.partyId }}
               name: modules-data-persistent-storage
             {{- end }}
             - mountPath: /data/projects/fate/eggroll/egg/conf/applicationContext-egg.xml
