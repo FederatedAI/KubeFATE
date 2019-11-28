@@ -43,7 +43,7 @@ spec:
               subPath: redis.conf
             {{- if and .Values.nfspath ( .Values.nfsserver ) }}
             - name: redis-persistent-storage
-              subPath: redis
+              subPath: redis-{{ .Values.partyId }}
               mountPath: /var/lib/redis
             {{- end }}
       {{ if .Values.nodeSelector.redis.value}}

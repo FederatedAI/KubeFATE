@@ -47,7 +47,7 @@ spec:
               mountPath: /docker-entrypoint-initdb.d/
             {{- if and .Values.nfspath ( .Values.nfsserver ) }}
             - name: mysql-persistent-storage
-              subPath: mysql
+              subPath: mysql-{{ .Values.partyId }}
               mountPath: /var/lib/mysql
             {{- end }}
       {{ if .Values.nodeSelector.mysql.value}}
