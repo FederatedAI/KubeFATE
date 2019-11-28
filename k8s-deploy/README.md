@@ -202,6 +202,10 @@ The above sample will deploy an `egg` service in node-0 and, an `egg` service in
 
 By default, only one egg service will be deployed. To deploy multiple egg services, please fill in the `eggList` with the label of the Kubernetes nodes (Separated with spaces). Helm will deploy one egg service to each node.
 
+### Multi module deployment
+
+DMZ deployment reference document [DMZ deployment](DMZ-deploy_zh.md).
+
 ### **The Visualizations**
 
 if you kubernetes cluster deployment Ingress controller ( [ingress-nginx](https://kubernetes.github.io/ingress-nginx/deploy/) ), you can also access the FATEBoard through http://\<party-id\>.fateboard.fedai.org 
