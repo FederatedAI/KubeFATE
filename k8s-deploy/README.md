@@ -45,7 +45,7 @@ It is recommended that non-Internet clusters use [Harbor](https://goharbor.io/) 
 $ cd KubeFATE/k8s-deploy/
 $ vi .env
 
-THIRDPARTYPREFIX=192.168.10.1/federatedai
+RegistryURI=192.168.10.1/federatedai
 ```
 
 ### Configure Parties
@@ -129,9 +129,9 @@ $ helm install --name=fate-exchange --namespace=fate-exchange ./fate-exchange/
 After the command returns, use `helm list` to fetch the status of deployment, an example output is as follows:
 ```
 NAME         	REVISION	UPDATED                 	STATUS  	CHART              	APP VERSION	NAMESPACE    
-fate-10000   	1       	Tue Oct 29 03:47:05 2019	DEPLOYED	fate-party-0.3.0   	1.1      	fate-10000   
-fate-9999    	1       	Tue Oct 29 03:46:58 2019	DEPLOYED	fate-party-0.3.0   	1.1      	fate-9999    
-fate-exchange	1       	Tue Oct 29 03:46:53 2019	DEPLOYED	fate-exchange-0.3.0	1.1      	fate-exchange
+fate-10000   	1       	Tue Oct 29 03:47:05 2019	DEPLOYED	fate-party-0.4.0   	1.1.1      	fate-10000   
+fate-9999    	1       	Tue Oct 29 03:46:58 2019	DEPLOYED	fate-party-0.4.0   	1.1.1      	fate-9999    
+fate-exchange	1       	Tue Oct 29 03:46:53 2019	DEPLOYED	fate-exchange-0.4.0	1.1.1      	fate-exchange
 ```
 
 In the above deployment, the data of "mysql", "redis" and "egg" will be persisted to the worker node that hosting the services(Pod). Which means if a service shifted to the other worker node, the service will be unable to read the previous data.

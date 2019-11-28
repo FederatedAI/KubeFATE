@@ -47,7 +47,7 @@ $ git clone git@github.com:FederatedAI/KubeFATE.git
 $ cd KubeFATE/k8s-deploy/
 $ vi .env
 
-THIRDPARTYPREFIX=192.168.10.1/federatedai
+RegistryURI=192.168.10.1/federatedai
 ```
 
 ## 修改配置文件
@@ -176,9 +176,9 @@ $ helm install --name=fate-exchange --namespace=fate-exchange ./fate-exchange/
 运行完这三个命令之后，可以用`helm list`来查看部署的状态：
 ```bash
 NAME         	REVISION	UPDATED                 	STATUS  	CHART              	APP VERSION	NAMESPACE    
-fate-10000   	1       	Tue Oct 29 03:47:05 2019	DEPLOYED	fate-party-0.3.0   	1.1      	fate-10000   
-fate-9999    	1       	Tue Oct 29 03:46:58 2019	DEPLOYED	fate-party-0.3.0   	1.1      	fate-9999    
-fate-exchange	1       	Tue Oct 29 03:46:53 2019	DEPLOYED	fate-exchange-0.3.0	1.1      	fate-exchange
+fate-10000   	1       	Tue Oct 29 03:47:05 2019	DEPLOYED	fate-party-0.4.0   	1.1.1      	fate-10000   
+fate-9999    	1       	Tue Oct 29 03:46:58 2019	DEPLOYED	fate-party-0.4.0   	1.1.1      	fate-9999    
+fate-exchange	1       	Tue Oct 29 03:46:53 2019	DEPLOYED	fate-exchange-0.4.0	1.1.1      	fate-exchange
 ```
 
 在这次部署中，”MySQL”, ”Redis”, ”egg”的数据将留在服务所在的本地节点上。如果以后某个服务迁移到其他节点上了，那么以前的数据就不能用了，这是因为数据不会同步迁移。  
