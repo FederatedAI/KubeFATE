@@ -20,8 +20,7 @@ proxy组件采用docker-compose的部署方式部署在DMZ区，其他组件通�
 
 ```bash
 partylist=(10000)
-DeployPartyInternal=true                      # 启用DMZ部署
-proxyIpList=(192.168.13.1)                    # DMZ主机ip
+proxyIpList=(192.168.13.1)    # DMZ主机ip，若为空则不分开部署proxy
 ```
 
 #### k8s部署

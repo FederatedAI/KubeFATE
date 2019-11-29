@@ -20,8 +20,7 @@ configuration file  `KubeFATE/k8s-deploy/kube.cfg`.
 
 ```bash
 partylist=(10000)
-DeployPartyInternal=true                      # Enable DMZ deployment
-proxyIpList=(192.168.13.1)                    # DMZ host IP
+proxyIpList=(192.168.13.1)    # DMZ host IP, leave it empty if you don't need a splitting proxy.
 ```
 
 #### Kubernetes Deployment

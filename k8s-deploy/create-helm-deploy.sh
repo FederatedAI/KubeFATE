@@ -103,7 +103,7 @@ nodeSelector:
 
 modules:
   proxy: 
-$( if [ $DeployPartyInternal = "true" ]
+$( if [ "${proxyIpList[${i}]}" != "" ]
   then
     proxyip=${proxyIpList[${i}]}
     echo "    include: false"
@@ -124,7 +124,7 @@ $( if [ $DeployPartyInternal = "true" ]
   fateflow: 
     include: true
     ip: fateflow
-    type: $( if [ $DeployPartyInternal = "true" ]
+    type: $( if [ "${proxyIpList[${i}]}" != "" ]
   then
     echo "NodePort"
   else
@@ -133,7 +133,7 @@ $( if [ $DeployPartyInternal = "true" ]
   federation: 
     include: true
     ip: federation
-    type: $( if [ $DeployPartyInternal = "true" ]
+    type: $( if [ "${proxyIpList[${i}]}" != "" ]
   then
     echo "NodePort"
   else
@@ -164,12 +164,13 @@ EOF
   echo fate-$partyid done!
 done
 
-if [ $DeployPartyInternal = "true" ]
+# Deploy exchange if not extra proxy was provided
+if [ ${#proxyIpList[@]} -ne 0 ]
 then
   exit
 fi
-# exchange
 
+# Exchange
 rm -rf fate-exchange/
 mkdir -p fate-exchange/
 
