@@ -42,16 +42,6 @@ spec:
         - -c
         - |
           set -x
-          
-          apt-get update;
-          apt-get install -y git;
-          git clone https://github.com/FederatedAI/FATE.git;
-          cd FATE;
-          git checkout v1.1;
-          cd ..;
-          mkdir -p /examples;
-          cp -r FATE/examples/* /examples/;
-          
           function checkMySQL(){
             checkMySQLCount=0
             while true ; do
@@ -68,10 +58,6 @@ spec:
           }
           echo "Waiting for mysql started..."
           checkMySQL
-          
-        volumeMounts:
-          - name: examples
-            mountPath: /examples
       containers:
         - image: {{ .Values.image.registry }}/python:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -91,8 +77,6 @@ spec:
               name: python-confs
             - name: logs
               mountPath: /data/projects/fate/python/logs
-            - name: examples
-              mountPath: /data/projects/fate/python/examples
         - image: {{ .Values.image.registry }}/fateboard:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           name: fateboard
@@ -118,9 +102,6 @@ spec:
             name: fateboard-config
         - name: logs
           emptyDir: {}
-        - name: examples
-          emptyDir: {}
-
 ---
 apiVersion: v1
 kind: Service
