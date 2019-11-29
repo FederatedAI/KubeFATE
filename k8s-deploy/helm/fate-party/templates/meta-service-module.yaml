@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0                  #
 ########################################################
 
+{{ if .Values.modules.metaService.include }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -65,6 +66,8 @@ spec:
       port: 8590
       targetPort: 8590
       protocol: TCP
-  type: ClusterIP
+  type: {{ .Values.modules.metaService.type }}
   selector:
     {{ .Values.partyId }}: meta-service
+---
+{{ end }}

@@ -124,6 +124,10 @@ roll=fate-node-3
 </div>
 如果没有给服务配置节点，这个服务会交给Kubernetes选择一个节点来部署。
 
+## 分模块部署
+
+DMZ部署参考文档[DMZ部署](DMZ-deploy_zh.md)
+
 ## 生成 helm 部署文件
 
 根据 kube.cfg 生成 helm chart 部署文件

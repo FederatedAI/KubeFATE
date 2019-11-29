@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0                  #
 ########################################################
 
+{{ if .Values.modules.egg.include }}
 {{- $root := . -}}
 {{- range .Values.eggList }}
 apiVersion: apps/v1
@@ -102,8 +103,9 @@ spec:
       port: 7778
       targetPort: 7778
       protocol: TCP
-  type: ClusterIP
+  type: {{ $root.Values.modules.egg.type }}
   selector:
     {{ $root.Values.partyId }}: {{ .egg }}
 ---
 {{- end }}
+{{ end }}

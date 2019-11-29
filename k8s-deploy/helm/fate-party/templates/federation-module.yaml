@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0                  #
 ########################################################
 
+{{ if .Values.modules.federation.include }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -62,6 +63,8 @@ spec:
       port: 9394
       targetPort: 9394
       protocol: TCP
-  type: ClusterIP
+  type: {{ .Values.modules.federation.type }}
   selector:
     {{ .Values.partyId }}: federation
+---
+{{ end }}
