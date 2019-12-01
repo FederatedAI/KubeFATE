@@ -1,33 +1,50 @@
-# Deployment by Docker Compose
+# FATE deployment using Docker Compose
+
+This guide describes the process of deploying FATE using Docker Compose.
 
 ## Prerequisites
-1. Docker: 18
-2. Docker-Compose: 1.24
-3. [The FATE Images](https://github.com/FederatedAI/FATE/tree/docker_1.1_contribution/docker-build) have been built and downloaded by nodes.
+The nodes (target nodes) to install FATE must meet the following requirements:
+
+1. A Linux host
+2. Docker: 18+
+3. Docker-Compose: 1.24+
+4. Network connection to Internet to pull container images from Docker Hub. If network connection to Internet is not available, consider to set up [Harbor as a local registry](../registry/README.md) or use [offline images](https://github.com/FederatedAI/FATE/tree/master/docker-build). 
 
 ## Deploying FATE
-Use the following command to clone repo if you did not clone before:
+A Linux host can be used as a deployment machine to run installation scripts to deploy FATE onto target hosts.
+
+First, on a Linux host, clone KubeFATE source repo:
 ```bash
 $ git clone git@github.com:FederatedAI/KubeFATE.git
 ```
-By default, the script pulls the images from [Docker Hub](https://hub.docker.com/search?q=federatedai&type=image) during the deployment.
+By default, the installation script pulls the images from Docker Hub during the deployment. If the target node is not connected to Internet, refer to the below section to set up a local registry such as Harbor and use the offline images.
 
-### Use Third Party Registry (Optional)
-It is recommended that non-Internet clusters use Harbor as a third-party registry. Please refer to [this guide](https://github.com/FederatedAI/KubeFATE/blob/master/registry/install_harbor.md) to install Harbor. Change the `RegistryURI` to [Harbor](https://goharbor.io/) hostname in the `.env` file. `192.168.10.1` is an example of Harbor IP.
+### Set up a local registry Harbor (Optional)
+Please refer to [this guide](../registry/README.md) to install Harbor as a local registry. 
+
+After setting up a Harbor registry, update the setting in the `.env` file. Change `THIRDPARTYPREFIX` to the hostname or IP address of the Harbor instance. This setting lets installation script use a local registry instead of Docker Hub.
+
+In the below example, `192.168.10.1` is the IP address of Harbor.
+
 ```bash
 $ cd KubeFATE/
 $ vi .env
 
-RegistryURI=192.168.10.1/federatedai
+...
+
+THIRDPARTYPREFIX=192.168.10.1/federatedai
+
+...
 ```
 
-### Configure Parties
-The following steps will illustrate how to deploy two parties on different hosts.
+### Configuring multiple parties of FATE
+There are usually multiple parties participating a federated training. Each party should install FATE using a set of configuration files and scripts. 
 
-### Generate startup files
-Before starting the FATE system, the user needs to define their parties in configuration file `./parties.conf`. 
+The following steps illustrate how to generate necessary configuration files and deploy two parties on different hosts.
 
-The following sample of `parties.conf` defines two parities, they are party `10000` hosted on a machine *192.168.7.1* and `9999` hosted on a machine *192.168.7.2*.
+Before deploying the FATE system, multiple parties should be defined in configuration file: `docker-deploy/parties.conf`. 
+
+In the following sample of `docker-deploy/parties.conf` , two parities are specified by id as `10000` and `9999`. They are going to be deployed on hosts with IP addresses of *192.168.7.1* and *192.168.7.2*, respectively. 
 
 ```bash
 user=root
@@ -36,21 +53,42 @@ partylist=(10000 9999)
 partyiplist=(192.168.7.1 192.168.7.2)
 exchangeip=192.168.7.1
 ```
+By default, the exchange node co-locates on the same host of the first party. The exchange service runs on port 9371. For this reason, the IP address of the exchange node should be the same as that of the first party. If a standalone exchange node is needed, update the value of `exchangeip` to the IP address of the desired host.
 
-**NOTE**: By default, the machine of the first party will also host the exchange on the 9371 port. A user can change the exchange IP if needed.
-
-Use the following command to deploy each party. Before running the command, ***please make sure host 192.168.7.1 and 192.168.7.2 allow password-less SSH access with SSH key***:
-
+After completing the above configuration file, use the following commands to generate configuration of target hosts.  
 ```bash
-$ bash generate_config.sh      # generate the config file
-$ bash docker_deploy.sh all    # launch the deployment
+$ cd docker-deploy
+$ bash generate_config.sh
 ```
 
-The script will copy `confs-10000.tar` and `confs-9999.tar` to host 192.168.7.1 and 192.168.7.2.
+Now, tar files have been generated for each party including the exchange node (party). They are named as ```<party-id>-confs.tar ```.
 
-Afterward the script will log in to these hosts and use docker-compose command to start the FATE cluster.
+### Deploying FATE to target hosts
 
-Once the command returns, log in to any host and use `docker ps` to verify the status of cluster, an example output is as follows:
+**Note:** Before running the below commands, all target hosts must
+
+* allow password-less SSH access with SSH key;
+* meet the requirements specified in [Prerequisites](#Prerequisites).
+
+To deploy FATE to all configured target hosts, use the below command:
+```bash
+$ bash docker_deploy.sh all
+```
+
+The script copies tar files (e.g. `10000-confs.tar` or `9999-confs.tar`) to corresponding target hosts. It then launches a FATE cluster on each host using `docker-compose` commands.
+
+
+To deploy FATE to a single target host, use the below command with the party's id (10000 in the below example):
+```bash
+$ bash docker_deploy.sh 10000
+```
+To deploy the exchange node to a target host, use the below command:
+```bash
+$ bash docker_deploy.sh exchange
+```
+
+
+Once the commands finish, log in to any host and use `docker ps` to verify the status of the cluster. A sample output is as follows:
 
 ```
 CONTAINER ID        IMAGE                                 COMMAND                  CREATED              STATUS              PORTS                                 NAMES
@@ -65,15 +103,15 @@ ed11ce8eb20d        federatedai/egg:1.1-release              "/bin/sh -c 'cd /da
 5386bcb7565f        federatedai/federation:1.1-release       "/bin/sh -c 'cd /dat…"   About a minute ago   Up About a minute   9394/tcp                              confs-10000_federation_1
 ```
 
-### Verify the Deployment
-Since the `confs-10000_python_1` container hosts the `fate-flow` service, so we need to perform the test within that container. Use the following commands to launch:
+### Verifying the deployment
+On the target node of each party, a container named  `confs-<party_id>_python_1` should have been created and running the `fate-flow` service. For example, on Party 10000's node, run the following commands to verify the deployment:
 ```bash
 $ docker exec -it confs-10000_python_1 bash
 $ source /data/projects/python/venv/bin/activate
-$ cd /data/projects/fate/python/examples/toy_example
+$ cd /data/projects/python/examples/toy_example/
 $ python run_toy_example.py 10000 9999 1
 ```
-If the test passed, the screen will print some messages like the follows:
+If the test passed, the output may look like the following:
 ```
 "2019-08-29 07:21:25,353 - secure_add_guest.py[line:96] - INFO: begin to init parameters of secure add example guest"
 "2019-08-29 07:21:25,354 - secure_add_guest.py[line:99] - INFO: begin to make guest data"
@@ -84,4 +122,5 @@ If the test passed, the screen will print some messages like the follows:
 "2019-08-29 07:21:33,920 - secure_add_guest.py[line:114] - INFO: receive host sum from guest"
 "2019-08-29 07:21:34,118 - secure_add_guest.py[line:121] - INFO: success to calculate secure_sum, it is 2000.0000000000002"
 ```
-For more details about the testing result, please refer to "/data/projects/fate/python/examples/toy_example/README.md" 
+For more details about the testing result, please refer to `python/examples/toy_example/README.md` .
+
