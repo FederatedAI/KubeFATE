@@ -22,7 +22,7 @@ By default, the installation script pulls the images from Docker Hub during the 
 ### Set up a local registry Harbor (Optional)
 Please refer to [this guide](../registry/README.md) to install Harbor as a local registry. 
 
-After setting up a Harbor registry, update the setting in the `.env` file. Change `THIRDPARTYPREFIX` to the hostname or IP address of the Harbor instance. This setting lets installation script use a local registry instead of Docker Hub.
+After setting up a Harbor registry, update the setting in the `.env` file. Change `RegistryURI` to the hostname or IP address of the Harbor instance. This setting lets the installation script use a local registry instead of Docker Hub.
 
 In the below example, `192.168.10.1` is the IP address of Harbor.
 
@@ -32,7 +32,7 @@ $ vi .env
 
 ...
 
-THIRDPARTYPREFIX=192.168.10.1/federatedai
+RegistryURI=192.168.10.1/federatedai
 
 ...
 ```
@@ -42,7 +42,7 @@ There are usually multiple parties participating a federated training. Each part
 
 The following steps illustrate how to generate necessary configuration files and deploy two parties on different hosts.
 
-Before deploying the FATE system, multiple parties should be defined in configuration file: `docker-deploy/parties.conf`. 
+Before deploying the FATE system, multiple parties should be defined in the configuration file: `docker-deploy/parties.conf`. 
 
 In the following sample of `docker-deploy/parties.conf` , two parities are specified by id as `10000` and `9999`. They are going to be deployed on hosts with IP addresses of *192.168.7.1* and *192.168.7.2*, respectively. 
 
