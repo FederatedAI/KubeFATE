@@ -220,6 +220,19 @@ EOF
 				}
 			]
 		},
+$( for ((j=0;j<${#partylist[*]};j++));do
+if [ "${party_id}" == "${partylist[${j}]}" ]; then
+continue
+fi
+echo "        \"${partylist[${j}]}\": {
+            \"default\": [
+                {
+                    \"ip\": \"${partyiplist[${j}]}\",
+                    \"port\": 9370
+                }
+            ]
+        },"
+        done)
 		"${party_id}": {
 			"fateflow": [
 			{
