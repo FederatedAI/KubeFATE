@@ -15,7 +15,7 @@ services:
     expose:
       - 9394
     volumes:
-      - ./confs/federation/conf:/data/projects/fate/federation/conf
+      - ./confs/federation/conf/federation.properties:/data/projects/fate/federation/conf/federation.properties
     networks:
       - fate-network
 
@@ -85,7 +85,6 @@ services:
       - ./confs/federatedml/conf:/data/projects/fate/python/arch/conf
       - ./confs/federatedml/conf:/data/projects/fate/python/eggroll/conf
       - ./confs/fate_flow/conf/settings.py:/data/projects/fate/python/fate_flow/settings.py
-      - ./examples:/data/projects/fate/python/examples
       - fate_flow_logs:/data/projects/fate/python/logs
     depends_on:
       - redis
