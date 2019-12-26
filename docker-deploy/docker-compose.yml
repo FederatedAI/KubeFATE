@@ -15,7 +15,7 @@ services:
     expose:
       - 9394
     volumes:
-      - ./confs/federation/conf/federation.properties:/data/projects/fate/federation/conf/federation.properties
+      - ./confs/federation/conf:/data/projects/fate/federation/conf
     networks:
       - fate-network
 
@@ -26,8 +26,7 @@ services:
     environment:
       PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION: python
     volumes:
-      - ./confs/proxy/conf/proxy.properties:/data/projects/fate/proxy/conf/proxy.properties
-      - ./confs/proxy/conf/route_table.json:/data/projects/fate/proxy/conf/route_table.json
+      - ./confs/proxy/conf:/data/projects/fate/proxy/conf
     networks:
       - fate-network
 
@@ -36,7 +35,7 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ./confs/fateboard/conf/application.properties:/data/projects/fate/fateboard/conf/application.properties
+      - ./confs/fateboard/conf:/data/projects/fate/fateboard/conf
       - fate_flow_logs:/data/projects/fate/python/logs
     networks:
       - fate-network
@@ -49,7 +48,7 @@ services:
     expose:
       - 8011
     volumes:
-      - ./confs/roll/conf/roll.properties:/data/projects/fate/roll/conf/roll.properties
+      - ./confs/roll/conf:/data/projects/fate/roll/conf
     environment:
       PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION: python
     networks:
@@ -69,7 +68,7 @@ services:
       PYTHONPATH: /data/projects/fate/eggroll/python
       GLOG_log_dir: /data/projects/fate/eggroll/storage-service-cxx/logs
     volumes:
-        - ./confs/egg/conf/egg.properties:/data/projects/fate/eggroll/egg/conf/egg.properties
+        - ./confs/egg/conf:/data/projects/fate/eggroll/egg/conf
         - ./confs/federatedml/conf/server_conf.json:/data/projects/fate/eggroll/python/eggroll/conf/server_conf.json
         - ./confs/egg/data-dir:/data/projects/fate/data-dir
     networks:
@@ -82,8 +81,8 @@ services:
       - "9380:9380"
     restart: always
     volumes:
-      - ./confs/federatedml/conf/server_conf.json:/data/projects/fate/python/arch/conf/server_conf.json
-      - ./confs/federatedml/conf/server_conf.json:/data/projects/fate/python/eggroll/conf/server_conf.json
+      - ./confs/federatedml/conf:/data/projects/fate/python/arch/conf
+      - ./confs/federatedml/conf:/data/projects/fate/python/eggroll/conf
       - ./confs/fate_flow/conf/settings.py:/data/projects/fate/python/fate_flow/settings.py
       - fate_flow_logs:/data/projects/fate/python/logs
     depends_on:
@@ -103,7 +102,7 @@ services:
     environment:
       PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION: python
     volumes:
-      - ./confs/meta-service/conf/meta-service.properties:/data/projects/fate/meta-service/conf/meta-service.properties
+      - ./confs/meta-service/conf:/data/projects/fate/meta-service/conf
     depends_on:
       - mysql
     networks:
