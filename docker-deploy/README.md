@@ -92,15 +92,15 @@ Once the commands finish, log in to any host and use `docker ps` to verify the s
 
 ```
 CONTAINER ID        IMAGE                                 COMMAND                  CREATED              STATUS              PORTS                                 NAMES
-d4686d616965        federatedai/python:1.1-release           "/bin/bash -c 'sourc…"   About a minute ago   Up 52 seconds       9360/tcp, 9380/tcp                    confs-10000_python_1
-4086ef0dc2de        federatedai/fateboard:1.1-release        "/bin/sh -c 'cd /dat…"   About a minute ago   Up About a minute   0.0.0.0:8080->8080/tcp                confs-10000_fateboard_1
-5cf3e1f1731a        federatedai/roll:1.1-release             "/bin/sh -c 'cd roll…"   About a minute ago   Up About a minute   8011/tcp                              confs-10000_roll_1
-11c01143540b        federatedai/meta-service:1.1-release     "/bin/sh -c 'java -c…"   About a minute ago   Up About a minute   8590/tcp                              confs-10000_meta-service_1
-f0976f48f0f7        federatedai/proxy:1.1-release            "/bin/sh -c 'cd /dat…"   About a minute ago   Up About a minute   0.0.0.0:9370->9370/tcp                confs-10000_proxy_1
+d4686d616965        federatedai/python:1.2-release           "/bin/bash -c 'sourc…"   About a minute ago   Up 52 seconds       9360/tcp, 9380/tcp                    confs-10000_python_1
+4086ef0dc2de        federatedai/fateboard:1.2-release        "/bin/sh -c 'cd /dat…"   About a minute ago   Up About a minute   0.0.0.0:8080->8080/tcp                confs-10000_fateboard_1
+5cf3e1f1731a        federatedai/roll:1.2-release             "/bin/sh -c 'cd roll…"   About a minute ago   Up About a minute   8011/tcp                              confs-10000_roll_1
+11c01143540b        federatedai/meta-service:1.2-release     "/bin/sh -c 'java -c…"   About a minute ago   Up About a minute   8590/tcp                              confs-10000_meta-service_1
+f0976f48f0f7        federatedai/proxy:1.2-release            "/bin/sh -c 'cd /dat…"   About a minute ago   Up About a minute   0.0.0.0:9370->9370/tcp                confs-10000_proxy_1
 7354af787036        redis                                 "docker-entrypoint.s…"   About a minute ago   Up About a minute   6379/tcp                              confs-10000_redis_1
-ed11ce8eb20d        federatedai/egg:1.1-release              "/bin/sh -c 'cd /dat…"   About a minute ago   Up About a minute   7778/tcp, 7888/tcp, 50001-50004/tcp   confs-10000_egg_1
+ed11ce8eb20d        federatedai/egg:1.2-release              "/bin/sh -c 'cd /dat…"   About a minute ago   Up About a minute   7778/tcp, 7888/tcp, 50001-50004/tcp   confs-10000_egg_1
 6802d1e2bd21        mysql                                 "docker-entrypoint.s…"   About a minute ago   Up About a minute   3306/tcp, 33060/tcp                   confs-10000_mysql_1
-5386bcb7565f        federatedai/federation:1.1-release       "/bin/sh -c 'cd /dat…"   About a minute ago   Up About a minute   9394/tcp                              confs-10000_federation_1
+5386bcb7565f        federatedai/federation:1.2-release       "/bin/sh -c 'cd /dat…"   About a minute ago   Up About a minute   9394/tcp                              confs-10000_federation_1
 ```
 
 ### Verifying the deployment
