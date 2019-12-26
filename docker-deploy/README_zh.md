@@ -50,8 +50,8 @@ federatedai/python                 1.2-release
 federatedai/roll                   1.2-release
 federatedai/proxy                  1.2-release
 federatedai/federation             1.2-release
-redis                              latest
-mysql                              latest
+redis                              5
+mysql                              8
 ```
 ### 下载部署脚本
 
@@ -69,7 +69,6 @@ git clone git@github.com:FederatedAI/KubeFATE.git
 PREFIX=federatedai
 TAG=1.2-release
 BASE_TAG=1.2-release
-BUILDER_TAG=1.2-release
 ```
 我们这里采用从Docker Hub下载镜像。如果在运行机器上已经下载或导入了所需镜像，部署将会变得非常容易。
 
@@ -95,7 +94,6 @@ RegistryURI=192.168.10.1/federatedai
 
 ```
 user=root                             #运行机运行FATE实例的用户
-venvdir=/data/projects/fate/venv      #默认就好
 dir=/data/projects/fate               #docker-compose部署目录
 partylist=(10000 9999)                #组织id
 partyiplist=(192.168.7.1 192.168.7.2) #id对应节点ip
@@ -137,9 +135,9 @@ dffc70fc68ac        fatetest/egg:1.2-release              "/bin/sh -c 'cd /dat�
 dc23d75692b0        fatetest/roll:1.2-release             "/bin/sh -c 'cd roll…"   7 days ago          Up 7 days           8011/tcp                              confs-10000_roll_1
 7e52b1b06d1a        fatetest/meta-service:1.2-release     "/bin/sh -c 'java -c…"   7 days ago          Up 7 days           8590/tcp                              confs-10000_meta-service_1
 50a6323f5cb8        fatetest/proxy:1.2-release            "/bin/sh -c 'cd /dat…"   7 days ago          Up 7 days           0.0.0.0:9370->9370/tcp                confs-10000_proxy_1
-4526f8e57004        redis                                 "docker-entrypoint.s…"   7 days ago          Up 7 days           6379/tcp                              confs-10000_redis_1
+4526f8e57004        redis:5                               "docker-entrypoint.s…"   7 days ago          Up 7 days           6379/tcp                              confs-10000_redis_1
 586f3f2fe191        fatetest/federation:1.2-release       "/bin/sh -c 'cd /dat…"   7 days ago          Up 7 days           9394/tcp                              confs-10000_federation_1
-ec434dcbbff1        mysql                                 "docker-entrypoint.s…"   7 days ago          Up 7 days           3306/tcp, 33060/tcp                   confs-10000_mysql_1
+ec434dcbbff1        mysql:8                               "docker-entrypoint.s…"   7 days ago          Up 7 days           3306/tcp, 33060/tcp                   confs-10000_mysql_1
 ```
 
 ####  验证部署
