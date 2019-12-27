@@ -20,6 +20,12 @@ nodePort: 30010
 exchange:
   partyIp: 192.168.1.1
   partyPort: 30000
+
+partyList:
+#  - partyId:
+#    partyIp:
+#    partyPort:
+
 mysql:
   mysql_root_password: fate_dev
   mysql_database: fate

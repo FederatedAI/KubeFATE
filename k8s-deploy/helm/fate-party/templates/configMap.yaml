@@ -22,11 +22,26 @@ data:
             "default": {
                 "default": [
                     {
+                      {{- if .Values.exchange -}}
                         "ip": "{{ .Values.exchange.partyIp }}",
                         "port": {{ .Values.exchange.partyPort }}
+                      {{- else -}}
+                        "ip": "proxy",
+                        "port": 9370
+                      {{- end -}}
                     }
                 ]
             },
+            {{- range .Values.partyList }}
+            "{{ .partyId }}": {
+                "default": [
+                    {
+                        "ip": "{{ .partyIp }}",
+                        "port": "{{ .partyPort }}"
+                    }
+                ]
+            },
+            {{- end }}
             "{{ .Values.partyId }}": {
                 "fate": [
                     {
