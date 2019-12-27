@@ -27,13 +27,13 @@ Compose是用于定义和运行多容器Docker应用程序的工具。通过Comp
 如果运行机没有FATE组件的镜像，可以通过以下命令从Docker Hub获取镜像：
 
 ```bash
-$ docker pull federatedai/egg:1.2-release
-$ docker pull federatedai/fateboard:1.2-release
-$ docker pull federatedai/meta-service:1.2-release
-$ docker pull federatedai/python:1.2-release
-$ docker pull federatedai/roll:1.2-release
-$ docker pull federatedai/proxy:1.2-release
-$ docker pull federatedai/federation:1.2-release
+$ docker pull federatedai/egg:1.2.0-release
+$ docker pull federatedai/fateboard:1.2.0-release
+$ docker pull federatedai/meta-service:1.2.0-release
+$ docker pull federatedai/python:1.2.0-release
+$ docker pull federatedai/roll:1.2.0-release
+$ docker pull federatedai/proxy:1.2.0-release
+$ docker pull federatedai/federation:1.2.0-release
 $ docker pull redis:5
 $ docker pull mysql:8
 ```
@@ -42,14 +42,14 @@ $ docker pull mysql:8
 ```bash
 $ docker images
 REPOSITORY                         TAG 
-federatedai/egg                    1.2-release
-federatedai/fateboard              1.2-release
-federatedai/serving-server         1.2-release
-federatedai/meta-service           1.2-release
-federatedai/python                 1.2-release
-federatedai/roll                   1.2-release
-federatedai/proxy                  1.2-release
-federatedai/federation             1.2-release
+federatedai/egg                    1.2.0-release
+federatedai/fateboard              1.2.0-release
+federatedai/serving-server         1.2.0-release
+federatedai/meta-service           1.2.0-release
+federatedai/python                 1.2.0-release
+federatedai/roll                   1.2.0-release
+federatedai/proxy                  1.2.0-release
+federatedai/federation             1.2.0-release
 redis                              5
 mysql                              8
 ```
@@ -67,8 +67,8 @@ git clone git@github.com:FederatedAI/KubeFATE.git
 
 ```bash
 PREFIX=federatedai
-TAG=1.2-release
-BASE_TAG=1.2-release
+TAG=1.2.0-release
+BASE_TAG=1.2.0-release
 ```
 我们这里采用从Docker Hub下载镜像。如果在运行机器上已经下载或导入了所需镜像，部署将会变得非常容易。
 
@@ -129,14 +129,14 @@ $ docker ps
 
 ```
 CONTAINER ID        IMAGE                                 COMMAND                  CREATED             STATUS              PORTS                                 NAMES
-f8ae11a882ba        fatetest/fateboard:1.2-release        "/bin/sh -c 'cd /dat…"   5 days ago          Up 5 days           0.0.0.0:8080->8080/tcp                confs-10000_fateboard_1
-d72995355962        fatetest/python:1.2-release           "/bin/bash -c 'sourc…"   5 days ago          Up 5 days           9360/tcp, 9380/tcp                    confs-10000_python_1
-dffc70fc68ac        fatetest/egg:1.2-release              "/bin/sh -c 'cd /dat…"   7 days ago          Up 7 days           7778/tcp, 7888/tcp, 50001-50004/tcp   confs-10000_egg_1
-dc23d75692b0        fatetest/roll:1.2-release             "/bin/sh -c 'cd roll…"   7 days ago          Up 7 days           8011/tcp                              confs-10000_roll_1
-7e52b1b06d1a        fatetest/meta-service:1.2-release     "/bin/sh -c 'java -c…"   7 days ago          Up 7 days           8590/tcp                              confs-10000_meta-service_1
-50a6323f5cb8        fatetest/proxy:1.2-release            "/bin/sh -c 'cd /dat…"   7 days ago          Up 7 days           0.0.0.0:9370->9370/tcp                confs-10000_proxy_1
+f8ae11a882ba        fatetest/fateboard:1.2.0-release      "/bin/sh -c 'cd /dat…"   5 days ago          Up 5 days           0.0.0.0:8080->8080/tcp                confs-10000_fateboard_1
+d72995355962        fatetest/python:1.2.0-release         "/bin/bash -c 'sourc…"   5 days ago          Up 5 days           9360/tcp, 9380/tcp                    confs-10000_python_1
+dffc70fc68ac        fatetest/egg:1.2.0-release            "/bin/sh -c 'cd /dat…"   7 days ago          Up 7 days           7778/tcp, 7888/tcp, 50001-50004/tcp   confs-10000_egg_1
+dc23d75692b0        fatetest/roll:1.2.0-release           "/bin/sh -c 'cd roll…"   7 days ago          Up 7 days           8011/tcp                              confs-10000_roll_1
+7e52b1b06d1a        fatetest/meta-service:1.2.0-release   "/bin/sh -c 'java -c…"   7 days ago          Up 7 days           8590/tcp                              confs-10000_meta-service_1
+50a6323f5cb8        fatetest/proxy:1.2.0-release          "/bin/sh -c 'cd /dat…"   7 days ago          Up 7 days           0.0.0.0:9370->9370/tcp                confs-10000_proxy_1
 4526f8e57004        redis:5                               "docker-entrypoint.s…"   7 days ago          Up 7 days           6379/tcp                              confs-10000_redis_1
-586f3f2fe191        fatetest/federation:1.2-release       "/bin/sh -c 'cd /dat…"   7 days ago          Up 7 days           9394/tcp                              confs-10000_federation_1
+586f3f2fe191        fatetest/federation:1.2.0-release     "/bin/sh -c 'cd /dat…"   7 days ago          Up 7 days           9394/tcp                              confs-10000_federation_1
 ec434dcbbff1        mysql:8                               "docker-entrypoint.s…"   7 days ago          Up 7 days           3306/tcp, 33060/tcp                   confs-10000_mysql_1
 ```
 
