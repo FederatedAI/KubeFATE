@@ -32,12 +32,6 @@ spec:
             - mountPath: /data/projects/fate/roll/conf/roll.properties
               name: roll-confs
               subPath: roll.properties
-            - mountPath: /data/projects/fate/roll/conf/applicationContext-roll.xml
-              name: other-confs
-              subPath: applicationContext-roll.xml
-            - mountPath: /data/projects/fate/roll/conf/log4j2.properties
-              name: other-confs
-              subPath: log4j2.properties
       {{ if .Values.nodeSelector.roll.value}}
       nodeSelector:
         {{ .Values.nodeSelector.roll.nodeLabel }}: {{ .Values.nodeSelector.roll.value }}
@@ -46,11 +40,7 @@ spec:
         - name: roll-confs
           configMap:
             name: roll-config
-        - name: other-confs
-          configMap:
-            name: roll-config-other
       restartPolicy: Always
-
 ---
 apiVersion: v1
 kind: Service

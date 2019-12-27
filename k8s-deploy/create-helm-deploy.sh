@@ -48,9 +48,26 @@ host:
   fateboard: ${partyid}.fateboard.fedai.org
 nodePort: ${partyiplist[${i}]#*:}
 
-exchange:
-  partyIp: ${exchangeip%:*}
-  partyPort: ${exchangeip#*:}
+$( if [ "$exchangeip" != "" ]; then
+echo "exchange:"
+echo "  partyIp: ${exchangeip%:*}"
+echo "  partyPort: ${exchangeip#*:}"
+else
+
+echo "partyList:"
+for ((j=0;j<${#partylist[*]};j++))
+   do
+     if [ ${i} -eq ${j} ]
+     then
+       continue
+     fi
+     echo "  - partyId: ${partylist[${j}]}"
+     echo "    partyIp: ${partyiplist[${j}]%:*}"
+     echo "    partyPort: ${partyiplist[${j}]#*:}"
+done
+
+
+fi )
 mysql:
   mysql_root_password: ${jdbcrootpassword}
   mysql_database: ${jdbcdbname}
@@ -170,16 +187,17 @@ then
   exit
 fi
 
-# Exchange
-rm -rf fate-exchange/
-mkdir -p fate-exchange/
+if [[ "${exchangeip}" != "" ]]; then
+  # Exchange
+  rm -rf fate-exchange/
+  mkdir -p fate-exchange/
 
-cp -r helm/fate-exchange/Chart.yaml fate-exchange/Chart.yaml
-cp -r helm/fate-exchange/templates fate-exchange/templates
+  cp -r helm/fate-exchange/Chart.yaml fate-exchange/Chart.yaml
+  cp -r helm/fate-exchange/templates fate-exchange/templates
 
-cat > fate-exchange/values.yaml << EOF
+  cat > fate-exchange/values.yaml << EOF
 image:
-$( if [[ "$RegistryURI" != "" ]]
+$( if [[ "$RegistryURI" -ne "" ]]
    then
      echo "  registry: ${RegistryURI}"
      echo "  isThridParty: true"
@@ -210,4 +228,6 @@ nodeSelector:
     nodeLabel: fedai.org
     value: 
 EOF
-echo fate-exchange done!
+  echo fate-exchange done!
+fi
+

@@ -129,9 +129,9 @@ $ helm install --name=fate-exchange --namespace=fate-exchange ./fate-exchange/
 After the command returns, use `helm list` to fetch the status of deployment, an example output is as follows:
 ```
 NAME         	REVISION	UPDATED                 	STATUS  	CHART              	APP VERSION	NAMESPACE    
-fate-10000   	1       	Tue Oct 29 03:47:05 2019	DEPLOYED	fate-party-0.4.0   	1.1.1      	fate-10000   
-fate-9999    	1       	Tue Oct 29 03:46:58 2019	DEPLOYED	fate-party-0.4.0   	1.1.1      	fate-9999    
-fate-exchange	1       	Tue Oct 29 03:46:53 2019	DEPLOYED	fate-exchange-0.4.0	1.1.1      	fate-exchange
+fate-10000   	1       	Tue Oct 29 03:47:05 2019	DEPLOYED	fate-party-1.2.0   	1.2.0      	fate-10000   
+fate-9999    	1       	Tue Oct 29 03:46:58 2019	DEPLOYED	fate-party-1.2.0   	1.2.0      	fate-9999    
+fate-exchange	1       	Tue Oct 29 03:46:53 2019	DEPLOYED	fate-exchange-1.2.0	1.2.0      	fate-exchange
 ```
 
 In the above deployment, the data of "mysql", "redis" and "egg" will be persisted to the worker node that hosting the services(Pod). Which means if a service shifted to the other worker node, the service will be unable to read the previous data.
@@ -171,11 +171,11 @@ View your nodes by this command:
 
 ```bash
 NAME      STATUS    AGE       VERSION       INTERNAL-IP
-master    Ready     5d        v1.15.3       192.168.11.1
-node-0    Ready     5d        v1.15.3       192.168.11.2
-node-1    Ready     5d        v1.15.3       192.168.11.3
-node-2    Ready     5d        v1.15.3       192.168.11.4
-node-3    Ready     5d        v1.15.3       192.168.11.5
+master    Ready     5d        v1.16.3       192.168.11.1
+node-0    Ready     5d        v1.16.3       192.168.11.2
+node-1    Ready     5d        v1.16.3       192.168.11.3
+node-2    Ready     5d        v1.16.3       192.168.11.4
+node-3    Ready     5d        v1.16.3       192.168.11.5
 ```
 
 A user can tag a specified node with labels, for example:  
@@ -190,11 +190,11 @@ After tagging all nodes, verify that they are worked by running:
 `$ kubectl get nodes --show-labels`
 ```bash
 NAME      STATUS    AGE       VERSION   LABELS
-master    Ready     5d        v1.15.3   kubernetes.io/arch=amd64,kubernetes.io/hostname=master,kubernetes.io/os=linux,name=master,node-role.kubernetes.io/master=
-node-0    Ready     5d        v1.15.3   ..., fedai.hostname=fate-node-0, ...
-node-1    Ready     5d        v1.15.3   ..., fedai.hostname=fate-node-1, ...
-node-2    Ready     5d        v1.15.3   ..., fedai.hostname=fate-node-2, ...
-node-3    Ready     5d        v1.15.3   ..., fedai.hostname=fate-node-3, ...
+master    Ready     5d        v1.16.3   kubernetes.io/arch=amd64,kubernetes.io/hostname=master,kubernetes.io/os=linux,name=master,node-role.kubernetes.io/master=
+node-0    Ready     5d        v1.16.3   ..., fedai.hostname=fate-node-0, ...
+node-1    Ready     5d        v1.16.3   ..., fedai.hostname=fate-node-1, ...
+node-2    Ready     5d        v1.16.3   ..., fedai.hostname=fate-node-2, ...
+node-3    Ready     5d        v1.16.3   ..., fedai.hostname=fate-node-3, ...
 ```
 
 With the use of node labels, a user can customize the deployment by configuring the "KubeFATE/k8s-deploy/kube.cfg". A sample is as follows:

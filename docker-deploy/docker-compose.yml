@@ -69,7 +69,6 @@ services:
       GLOG_log_dir: /data/projects/fate/eggroll/storage-service-cxx/logs
     volumes:
         - ./confs/egg/conf:/data/projects/fate/eggroll/egg/conf
-        - ./confs/egg/conf/transfer_conf.json:/data/projects/fate/eggroll/python/eggroll/conf/transfer_conf.json
         - ./confs/federatedml/conf/server_conf.json:/data/projects/fate/eggroll/python/eggroll/conf/server_conf.json
         - ./confs/egg/data-dir:/data/projects/fate/data-dir
     networks:
@@ -85,7 +84,6 @@ services:
       - ./confs/federatedml/conf:/data/projects/fate/python/arch/conf
       - ./confs/federatedml/conf:/data/projects/fate/python/eggroll/conf
       - ./confs/fate_flow/conf/settings.py:/data/projects/fate/python/fate_flow/settings.py
-      - ./examples:/data/projects/fate/python/examples
       - fate_flow_logs:/data/projects/fate/python/logs
     depends_on:
       - redis
