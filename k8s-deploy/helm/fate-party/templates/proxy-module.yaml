@@ -35,12 +35,6 @@ spec:
             - mountPath: /data/projects/fate/proxy/conf/route_table.json
               name: proxy-confs
               subPath: route_table.json
-            - mountPath: /data/projects/fate/proxy/conf/applicationContext-proxy.xml
-              name: other-confs
-              subPath: applicationContext-proxy.xml
-            - mountPath: /data/projects/fate/proxy/conf/log4j2.properties
-              name: other-confs
-              subPath: log4j2.properties
       {{ if .Values.nodeSelector.proxy.value}}
       nodeSelector:
         {{ .Values.nodeSelector.proxy.nodeLabel }}: {{ .Values.nodeSelector.proxy.value }}
@@ -50,9 +44,6 @@ spec:
         - name: proxy-confs
           configMap:
             name: proxy-config
-        - name: other-confs
-          configMap:
-            name: proxy-config-other
 ---
 apiVersion: v1
 kind: Service

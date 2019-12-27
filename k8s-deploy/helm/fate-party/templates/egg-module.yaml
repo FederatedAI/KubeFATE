@@ -48,6 +48,9 @@ spec:
             - mountPath: /data/projects/fate/eggroll/egg/conf/egg.properties
               name: egg-confs
               subPath: egg.properties
+            - mountPath: /data/projects/fate/eggroll/egg/conf/processor-starter.sh
+              name: egg-confs
+              subPath: processor-starter.sh
             - mountPath: /data/projects/fate/eggroll/python/eggroll/conf/server_conf.json
               name: python-confs
               subPath: server_conf.json
@@ -56,15 +59,6 @@ spec:
               subPath: {{ .egg }}-data-dir-{{ $root.Values.partyId }}
               name: modules-data-persistent-storage
             {{- end }}
-            - mountPath: /data/projects/fate/eggroll/egg/conf/applicationContext-egg.xml
-              name: other-confs
-              subPath: applicationContext-egg.xml
-            - mountPath: /data/projects/fate/eggroll/egg/conf/log4j2.properties
-              name: other-confs
-              subPath: log4j2.properties
-            - mountPath: /data/projects/fate/eggroll/egg/conf/processor-starter.sh
-              name: other-confs
-              subPath: processor-starter.sh
       {{ if .value}}
       nodeSelector:
         {{ .nodeLabel }}: {{ .value }}
@@ -83,9 +77,6 @@ spec:
             path: /data/projects/fate/data-dir
             type: DirectoryOrCreate
         {{- end }}
-        - name: other-confs
-          configMap:
-            name: egg-config-other
 ---
 apiVersion: v1
 kind: Service

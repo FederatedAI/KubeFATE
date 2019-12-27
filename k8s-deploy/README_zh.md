@@ -74,11 +74,11 @@ exchange 实例 id 0000, namespace fate-exchange
 `$ kubectl get nodes -o wide`
 ```bash
 NAME      STATUS    AGE       VERSION       INTERNAL-IP
-master    Ready     5d        v1.15.3       192.168.11.1
-node-0    Ready     5d        v1.15.3       192.168.11.2
-node-1    Ready     5d        v1.15.3       192.168.11.3
-node-2    Ready     5d        v1.15.3       192.168.11.4
-node-3    Ready     5d        v1.15.3       192.168.11.5
+master    Ready     5d        v1.16.3       192.168.11.1
+node-0    Ready     5d        v1.16.3       192.168.11.2
+node-1    Ready     5d        v1.16.3       192.168.11.3
+node-2    Ready     5d        v1.16.3       192.168.11.4
+node-3    Ready     5d        v1.16.3       192.168.11.5
 ```
 
 选定一个节点，添加一个标签（label）：
@@ -93,11 +93,11 @@ node "node-0" labeled
 `$ kubectl get nodes --show-labels`
 ```bash
 NAME      STATUS    AGE       VERSION   LABELS
-master    Ready     5d        v1.15.3   kubernetes.io/arch=amd64,kubernetes.io/hostname=master,kubernetes.io/os=linux,name=master,node-role.kubernetes.io/master=
-node-0    Ready     5d        v1.15.3   ..., fedai.hostname=fate-node-0, ...
-node-1    Ready     5d        v1.15.3   ..., fedai.hostname=fate-node-1, ...
-node-2    Ready     5d        v1.15.3   ..., fedai.hostname=fate-node-2, ...
-node-3    Ready     5d        v1.15.3   ..., fedai.hostname=fate-node-3, ...
+master    Ready     5d        v1.16.3   kubernetes.io/arch=amd64,kubernetes.io/hostname=master,kubernetes.io/os=linux,name=master,node-role.kubernetes.io/master=
+node-0    Ready     5d        v1.16.3   ..., fedai.hostname=fate-node-0, ...
+node-1    Ready     5d        v1.16.3   ..., fedai.hostname=fate-node-1, ...
+node-2    Ready     5d        v1.16.3   ..., fedai.hostname=fate-node-2, ...
+node-3    Ready     5d        v1.16.3   ..., fedai.hostname=fate-node-3, ...
 ```
 
 配置文件kube.cfg里面还有一部分配置项，可定制服务部署的节点，例如下面配置：
@@ -180,9 +180,9 @@ $ helm install --name=fate-exchange --namespace=fate-exchange ./fate-exchange/
 运行完这三个命令之后，可以用`helm list`来查看部署的状态：
 ```bash
 NAME         	REVISION	UPDATED                 	STATUS  	CHART              	APP VERSION	NAMESPACE    
-fate-10000   	1       	Tue Oct 29 03:47:05 2019	DEPLOYED	fate-party-0.4.0   	1.1.1      	fate-10000   
-fate-9999    	1       	Tue Oct 29 03:46:58 2019	DEPLOYED	fate-party-0.4.0   	1.1.1      	fate-9999    
-fate-exchange	1       	Tue Oct 29 03:46:53 2019	DEPLOYED	fate-exchange-0.4.0	1.1.1      	fate-exchange
+fate-10000   	1       	Tue Oct 29 03:47:05 2019	DEPLOYED	fate-party-1.2.0   	1.2.0      	fate-10000   
+fate-9999    	1       	Tue Oct 29 03:46:58 2019	DEPLOYED	fate-party-1.2.0   	1.2.0      	fate-9999    
+fate-exchange	1       	Tue Oct 29 03:46:53 2019	DEPLOYED	fate-exchange-1.2.0	1.2.0      	fate-exchange
 ```
 
 在这次部署中，”MySQL”, ”Redis”, ”egg”的数据将留在服务所在的本地节点上。如果以后某个服务迁移到其他节点上了，那么以前的数据就不能用了，这是因为数据不会同步迁移。  
