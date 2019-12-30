@@ -13,10 +13,8 @@ The nodes (target nodes) to install FATE must meet the following requirements:
 ## Deploying FATE
 A Linux host can be used as a deployment machine to run installation scripts to deploy FATE onto target hosts.
 
-First, on a Linux host, clone KubeFATE source repo:
-```bash
-$ git clone git@github.com:FederatedAI/KubeFATE.git
-```
+First, on a Linux host, download KubeFATE from [releases pages](https://github.com/FederatedAI/KubeFATE/releases), unzip it into folder KubeFATE.
+
 By default, the installation script pulls the images from Docker Hub during the deployment. If the target node is not connected to Internet, refer to the below section to set up a local registry such as Harbor and use the offline images.
 
 ### Set up a local registry Harbor (Optional)

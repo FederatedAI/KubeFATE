@@ -36,10 +36,7 @@ python         | fateflow.\<namespace><br>fateboard.\<namespace> | fate-flow/fat
 
 ## 克隆KubeFATE项目
 
-通过以下命令克隆远端代码块：
-```bash
-$ git clone git@github.com:FederatedAI/KubeFATE.git
-```
+请在 [releases pages](https://github.com/FederatedAI/KubeFATE/releases)中下载合适的KubeFATE版本，并解压到KubeFATE目录
 
 ## 使用第三方Docker仓库
 非互联网集群建议使用[Harbor](https://goharbor.io/)作为第三方仓库。安装Harbor请参考[文章](https://github.com/FederatedAI/KubeFATE/blob/master/registry/install_harbor.md)。在`.env`文件中，将`THIRDPARTYPREFIX`更改为Harbor的IP。 192.168.10.1是Harbor IP的示例。
