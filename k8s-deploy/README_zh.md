@@ -201,7 +201,6 @@ helm install --set nfspath=${NfsPath} --set nfsserver=${NfsIp} --name=fate-* --n
     ```
 - 运行toy_example
     ```bash
-    $ source /data/projects/python/venv/bin/activate
     $ cd /data/projects/fate/python/examples/toy_example/
     $ python run_toy_example.py 10000 9999 1
     ```

@@ -153,7 +153,6 @@ $ kubectl exec -it -c python svc/fateflow bash -n fate-10000
 ```
 2. Run the test toy_example
 ```bash
-$ source /data/projects/python/venv/bin/activate
 $ cd /data/projects/fate/python/examples/toy_example/
 $ python run_toy_example.py 10000 9999 1
 ```

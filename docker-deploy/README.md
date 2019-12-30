@@ -107,7 +107,6 @@ ed11ce8eb20d        federatedai/egg:1.2.0-release            "/bin/sh -c 'cd /da
 On the target node of each party, a container named  `confs-<party_id>_python_1` should have been created and running the `fate-flow` service. For example, on Party 10000's node, run the following commands to verify the deployment:
 ```bash
 $ docker exec -it confs-10000_python_1 bash
-$ source /data/projects/python/venv/bin/activate
 $ cd /data/projects/python/examples/toy_example/
 $ python run_toy_example.py 10000 9999 1
 ```
