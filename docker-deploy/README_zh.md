@@ -68,7 +68,6 @@ git clone git@github.com:FederatedAI/KubeFATE.git
 ```bash
 PREFIX=federatedai
 TAG=1.2.0-release
-BASE_TAG=1.2.0-release
 ```
 我们这里采用从Docker Hub下载镜像。如果在运行机器上已经下载或导入了所需镜像，部署将会变得非常容易。
 
