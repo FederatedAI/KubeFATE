@@ -55,11 +55,8 @@ mysql                              8
 ```
 ### 下载部署脚本
 
-部署机器运行以下命令获取kubeFATE项目代码：
+在部署机器上下载合适的KubeFATE版本，可参考 [releases pages](https://github.com/FederatedAI/KubeFATE/releases)，然后解压到KubeFATE目录。
 
-```bash
-git clone git@github.com:FederatedAI/KubeFATE.git
-```
 
 ### 修改镜像配置文件
 

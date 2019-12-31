@@ -31,10 +31,7 @@ python         | fateflow.\<namespace><br/>fateboard.\<namespace> | fate-flow/fa
 The Helm is a package management tool of Kubernetes, it simplifies the deployment and management of applications on Kubernetes. Before using the script, a user needs to install on his machine first. For more details about Helm and installation please refer to the [official page](https://helm.sh/docs/using_helm/).
 
 ## Deploying FATE
-Use the following command to clone repo if you did not clone before: 
-```bash
-$ git clone git@github.com:FederatedAI/KubeFATE.git
-```
+Download KubeFATE from [releases pages](https://github.com/FederatedAI/KubeFATE/releases), unzip it into folder KubeFATE
 
 By default, the script pulls the images from [Docker Hub](https://hub.docker.com/search?q=federatedai&type=image) during the deployment.
 
