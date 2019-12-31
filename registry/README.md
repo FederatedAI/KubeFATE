@@ -97,5 +97,17 @@ In thhe Source resource filters, under **Name**, enter `federatedai/* `. Click `
 
 Next, select the newly created replication rule and click `REPLICATE`, the FATE images from Docker Hub will be replicated to Harbor immediately. Depending on the network bandwidth, the images will appear under porject `federatedai` after the images have been replicated. Now FATE images are ready for local environment to pull from.
 
+For KubeFATE, you also need to replicate the `MySQL` and `Redis` images.
+
+<div style="text-align:left", align=left>
+<img width=600 src="./images/mysql-replication.jpg" />
+</div>
+
+<div style="text-align:left", align=left>
+<img width=600 src="./images/redis-replication.jpg" />
+</div>
+
+MySQL version is `8` and Redis version is `5`. They both need to specify the **Destination namespace** as `federatedai`.
+
 **NOTE:** The replication rule continues to take effect until it is disabled or cancelled. If FATE images are avaiable for a new release, they will be replicated to Harbor automatically. 
 
