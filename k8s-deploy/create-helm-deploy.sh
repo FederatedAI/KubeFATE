@@ -197,7 +197,7 @@ if [[ "${exchangeip}" != "" ]]; then
 
   cat > fate-exchange/values.yaml << EOF
 image:
-$( if [[ "$RegistryURI" -ne "" ]]
+$( if [[ "$RegistryURI" != "" ]]
    then
      echo "  registry: ${RegistryURI}"
      echo "  isThridParty: true"

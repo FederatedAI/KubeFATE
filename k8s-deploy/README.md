@@ -60,11 +60,6 @@ After finished the definition, use the following command to generate deployment 
 $ cd KubeFATE/k8s-deploy/
 $ bash create-helm-deploy.sh
 ```
-If using a third-party registry, use the following command to generate deployment files:
-```bash
-$ cd KubeFATE/k8s-deploy/
-$ bash create-helm-deploy.sh useThirdParty
-```
 According to the `kube.cfg`, the script creates three directories “fate-10000” 、“fate-9999”  and “fate-exchange” under the current path. The structure of each directory is as follows:
 ```
 fate-*

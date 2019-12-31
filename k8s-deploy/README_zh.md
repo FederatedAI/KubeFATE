@@ -132,11 +132,6 @@ DMZ部署参考文档[DMZ部署](DMZ-deploy_zh.md)
 $ cd KubeFATE/k8s-deploy/
 $ bash create-helm-deploy.sh
 ```
-如果使用第三方仓库，请使用这个命令：
-```bash
-$ cd KubeFATE/k8s-deploy/
-$ bash create-helm-deploy.sh useThirdParty
-```
 根据kube.cfg的内容，将会在当前目录生成两个文件夹，fate-9999/和fate-10000/。结构是这样的：
 ```bash
 fate-*
