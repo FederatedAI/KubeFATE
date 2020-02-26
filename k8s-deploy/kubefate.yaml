@@ -1,0 +1,116 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kubefate
+  namespace: kube-fate
+  labels:
+    fate: kubefate
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      fate: kubefate
+  template:
+    metadata:
+      labels:
+        fate: kubefate
+    spec:
+      serviceAccount: kubefate-admin
+      containers:
+        - image: federatedai/kubefate:2.0-alpha
+          imagePullPolicy: Always
+          name: kubefate
+          env:
+            - name: FATECLOUD_MONGO_URL
+              value: "mongo:27017"
+            - name: FATECLOUD_REPO_NAME
+              value: "kubefate"
+            - name: FATECLOUD_REPO_URL
+              value: "https://owlet42.github.io/helm-chart/"
+          ports:
+            - containerPort: 8080
+      restartPolicy: Always
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo
+  namespace: kube-fate
+  labels:
+    fate: mongo
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      fate: mongo
+  template:
+    metadata:
+      labels:
+        fate: mongo
+    spec:
+      containers:
+        - image: mongo
+          imagePullPolicy: IfNotPresent
+          name: mongo
+          env:
+            - name: MONGO_INITDB_ROOT_USERNAME
+              value: root
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              value: root
+          ports:
+            - containerPort: 27017
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo
+  namespace: kube-fate
+  labels:
+    fate: mongo
+spec:
+  ports:
+    - name: "27017"
+      port: 27017
+      targetPort: 27017
+      protocol: TCP
+  type: ClusterIP
+  selector:
+    fate: mongo
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kubefate
+  namespace: kube-fate
+  labels:
+    fate: kubefate
+spec:
+  ports:
+    - name: "8080"
+      port: 8080
+      targetPort: 8080
+      protocol: TCP
+  type: ClusterIP
+  selector:
+    fate: kubefate
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: kubefate
+  namespace: kube-fate
+  annotations:
+spec:
+  rules:
+    - host: kubefate.net
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: kubefate
+              servicePort: 8080
