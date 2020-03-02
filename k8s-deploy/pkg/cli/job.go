@@ -17,8 +17,12 @@ func (c *Job) getRequestPath() (Path string) {
 	return "job/"
 }
 
+func (c *Job) addArgs() (Args string) {
+	return ""
+}
+
 type JobResultList struct {
-	Data []*db.Job
+	Data db.JobList
 	Msg  string
 }
 
@@ -76,10 +80,13 @@ func (c *Job) outPutList(result interface{}) error {
 		return errors.New("type jobResultList not ok")
 	}
 
+	joblist := item.Data
+	joblist.Sort()
+
 	table := uitable.New()
-	table.AddRow("UUID", "CREATOR","METHOD", "STATUS", "CLUSTERID")
-	for _, r := range item.Data {
-		table.AddRow(r.Uuid, r.Creator,r.Method, r.Status.String(), r.ClusterId)
+	table.AddRow("UUID", "CREATOR", "METHOD", "STATUS", "STARTTIME", "CLUSTERID")
+	for _, r := range joblist {
+		table.AddRow(r.Uuid, r.Creator, r.Method, r.Status.String(), r.StartTime.Format("2006-01-02 15:04:05"), r.ClusterId)
 	}
 
 	return output.EncodeTable(os.Stdout, table)

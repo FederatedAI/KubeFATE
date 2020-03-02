@@ -4,12 +4,12 @@ import (
 	"context"
 	"fate-cloud-agent/pkg/utils/logging"
 	"fmt"
-	"go.mongodb.org/mongo-driver/bson"
 	"reflect"
 	"testing"
 	"time"
 
 	"github.com/rs/zerolog/log"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 var jobJustAddedUuid string
@@ -210,4 +210,68 @@ func TestJobDeleteAll(t *testing.T) {
 	}
 	fmt.Println(r)
 	return
+}
+
+func TestJob_timeOut(t *testing.T) {
+	type fields struct {
+		Uuid      string
+		StartTime time.Time
+		EndTime   time.Time
+		Method    string
+		Result    string
+		ClusterId string
+		Creator   string
+		SubJobs   []string
+		Status    JobStatus
+		timeLimit time.Duration
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   bool
+	}{
+		// TODO: Add test cases.
+		{
+			name: "",
+			fields: fields{
+				StartTime: time.Now(),
+				EndTime:   time.Time{},
+				timeLimit: 3 * time.Second,
+			},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			job := &Job{
+				Uuid:      tt.fields.Uuid,
+				StartTime: tt.fields.StartTime,
+				EndTime:   tt.fields.EndTime,
+				Method:    tt.fields.Method,
+				Result:    tt.fields.Result,
+				ClusterId: tt.fields.ClusterId,
+				Creator:   tt.fields.Creator,
+				SubJobs:   tt.fields.SubJobs,
+				Status:    tt.fields.Status,
+				timeLimit: tt.fields.timeLimit,
+			}
+
+			var i int
+
+			for i < 10 {
+				i++
+				got := job.TimeOut()
+				if got {
+					t.Log("timeOut")
+					return
+				} else {
+					t.Log("no timeOut")
+				}
+				time.Sleep(time.Second)
+			}
+			if i > 4 {
+				t.Error("job.TimeOut() error")
+			}
+		})
+	}
 }

@@ -6,75 +6,66 @@ import (
 	"fate-cloud-agent/pkg/api"
 	"fate-cloud-agent/pkg/db"
 	"fmt"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
 	"io/ioutil"
 	"net/http"
+	"time"
 )
 
-func getKubefate() {
+//func getToken_old() string {
+//
+//	serviceurl := viper.GetString("serviceurl")
+//
+//	loginUrl := "http://" + serviceurl + "/v1/user/login"
+//
+//	login := map[string]string{
+//		"username": viper.GetString("user.username"),
+//		"password": viper.GetString("user.password"),
+//	}
+//
+//	loginJsonB, err := json.Marshal(login)
+//
+//	body := bytes.NewReader(loginJsonB)
+//	request, err := http.NewRequest("POST", loginUrl, body)
+//	if err != nil {
+//		panic(err)
+//	}
+//
+//	var resp *http.Response
+//	resp, err = http.DefaultClient.Do(request)
+//	if err != nil {
+//		panic(err)
+//	}
+//
+//	rbody, err := ioutil.ReadAll(resp.Body)
+//	if err != nil {
+//		panic(err)
+//	}
+//
+//	result := map[string]interface{}{}
+//
+//	err = json.Unmarshal(rbody, &result)
+//	if err != nil {
+//		panic(err)
+//	}
+//	return fmt.Sprint(result["token"])
+//}
 
-	serviceurl := viper.GetString("serviceurl")
+func getToken() (string, error) {
 
-	//loginUrl := "http://" + serviceurl + "/v1"
-	loginUrl := "http://" + serviceurl + "/v1/user/login"
-
-	body := bytes.NewReader([]byte("{\"username\": \"admin\",\"password\": \"admin\"}"))
-	request, err := http.NewRequest("POST", loginUrl, body)
+	claims := &jwt.MapClaims{
+		"id":       viper.GetString("user.username"),
+		"exp":      time.Now().Add(30 * time.Second).Unix(),
+		"orig_iat": time.Now().Add(30 * time.Second).Unix(),
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims) //生成token
+	accessToken, err := token.SignedString([]byte("secret key"))
 	if err != nil {
-		panic(err)
+		return "", err
 	}
-
-	var resp *http.Response
-	resp, err = http.DefaultClient.Do(request)
-	if err != nil {
-		panic(err)
-	}
-
-	rbody, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Printf("%s\n", rbody)
-}
-
-func getToken() string {
-
-	serviceurl := viper.GetString("serviceurl")
-
-	loginUrl := "http://" + serviceurl + "/v1/user/login"
-
-	login := map[string]string{
-		"username": viper.GetString("user.username"),
-		"password": viper.GetString("user.password"),
-	}
-
-	loginJsonB, err := json.Marshal(login)
-
-	body := bytes.NewReader(loginJsonB)
-	request, err := http.NewRequest("POST", loginUrl, body)
-	if err != nil {
-		panic(err)
-	}
-
-	var resp *http.Response
-	resp, err = http.DefaultClient.Do(request)
-	if err != nil {
-		panic(err)
-	}
-
-	rbody, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		panic(err)
-	}
-
-	result := map[string]interface{}{}
-
-	err = json.Unmarshal(rbody, &result)
-	if err != nil {
-		panic(err)
-	}
-	return fmt.Sprint(result["token"])
+	return accessToken, nil
 }
 
 type request struct {
@@ -90,19 +81,22 @@ type Response struct {
 
 func Send(r *request) (*Response, error) {
 	serviceUrl := viper.GetString("serviceurl")
-	apiVersion := api.ApiVersion+"/"
+	apiVersion := api.ApiVersion + "/"
 	if serviceUrl == "" {
 		serviceUrl = "localhost:8080/"
 	}
-	Url := "http://" + serviceUrl +"/"+ apiVersion + r.Path
+	Url := "http://" + serviceUrl + "/" + apiVersion + r.Path
 	body := bytes.NewReader(r.Body)
-	log.Debug().Str("Type", r.Type).Str("url", Url).Str("Body",string(r.Body)).Msg("Request")
+	log.Debug().Str("Type", r.Type).Str("url", Url).Str("Body", string(r.Body)).Msg("Request")
 	request, err := http.NewRequest(r.Type, Url, body)
 	if err != nil {
 		return nil, err
 	}
-
-	Authorization := fmt.Sprintf("Bearer %s", getToken())
+	token, err := getToken()
+	if err != nil {
+		return nil, err
+	}
+	Authorization := fmt.Sprintf("Bearer %s", token)
 
 	request.Header.Add("Authorization", Authorization)
 

@@ -3,6 +3,7 @@ package api
 import (
 	"fate-cloud-agent/pkg/db"
 	"fate-cloud-agent/pkg/job"
+	"fate-cloud-agent/pkg/service"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
 )
@@ -78,23 +79,74 @@ func (_ *Cluster) getCluster(c *gin.Context) {
 	clusterId := c.Param("clusterId")
 	if clusterId == "" {
 		c.JSON(400, gin.H{"error": "err"})
+		return
 	}
+
+	//cluster, err := db.ClusterFindByName(clusterId, clusterId)
+	//if err != nil {
+	//	c.JSON(500, gin.H{"error": err})
+	//	return
+	//}
+
 	cluster, err := db.ClusterFindByUUID(clusterId)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err})
+		return
 	}
 
+	ip, err := service.GetNodeIp()
+	if err != nil {
+		c.JSON(500, gin.H{"error": err})
+		return
+	}
+	port, err := service.GetProxySvcNodePorts(cluster.NameSpace)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err})
+		return
+	}
+	podList, err := service.GetPodList(cluster.NameSpace)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err})
+		return
+	}
+
+	if cluster.Metadata == nil {
+		cluster.Metadata = make(map[string]interface{})
+	}
+	cluster.Metadata["ip"] = ip[1]
+	cluster.Metadata["port"] = port[0]
+	cluster.Metadata["modules"] = podList
 	c.JSON(200, gin.H{"data": cluster})
 }
 
 func (_ *Cluster) getClusterList(c *gin.Context) {
 
-	clusterList, err := db.FindClusterList("")
+	all := false
+	qall := c.Query("all")
+	if qall == "true" {
+		all = true
+	}
+
+	log.Debug().Bool("all", all).Msg("get args")
+
+	clusterList, err := db.FindClusterList("", all)
+
+	var clusterListreturn = make([]*db.Cluster, 0)
+	if !all {
+		for _, v := range clusterList {
+			if v.Status != db.Deleted_c {
+				clusterListreturn = append(clusterListreturn, v)
+			}
+		}
+	} else {
+		clusterListreturn = clusterList
+	}
+
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(200, gin.H{"msg": "getClusterList success", "data": clusterList})
+	c.JSON(200, gin.H{"msg": "getClusterList success", "data": clusterListreturn})
 }
 
 func (_ *Cluster) deleteCluster(c *gin.Context) {
@@ -106,7 +158,7 @@ func (_ *Cluster) deleteCluster(c *gin.Context) {
 		c.JSON(400, gin.H{"error": "err"})
 	}
 
-	j,err := job.ClusterDelete(clusterId, user.(*User).Username)
+	j, err := job.ClusterDelete(clusterId, user.(*User).Username)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return

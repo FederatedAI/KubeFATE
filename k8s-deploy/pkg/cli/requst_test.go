@@ -3,55 +3,19 @@ package cli
 import (
 	"fate-cloud-agent/pkg/utils/config"
 	"fate-cloud-agent/pkg/utils/logging"
+	"fmt"
+	"github.com/dgrijalva/jwt-go"
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/spf13/viper"
 )
 
-func Test_getKubefate(t *testing.T) {
-	InitConfigForTest()
-	logging.InitLog()
-	tests := []struct {
-		name string
-	}{
-		// TODO: Add test cases.
-		{
-			name: "test",
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			getKubefate()
-		})
-	}
-}
 func InitConfigForTest() {
 	config.InitViper()
 	viper.AddConfigPath("../../")
 	viper.ReadInConfig()
-}
-
-func Test_getToken(t *testing.T) {
-	InitConfigForTest()
-	logging.InitLog()
-	tests := []struct {
-		name string
-		want string
-	}{
-		// TODO: Add test cases.
-		{
-			name: "",
-			want: "",
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := getToken(); got != tt.want {
-				t.Errorf("getToken() = %v, want %v", got, tt.want)
-			}
-		})
-	}
 }
 
 func TestSend(t *testing.T) {
@@ -129,4 +93,19 @@ func TestResponse_Unmarshal(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestGetToken(t *testing.T) {
+	claims := &jwt.MapClaims{
+		"id": "admin",
+		"exp": time.Now().Add(30 * time.Second).Unix(),
+		"orig_iat": time.Now().Add(30 * time.Second).Unix(),
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims) //生成token
+	accessToken, err := token.SignedString([]byte("secret key"))
+	if err != nil {
+		return
+	}
+	fmt.Println(accessToken)
 }

@@ -28,7 +28,7 @@ func TestMsa(t *testing.T) {
 		Name:      "fate-10000",
 		Namespace: "fate-10000",
 		Version:   "V1.2.0",
-		Data:      []byte(`{ "partyId":10000,"endpoint": { "ip":"10.184.111.187","port":30000}}`),
+		Data:      []byte(`{"egg":{"count":3},"exchange":{"ip":"192.168.1.1","port":9370},"modules":["proxy","egg","fateboard","fateflow","federation","metaService","mysql","redis","roll","python"],"partyId":10000,"proxy":{"nodePort":30010,"type":"NodePort"}}`),
 	}
 	b, err := json.Marshal(d)
 	if err != nil {
@@ -67,7 +67,7 @@ func TestClusterInstall(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := ClusterInstall(tt.args.clusterArgs)
+			got, err := ClusterInstall(tt.args.clusterArgs,"test")
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ClusterInstall() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -101,7 +101,7 @@ func TestClusterDelete(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := ClusterDelete(tt.args.clusterId); !reflect.DeepEqual(got, tt.want) {
+			if got,_ := ClusterDelete(tt.args.clusterId,"test"); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("ClusterDelete() = %v, want %v", got, tt.want)
 			}
 			time.Sleep(30 * time.Second)

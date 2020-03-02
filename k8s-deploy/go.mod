@@ -6,6 +6,7 @@ require (
 	github.com/DataDog/zstd v1.4.4 // indirect
 	github.com/Masterminds/sprig/v3 v3.0.2
 	github.com/appleboy/gin-jwt/v2 v2.6.3
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-contrib/logger v0.0.2
 	github.com/gin-gonic/gin v1.5.0
 	github.com/go-playground/universal-translator v0.17.0 // indirect

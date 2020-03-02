@@ -9,7 +9,6 @@ import (
 	"sigs.k8s.io/yaml"
 
 	"io/ioutil"
-	"k8s.io/apimachinery/pkg/util/rand"
 )
 
 func ClusterCommand() *cli.Command {
@@ -22,7 +21,7 @@ func ClusterCommand() *cli.Command {
 			ClusterInfoCommand(),
 			ClusterDeleteCommand(),
 			ClusterInstallCommand(),
-			ClusterUpgradeCommand(),
+			ClusterUpdateCommand(),
 		},
 		Usage: "add a task to the list",
 	}
@@ -33,10 +32,19 @@ func ClusterListCommand() *cli.Command {
 		Name:    "list",
 		Aliases: []string{"ls"},
 		Flags: []cli.Flag{
+			&cli.BoolFlag{
+				Name:    "all",
+				Aliases: []string{"A"},
+				Value:   false,
+				Usage:   "chart valTemVal.yaml",
+			},
 		},
 		Usage: "show cluster list",
 		Action: func(c *cli.Context) error {
+			all := c.Bool("all")
 			cluster := new(Cluster)
+			cluster.all = all
+			log.Debug().Bool("all",all).Msg("all")
 			return getItemList(cluster)
 		},
 	}
@@ -76,7 +84,6 @@ func ClusterDeleteCommand() *cli.Command {
 				return errors.New("not uuid")
 			}
 
-
 			cluster := new(Cluster)
 			log.Debug().Str("uuid", uuid).Msg("cluster delete uuid")
 			return deleteItem(cluster, uuid)
@@ -94,38 +101,47 @@ func ClusterInstallCommand() *cli.Command {
 				Value:   "",
 				Usage:   "chart valTemVal.yaml",
 			},
-			&cli.StringFlag{
-				Name:    "namespace",
-				Aliases: []string{"n"},
-				Value:   "",
-				Usage:   "k8s namespace",
-			},
-			&cli.StringFlag{
-				Name:    "version",
-				Aliases: []string{"v"},
-				Value:   "",
-				Usage:   "chart version",
-			},
 		},
 		Usage: "cluster delete",
 		Action: func(c *cli.Context) error {
 
 			valTemValPath := c.String("file")
 
-			valBY, err := ioutil.ReadFile(valTemValPath)
+			clusterConfig, err := ioutil.ReadFile(valTemValPath)
 			if err != nil {
 				return err
 			}
-			log.Debug().Str("yaml",string(valBY)).Msg("ReadFile success")
-			valBJ, err := yamlToJson(valBY)
+			log.Debug().Str("yaml", string(clusterConfig)).Msg("ReadFile success")
+
+			var m map[string]interface{}
+			err = yaml.Unmarshal(clusterConfig, &m)
 			if err != nil {
 				return err
 			}
-			var name string
-			if c.Args().Len() > 0 {
-				name = c.Args().Get(0)
-			} else {
-				name = "fate-" + rand.String(4)
+
+			name, ok := m["name"]
+			if !ok {
+				return errors.New("name not found, check your cluster file")
+			}
+			delete(m, "name")
+
+			namespace, ok := m["namespace"]
+			if !ok {
+				return errors.New("namespace not found, check your cluster file")
+			}
+			delete(m, "namespace")
+
+			version, ok := m["version"]
+			if !ok {
+				return errors.New("version not found, check your cluster file")
+			}
+			delete(m, "version")
+
+			var json = jsoniter.ConfigCompatibleWithStandardLibrary
+			valBJ, err := json.Marshal(m)
+
+			if err != nil {
+				return err
 			}
 
 			cluster := new(Cluster)
@@ -135,12 +151,12 @@ func ClusterInstallCommand() *cli.Command {
 				Version   string
 				Data      []byte
 			}{
-				Namespace: c.String("namespace"),
-				Name:      name,
-				Version:   c.String("version"),
+				Namespace: namespace.(string),
+				Name:      name.(string),
+				Version:   version.(string),
 				Data:      valBJ,
 			}
-			var json = jsoniter.ConfigCompatibleWithStandardLibrary
+
 			body, err := json.Marshal(args)
 			if err != nil {
 				return err
@@ -150,9 +166,9 @@ func ClusterInstallCommand() *cli.Command {
 	}
 }
 
-func ClusterUpgradeCommand() *cli.Command {
+func ClusterUpdateCommand() *cli.Command {
 	return &cli.Command{
-		Name: "upgrade",
+		Name: "update",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:    "file",
@@ -160,33 +176,47 @@ func ClusterUpgradeCommand() *cli.Command {
 				Value:   "",
 				Usage:   "chart valTemVal.yaml",
 			},
-			&cli.StringFlag{
-				Name:    "namespace",
-				Aliases: []string{"n"},
-				Value:   "",
-				Usage:   "k8s namespace",
-			},
 		},
 		Usage: "cluster Upgrade",
 		Action: func(c *cli.Context) error {
 			valTemValPath := c.String("file")
 
-			valBY, err := ioutil.ReadFile(valTemValPath)
+			clusterConfig, err := ioutil.ReadFile(valTemValPath)
 			if err != nil {
 				return err
 			}
 
-			log.Debug().Str("yaml",string(valBY)).Msg("ReadFile success")
+			log.Debug().Str("yaml", string(clusterConfig)).Msg("ReadFile success")
 
-			valBJ, err := yamlToJson(valBY)
+			var m map[string]interface{}
+			err = yaml.Unmarshal(clusterConfig, &m)
 			if err != nil {
 				return err
 			}
-			var name string
-			if c.Args().Len() > 0 {
-				name = c.Args().Get(0)
-			} else {
-				name = "fate-" + rand.String(4)
+
+			name, ok := m["name"]
+			if !ok {
+				return errors.New("name not found, check your cluster file")
+			}
+			delete(m, "name")
+
+			namespace, ok := m["namespace"]
+			if !ok {
+				return errors.New("namespace not found, check your cluster file")
+			}
+			delete(m, "namespace")
+
+			version, ok := m["version"]
+			if !ok {
+				return errors.New("version not found, check your cluster file")
+			}
+			delete(m, "version")
+
+			var json = jsoniter.ConfigCompatibleWithStandardLibrary
+			valBJ, err := json.Marshal(m)
+
+			if err != nil {
+				return err
 			}
 
 			cluster := new(Cluster)
@@ -196,12 +226,12 @@ func ClusterUpgradeCommand() *cli.Command {
 				Version   string
 				Data      []byte
 			}{
-				Namespace: c.String("namespace"),
-				Name:      name,
-				Version:   "",
+				Namespace: namespace.(string),
+				Name:      name.(string),
+				Version:   version.(string),
 				Data:      valBJ,
 			}
-			var json = jsoniter.ConfigCompatibleWithStandardLibrary
+
 			body, err := json.Marshal(args)
 			if err != nil {
 				return err
@@ -209,15 +239,4 @@ func ClusterUpgradeCommand() *cli.Command {
 			return putItem(cluster, body)
 		},
 	}
-}
-
-func yamlToJson(bytes []byte) ([]byte, error) {
-	var m map[string]interface{}
-	err := yaml.Unmarshal(bytes, &m)
-	if err != nil {
-		return nil, err
-	}
-	var json = jsoniter.ConfigCompatibleWithStandardLibrary
-	return json.Marshal(m)
-
 }

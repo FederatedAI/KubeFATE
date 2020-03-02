@@ -16,6 +16,7 @@ const (
 
 type Item interface {
 	getRequestPath() (Path string)
+	addArgs() (Args string)
 	getResult(Type int) (result interface{}, err error)
 	outPut(result interface{}, Type int) error
 }
@@ -23,7 +24,7 @@ type Item interface {
 func postItem(i Item, Body []byte) error {
 	req := &request{
 		Type: "POST",
-		Path: i.getRequestPath(),
+		Path: i.getRequestPath() ,
 		Body: Body,
 	}
 
@@ -144,7 +145,7 @@ func getItem(i Item, UUID string) error {
 func getItemList(i Item) error {
 	req := &request{
 		Type: "GET",
-		Path: i.getRequestPath(),
+		Path: i.getRequestPath()+ i.addArgs(),
 		Body: nil,
 	}
 

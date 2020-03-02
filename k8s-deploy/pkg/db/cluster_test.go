@@ -54,7 +54,7 @@ func TestUpdateCluster(t *testing.T) {
 	if error == nil {
 		fate2Update := result.(Cluster)
 		fate2Update.Name = "fate-cluster2"
-		fate2Update.NameSpaces = "fate-nameSpaces"
+		fate2Update.NameSpace = "fate-nameSpaces"
 
 		party := NewParty("10000", "192.168.0.1", "normal")
 		backend := NewComputingBackend("egg", "1")
@@ -114,12 +114,12 @@ func TestFindClusterFindByUUID(t *testing.T) {
 				uuid: "a42d9679-7f44-47a6-a42a-89e3bedacd1f",
 			},
 			want: &Cluster{
-				Uuid:       "2f41aabe-1610-4e4a-bc1c-9b24e9f8ec11",
-				Name:       "fate-8888",
-				NameSpaces: "fate-8888",
-				Version:    1,
-				Metadata:   map[string]interface{}{},
-				Status:     Creating_c,
+				Uuid:      "2f41aabe-1610-4e4a-bc1c-9b24e9f8ec11",
+				Name:      "fate-8888",
+				NameSpace: "fate-8888",
+				Version:   1,
+				Metadata:  map[string]interface{}{},
+				Status:    Creating_c,
 				Backend: ComputingBackend{
 					BackendType: "",
 					BackendInfo: "",
@@ -198,7 +198,7 @@ func TestFindClusterList(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := FindClusterList(tt.args.args)
+			got, err := FindClusterList(tt.args.args, true)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("FindClusterList() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -263,6 +263,68 @@ func TestClusterFindByName(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("ClusterFindByName() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestCluster_IsExisted(t *testing.T) {
+	InitConfigForTest()
+	type fields struct {
+		Uuid             string
+		Name             string
+		NameSpace        string
+		Version          int
+		ChartVersion     string
+		ChartValues      map[string]interface{}
+		Values           string
+		ChartName        string
+		Type             string
+		Metadata         map[string]interface{}
+		Status           ClusterStatus
+		Backend          ComputingBackend
+		BootstrapParties Party
+	}
+	type args struct {
+		name      string
+		namespace string
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		want   bool
+	}{
+		// TODO: Add test cases.
+		{
+			name:   "",
+			fields: fields{},
+			args:   args{
+				name:      "fate-10000",
+				namespace: "fate-10000",
+			},
+			want:   false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cluster := &Cluster{
+				Uuid:             tt.fields.Uuid,
+				Name:             tt.fields.Name,
+				NameSpace:        tt.fields.NameSpace,
+				Version:          tt.fields.Version,
+				ChartVersion:     tt.fields.ChartVersion,
+				ChartValues:      tt.fields.ChartValues,
+				Values:           tt.fields.Values,
+				ChartName:        tt.fields.ChartName,
+				Type:             tt.fields.Type,
+				Metadata:         tt.fields.Metadata,
+				Status:           tt.fields.Status,
+				Backend:          tt.fields.Backend,
+				BootstrapParties: tt.fields.BootstrapParties,
+			}
+			if got := cluster.IsExisted(tt.args.name, tt.args.namespace); got != tt.want {
+				t.Errorf("Cluster.IsExisted() = %v, want %v", got, tt.want)
 			}
 		})
 	}
