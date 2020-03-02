@@ -104,37 +104,6 @@ func FindByUUID(repository Repository, uuid string) (interface{}, error) {
 	return r, nil
 }
 
-// FindByUUID find the object from the database via uuid
-func FindByName(repository Repository, name string, namespace string) (interface{}, error) {
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
-	db, err := ConnectDb()
-	if err != nil {
-		log.Println(err)
-		return nil, err
-	}
-	collection := db.Collection(repository.getCollection())
-
-	filter := bson.M{"name": name, "namespaces": namespace}
-	cur := collection.FindOne(ctx, filter)
-
-	//var r interface{}
-
-	// Decode to bson map
-	var result bson.M
-	err = cur.Decode(&result)
-	if err != nil {
-		log.Println(err)
-		return nil, err
-	}
-	// Convert bson.M to struct
-	r, err := repository.FromBson(&result)
-	if err != nil {
-		log.Println(err)
-		return nil, err
-	}
-
-	return r, nil
-}
 
 // FindByUUID find the object from the database via uuid
 func FindOneByUUID(repository Repository, uuid string) (interface{}, error) {
@@ -286,4 +255,38 @@ func FindByFilter(repository Repository, filter bson.M) ([]interface{}, error) {
 		persistents = append(persistents, r)
 	}
 	return persistents, nil
+}
+
+// FindByFilter find objects from database via custom filter, such as: findByName, findByStatus
+func FindOneByFilter(repository Repository, filter bson.M) (interface{}, error) {
+	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	db, err := ConnectDb()
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	collection := db.Collection(repository.getCollection())
+	cur := collection.FindOne(ctx, filter)
+	if cur.Err() != nil {
+		log.Println(err)
+		return nil, err
+	}
+	var persistent interface{}
+
+	// Decode to bson map
+	var result bson.M
+	err = cur.Decode(&result)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	// Convert bson.M to struct
+	r, err := repository.FromBson(&result)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	persistent = r
+
+	return persistent, nil
 }

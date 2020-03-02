@@ -63,7 +63,15 @@ spec:
               value: root
           ports:
             - containerPort: 27017
+          volumeMounts:
+            - name: mongo-data
+              mountPath: /data/db
       restartPolicy: Always
+      volumes:
+        - name: mongo-data
+          hostPath:
+            path: /home/kubefate/mongodb/db
+            type: DirectoryOrCreate
 ---
 apiVersion: v1
 kind: Service

@@ -83,3 +83,23 @@ func FindHelmByVersion(version string) (*HelmChart, error) {
 	return &HelmChart, nil
 
 }
+
+
+// FindHelmByNameAndVersion find helm chart via name and version
+func FindHelmChartList() ([]*HelmChart, error) {
+	filter := bson.M{}
+	helm := new(HelmChart)
+	result, err := FindByFilter(helm, filter)
+	if err != nil {
+		return nil, err
+	}
+	if len(result) == 0 {
+		return nil, errors.New("not find HelmChart")
+	}
+	var HelmChartList []*HelmChart
+	for _,v:=range result{
+		r:=v.(HelmChart)
+		HelmChartList=append(HelmChartList,&r)
+	}
+	return HelmChartList, nil
+}

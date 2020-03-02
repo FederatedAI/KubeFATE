@@ -3,15 +3,16 @@ package db
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"github.com/rs/zerolog/log"
 	"github.com/satori/go.uuid"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
 type Cluster struct {
-	Uuid       string `json:"uuid"`
-	Name       string `json:"name"`
-	NameSpaces string `json:"namespaces"`
+	Uuid      string `json:"uuid"`
+	Name      string `json:"name"`
+	NameSpace string `json:"namespaces"`
 	// Cluster version
 	Version int `json:"version"`
 	// Helm chart version, example: fate v1.2.0
@@ -35,6 +36,7 @@ const (
 	Updating_c
 	Running_c
 	Unavailable_c
+	Deleted_c
 )
 
 func (s ClusterStatus) String() string {
@@ -44,6 +46,7 @@ func (s ClusterStatus) String() string {
 		"Updating",
 		"Running",
 		"Unavailable",
+		"Deleted",
 	}
 
 	return names[s]
@@ -74,6 +77,8 @@ func (s *ClusterStatus) UnmarshalJSON(data []byte) error {
 		ClusterStatus = Running_c
 	case "\"Unavailable\"":
 		ClusterStatus = Unavailable_c
+	case "\"Deleted\"":
+		ClusterStatus = Deleted_c
 	default:
 		return errors.New("data can't UnmarshalJSON")
 	}
@@ -110,7 +115,7 @@ func NewCluster(name string, nameSpaces string, backend ComputingBackend, party 
 	cluster := &Cluster{
 		Uuid:             uuid.NewV4().String(),
 		Name:             name,
-		NameSpaces:       nameSpaces,
+		NameSpace:        nameSpaces,
 		Version:          0,
 		Status:           Creating_c,
 		Backend:          backend,
@@ -137,9 +142,11 @@ func ClusterFindByUUID(uuid string) (*Cluster, error) {
 	return &Cluster, nil
 }
 
-// ClusterFindByUUID get cluster from via uuid
+// ClusterFindByName get cluster from via name
 func ClusterFindByName(name, namespace string) (*Cluster, error) {
-	result, err := FindByName(new(Cluster), name, namespace)
+
+	filter := bson.M{"name": name, "namespace": namespace}
+	result, err := FindOneByFilter(new(Cluster), filter)
 	if err != nil {
 		return nil, err
 	}
@@ -155,10 +162,11 @@ func ClusterFindByName(name, namespace string) (*Cluster, error) {
 }
 
 // FindClusterList get all cluster list
-func FindClusterList(args string) ([]*Cluster, error) {
+func FindClusterList(args string, all bool) ([]*Cluster, error) {
 
 	cluster := &Cluster{}
-	result, err := Find(cluster)
+	filter := bson.M{}
+	result, err := FindByFilter(cluster, filter)
 	if err != nil {
 		return nil, err
 	}
@@ -173,11 +181,28 @@ func FindClusterList(args string) ([]*Cluster, error) {
 
 func ClusterDeleteByUUID(uuid string) error {
 
-	err := DeleteOneByUUID(new(Cluster), uuid)
+	cluster, err := ClusterFindByUUID(uuid)
+	if err != nil {
+		return err
+	}
+	cluster.Status = Deleted_c
+	err = UpdateByUUID(cluster, uuid)
 	if err != nil {
 		return err
 	}
 
 	log.Debug().Interface("ClusterUuid", uuid).Msg("delete Cluster success")
 	return nil
+}
+
+func (cluster *Cluster) IsExisted(name, namespace string) bool {
+	//filter := bson.M{"name": name, "namespace": namespace, "status": bson.M{"$ne": "Deleted"}}
+	filter := bson.M{"$and": []bson.M{{"name": name, "namespace": namespace}, {"status": bson.M{"$ne": Deleted_c}}}}
+	Clusters, err := FindByFilter(cluster, filter)
+	fmt.Println(ToJson(Clusters))
+	fmt.Println(err)
+	if err != nil || len(Clusters) == 0 {
+		return false
+	}
+	return true
 }

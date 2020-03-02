@@ -21,7 +21,6 @@ func initCommandLine() *cli.App {
 			ClusterCommand(),
 			JobCommand(),
 			UserCommand(),
-			configCommand(),
 		},
 	}
 

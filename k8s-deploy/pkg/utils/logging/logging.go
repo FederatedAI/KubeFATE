@@ -44,5 +44,4 @@ func InitLog() {
 
 	log.Logger = log.With().Caller().CallerWithSkipFrameCount(2).Logger()
 
-	log.Info().Msgf("logLevel: %v", logLevel)
 }

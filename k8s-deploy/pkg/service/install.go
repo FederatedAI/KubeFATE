@@ -13,11 +13,11 @@ import (
 )
 
 type Result struct {
-	Namespace   string
-	ChartName   string
+	Namespace    string
+	ChartName    string
 	ChartVersion string
-	ChartValues map[string]interface{}
-	release     *release.Release
+	ChartValues  map[string]interface{}
+	release      *release.Release
 }
 
 // install is create a cluster
@@ -75,7 +75,7 @@ func Install(namespace, name, chartVersion string, value *Value) (*Result, error
 		return nil, err
 	}
 	// default values
-	val = mergeMaps(val, chartRequested.Values)
+	//val = mergeMaps(chartRequested.Values, val)
 
 	log.Debug().Fields(val).Msg("chart values: ")
 
@@ -88,11 +88,11 @@ func Install(namespace, name, chartVersion string, value *Value) (*Result, error
 	log.Debug().Interface("runInstall result", rel)
 
 	return &Result{
-		Namespace:   settings.Namespace(),
-		ChartName:   fc.Name,
+		Namespace:    settings.Namespace(),
+		ChartName:    fc.Name,
 		ChartVersion: fc.Version,
-		ChartValues: val,
-		release:     rel,
+		ChartValues:  val,
+		release:      rel,
 	}, nil
 }
 func newReleaseWriter(releases *release.Release) *releaseElement {

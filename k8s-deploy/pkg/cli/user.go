@@ -16,6 +16,10 @@ func (c *User) getRequestPath() (Path string) {
 	return "user/"
 }
 
+func (c *User) addArgs() (Args string) {
+	return ""
+}
+
 type UserResultList struct {
 	Data []*db.User
 	Msg  string

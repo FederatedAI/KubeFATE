@@ -6,20 +6,32 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/satori/go.uuid"
 	"go.mongodb.org/mongo-driver/bson"
+	"sort"
 	"time"
 )
 
 type Job struct {
-	Uuid      string    `json:"uuid"`
-	StartTime time.Time `json:"start_time"`
-	EndTime   time.Time `json:"end_time"`
-	Method    string    `json:"method"`
-	Result    string    `json:"result"`
-	ClusterId string    `json:"cluster_id"`
-	Creator   string    `json:"creator"`
-	SubJobs   []string  `json:"sub-jobs"`
-	Status    JobStatus `json:"status"`
+	Uuid      string        `json:"uuid"`
+	StartTime time.Time     `json:"start_time"`
+	EndTime   time.Time     `json:"end_time"`
+	Method    string        `json:"method"`
+	Result    string        `json:"result"`
+	ClusterId string        `json:"cluster_id"`
+	Creator   string        `json:"creator"`
+	SubJobs   []string      `json:"sub-jobs"`
+	Status    JobStatus     `json:"status"`
+	timeLimit time.Duration `json:"time_limit"`
 }
+
+type JobList []*Job
+
+func (jl JobList) Len() int           { return len(jl) }
+func (jl JobList) Less(i, j int) bool { return jl[i].StartTime.Before(jl[j].StartTime) }
+func (jl JobList) Swap(i, j int)      { jl[i], jl[j] = jl[j], jl[i] }
+
+// Sort is a convenience method.
+func (jl JobList) Sort() { sort.Sort(jl) }
+
 type Method uint32
 
 const (
@@ -100,6 +112,7 @@ func NewJob(method string, creator string) *Job {
 		Creator:   creator,
 		StartTime: time.Now(),
 		Status:    Pending_j,
+		timeLimit: 1 * time.Hour,
 	}
 
 	return job
@@ -168,4 +181,8 @@ func JobDeleteByUUID(uuid string) error {
 
 	log.Debug().Interface("jobUuid", uuid).Msg("delete job success")
 	return nil
+}
+
+func (job *Job) TimeOut() bool {
+	return time.Now().After(job.StartTime.Add(job.timeLimit))
 }
