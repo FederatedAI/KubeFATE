@@ -336,7 +336,7 @@ func updateCharts(repos []*repo.ChartRepository) {
 		}(re)
 	}
 	wg.Wait()
-	log.Debug().Msg("Update Complete. ⎈ Happy Helming!⎈ ")
+	log.Debug().Msg("Update Complete.")
 }
 func RepoAddAndUpdate() error {
 	settings := cli.New()
