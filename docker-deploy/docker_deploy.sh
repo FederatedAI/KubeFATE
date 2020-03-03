@@ -96,12 +96,14 @@ cd $dir
 tar -xzf confs-$target_party_id.tar
 cd confs-$target_party_id
 docker-compose down
+docker volume rm confs-${target_party_id}_shared_dir_examples
+docker volume rm confs-${target_party_id}_shared_dir_federatedml
 docker-compose up -d
 cd ../
-rm -f confs-$target_party_id.tar
+rm -f confs-${target_party_id}.tar
 exit
 eeooff
-  echo "party $target_party_id deploy is ok!"
+  echo "party ${target_party_id} deploy is ok!"
 }
 
 ShowUsage() {

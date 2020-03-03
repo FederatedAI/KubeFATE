@@ -7,8 +7,22 @@ version: '3'
 
 networks:
   fate-network:
+
 volumes:
   fate_flow_logs:
+  shared_dir_examples:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /path/to/host/dir/examples
+  shared_dir_federatedml:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /path/to/host/dir/federatedml
+
 services:
   federation:
     image: "${PREFIX}/federation:${TAG}"
@@ -81,6 +95,8 @@ services:
       - "9380:9380"
     restart: always
     volumes:
+      - shared_dir_federatedml:/data/projects/fate/python/federatedml
+      - shared_dir_examples:/data/projects/fate/python/examples
       - ./confs/federatedml/conf:/data/projects/fate/python/arch/conf
       - ./confs/federatedml/conf:/data/projects/fate/python/eggroll/conf
       - ./confs/fate_flow/conf/settings.py:/data/projects/fate/python/fate_flow/settings.py
