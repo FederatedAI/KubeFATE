@@ -1,1 +1,20 @@
-k8s-deploy/Makefile
+BUILD-PATH = ${shell pwd}
+K8S-DEPLOY="./k8s-deploy"
+
+define sub_make
+ cd $1 && make $2 && cd ${BUILD-PATH}
+endef
+
+all: build-linux-binary zip build-docker-image
+
+build-linux-binary:
+	$(call sub_make, ${K8S-DEPLOY}, build-linux-binary)
+
+build-docker-image:
+	$(call sub_make, ${K8S-DEPLOY}, build-docker-image)
+
+zip:
+	tar -czvf kubefate-docker-compose.tar.gz ./docker-deploy
+
+clean:
+	rm kubefate-docker-compose.tar.gz && $(call sub_make, ${K8S-DEPLOY}, clean)
