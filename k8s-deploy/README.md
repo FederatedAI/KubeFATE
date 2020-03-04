@@ -6,7 +6,7 @@ If you focus on how to quickly use KubeFATE, please jump to [Use Scenarios](#use
 ## Highlevel Architecture of multiple Federated Learning Parties
 The very highlevel architecture of a multiple Federated Learning deployment (e.g. two parties) as follow image:
 <div align="center">
-  <img src="./images/hamflp.png">
+  <img src="./images/hamflp.PNG">
 </div>
 
 FateCloud which will be release later, will be a unified federated cloud management system, which will coordinate different parties. In each party, KubeFATE manage the infrastructure. 
@@ -24,7 +24,7 @@ KubeFATE will responsible for:
 ## Highlevel Architecture of KubeFATE
 The highlevel architecture of KubeFATE can be presented as follow image:
 <div align="center">
-  <img src="./images/kfha.png">
+  <img src="./images/kfha.PNG">
 </div>
 
 The numbers marked in diagram:
@@ -45,7 +45,7 @@ Suppose in a organization, there are two roles:
 * ML Infra. Ops.: who responsible for managing the machine learning cluster like FATE
 
 <div align="center">
-  <img src="./images/swim.png">
+  <img src="./images/swim.PNG">
 </div>
 
 #### Create role, namespace and other resource in Kubernetes
