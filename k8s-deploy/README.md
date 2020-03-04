@@ -48,6 +48,7 @@ Suppose in a organization, there are two roles:
   <img src="./images/swim.PNG">
 </div>
 
+### Initial a new FATE deployment
 #### Create role, namespace and other resource in Kubernetes
 The sample yaml can be [rbac-config.yaml](./rbac-config.yaml). In the sample yaml, we create a kube-fate namespace for KubeFATE service. More limitation can be applied to kube-fate namespace, refer to [Kubernetes Namespace](https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/), [Configure Memory and CPU Quotas for Namespace](https://kubernetes.io/docs/tasks/administer-cluster/manage-resources/quota-memory-cpu-namespace/) 
 ```
@@ -112,6 +113,10 @@ ChartName       fate
 Info            map[]
 ```
 
+### Other Common Use Scenarios
+#### [Add a <span style="color:red">NEW</span> FATE Version Support](#)
+#### [Update and Delete a FATE Cluster](#)
+
 ## Command Line Reference
 ## KubeFATE Service RESTful APIs Reference
-[API Reference](./docs/api-reference/index.html)
+[API Reference](https://app.swaggerhub.com/apis-docs/vmware-octo/kubefate2/1.0.0-oas3#/cluster/createcluster)
