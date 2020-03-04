@@ -29,6 +29,10 @@ spec:
               value: "kubefate"
             - name: FATECLOUD_REPO_URL
               value: "https://owlet42.github.io/helm-chart/"
+            - name: FATECLOUD_USER_USERNAME
+              value: "admin"
+            - name: FATECLOUD_USER_PASSWORD
+              value: "admin"
           ports:
             - containerPort: 8080
       restartPolicy: Always

@@ -1,3 +1,4 @@
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 # Overview
 This branch is for the new designed KubeFATE preview version.
 
@@ -7,6 +8,11 @@ Federated learning involves multiple parties to collaborately train a machine le
 
 KubeFATE supports the deployment of FATE via Docker Compose and Kubernetes. We recommend installing a quick development and playground FATE cluster with Docker Compose, while a production environment with Kubernetes. 
 
+## Getting Involved
+* For any frequently asked questions, you can check in [FAQ](https://github.com/FederatedAI/KubeFATE/wiki/KubeFATE#faqs).
+* Please report bugs by submitting [issues](https://github.com/FederatedAI/KubeFATE/issues).
+* Submit contributions using [pull requests](https://github.com/FederatedAI/KubeFATE/pulls)
+
 ## Project structure
 ```
 KubeFATE2
@@ -15,7 +21,7 @@ KubeFATE2
 ```
 `docker-deploy`: The traditional  Docker Compose installation. The pricipal of `docker-deploy` is simple and quickly to set the environment up. Docker Compose can deploy FATE components on a single host. By using Docker Compose, FATE can be set up for environments of multiple parties which are collaborating in a federated manner. Please refer to [Docker Compose Deployment](./docker-deploy/README.md) for more details.
 
-`k8s-deploy`: The new KubeFATE preview version. The k8s deployment is design for a real production deployed and managed environment. It designed for flexibility to suit different variable environments.
+`k8s-deploy`: The new KubeFATE preview version. The k8s deployment is design for a real production deployed and managed environment. It designed for flexibility to suit different various environments.
 
 ### Major features of new KubeFATE k8s-deploy
   * Provide a single executable binary for initialing and managing FATE cluster
@@ -25,6 +31,27 @@ KubeFATE2
   * Provide cluster management service with RESTful APIs
 
 For more details, please refer to [Kubernetes Deployment](./k8s-deploy/README.md).
+
+## Build KubeFATE
+##### To use docker-deploy for docker compose deployment, you need to make sure [Docker Compose] installed
+Refer to: [Docker Compose Deployment](./docker-deploy/README.md) for more details
+
+##### To build KubeFATE binary, you need a [Go environment] 
+
+```
+git clone https://github.com/FederatedAI/KubeFATE.git
+cd KubeFATE
+git checkout kubefate2 #Should be removed after merge kubefate2 back to master branch
+make build-linux-binary
+```
+##### To build KubeFATE service image, you need a [Docker environment]
+
+```
+git clone https://github.com/FederatedAI/KubeFATE.git
+cd KubeFATE
+git checkout kubefate2 #Should be removed after merge kubefate2 back to master branch
+make build-docker-image
+```
 
 ## Note on the usage of ".env"
 By default, the installation script pulls the images from [Docker Hub](https://hub.docker.com/u/federatedai) during the deployment. A user could also modify `.env` to specify a local registry (such as Harbor) to pull images from.
