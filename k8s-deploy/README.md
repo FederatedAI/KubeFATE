@@ -113,4 +113,5 @@ Info            map[]
 ```
 
 ## Command Line Reference
-## KubeFATE Service Reference
+## KubeFATE Service RESTful APIs Reference
+[API Reference](./docs/api-reference/index.html)

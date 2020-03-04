@@ -13,7 +13,7 @@ KubeFATE supports the deployment of FATE via Docker Compose and Kubernetes. We r
 * Please report bugs by submitting [issues](https://github.com/FederatedAI/KubeFATE/issues).
 * Submit contributions using [pull requests](https://github.com/FederatedAI/KubeFATE/pulls)
 
-## Project structure
+## Project Structure
 ```
 KubeFATE2
 |-- docker-deploy   
