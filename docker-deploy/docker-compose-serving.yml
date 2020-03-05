@@ -1,0 +1,43 @@
+########################################################
+# Copyright 2019-2020 program was created VMware, Inc. #
+# SPDX-License-Identifier: Apache-2.0                  #
+########################################################
+
+version: '3'
+
+networks:
+  fate-network:
+services:
+  serving-server:
+    image: "${PREFIX}/serving-server:${SERVING_TAG}"
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./confs/serving-server/conf/serving-server.properties:/data/projects/fate/serving-server/conf/serving-server.properties
+      - ./confs/serving-server/.fate:/root/.fate
+    networks:
+      - fate-network
+
+  serving-proxy:
+    image: "${PREFIX}/serving-proxy:${SERVING_TAG}"
+    ports:
+      - "8059:8059"
+      - "8869:8869"
+    expose:
+      - 8879
+    volumes:
+      - ./confs/serving-proxy/conf/application.properties:/data/projects/fate/serving-proxy/conf/application.properties
+      - ./confs/serving-proxy/conf/route_table.json:/data/projects/fate/serving-proxy/conf/route_table.json
+    networks:
+      - fate-network
+
+  redis:
+    image: "redis:5"
+    expose:
+      - 6379
+    command: redis-server --requirepass fate_dev
+    volumes:
+      - ./confs/redis/data:/data
+    networks:
+      - fate-network
+

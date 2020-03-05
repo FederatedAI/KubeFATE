@@ -27,6 +27,7 @@ GenerateConfig() {
     
         eval party_id=\${partylist[${i}]}
         eval party_ip=\${partyiplist[${i}]}
+        eval serving_ip=\${servingiplist[${i}]}
     
         eval processor_port=50000
         eval processor_count=16
@@ -169,6 +170,7 @@ GenerateConfig() {
         sed -i.bak "s/'name':.*/'name': '${db_name}',/g" ./confs-$party_id/confs/fate_flow/conf/settings.py
         sed -i.bak "s/'password':.*/'password': '${redis_password}',/g" ./confs-$party_id/confs/fate_flow/conf/settings.py
         sed -i.bak "/'host':.*/{x;s/^/./;/^\.\{2\}$/{x;s/.*/    'host': '${redis_ip}',/;x};x;}" ./confs-$party_id/confs/fate_flow/conf/settings.py
+        sed -i.bak "s/serving:8000/${serving_ip}:8000/g" ./confs-$party_id/confs/fate_flow/conf/server_conf.json
         echo fate_flow module of $party_id done!
     
         # federatedml
@@ -325,6 +327,76 @@ EOF
     
   fi
   
+    # handle serving
+    echo "handle serving"
+    for ((i=0;i<${#servingiplist[*]};i++))
+    do
+        eval party_id=\${partylist[${i}]}
+        eval party_ip=\${partyiplist[${i}]}
+        eval serving_ip=\${servingiplist[${i}]}
+
+        rm -rf serving-$party_id/
+        mkdir -p serving-$party_id/confs
+        cp -r docker-serving/* serving-$party_id/confs/
+        
+        cp ./docker-compose-serving.yml serving-$party_id/docker-compose.yml
+        # generate conf dir
+        cp ${WORKINGDIR}/../.env ./serving-$party_id
+
+
+        # serving server
+        sed -i.bak "s/127.0.0.1:9380/${party_ip}:9380/g" ./serving-$party_id/confs/serving-server/conf/serving-server.properties
+
+        # serving proxy
+        sed -i.bak "s/coordinator=partyid/coordinator=${party_id}/g" ./serving-$party_id/confs/serving-proxy/conf/application.properties
+        cat > ./serving-$party_id/confs/serving-proxy/conf/route_table.json <<EOF
+{
+    "route_table": {
+$( for ((j=0;j<${#partylist[*]};j++));do
+if [ "${party_id}" == "${partylist[${j}]}" ]; then
+echo "        \"${partylist[${j}]}\": {
+            \"default\": [
+                {
+                    \"ip\": \"serving-proxy\",
+                    \"port\": 8059
+                }
+            ],
+            \"serving\": [
+                {
+                    \"ip\": \"serving-server\",
+                    \"port\": 8000
+                }
+            ]
+        },"
+else
+echo "        \"${partylist[${j}]}\": {
+            \"default\": [
+                {
+                    \"ip\": \"${servingiplist[${j}]}\",
+                    \"port\": 8869
+                }
+            ]
+        },"
+fi
+done)
+        "default": {
+            "default": [
+                {
+                    "ip": "default-serving-proxy",
+                    "port": 8869
+                }
+            ]
+        }
+    },
+    "permission": {
+        "default_allow": true
+    }
+}
+EOF
+    tar -czf ./outputs/serving-$party_id.tar ./serving-$party_id
+    rm -rf ./serving-$party_id
+    echo serving of $party_id done!
+    done
 }
 
 # only used in the k8s deployment
