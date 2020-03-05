@@ -52,7 +52,7 @@ func Install(namespace, name, chartVersion string, value *Value) (*Result, error
 		log.Err(err).Msg("GetFateChart error")
 		return nil, err
 	}
-	log.Debug().Interface("FateChartName", fc.Name).Msg("GetFateChart success")
+	log.Debug().Interface("FateChartName", fc.Name).Interface("FateChartVersion", fc.Version).Msg("GetFateChart success")
 
 	// fateChart to helmChart
 	chartRequested, err := fc.ToHelmChart()

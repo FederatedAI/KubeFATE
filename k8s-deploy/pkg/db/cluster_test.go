@@ -105,7 +105,7 @@ func TestFindClusterFindByUUID(t *testing.T) {
 		{
 			name: "test",
 			args: args{
-				uuid: "a42d9679-7f44-47a6-a42a-89e3bedacd1f",
+				uuid: "aa3f3e57-79e3-497e-9ecb-ad778b119da1",
 			},
 			want: &Cluster{
 				Uuid:      "2f41aabe-1610-4e4a-bc1c-9b24e9f8ec11",
@@ -146,7 +146,7 @@ func TestClusterDeleteByUUID(t *testing.T) {
 		{
 			name: "",
 			args: args{
-				uuid: "a42d9679-7f44-47a6-a42a-89e3bedacd1f",
+				uuid: "aa3f3e57-79e3-497e-9ecb-ad778b119da1",
 			},
 			wantErr: false,
 		},

@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fate-cloud-agent/pkg/service"
 	"fmt"
 	"os"
 
@@ -26,10 +25,6 @@ func Run() {
 	//if err != nil {
 	//	panic(err)
 	//}
-	err := service.RepoAddAndUpdate()
-	if err != nil {
-		panic(err)
-	}
 
 	// use gin.New() instead
 	r := gin.New()

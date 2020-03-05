@@ -17,7 +17,7 @@ type Cluster struct {
 	Version int `json:"version"`
 	// Helm chart version, example: fate v1.2.0
 	ChartVersion string `json:"chart_version"`
-	ChartValues  map[string]interface{} `json:"chart_version"`
+	ChartValues  map[string]interface{} `json:"chart_values"`
 	// The value of this cluster for installing helm chart
 	Values           string                 `json:"values"`
 	ChartName        string                 `json:"chart_name"`
