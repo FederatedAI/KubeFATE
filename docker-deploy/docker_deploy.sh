@@ -38,11 +38,9 @@ Deploy() {
                 if [ "${exchangeip}" != "" ]; then
                   DeployPartyInternal exchange
                 fi
-              break
               ;;
               --serving)
               DeployPartyServing $party
-              break
               ;;
             esac
           else
