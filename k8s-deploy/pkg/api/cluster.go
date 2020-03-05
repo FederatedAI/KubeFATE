@@ -113,8 +113,14 @@ func (_ *Cluster) getCluster(c *gin.Context) {
 	if cluster.Info == nil {
 		cluster.Info = make(map[string]interface{})
 	}
-	cluster.Info["ip"] = ip[1]
-	cluster.Info["port"] = port[0]
+
+	if len(ip) > 0 {
+		cluster.Info["ip"] = ip[len(ip)-1]
+	}
+	if len(port) > 0 {
+		cluster.Info["port"] = port[0]
+	}
+
 	cluster.Info["modules"] = podList
 
 	if cluster.Config == nil {
