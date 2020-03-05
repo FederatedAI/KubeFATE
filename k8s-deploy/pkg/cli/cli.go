@@ -10,17 +10,15 @@ func initCommandLine() *cli.App {
 	app := &cli.App{
 
 		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:  "name",
-				Value: "n",
-				Usage: "fate name",
-			},
+
 		},
 		Commands: []*cli.Command{
+			//todo add versionCommand
 			serviceCommand(),
 			ClusterCommand(),
 			JobCommand(),
 			UserCommand(),
+			ChartCommand(),
 		},
 	}
 

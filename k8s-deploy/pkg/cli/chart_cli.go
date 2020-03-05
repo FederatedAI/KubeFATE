@@ -1,0 +1,183 @@
+package cli
+
+import (
+	"bytes"
+	"errors"
+	"fate-cloud-agent/pkg/api"
+	"fmt"
+	"github.com/rs/zerolog/log"
+	"github.com/spf13/viper"
+	"github.com/urfave/cli/v2"
+	"io"
+	"mime/multipart"
+	"net/http"
+	"os"
+	"path/filepath"
+
+	"io/ioutil"
+)
+
+func ChartCommand() *cli.Command {
+	return &cli.Command{
+		Name: "chart",
+		Flags: []cli.Flag{
+		},
+		Subcommands: []*cli.Command{
+			ChartListCommand(),
+			ChartInfoCommand(),
+			ChartDeleteCommand(),
+			ChartCreateCommand(),
+		},
+		Usage: "add a task to the list",
+	}
+}
+
+func ChartListCommand() *cli.Command {
+	return &cli.Command{
+		Name:    "list",
+		Aliases: []string{"ls"},
+		Flags: []cli.Flag{
+		},
+		Usage: "show Chart list",
+		Action: func(c *cli.Context) error {
+			cluster := new(Chart)
+			return getItemList(cluster)
+		},
+	}
+}
+
+func ChartInfoCommand() *cli.Command {
+	return &cli.Command{
+		Name: "describe",
+		Flags: []cli.Flag{
+		},
+		Usage: "show chart info",
+		Action: func(c *cli.Context) error {
+			var uuid string
+			if c.Args().Len() > 0 {
+				uuid = c.Args().Get(0)
+			} else {
+				return errors.New("not uuid")
+			}
+			cluster := new(Chart)
+			return getItem(cluster, uuid)
+		},
+	}
+}
+
+func ChartDeleteCommand() *cli.Command {
+	return &cli.Command{
+		Name:    "delete",
+		Aliases: []string{"del"},
+		Flags: []cli.Flag{
+		},
+		Usage: "chart delete",
+		Action: func(c *cli.Context) error {
+			var uuid string
+			if c.Args().Len() > 0 {
+				uuid = c.Args().Get(0)
+			} else {
+				return errors.New("not uuid")
+			}
+
+			cluster := new(Chart)
+			log.Debug().Str("uuid", uuid).Msg("Chart delete uuid")
+			return deleteItem(cluster, uuid)
+
+		},
+	}
+}
+
+func ChartCreateCommand() *cli.Command {
+
+	return &cli.Command{
+		Name: "upload",
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:    "file",
+				Aliases: []string{"f"},
+				Value:   "",
+				Usage:   "chart valTemVal.yaml",
+			},
+		},
+		Usage: "Chart upload",
+		Action: func(c *cli.Context) error {
+
+			file := c.String("file")
+
+			log.Debug().Str("file", file).Msg("file")
+
+			filename := filepath.Base(file)
+			log.Debug().Str("filename", filename).Msg("filename")
+
+			bodyBuf := &bytes.Buffer{}
+			bodyWriter := multipart.NewWriter(bodyBuf)
+
+			//关键的一步操作
+			fileWriter, err := bodyWriter.CreateFormFile("file", filename)
+			if err != nil {
+				fmt.Println("error writing to buffer")
+				return err
+			}
+
+			//打开文件句柄操作
+			fh, err := os.Open(file)
+			if err != nil {
+				fmt.Println("error opening file")
+				return err
+			}
+			defer fh.Close()
+
+			//iocopy
+			_, err = io.Copy(fileWriter, fh)
+			if err != nil {
+				return err
+			}
+
+			contentType := bodyWriter.FormDataContentType()
+			log.Debug().Str("contentType", contentType).Msg("contentType")
+			bodyWriter.Close()
+
+			r := &request{
+				Type: "POST",
+				Path: "chart",
+				Body: bodyBuf.Bytes(),
+			}
+
+			serviceUrl := viper.GetString("serviceurl")
+			apiVersion := api.ApiVersion + "/"
+			if serviceUrl == "" {
+				serviceUrl = "localhost:8080/"
+			}
+			Url := "http://" + serviceUrl + "/" + apiVersion + r.Path
+			body := bytes.NewReader(r.Body)
+			log.Debug().Str("Type", r.Type).Str("url", Url).Msg("Request")
+			request, err := http.NewRequest(r.Type, Url, body)
+			if err != nil {
+				return err
+			}
+			token, err := getToken()
+			if err != nil {
+				return err
+			}
+			Authorization := fmt.Sprintf("Bearer %s", token)
+
+			request.Header.Add("Authorization", Authorization)
+			request.Header.Add("Content-Type", contentType)
+
+			resp, err := http.DefaultClient.Do(request)
+			if err != nil {
+				return err
+			}
+
+			respBody, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return err
+			}
+
+			log.Debug().Int("Code", resp.StatusCode).Bytes("Body", respBody).Msg("ok")
+			fmt.Println("upload file success")
+			return nil
+		},
+	}
+}

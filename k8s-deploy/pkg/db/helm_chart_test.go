@@ -100,3 +100,45 @@ func TestFindHelmChartList(t *testing.T) {
 		})
 	}
 }
+
+func TestChartSave(t *testing.T) {
+	InitConfigForTest()
+	type args struct {
+		helmChart *HelmChart
+	}
+	var tests = []struct {
+		name    string
+		args    args
+		want    string
+		wantErr bool
+	}{
+		{
+			name: "",
+			args: args{
+				helmChart: &HelmChart{
+					Uuid:           "4444",
+					Name:           "fate444",
+					Chart:          "fate",
+					Values:         "fate",
+					ValuesTemplate: "ddd",
+					Templates:      nil,
+					Version:        "v1.2.4",
+				},
+			},
+			want:    "",
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := ChartSave(tt.args.helmChart)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ChartSave() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("ChartSave() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

@@ -98,8 +98,8 @@ func TestResponse_Unmarshal(t *testing.T) {
 func TestGetToken(t *testing.T) {
 	claims := &jwt.MapClaims{
 		"id": "admin",
-		"exp": time.Now().Add(30 * time.Second).Unix(),
-		"orig_iat": time.Now().Add(30 * time.Second).Unix(),
+		"exp": time.Now().Add(300000 * time.Second).Unix(),
+		"orig_iat": time.Now().Add(300000 * time.Second).Unix(),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims) //生成token
