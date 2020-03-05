@@ -20,11 +20,17 @@ spec:
       serviceAccount: kubefate-admin
       containers:
         - image: federatedai/kubefate:2.0-alpha
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           name: kubefate
           env:
             - name: FATECLOUD_MONGO_URL
               value: "mongo:27017"
+            - name: FATECLOUD_MONGO_USERNAME
+              value: "root"
+            - name: FATECLOUD_MONGO_PASSWORD
+              value: "root"
+            - name: FATECLOUD_MONGO_DATABASE
+              value: "KubeFate"
             - name: FATECLOUD_REPO_NAME
               value: "kubefate"
             - name: FATECLOUD_REPO_URL
@@ -33,6 +39,12 @@ spec:
               value: "admin"
             - name: FATECLOUD_USER_PASSWORD
               value: "admin"
+            - name: FATECLOUD_SERVER_ADDRESS
+              value: "0.0.0.0"
+            - name: FATECLOUD_SERVER_PORT
+              value: "8080"
+            - name: FATECLOUD_LOG_LEVEL
+              value: "debug"
           ports:
             - containerPort: 8080
       restartPolicy: Always

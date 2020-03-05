@@ -1,25 +1,5 @@
 # Comm prefix FATECLOUD
 
-server:
-  address: 0.0.0.0
-  port: 8080
-
-mongo:
-  url: localhost:27017
-  username: root
-  password: root
-  database: KubeFate
-
-log:
-  level: debug
-
-# chart
-repo:
-  name: "myChart"
-  url: "https://example.com/charts/" # chart url https://example.com/charts/index.yaml
-  username: ""
-  password: ""
-
 # TODO
 # persistent layer
 
