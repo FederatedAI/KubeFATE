@@ -118,3 +118,28 @@ func FindHelmChart(chartId string) (*HelmChart, error) {
 	}
 	return &helmChart, nil
 }
+
+func ChartSave(helmChart *HelmChart) (string, error) {
+
+	//find chart
+	filter := bson.M{"version": helmChart.Version}
+	helmChartFind, err := FindOneByFilter(new(HelmChart), filter)
+	if err != nil {
+		return "", err
+	}
+	if helmChartFind == nil {
+		helmUUID, err := Save(helmChart)
+		if err != nil {
+			return "", err
+		}
+
+		return helmUUID, err
+	}
+
+	err = UpdateByUUID(helmChart, helmChartFind.(HelmChart).Uuid)
+	if err != nil {
+		return "", err
+	}
+	return helmChart.Uuid, nil
+
+}

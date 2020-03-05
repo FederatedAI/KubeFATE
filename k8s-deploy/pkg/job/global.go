@@ -3,7 +3,6 @@ package job
 import (
 	"errors"
 	"fate-cloud-agent/pkg/db"
-	"github.com/rs/zerolog/log"
 	"sync"
 )
 
@@ -21,7 +20,7 @@ var GlobalJobList = initGlobalJob()
 //}
 
 func initGlobalJob() *GlobalJobs {
-	log.Debug().Msg("initGlobalJob success")
+	//log.Debug().Msg("initGlobalJob success")
 	return &GlobalJobs{
 		JobByUuid:      make(map[string]*db.Job),
 		JobByClusterId: make(map[string]*db.Job),

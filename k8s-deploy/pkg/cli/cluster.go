@@ -155,9 +155,6 @@ func (c *Cluster) outPutInfo(result interface{}) error {
 	table.AddRow("Config", cluster.Config)
 	table.AddRow("Info", cluster.Info)
 
-	//table.AddRow("Backend", cluster.Backend)
-	//table.AddRow("BootstrapParties", cluster.BootstrapParties)
-
 	return output.EncodeTable(os.Stdout, table)
 }
 

@@ -26,5 +26,8 @@ func Router(r *gin.Engine) {
 
 		job := new(Job)
 		job.Router(v1)
+
+		chart := new(Chart)
+		chart.Router(v1)
 	}
 }
