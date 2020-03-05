@@ -17,15 +17,17 @@ type Cluster struct {
 	Version int `json:"version"`
 	// Helm chart version, example: fate v1.2.0
 	ChartVersion string `json:"chart_version"`
-	ChartValues  map[string]interface{}
+	ChartValues  map[string]interface{} `json:"chart_version"`
 	// The value of this cluster for installing helm chart
 	Values           string                 `json:"values"`
 	ChartName        string                 `json:"chart_name"`
-	Type             string                 `json:"cluster_type"`
+	Type             string                 `json:"cluster_type,omitempty"`
 	Metadata         map[string]interface{} `json:"metadata"`
 	Status           ClusterStatus          `json:"status"`
-	Backend          ComputingBackend       `json:"backend"`
-	BootstrapParties Party                  `json:"bootstrap_parties"`
+	//Backend          ComputingBackend       `json:"backend"`
+	//BootstrapParties Party                  `json:"bootstrap_parties"`
+	Config           map[string]interface{} `json:"Config,omitempty"`
+	Info             map[string]interface{} `json:"Info,omitempty"`
 }
 
 type ClusterStatus int
@@ -111,15 +113,13 @@ func (cluster *Cluster) FromBson(m *bson.M) (interface{}, error) {
 }
 
 // NewCluster create cluster object with basic argument
-func NewCluster(name string, nameSpaces string, backend ComputingBackend, party Party) *Cluster {
+func NewCluster(name string, nameSpaces string) *Cluster {
 	cluster := &Cluster{
 		Uuid:             uuid.NewV4().String(),
 		Name:             name,
 		NameSpace:        nameSpaces,
 		Version:          0,
 		Status:           Creating_c,
-		Backend:          backend,
-		BootstrapParties: party,
 	}
 
 	return cluster

@@ -44,8 +44,7 @@ func ClusterInstall(clusterArgs *ClusterArgs, creator string) (*db.Job, error) {
 		job.Status = db.Running_j
 
 		//create a cluster use parameter
-		cluster := db.NewCluster(clusterArgs.Name, clusterArgs.Namespace,
-			db.ComputingBackend{}, db.Party{})
+		cluster := db.NewCluster(clusterArgs.Name, clusterArgs.Namespace)
 		job.ClusterId = cluster.Uuid
 
 		err := setJobByClusterId(job)
@@ -393,6 +392,7 @@ func install(fc *db.Cluster, values []byte) error {
 	fc.NameSpace = result.Namespace
 	fc.ChartVersion = result.ChartVersion
 	fc.ChartValues = result.ChartValues
+	fc.Config = result.Config
 
 	return nil
 }
@@ -447,8 +447,7 @@ func Run(j Job) (*db.Job, error) {
 
 	go func() {
 		//create a cluster use parameter
-		cluster := db.NewCluster(clusterArgs.Name, clusterArgs.Namespace,
-			db.ComputingBackend{}, db.Party{})
+		cluster := db.NewCluster(clusterArgs.Name, clusterArgs.Namespace)
 		job.ClusterId = cluster.Uuid
 
 		err := install(cluster, clusterArgs.Data)

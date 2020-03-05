@@ -152,8 +152,8 @@ func (c *Cluster) outPutInfo(result interface{}) error {
 	table.AddRow("Status", cluster.Status)
 	table.AddRow("Values", cluster.Values)
 	table.AddRow("ChartName", cluster.ChartName)
-
-	table.AddRow("Info", cluster.Metadata)
+	table.AddRow("Config", cluster.Config)
+	table.AddRow("Info", cluster.Info)
 
 	//table.AddRow("Backend", cluster.Backend)
 	//table.AddRow("BootstrapParties", cluster.BootstrapParties)

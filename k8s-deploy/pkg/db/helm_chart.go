@@ -84,8 +84,7 @@ func FindHelmByVersion(version string) (*HelmChart, error) {
 
 }
 
-
-// FindHelmByNameAndVersion find helm chart via name and version
+// FindHelmChartList find helm chart list
 func FindHelmChartList() ([]*HelmChart, error) {
 	filter := bson.M{}
 	helm := new(HelmChart)
@@ -97,9 +96,25 @@ func FindHelmChartList() ([]*HelmChart, error) {
 		return nil, errors.New("not find HelmChart")
 	}
 	var HelmChartList []*HelmChart
-	for _,v:=range result{
-		r:=v.(HelmChart)
-		HelmChartList=append(HelmChartList,&r)
+	for _, v := range result {
+		r := v.(HelmChart)
+		HelmChartList = append(HelmChartList, &r)
 	}
 	return HelmChartList, nil
+}
+
+// FindHelmChartList find helm chart list
+func FindHelmChart(chartId string) (*HelmChart, error) {
+	filter := bson.M{"uuid": chartId}
+	helm := new(HelmChart)
+	result, err := FindOneByFilter(helm, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	helmChart, ok := result.(HelmChart)
+	if !ok {
+		return nil, errors.New("assertion type error")
+	}
+	return &helmChart, nil
 }
