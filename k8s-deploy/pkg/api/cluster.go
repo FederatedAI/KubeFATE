@@ -78,7 +78,7 @@ func (_ *Cluster) getCluster(c *gin.Context) {
 
 	clusterId := c.Param("clusterId")
 	if clusterId == "" {
-		c.JSON(400, gin.H{"error": "err"})
+		c.JSON(400, gin.H{"error": "not exit clusterId"})
 		return
 	}
 
@@ -110,12 +110,17 @@ func (_ *Cluster) getCluster(c *gin.Context) {
 		return
 	}
 
-	if cluster.Metadata == nil {
-		cluster.Metadata = make(map[string]interface{})
+	if cluster.Info == nil {
+		cluster.Info = make(map[string]interface{})
 	}
-	cluster.Metadata["ip"] = ip[1]
-	cluster.Metadata["port"] = port[0]
-	cluster.Metadata["modules"] = podList
+	cluster.Info["ip"] = ip[1]
+	cluster.Info["port"] = port[0]
+	cluster.Info["modules"] = podList
+
+	if cluster.Config == nil {
+		cluster.Config = make(map[string]interface{})
+	}
+
 	c.JSON(200, gin.H{"data": cluster})
 }
 
@@ -155,7 +160,7 @@ func (_ *Cluster) deleteCluster(c *gin.Context) {
 
 	clusterId := c.Param("clusterId")
 	if clusterId == "" {
-		c.JSON(400, gin.H{"error": "err"})
+		c.JSON(400, gin.H{"error": "not exit clusterId"})
 	}
 
 	j, err := job.ClusterDelete(clusterId, user.(*User).Username)

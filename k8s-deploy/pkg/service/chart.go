@@ -88,7 +88,7 @@ func (fc *FateChart) load(version string) (*FateChart, error) {
 		return nil, err
 	}
 
-	helmChart, err := chartRequestedTohelmChart(chartRequested)
+	helmChart, err := ChartRequestedTohelmChart(chartRequested)
 	if err != nil {
 		return nil, err
 	}
@@ -102,7 +102,7 @@ func (fc *FateChart) load(version string) (*FateChart, error) {
 	}, nil
 }
 
-func chartRequestedTohelmChart(chartRequested *chart.Chart) (*db.HelmChart, error) {
+func ChartRequestedTohelmChart(chartRequested *chart.Chart) (*db.HelmChart, error) {
 	if chartRequested == nil || chartRequested.Raw == nil {
 		log.Error().Msg("chartRequested not exist")
 		return nil, errors.New("chartRequested not exist")

@@ -15,9 +15,7 @@ var clusterJustAddedUuid string
 
 func TestNewCluster(t *testing.T) {
 	InitConfigForTest()
-	party := NewParty("9999", "192.168.0.1", "normal")
-	backend := NewComputingBackend("egg", "1")
-	fate := NewCluster("fate-cluster1", "fate-nameSpaces", *backend, *party)
+	fate := NewCluster("fate-cluster1", "fate-nameSpaces")
 	clusterUuid, error := Save(fate)
 	if error == nil {
 		t.Log("uuid: ", clusterUuid)
@@ -56,10 +54,6 @@ func TestUpdateCluster(t *testing.T) {
 		fate2Update.Name = "fate-cluster2"
 		fate2Update.NameSpace = "fate-nameSpaces"
 
-		party := NewParty("10000", "192.168.0.1", "normal")
-		backend := NewComputingBackend("egg", "1")
-		fate2Update.Backend = *backend
-		fate2Update.BootstrapParties = *party
 		UpdateByUUID(&fate2Update, clusterJustAddedUuid)
 	}
 
@@ -120,15 +114,6 @@ func TestFindClusterFindByUUID(t *testing.T) {
 				Version:   1,
 				Metadata:  map[string]interface{}{},
 				Status:    Creating_c,
-				Backend: ComputingBackend{
-					BackendType: "",
-					BackendInfo: "",
-				},
-				BootstrapParties: Party{
-					PartyId:   "",
-					Endpoint:  "",
-					PartyType: "",
-				},
 			},
 			wantErr: false,
 		},
@@ -224,7 +209,8 @@ func TestClusterDeleteAll(t *testing.T) {
 	if err != nil {
 		log.Error().Err(err).Msg("DeleteMany")
 	}
-	if r.DeletedCount == 0 {
+
+	if r != nil && r.DeletedCount == 0 {
 		log.Error().Msg("this record may not exist(DeletedCount==0)")
 	}
 	fmt.Println(r)
@@ -299,29 +285,27 @@ func TestCluster_IsExisted(t *testing.T) {
 		{
 			name:   "",
 			fields: fields{},
-			args:   args{
+			args: args{
 				name:      "fate-10000",
 				namespace: "fate-10000",
 			},
-			want:   false,
+			want: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			cluster := &Cluster{
-				Uuid:             tt.fields.Uuid,
-				Name:             tt.fields.Name,
-				NameSpace:        tt.fields.NameSpace,
-				Version:          tt.fields.Version,
-				ChartVersion:     tt.fields.ChartVersion,
-				ChartValues:      tt.fields.ChartValues,
-				Values:           tt.fields.Values,
-				ChartName:        tt.fields.ChartName,
-				Type:             tt.fields.Type,
-				Metadata:         tt.fields.Metadata,
-				Status:           tt.fields.Status,
-				Backend:          tt.fields.Backend,
-				BootstrapParties: tt.fields.BootstrapParties,
+				Uuid:         tt.fields.Uuid,
+				Name:         tt.fields.Name,
+				NameSpace:    tt.fields.NameSpace,
+				Version:      tt.fields.Version,
+				ChartVersion: tt.fields.ChartVersion,
+				ChartValues:  tt.fields.ChartValues,
+				Values:       tt.fields.Values,
+				ChartName:    tt.fields.ChartName,
+				Type:         tt.fields.Type,
+				Metadata:     tt.fields.Metadata,
+				Status:       tt.fields.Status,
 			}
 			if got := cluster.IsExisted(tt.args.name, tt.args.namespace); got != tt.want {
 				t.Errorf("Cluster.IsExisted() = %v, want %v", got, tt.want)

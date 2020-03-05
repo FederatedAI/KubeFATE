@@ -17,6 +17,7 @@ type Result struct {
 	ChartName    string
 	ChartVersion string
 	ChartValues  map[string]interface{}
+	Config       map[string]interface{}
 	release      *release.Release
 }
 
@@ -93,6 +94,7 @@ func Install(namespace, name, chartVersion string, value *Value) (*Result, error
 		ChartVersion: fc.Version,
 		ChartValues:  val,
 		release:      rel,
+		Config:       v,
 	}, nil
 }
 func newReleaseWriter(releases *release.Release) *releaseElement {
