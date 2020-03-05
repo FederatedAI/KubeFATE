@@ -118,7 +118,7 @@ func ClusterInstall(clusterArgs *ClusterArgs, creator string) (*db.Job, error) {
 			if err != nil {
 				log.Error().Err(err).Interface("cluster", cluster).Msg("update cluster error")
 			}
-			log.Debug().Str("cluster status", cluster.Status.String()).Str("cluster uuid", cluster.Uuid).Msg("update cluster success")
+			log.Debug().Str("chart_version", cluster.ChartVersion).Str("status", cluster.Status.String()).Str("cluster uuid", cluster.Uuid).Msg("update cluster success")
 		}
 
 		// rollBACK
@@ -246,7 +246,6 @@ func ClusterUpdate(clusterArgs *ClusterArgs, creator string) (*db.Job, error) {
 		if job.Status != db.Success_j && job.Status != db.Canceled_j {
 			//todo helm rollBack
 
-
 			err = db.UpdateByUUID(cluster_old, job.ClusterId)
 			if err != nil {
 				log.Error().Err(err).Interface("cluster", cluster).Msg("rollBACK cluster error")
@@ -279,14 +278,11 @@ func ClusterDelete(clusterId string, creator string) (*db.Job, error) {
 
 	job.ClusterId = cluster.Uuid
 
-
 	err = setJobByUuid(job)
 	if err != nil {
 		log.Error().Err(err).Interface("job", job).Msg("setJobByUuid error")
 		return nil, err
 	}
-
-
 
 	if ok := IsExistedJobByClusterID(job); ok {
 		jobOther := getJobByClusterID(cluster.Uuid)
@@ -300,7 +296,6 @@ func ClusterDelete(clusterId string, creator string) (*db.Job, error) {
 		return nil, err
 	}
 
-
 	// save job to db
 	_, err = db.Save(job)
 	if err != nil {
@@ -308,10 +303,7 @@ func ClusterDelete(clusterId string, creator string) (*db.Job, error) {
 		return nil, err
 	}
 
-
 	log.Info().Str("jobId", job.Uuid).Msg("create a new job of ClusterDelete")
-
-
 
 	go func() {
 		job.Status = db.Running_j
@@ -376,6 +368,11 @@ func ClusterDelete(clusterId string, creator string) (*db.Job, error) {
 }
 
 func install(fc *db.Cluster, values []byte) error {
+
+	err := service.RepoAddAndUpdate()
+	if err != nil {
+		return err
+	}
 	v := new(service.Value)
 	v.Val = values
 	v.T = "json"
@@ -387,6 +384,7 @@ func install(fc *db.Cluster, values []byte) error {
 	if err != nil {
 		return err
 	}
+	log.Debug().Interface("result", result).Msg("service.Install got ")
 
 	fc.ChartName = result.ChartName
 	fc.NameSpace = result.Namespace
@@ -398,6 +396,10 @@ func install(fc *db.Cluster, values []byte) error {
 }
 
 func upgrade(fc *db.Cluster, values []byte) error {
+	err := service.RepoAddAndUpdate()
+	if err != nil {
+		return err
+	}
 	v := new(service.Value)
 	v.Val = values
 	v.T = "json"

@@ -78,7 +78,7 @@ func (c *Chart) outPutList(result interface{}) error {
 		return errors.New("type ChartResultList not ok")
 	}
 	table := uitable.New()
-	table.AddRow("UUID", "NAME", "REVISION")
+	table.AddRow("UUID", "NAME", "VERSION")
 	for _, r := range item.Data {
 		table.AddRow(r.Uuid, r.Name, r.Version)
 	}
