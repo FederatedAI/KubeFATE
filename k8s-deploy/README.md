@@ -9,10 +9,8 @@ The very highlevel architecture of a multiple Federated Learning deployment (e.g
   <img src="./images/hamflp.PNG">
 </div>
 
-FateCloud which will be release later, will be a unified federated cloud management system, which will coordinate different parties. In each party, KubeFATE manage the infrastructure. 
+FateCloud which will be release later as a unified federated cloud management system, which will coordinate different parties. In each party, KubeFATE manage the infrastructure. 
 
-* FATE Cloud Manager: Cross-parties coordination
-* Data Scientist Portal (FATE Dashboard): machine learning visulization
 * KubeFATE: Orchestrated FATE cluster inside one party, offer APIs for FATE Cloud Manager and other management portals
 * Harbor (Optional): Versioned FATE deployments and images management
 * Kubernetes: Orchestration engine.
