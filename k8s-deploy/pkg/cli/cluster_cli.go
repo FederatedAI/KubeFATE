@@ -23,7 +23,7 @@ func ClusterCommand() *cli.Command {
 			ClusterInstallCommand(),
 			ClusterUpdateCommand(),
 		},
-		Usage: "add a task to the list",
+		Usage: "Manage cluster install, delete and update",
 	}
 }
 

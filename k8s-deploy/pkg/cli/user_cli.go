@@ -14,7 +14,7 @@ func UserCommand() *cli.Command {
 			UserListCommand(),
 			UserInfoCommand(),
 		},
-		Usage: "add a task to the list",
+		Usage: "List all users and describe a user's info",
 	}
 }
 

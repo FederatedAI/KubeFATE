@@ -28,7 +28,7 @@ func ChartCommand() *cli.Command {
 			ChartDeleteCommand(),
 			ChartCreateCommand(),
 		},
-		Usage: "add a task to the list",
+		Usage: "List charts, create, delete and describe a chart",
 	}
 }
 

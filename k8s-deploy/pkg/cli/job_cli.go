@@ -15,7 +15,7 @@ func JobCommand() *cli.Command {
 			JobInfoCommand(),
 			JobDeleteCommand(),
 		},
-		Usage: "add a task to the list",
+		Usage: "List jobs, describe and delete a job",
 	}
 }
 

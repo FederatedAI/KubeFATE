@@ -8,7 +8,7 @@ import (
 func serviceCommand() *cli.Command {
 	return &cli.Command{
 		Name:   "service",
-		Usage:  "service",
+		Usage:  "Start KubeFATE as service",
 		Action: serviceRun,
 	}
 }
