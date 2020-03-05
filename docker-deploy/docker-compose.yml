@@ -100,6 +100,7 @@ services:
       - ./confs/federatedml/conf:/data/projects/fate/python/arch/conf
       - ./confs/federatedml/conf:/data/projects/fate/python/eggroll/conf
       - ./confs/fate_flow/conf/settings.py:/data/projects/fate/python/fate_flow/settings.py
+      - ./confs/fate_flow/conf/server_conf.json:/data/projects/fate/python/arch/conf/server_conf.json
       - fate_flow_logs:/data/projects/fate/python/logs
     depends_on:
       - redis
