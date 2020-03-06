@@ -16,5 +16,8 @@ build-docker-image:
 zip:
 	tar -czvf kubefate-docker-compose.tar.gz ./docker-deploy
 
+release: zip
+	${call sub_make, ${K8S-DEPLOY}, release RELEASE_VERSION=${RELEASE_VERSION}} && mv ${K8S-DEPLOY}/kubefate-k8s-${RELEASE_VERSION}.tar.gz ./
+
 clean:
-	rm kubefate-docker-compose.tar.gz && $(call sub_make, ${K8S-DEPLOY}, clean)
+	rm kubefate-docker-compose.tar.gz kubefate-k8s-*.tar.gz && $(call sub_make, ${K8S-DEPLOY}, clean)
