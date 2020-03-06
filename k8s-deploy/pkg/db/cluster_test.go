@@ -15,7 +15,7 @@ var clusterJustAddedUuid string
 
 func TestNewCluster(t *testing.T) {
 	InitConfigForTest()
-	fate := NewCluster("fate-cluster1", "fate-nameSpaces")
+	fate := NewCluster("fate-cluster1", "fate-nameSpaces","v1.3.0")
 	clusterUuid, error := Save(fate)
 	if error == nil {
 		t.Log("uuid: ", clusterUuid)
