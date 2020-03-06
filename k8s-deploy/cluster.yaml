@@ -1,16 +1,16 @@
 name: fate-9999
 namespace: fate-9999
-version: v1.2.0
+version: v1.3.0
 partyId: 9999
 exchange:
   ip: proxy.fate-10000
   port: 9370
 modules:
   - proxy
-  #- egg
+  - egg
   - fateboard
   - fateflow
-  #- federation
+  - federation
   - metaService
   - mysql
   - redis
@@ -20,6 +20,10 @@ modules:
 proxy:
   type: NodePort
   nodePort: 30009
+  partyList:
+    - partyId: 8888
+      partyIp: 192.168.1.10
+      partyPort: 30008
 
 egg:
   count: 3

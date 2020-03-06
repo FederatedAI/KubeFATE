@@ -159,9 +159,9 @@ func (fc *FateChart) GetChartValues(v map[string]interface{}) (map[string]interf
 // todo  get chart by version from repository
 func GetFateChart(version string) (*FateChart, error) {
 	chartVersion := version
-	if version == "" {
-		chartVersion = latestChartVersion
-	}
+	//if version == "" {
+	//	chartVersion = latestChartVersion
+	//}
 	fc := new(FateChart)
 	fc, err := fc.read(chartVersion)
 	if err == nil {
