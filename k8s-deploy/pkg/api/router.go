@@ -29,5 +29,8 @@ func Router(r *gin.Engine) {
 
 		chart := new(Chart)
 		chart.Router(v1)
+
+		version := new(Version)
+		version.Router(v1)
 	}
 }
