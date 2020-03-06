@@ -13,12 +13,12 @@ func initCommandLine() *cli.App {
 
 		},
 		Commands: []*cli.Command{
-			//todo add versionCommand
 			serviceCommand(),
 			ClusterCommand(),
 			JobCommand(),
 			UserCommand(),
 			ChartCommand(),
+			VersionCommand(),
 		},
 	}
 

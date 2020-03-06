@@ -20,6 +20,8 @@ func initUser() {
 // Run starts the API server
 func Run() {
 	log.Info().Msgf("logLevel: %v", viper.GetString("log.level"))
+	log.Info().Msgf("api version: %v", ApiVersion)
+	log.Info().Msgf("service version: %v", ServiceVersion)
 	initUser()
 	//err := service.InitKubeConfig()
 	//if err != nil {
