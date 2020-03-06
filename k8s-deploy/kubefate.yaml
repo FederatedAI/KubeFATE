@@ -19,7 +19,7 @@ spec:
     spec:
       serviceAccount: kubefate-admin
       containers:
-        - image: federatedai/kubefate:2.0-alpha
+        - image: federatedai/kubefate:v1.0.1
           imagePullPolicy: IfNotPresent
           name: kubefate
           env:
