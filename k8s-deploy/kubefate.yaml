@@ -34,7 +34,7 @@ spec:
             - name: FATECLOUD_REPO_NAME
               value: "kubefate"
             - name: FATECLOUD_REPO_URL
-              value: "https://owlet42.github.io/helm-chart/"
+              value: "https://federatedai.github.io/KubeFATE/"
             - name: FATECLOUD_USER_USERNAME
               value: "admin"
             - name: FATECLOUD_USER_PASSWORD
