@@ -138,6 +138,10 @@ dc23d75692b0        fatetest/roll:<version>-release           "/bin/sh -c 'cd ro
 4526f8e57004        redis:5                                   "docker-entrypoint.s…"   7 days ago          Up 7 days           6379/tcp                              confs-10000_redis_1
 586f3f2fe191        fatetest/federation:<version>-release     "/bin/sh -c 'cd /dat…"   7 days ago          Up 7 days           9394/tcp                              confs-10000_federation_1
 ec434dcbbff1        mysql:8                                   "docker-entrypoint.s…"   7 days ago          Up 7 days           3306/tcp, 33060/tcp                   confs-10000_mysql_1
+68b1d6c68b6c        federatedai/serving-proxy:<version>-release    "/bin/sh -c 'java -D…"   32 hours ago        Up 32 hours         0.0.0.0:8059->8059/tcp, 0.0.0.0:8869->8869/tcp, 8879/tcp   serving-10000_serving-proxy_1
+7937ecf2974e        redis:5                                    "docker-entrypoint.s…"   32 hours ago        Up 32 hours         6379/tcp                                                   serving-10000_redis_1
+00a8d98021a6        federatedai/serving-server:<version>-release   "/bin/sh -c 'java -c…"   32 hours ago        Up 32 hours         0.0.0.0:8000->8000/tcp                                     serving-10000_serving-server_1
+luke@luke-machine:~$ 
 ```
 
 ####  验证部署
@@ -168,6 +172,201 @@ $ python run_toy_example.py 10000 9999 1        #验证
 
 有关测试结果的更多详细信息，请参阅"python/examples/toy_example/README.md"这个文件 。
 
+#### 验证Serving-Service功能
+##### Host方操作
+###### 进入python容器
+`$ docker exec -it confs-10000_python_1 bash`
+
+###### 进入fate_flow目录
+`$ cd fate_flow`
+
+###### 修改examples/upload_host.json 
+`$ vi examples/upload_host.json`
+```
+{
+  "file": "examples/data/breast_a.csv",
+  "head": 1,
+  "partition": 10,
+  "work_mode": 1,
+  "namespace": "fate_flow_test_breast",
+  "table_name": "breast"
+}
+```
+
+###### 上传数据
+`$ python fate_flow_client.py -f upload -c examples/upload_host.json `
+
+
+##### Guest方操作
+###### 进入python容器
+`$ docker exec -it confs-9999_python_1 bash`
+
+###### 进入fate_flow目录
+`$ cd fate_flow`
+
+###### 修改examples/upload_host.json 
+`$ vi examples/upload_guest.json`
+```
+{
+  "file": "examples/data/breast_a.csv",
+  "head": 1,
+  "partition": 10,
+  "work_mode": 1,
+  "namespace": "fate_flow_test_breast",
+  "table_name": "breast"
+}
+```
+###### 上传数据
+`$ python fate_flow_client.py -f upload -c examples/upload_guest.json `
+
+###### 修改examples/test_hetero_lr_job_conf.json
+`$ vi examples/test_hetero_lr_job_conf.json`
+```
+{
+    "initiator": {
+        "role": "guest",
+        "party_id": 9999
+    },
+    "job_parameters": {
+        "work_mode": 1
+    },
+    "role": {
+        "guest": [9999],
+        "host": [10000],
+        "arbiter": [10000]
+    },
+    "role_parameters": {
+        "guest": {
+            "args": {
+                "data": {
+                    "train_data": [{"name": "breast", "namespace": "fate_flow_test_breast"}]
+                }
+            },
+            "dataio_0":{
+                "with_label": [true],
+                "label_name": ["y"],
+                "label_type": ["int"],
+                "output_format": ["dense"]
+            }
+        },
+        "host": {
+            "args": {
+                "data": {
+                    "train_data": [{"name": "breast", "namespace": "fate_flow_test_breast"}]
+                }
+            },
+             "dataio_0":{
+                "with_label": [false],
+                "output_format": ["dense"]
+            }
+        }
+    },
+    ....
+}
+```
+
+###### 提交任务
+`$ python fate_flow_client.py -f submit_job -d examples/test_hetero_lr_job_dsl.json -c examples/test_hetero_lr_job_conf.json`
+
+output：
+```
+{
+    "data": {
+        "board_url": "http://fateboard:8080/index.html#/dashboard?job_id=202003060553168191842&role=guest&party_id=9999",
+        "job_dsl_path": "/data/projects/fate/python/jobs/202003060553168191842/job_dsl.json",
+        "job_runtime_conf_path": "/data/projects/fate/python/jobs/202003060553168191842/job_runtime_conf.json",
+        "logs_directory": "/data/projects/fate/python/logs/202003060553168191842",
+        "model_info": {
+            "model_id": "arbiter-10000#guest-9999#host-10000#model",
+            "model_version": "202003060553168191842"
+        }
+    },
+    "jobId": "202003060553168191842",
+    "retcode": 0,
+    "retmsg": "success"
+}
+```
+
+###### 修改加载模型的配置
+`$ vi examples/publish_load_model.json`
+
+```
+{
+    "initiator": {
+        "party_id": "9999",
+        "role": "guest"
+    },
+    "role": {
+        "guest": ["9999"],
+        "host": ["10000"],
+        "arbiter": ["10000"]
+    },
+    "job_parameters": {
+        "work_mode": 1,
+        "model_id": "arbiter-10000#guest-9999#host-10000#model",
+        "model_version": "202003060553168191842"
+    }
+}
+```
+
+###### 加载模型
+`$ python fate_flow_client.py -f load -c examples/publish_load_model.json`
+
+###### 修改绑定模型的配置
+`$ vi examples/bind_model_service.json`
+
+```
+{
+    "service_id": "test",
+    "initiator": {
+        "party_id": "9999",
+        "role": "guest"
+    },
+    "role": {
+        "guest": ["9999"],
+        "host": ["10000"],
+        "arbiter": ["10000"]
+    },
+    "job_parameters": {
+        "work_mode": 1,
+        "model_id": "arbiter-10000#guest-9999#host-10000#model",
+        "model_version": "202003060553168191842"
+    }
+}
+```
+
+
+###### 绑定模型
+`$ python fate_flow_client.py -f bind -c examples/bind_model_service.json`
+
+###### 在线测试
+发送以下信息到{SERVING_SERVICE_IP}:8059/federation/v1/inference
+
+```
+# HTTP Method：POST
+# HEADERs:
+#   - Content-Type：application/json
+
+{
+  "head": {
+    "serviceId": "test"
+  },
+  "body": {
+    "featureData": {
+      "x0": 0.254879,
+      "x1": -1.046633,
+      "x2": 0.209656,
+      "x3": 0.074214,
+      "x4": -0.441366,
+      "x5": -0.377645,
+      "x6": -0.485934,
+      "x7": 0.347072,
+      "x8": -0.287570,
+      "x9": -0.733474,
+    }
+  }
+}
+```
 ### 删除部署
 
 如果想要彻底删除在运行机器上部署的FATE，可以分别登录节点，然后运行命令：
