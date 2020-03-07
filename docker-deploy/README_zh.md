@@ -27,13 +27,15 @@ Compose是用于定义和运行多容器Docker应用程序的工具。通过Comp
 如果运行机没有FATE组件的镜像，可以通过以下命令从Docker Hub获取镜像：
 
 ```bash
-$ docker pull federatedai/egg:1.3.0-release
-$ docker pull federatedai/fateboard:1.3.0-release
-$ docker pull federatedai/meta-service:1.3.0-release
-$ docker pull federatedai/python:1.3.0-release
-$ docker pull federatedai/roll:1.3.0-release
-$ docker pull federatedai/proxy:1.3.0-release
-$ docker pull federatedai/federation:1.3.0-release
+$ docker pull federatedai/egg:<version>-release
+$ docker pull federatedai/fateboard:<version>-release
+$ docker pull federatedai/meta-service:<version>-release
+$ docker pull federatedai/python:<version>-release
+$ docker pull federatedai/roll:<version>-release
+$ docker pull federatedai/proxy:<version>-release
+$ docker pull federatedai/federation:<version>-release
+$ docker pull federatedai/serving-server:<version>-release
+$ docker pull federatedai/serving-proxy:<version>-release
 $ docker pull redis:5
 $ docker pull mysql:8
 ```
@@ -42,14 +44,15 @@ $ docker pull mysql:8
 ```bash
 $ docker images
 REPOSITORY                         TAG 
-federatedai/egg                    1.3.0-release
-federatedai/fateboard              1.3.0-release
-federatedai/serving-server         1.3.0-release
-federatedai/meta-service           1.3.0-release
-federatedai/python                 1.3.0-release
-federatedai/roll                   1.3.0-release
-federatedai/proxy                  1.3.0-release
-federatedai/federation             1.3.0-release
+federatedai/egg                    <version>-release
+federatedai/fateboard              <version>-release
+federatedai/meta-service           <version>-release
+federatedai/python                 <version>-release
+federatedai/roll                   <version>-release
+federatedai/proxy                  <version>-release
+federatedai/federation             <version>-release
+federatedai/serving-server         <version>-release
+federatedai/serving-proxy          <version>-release
 redis                              5
 mysql                              8
 ```
@@ -86,13 +89,14 @@ RegistryURI=192.168.10.1/federatedai
 
 部署脚本提供了部署多个FATE实例的功能，下面的例子我们部署在两个机器上，每个机器运行一个FATE实例。根据需求修改配置文件`kubeFATE\docker-deploy\parties.conf`。
 
-下面是修改好的文件，分别是在主机*192.168.7.1*上的节点`10000`和主机*192.168.7.2*上的`9999`。
+下面是修改好的文件，节点`10000`的训练集群在*192.168.7.1*上，在线预测集群在*192.168.7.3*上。节点`9999`的训练集群在*192.168.7.2*，在线预测集群在*192.168.7.4*上。
 
 ```
-user=root                             #运行机运行FATE实例的用户
-dir=/data/projects/fate               #docker-compose部署目录
-partylist=(10000 9999)                #组织id
-partyiplist=(192.168.7.1 192.168.7.2) #id对应节点ip
+user=root                                   #运行机运行FATE实例的用户
+dir=/data/projects/fate                     #docker-compose部署目录
+partylist=(10000 9999)                      #组织id
+partyiplist=(192.168.7.1 192.168.7.2)       #id对应训练集群ip
+servingiplist=(192.168.7.3 192.168.7.4)     #id对应在线预测集群ip
 exchangeip=192.168.7.1                      #通信组件标识
 ```
 
@@ -108,7 +112,7 @@ exchangeip=192.168.7.1                      #通信组件标识
 $ bash generate_config.sh          # 生成部署文件
 $ bash docker_deploy.sh all        # 在各个party上部署FATE
 ```
-脚本将会生成10000、9999两个组织（Party）和exchange的部署文件，然后打包成tar文件。接着把tar文件`confs-10000.tar`、`confs-9999.tar`和`confs-exchange.tar`分别复制到party对应的主机上并解包，解包后的文件默认在`/data/projects/fate`目录下。然后脚本将远程登录到这些主机并使用docker compose命令启动FATE实例。
+脚本将会生成10000、9999两个组织（Party）和exchange的部署文件，然后打包成tar文件。接着把tar文件`confs-<party-id>.tar`、`serving-<party-id>.tar`和`confs-exchange.tar`分别复制到party对应的主机上并解包，解包后的文件默认在`/data/projects/fate`目录下。然后脚本将远程登录到这些主机并使用docker compose命令启动FATE实例。
 
 命令成功执行返回后，登录其中任意一个主机：
 
@@ -124,16 +128,16 @@ $ docker ps
 输出显示如下，若各个组件都是运行（up）状态，说明部署成功。
 
 ```
-CONTAINER ID        IMAGE                                 COMMAND                  CREATED             STATUS              PORTS                                 NAMES
-f8ae11a882ba        fatetest/fateboard:1.3.0-release      "/bin/sh -c 'cd /dat…"   5 days ago          Up 5 days           0.0.0.0:8080->8080/tcp                confs-10000_fateboard_1
-d72995355962        fatetest/python:1.3.0-release         "/bin/bash -c 'sourc…"   5 days ago          Up 5 days           9360/tcp, 9380/tcp                    confs-10000_python_1
-dffc70fc68ac        fatetest/egg:1.3.0-release            "/bin/sh -c 'cd /dat…"   7 days ago          Up 7 days           7778/tcp, 7888/tcp, 50001-50004/tcp   confs-10000_egg_1
-dc23d75692b0        fatetest/roll:1.3.0-release           "/bin/sh -c 'cd roll…"   7 days ago          Up 7 days           8011/tcp                              confs-10000_roll_1
-7e52b1b06d1a        fatetest/meta-service:1.3.0-release   "/bin/sh -c 'java -c…"   7 days ago          Up 7 days           8590/tcp                              confs-10000_meta-service_1
-50a6323f5cb8        fatetest/proxy:1.3.0-release          "/bin/sh -c 'cd /dat…"   7 days ago          Up 7 days           0.0.0.0:9370->9370/tcp                confs-10000_proxy_1
-4526f8e57004        redis:5                               "docker-entrypoint.s…"   7 days ago          Up 7 days           6379/tcp                              confs-10000_redis_1
-586f3f2fe191        fatetest/federation:1.3.0-release     "/bin/sh -c 'cd /dat…"   7 days ago          Up 7 days           9394/tcp                              confs-10000_federation_1
-ec434dcbbff1        mysql:8                               "docker-entrypoint.s…"   7 days ago          Up 7 days           3306/tcp, 33060/tcp                   confs-10000_mysql_1
+CONTAINER ID        IMAGE                                     COMMAND                  CREATED             STATUS              PORTS                                 NAMES
+f8ae11a882ba        fatetest/fateboard:<version>-release      "/bin/sh -c 'cd /dat…"   5 days ago          Up 5 days           0.0.0.0:8080->8080/tcp                confs-10000_fateboard_1
+d72995355962        fatetest/python:<version>-release         "/bin/bash -c 'sourc…"   5 days ago          Up 5 days           9360/tcp, 9380/tcp                    confs-10000_python_1
+dffc70fc68ac        fatetest/egg:<version>-release            "/bin/sh -c 'cd /dat…"   7 days ago          Up 7 days           7778/tcp, 7888/tcp, 50001-50004/tcp   confs-10000_egg_1
+dc23d75692b0        fatetest/roll:<version>-release           "/bin/sh -c 'cd roll…"   7 days ago          Up 7 days           8011/tcp                              confs-10000_roll_1
+7e52b1b06d1a        fatetest/meta-service:<version>-release   "/bin/sh -c 'java -c…"   7 days ago          Up 7 days           8590/tcp                              confs-10000_meta-service_1
+50a6323f5cb8        fatetest/proxy:<version>-release          "/bin/sh -c 'cd /dat…"   7 days ago          Up 7 days           0.0.0.0:9370->9370/tcp                confs-10000_proxy_1
+4526f8e57004        redis:5                                   "docker-entrypoint.s…"   7 days ago          Up 7 days           6379/tcp                              confs-10000_redis_1
+586f3f2fe191        fatetest/federation:<version>-release     "/bin/sh -c 'cd /dat…"   7 days ago          Up 7 days           9394/tcp                              confs-10000_federation_1
+ec434dcbbff1        mysql:8                                   "docker-entrypoint.s…"   7 days ago          Up 7 days           3306/tcp, 33060/tcp                   confs-10000_mysql_1
 ```
 
 ####  验证部署

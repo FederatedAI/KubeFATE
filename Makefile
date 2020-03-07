@@ -18,5 +18,6 @@ zip:
 
 release: zip
 	${call sub_make, ${K8S-DEPLOY}, release RELEASE_VERSION=v${RELEASE_VERSION}} && mv ${K8S-DEPLOY}/kubefate-k8s-v${RELEASE_VERSION}.tar.gz ./ && curl -LJO https://federatedai.github.io/KubeFATE/fate-${RELEASE_VERSION}.tgz
+
 clean:
 	rm kubefate-docker-compose.tar.gz kubefate-k8s-*.tar.gz fate-*.tgz && $(call sub_make, ${K8S-DEPLOY}, clean)

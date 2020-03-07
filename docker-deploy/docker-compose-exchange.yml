@@ -1,0 +1,9 @@
+version: '3'
+
+services:
+  exchange:
+    image: "${PREFIX}/proxy:${TAG}"
+    ports:
+      - "9371:9370"
+    volumes:
+      - ./conf:/data/projects/fate/proxy/conf
