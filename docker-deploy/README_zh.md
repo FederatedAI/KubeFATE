@@ -18,7 +18,7 @@ Compose是用于定义和运行多容器Docker应用程序的工具。通过Comp
 
 ### 准备工作
 
-1. 三个主机（物理机或者虚拟机，一个部署机，两个运行机，都是Centos7系统）；
+1. 两个或三个主机（物理机或者虚拟机，一个部署机，两个运行机，其中部署机和其中一个运行机可为同一个主机，都是Centos7系统）；
 2. 所有主机安装Docker 版本 : 18+；
 3. 所有主机安装Docker-Compose 版本: 1.24+；
 4. 部署机可以联网，所以主机相互之间可以网络互通；
@@ -97,10 +97,10 @@ dir=/data/projects/fate                     #docker-compose部署目录
 partylist=(10000 9999)                      #组织id
 partyiplist=(192.168.7.1 192.168.7.2)       #id对应训练集群ip
 servingiplist=(192.168.7.3 192.168.7.4)     #id对应在线预测集群ip
-exchangeip=192.168.7.1                      #通信组件标识
+exchangeip=                                 #通信组件标识
 ```
 
-**注意**: 默认情况下，运行partylist中第一个party的主机会同时运行exchange组件，该组件的默认监听端口为9371
+**注意**: 默认情况下不会部署exchange组件。如需部署，用户可以把服务器IP填入上述配置文件的`exchangeip`中，该组件的默认监听端口为9371
 
 在运行部署脚本之前，需要确保部署机器可以ssh免密登录到两个运行节点主机上。user代表免密的用户。
 
@@ -112,7 +112,7 @@ exchangeip=192.168.7.1                      #通信组件标识
 $ bash generate_config.sh          # 生成部署文件
 $ bash docker_deploy.sh all        # 在各个party上部署FATE
 ```
-脚本将会生成10000、9999两个组织（Party）和exchange的部署文件，然后打包成tar文件。接着把tar文件`confs-<party-id>.tar`、`serving-<party-id>.tar`和`confs-exchange.tar`分别复制到party对应的主机上并解包，解包后的文件默认在`/data/projects/fate`目录下。然后脚本将远程登录到这些主机并使用docker compose命令启动FATE实例。
+脚本将会生成10000、9999两个组织(Party)的部署文件，然后打包成tar文件。接着把tar文件`confs-<party-id>.tar`、`serving-<party-id>.tar`分别复制到party对应的主机上并解包，解包后的文件默认在`/data/projects/fate`目录下。然后脚本将远程登录到这些主机并使用docker compose命令启动FATE实例。
 
 命令成功执行返回后，登录其中任意一个主机：
 
@@ -195,7 +195,6 @@ $ python run_toy_example.py 10000 9999 1        #验证
 
 ###### 上传数据
 `$ python fate_flow_client.py -f upload -c examples/upload_host.json `
-
 
 ##### Guest方操作
 ###### 进入python容器
@@ -367,12 +366,21 @@ output：
   }
 }
 ```
+
+output:
+```
+{"flag":0,"data":{"prob":0.30684422824464636,"retmsg":"success","retcode":0}
+```
 ### 删除部署
+在部署机器上运行以下命令可以停止所有FATE集群：
+```bash
+bash docker_deploy.sh --delete all
+```
 
 如果想要彻底删除在运行机器上部署的FATE，可以分别登录节点，然后运行命令：
 
 ```bash
-$ cd ~/confs-<id>/  # <id> 组织的id，本例中代表10000或者9999
+$ cd /data/projects/fate/confs-<id>/  # <id> 组织的id，本例中代表10000或者9999
 $ docker-compose down
 $ rm -rf ../confs-<id>/               # 删除docker-compose部署文件
 ```

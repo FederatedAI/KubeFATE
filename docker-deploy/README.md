@@ -53,9 +53,9 @@ servingiplist=(192.168.7.3 192.168.7.4)
 exchangeip=192.168.7.1
 ```
 
-If 'servingiplist' is the same as 'partyiplist', the training cluster and service cluster can be deployed on the same machine.
+If 'servingiplist' is the same as 'partyiplist', the training cluster and service cluster will be deployed on the same machine.
 
-By default, the exchange node co-locates on the same host of the first party. The exchange service runs on port 9371. For this reason, the IP address of the exchange node should be the same as that of the first party. If a standalone exchange node is needed, update the value of `exchangeip` to the IP address of the desired host.
+By default, the exchange node won't be deployed. The exchange service runs on port 9371. If a exchange (co-locates on the host of party or standalone) node is needed, update the value of `exchangeip` to the IP address of the desired host.
 
 After completing the above configuration file, use the following commands to generate configuration of target hosts.  
 ```bash
@@ -93,15 +93,8 @@ To deploy FATE to a single target host, use the below command with the party's i
 ```bash
 $ bash docker_deploy.sh 10000
 ```
-To deploy a single party's training cluster, use the below command:
-```bash
-$ bash docker_deploy.sh 10000 --training
-```
-To deploy a single party's serving cluster, use the below command:
-```bash
-$ bash docker_deploy.sh 10000 --serving
-```
-To deploy the exchange node to a target host, use the below command:
+
+(Optional) To deploy the exchange node to a target host, use the below command:
 ```bash
 $ bash docker_deploy.sh exchange
 ```
@@ -142,3 +135,215 @@ If the test passed, the output may look like the following:
 ```
 For more details about the testing result, please refer to `python/examples/toy_example/README.md` .
 
+### Verifying the serving service
+#### Operations on Host
+##### Log in to the python container
+`$ docker exec -it confs-10000_python_1 bash`
+
+##### Go to `fate_flow` dir
+`$ cd fate_flow`
+
+##### Modify examples/upload_host.json 
+`$ vi examples/upload_host.json`
+```
+{
+  "file": "examples/data/breast_a.csv",
+  "head": 1,
+  "partition": 10,
+  "work_mode": 1,
+  "namespace": "fate_flow_test_breast",
+  "table_name": "breast"
+}
+```
+
+##### Upload data
+`$ python fate_flow_client.py -f upload -c examples/upload_host.json `
+
+#### Operations on Guest
+##### Log in to the python container
+`$ docker exec -it confs-9999_python_1 bash`
+
+##### Go to `fate_flow` dir
+`$ cd fate_flow`
+
+##### Modify examples/upload_host.json 
+`$ vi examples/upload_guest.json`
+```
+{
+  "file": "examples/data/breast_a.csv",
+  "head": 1,
+  "partition": 10,
+  "work_mode": 1,
+  "namespace": "fate_flow_test_breast",
+  "table_name": "breast"
+}
+```
+##### Upload data
+`$ python fate_flow_client.py -f upload -c examples/upload_guest.json `
+
+##### Modify examples/test_hetero_lr_job_conf.json
+`$ vi examples/test_hetero_lr_job_conf.json`
+```
+{
+    "initiator": {
+        "role": "guest",
+        "party_id": 9999
+    },
+    "job_parameters": {
+        "work_mode": 1
+    },
+    "role": {
+        "guest": [9999],
+        "host": [10000],
+        "arbiter": [10000]
+    },
+    "role_parameters": {
+        "guest": {
+            "args": {
+                "data": {
+                    "train_data": [{"name": "breast", "namespace": "fate_flow_test_breast"}]
+                }
+            },
+            "dataio_0":{
+                "with_label": [true],
+                "label_name": ["y"],
+                "label_type": ["int"],
+                "output_format": ["dense"]
+            }
+        },
+        "host": {
+            "args": {
+                "data": {
+                    "train_data": [{"name": "breast", "namespace": "fate_flow_test_breast"}]
+                }
+            },
+             "dataio_0":{
+                "with_label": [false],
+                "output_format": ["dense"]
+            }
+        }
+    },
+    ....
+}
+```
+
+##### Sbumit job
+`$ python fate_flow_client.py -f submit_job -d examples/test_hetero_lr_job_dsl.json -c examples/test_hetero_lr_job_conf.json`
+
+output：
+```
+{
+    "data": {
+        "board_url": "http://fateboard:8080/index.html#/dashboard?job_id=202003060553168191842&role=guest&party_id=9999",
+        "job_dsl_path": "/data/projects/fate/python/jobs/202003060553168191842/job_dsl.json",
+        "job_runtime_conf_path": "/data/projects/fate/python/jobs/202003060553168191842/job_runtime_conf.json",
+        "logs_directory": "/data/projects/fate/python/logs/202003060553168191842",
+        "model_info": {
+            "model_id": "arbiter-10000#guest-9999#host-10000#model",
+            "model_version": "202003060553168191842"
+        }
+    },
+    "jobId": "202003060553168191842",
+    "retcode": 0,
+    "retmsg": "success"
+}
+```
+
+##### Modify the configuration of loading model
+`$ vi examples/publish_load_model.json`
+
+```
+{
+    "initiator": {
+        "party_id": "9999",
+        "role": "guest"
+    },
+    "role": {
+        "guest": ["9999"],
+        "host": ["10000"],
+        "arbiter": ["10000"]
+    },
+    "job_parameters": {
+        "work_mode": 1,
+        "model_id": "arbiter-10000#guest-9999#host-10000#model",
+        "model_version": "202003060553168191842"
+    }
+}
+```
+
+##### Load model
+`$ python fate_flow_client.py -f load -c examples/publish_load_model.json`
+
+##### Modify the configuration of binding model
+`$ vi examples/bind_model_service.json`
+
+```
+{
+    "service_id": "test",
+    "initiator": {
+        "party_id": "9999",
+        "role": "guest"
+    },
+    "role": {
+        "guest": ["9999"],
+        "host": ["10000"],
+        "arbiter": ["10000"]
+    },
+    "job_parameters": {
+        "work_mode": 1,
+        "model_id": "arbiter-10000#guest-9999#host-10000#model",
+        "model_version": "202003060553168191842"
+    }
+}
+```
+
+
+##### Bind model
+`$ python fate_flow_client.py -f bind -c examples/bind_model_service.json`
+
+##### Test the online serving
+Send the following message to {SERVING_SERVICE_IP}:8059/federation/v1/inference
+
+```
+# HTTP Method：POST
+# HEADERs:
+#   - Content-Type：application/json
+
+{
+  "head": {
+    "serviceId": "test"
+  },
+  "body": {
+    "featureData": {
+      "x0": 0.254879,
+      "x1": -1.046633,
+      "x2": 0.209656,
+      "x3": 0.074214,
+      "x4": -0.441366,
+      "x5": -0.377645,
+      "x6": -0.485934,
+      "x7": 0.347072,
+      "x8": -0.287570,
+      "x9": -0.733474,
+    }
+  }
+}
+```
+
+output:
+```
+{"flag":0,"data":{"prob":0.30684422824464636,"retmsg":"success","retcode":0}
+```
+
+### Deleting cluster
+Use this command to stop all cluster:
+```
+bash docker_deploy.sh --delete all
+```
+
+To delete the cluster completely, log in to each host and run the commands as follows:
+```bash
+$ cd /data/projects/fate/confs-<id>/  # id of party
+$ docker-compose down
+$ rm -rf ../confs-<id>/               # delete the legacy files
+```
