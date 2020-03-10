@@ -1,0 +1,61 @@
+########################################################
+# Copyright 2019-2020 program was created VMware, Inc. #
+# SPDX-License-Identifier: Apache-2.0                  #
+########################################################
+
+{{ if .Values.modules.metaService.include }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    {{ .Values.partyId }}: meta-service
+  name: meta-service
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      {{ .Values.partyId }}: meta-service
+  template:
+    metadata:
+      labels:
+        {{ .Values.partyId }}: meta-service
+    spec:
+      containers:
+        - image: {{ .Values.image.registry }}/meta-service:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          name: meta-service
+          ports:
+            - containerPort: 8590
+          volumeMounts:
+            - mountPath: /data/projects/fate/meta-service/conf/meta-service.properties
+              name: meta-service-confs
+              subPath: meta-service.properties
+      {{ if .Values.nodeSelector.metaService.value}}
+      nodeSelector:
+        {{ .Values.nodeSelector.metaService.nodeLabel }}: {{ .Values.nodeSelector.metaService.value }}
+      {{ end }}
+      restartPolicy: Always
+      volumes:
+        - name: meta-service-confs
+          configMap:
+            name: meta-service-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    {{ .Values.partyId }}: meta-service
+  name: meta-service
+spec:
+  ports:
+    - name: "8590"
+      port: 8590
+      targetPort: 8590
+      protocol: TCP
+  type: {{ .Values.modules.metaService.type }}
+  selector:
+    {{ .Values.partyId }}: meta-service
+---
+{{ end }}

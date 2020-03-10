@@ -1,0 +1,104 @@
+#nfspath: /data/fate-data
+#nfsserver: 192.168.0.2
+
+image:
+  registry: federatedai
+  isThridParty:
+  tag: 1.3.0-release
+  pullPolicy: IfNotPresent
+partyId: {{ .partyId }}
+host:
+  fateboard: {{ .partyId }}.fateboard.kubefate.net
+nodePort: {{ .proxy.nodePort }}
+
+exchange:
+  partyIp: {{ .exchange.ip }}
+  partyPort: {{ .exchange.port }}
+{{- range .proxy.partyList }}
+partyList:
+  - partyId: {{ .partyId }}
+    partyIp: {{ .partyIp }}
+    partyPort: {{ .partyPort }}
+{{- end }}
+mysql:
+  mysql_root_password: fate_dev
+  mysql_database: fate
+  mysql_user: fate
+  mysql_password: fate_dev
+redis:
+  requirepass: fate_dev
+eggList:
+{{- range .egg.count | int | until }}
+  - egg: egg{{ . }}
+    nodeLabel: fedai.org
+    value:
+{{- end }}
+nodeSelector:
+  fateboard:
+    nodeLabel: fedai.org
+    value: 
+  federation:
+    nodeLabel: fedai.org
+    value: 
+  metaService:
+    nodeLabel: fedai.org
+    value: 
+  mysql:
+    nodeLabel: fedai.org
+    value: 
+  proxy:
+    nodeLabel: fedai.org
+    value: 
+  python:
+    nodeLabel: fedai.org
+    value: 
+  redis:
+    nodeLabel: fedai.org
+    value: 
+  roll:
+    nodeLabel: fedai.org
+    value: 
+  servingServer:
+    nodeLabel: fedai.org
+    value: 
+modules: 
+  proxy: 
+    include: {{ has "proxy" .modules }}
+    ip: proxy
+    type: {{ .proxy.type | default "ClusterIP" }}
+  egg: 
+    include: {{ has "egg" .modules }}
+    ip: egg
+    type: ClusterIP
+  fateboard: 
+    include: {{ has "fateboard" .modules }}
+    ip: fateboard
+    type: ClusterIP
+  fateflow: 
+    include: {{ has "fateflow" .modules }}
+    ip: fateflow
+    type: ClusterIP
+  federation: 
+    include: {{ has "federation" .modules }}
+    ip: federation
+    type: ClusterIP
+  metaService: 
+    include: {{ has "metaService" .modules }}
+    ip: meta-service
+    type: ClusterIP
+  mysql: 
+    include: {{ has "mysql" .modules }}
+    ip: mysql
+    type: ClusterIP
+  redis: 
+    include: {{ has "redis" .modules }}
+    ip: redis
+    type: ClusterIP
+  roll: 
+    include: {{ has "roll" .modules }}
+    ip: roll
+    type: ClusterIP
+  python: 
+    include: {{ has "python" .modules }}
+    ip: python
+    type: ClusterIP

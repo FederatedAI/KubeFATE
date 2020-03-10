@@ -1,0 +1,61 @@
+########################################################
+# Copyright 2019-2020 program was created VMware, Inc. #
+# SPDX-License-Identifier: Apache-2.0                  #
+########################################################
+
+{{ if .Values.modules.federation.include }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    {{ .Values.partyId }}: federation
+  name: federation
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      {{ .Values.partyId }}: federation
+  template:
+    metadata:
+      labels:
+        {{ .Values.partyId }}: federation
+    spec:
+      containers:
+        - image: {{ .Values.image.registry }}/federation:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          name: federation
+          ports:
+            - containerPort: 9394
+          volumeMounts:
+            - mountPath: /data/projects/fate/federation/conf/federation.properties
+              name: federation-confs
+              subPath: federation.properties
+      {{ if .Values.nodeSelector.federation.value}}
+      nodeSelector:
+        {{ .Values.nodeSelector.federation.nodeLabel }}: {{ .Values.nodeSelector.federation.value }}
+      {{ end }}
+      restartPolicy: Always
+      volumes:
+        - name: federation-confs
+          configMap:
+            name: federation-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    {{ .Values.partyId }}: federation
+  name: federation
+spec:
+  ports:
+    - name: "9394"
+      port: 9394
+      targetPort: 9394
+      protocol: TCP
+  type: {{ .Values.modules.federation.type }}
+  selector:
+    {{ .Values.partyId }}: federation
+---
+{{ end }}

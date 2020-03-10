@@ -1,0 +1,29 @@
+name: fate-10000
+namespaces: fate-10000
+version: v1.3.0
+partyId: 10000
+exchange:
+  ip: 192.168.1.1
+  port: 9371
+modules:
+  - proxy
+  - egg
+  - fateboard
+  - fateflow
+  - federation
+  - metaService
+  - mysql
+  - redis
+  - roll
+  - python
+
+proxy: 
+  type: NodePort
+  nodePort: 30010
+  partyList:
+  - partyId: 8888
+    partyIp: 192.168.1.10
+    partyPort: 30008
+
+egg:
+  count: 1

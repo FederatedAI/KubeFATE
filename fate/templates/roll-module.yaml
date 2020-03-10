@@ -1,0 +1,61 @@
+########################################################
+# Copyright 2019-2020 program was created VMware, Inc. #
+# SPDX-License-Identifier: Apache-2.0                  #
+########################################################
+
+{{ if .Values.modules.roll.include }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    {{ .Values.partyId }}: roll
+  name: roll
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      {{ .Values.partyId }}: roll
+  template:
+    metadata:
+      labels:
+        {{ .Values.partyId }}: roll
+    spec:
+      containers:
+        - image: {{ .Values.image.registry }}/roll:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          name: roll
+          ports:
+            - containerPort: 8011
+          volumeMounts:
+            - mountPath: /data/projects/fate/roll/conf/roll.properties
+              name: roll-confs
+              subPath: roll.properties
+      {{ if .Values.nodeSelector.roll.value}}
+      nodeSelector:
+        {{ .Values.nodeSelector.roll.nodeLabel }}: {{ .Values.nodeSelector.roll.value }}
+      {{ end }}
+      volumes:
+        - name: roll-confs
+          configMap:
+            name: roll-config
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    {{ .Values.partyId }}: roll
+  name: roll
+spec:
+  ports:
+    - name: "8011"
+      port: 8011
+      targetPort: 8011
+      protocol: TCP
+  type: {{ .Values.modules.roll.type }}
+  selector:
+    {{ .Values.partyId }}: roll
+---
+{{ end }}
