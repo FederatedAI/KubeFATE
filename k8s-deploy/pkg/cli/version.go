@@ -21,11 +21,11 @@ func VersionCommand() *cli.Command {
 		Action: func(c *cli.Context) error {
 			serviceVersion, err := getServiceVersion()
 			if err != nil {
-				fmt.Printf("* kubefate service connection error, %s\n", err.Error())
+				fmt.Printf("* kubefate service connection error, %s\r\n", err.Error())
 			} else {
-				fmt.Printf("* kubefate service version=%s\n", serviceVersion)
+				fmt.Printf("* kubefate service version=%s\r\n", serviceVersion)
 			}
-			fmt.Printf("* kubefate commandLine version=%s\n", api.ServiceVersion)
+			fmt.Printf("* kubefate commandLine version=%s\r\n", api.ServiceVersion)
 			return nil
 		},
 	}

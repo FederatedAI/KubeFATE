@@ -83,6 +83,7 @@ func (c *User) outPutList(result interface{}) error {
 	for _, r := range item.Data {
 		table.AddRow(r.Uuid, r.Username, r.Email, r.Status)
 	}
+	table.AddRow("")
 	return output.EncodeTable(os.Stdout, table)
 }
 
@@ -95,7 +96,7 @@ func (c *User) outPutMsg(result interface{}) error {
 		return errors.New("type UserResultMsg not ok")
 	}
 
-	_, err := fmt.Fprintf(os.Stdout, "%s", item.Msg)
+	_, err := fmt.Println(item.Msg)
 
 	return err
 }
@@ -109,7 +110,7 @@ func (c *User) outPutErr(result interface{}) error {
 		return errors.New("type userResultErr not ok")
 	}
 
-	_, err := fmt.Fprintf(os.Stdout, "%s", item.Error)
+	_, err := fmt.Println(item.Error)
 
 	return err
 }
@@ -132,6 +133,6 @@ func (c *User) outPutInfo(result interface{}) error {
 	table.AddRow("StartTime", user.Username)
 	table.AddRow("EndTime", user.Email)
 	table.AddRow("Status", user.Status)
-
+	table.AddRow("")
 	return output.EncodeTable(os.Stdout, table)
 }

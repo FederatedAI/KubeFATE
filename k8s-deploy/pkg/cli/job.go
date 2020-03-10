@@ -88,7 +88,7 @@ func (c *Job) outPutList(result interface{}) error {
 	for _, r := range joblist {
 		table.AddRow(r.Uuid, r.Creator, r.Method, r.Status.String(), r.StartTime.Format("2006-01-02 15:04:05"), r.ClusterId)
 	}
-
+	table.AddRow("")
 	return output.EncodeTable(os.Stdout, table)
 }
 
@@ -101,7 +101,7 @@ func (c *Job) outPutMsg(result interface{}) error {
 		return errors.New("type JobResultMsg not ok")
 	}
 
-	_, err := fmt.Fprintf(os.Stdout, "%s", item.Msg)
+	_, err := fmt.Println(item.Msg)
 
 	return err
 }
@@ -115,7 +115,7 @@ func (c *Job) outPutErr(result interface{}) error {
 		return errors.New("type jobResultErr not ok")
 	}
 
-	_, err := fmt.Fprintf(os.Stdout, "%s", item.Error)
+	_, err := fmt.Println(item.Error)
 
 	return err
 }
@@ -144,6 +144,6 @@ func (c *Job) outPutInfo(result interface{}) error {
 	table.AddRow("ClusterId", job.ClusterId)
 	table.AddRow("Result", job.Result)
 	table.AddRow("SubJobs", job.SubJobs)
-
+	table.AddRow("")
 	return output.EncodeTable(os.Stdout, table)
 }

@@ -66,7 +66,6 @@ func (c *Chart) outPut(result interface{}, Type int) error {
 	default:
 		return fmt.Errorf("outPut error: no type %d", Type)
 	}
-	return nil
 }
 
 func (c *Chart) outPutList(result interface{}) error {
@@ -82,6 +81,7 @@ func (c *Chart) outPutList(result interface{}) error {
 	for _, r := range item.Data {
 		table.AddRow(r.Uuid, r.Name, r.Version)
 	}
+	table.AddRow("")
 	return output.EncodeTable(os.Stdout, table)
 }
 
@@ -94,9 +94,8 @@ func (c *Chart) outPutMsg(result interface{}) error {
 		return errors.New("type ChartResultMsg not ok")
 	}
 
-	_, err := fmt.Fprintf(os.Stdout, "%s", item.Msg)
-
-	return err
+	fmt.Println(item.Msg)
+	return nil
 }
 
 func (c *Chart) outPutErr(result interface{}) error {
@@ -108,7 +107,7 @@ func (c *Chart) outPutErr(result interface{}) error {
 		return errors.New("type ChartResultErr not ok")
 	}
 
-	_, err := fmt.Fprintf(os.Stdout, "%s", item.Error)
+	_, err := fmt.Println(item.Error)
 
 	return err
 }
@@ -131,6 +130,6 @@ func (c *Chart) outPutInfo(result interface{}) error {
 	table.AddRow("Name", Chart.Name)
 	table.AddRow("Version", Chart.Version)
 	table.AddRow("Chart", Chart.Chart)
-
+	table.AddRow("")
 	return output.EncodeTable(os.Stdout, table)
 }

@@ -1,8 +1,8 @@
 package cli
 
 import (
+	"fmt"
 	"github.com/urfave/cli/v2" // imports as package "cli"
-	"log"
 	"sort"
 )
 
@@ -31,6 +31,6 @@ func Run(Args []string) {
 	app := initCommandLine()
 	err := app.Run(Args)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
 	}
 }
