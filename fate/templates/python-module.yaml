@@ -1,0 +1,143 @@
+########################################################
+# Copyright 2019-2020 program was created VMware, Inc. #
+# SPDX-License-Identifier: Apache-2.0                  #
+########################################################
+
+{{ if .Values.modules.python.include }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python
+  labels:
+    {{ .Values.partyId }}: python
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      {{ .Values.partyId }}: python
+  template:
+    metadata:
+      labels:
+        {{ .Values.partyId }}: python
+    spec:
+      hostAliases:
+      - ip: "127.0.0.1"
+        hostnames:
+        - "fateflow"
+      initContainers:
+      - image: mysql:8
+        name: mysql
+        env:
+        - name: MYSQL_DATABASE
+          value: {{ .Values.mysql.mysql_database }}
+        - name: MYSQL_USER
+          value: {{ .Values.mysql.mysql_user }}
+        - name: MYSQL_PASSWORD
+          value: {{ .Values.mysql.mysql_password }}
+        - name: MYSQL_HOST
+          value: mysql
+        command:
+        - /bin/bash
+        - -c
+        - |
+          set -x
+          function checkMySQL(){
+            checkMySQLCount=0
+            while true ; do
+              checkMySQLCount=$[checkMySQLCount+1]
+              echo "Waiting for mysql started. check count: $checkMySQLCount"
+              sleep 2
+
+              state=`mysqladmin ping -h ${MYSQL_HOST} -u${MYSQL_USER} -p${MYSQL_PASSWORD}| awk '{print $3}'`
+              if [ "$state" == "alive" ]; then
+                echo "mysql server has been already started."
+              break
+              fi
+           done
+          }
+          echo "Waiting for mysql started..."
+          checkMySQL
+      containers:
+        - image: {{ .Values.image.registry }}/python:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          name: python
+          ports:
+            - containerPort: 9360
+            - containerPort: 9380
+          volumeMounts:
+            - mountPath: /data/projects/fate/python/eggroll/conf/server_conf.json
+              name: python-confs
+              subPath: server_conf.json
+            - mountPath: /data/projects/fate/python/arch/conf/server_conf.json
+              name: python-confs
+              subPath: server_conf.json
+            - mountPath: /data/projects/fate/python/fate_flow/settings.py
+              subPath: settings.py
+              name: python-confs
+            - name: logs
+              mountPath: /data/projects/fate/python/logs
+        - image: {{ .Values.image.registry }}/fateboard:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          name: fateboard
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - mountPath: /data/projects/fate/fateboard/conf/application.properties
+              name: fateboard-confs
+              subPath: application.properties
+            - name: logs
+              mountPath: /data/projects/fate/python/logs
+      {{ if .Values.nodeSelector.python.value}}
+      nodeSelector:
+        {{ .Values.nodeSelector.python.nodeLabel }}: {{ .Values.nodeSelector.python.value }}
+      {{ end }}
+      restartPolicy: Always
+      volumes:
+        - name: python-confs
+          configMap:
+            name: python-config
+        - name: fateboard-confs
+          configMap:
+            name: fateboard-config
+        - name: logs
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fateflow
+  labels:
+    {{ .Values.partyId }}: python
+spec:
+  ports:
+    - name: "9360"
+      port: 9360
+      targetPort: 9360
+      protocol: TCP
+    - name: "9380"
+      port: 9380
+      targetPort: 9380
+      protocol: TCP
+  type: {{ .Values.modules.fateflow.type }}
+  selector:
+    {{ .Values.partyId }}: python
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fateboard
+  labels:
+    {{ .Values.partyId }}: python
+spec:
+  ports:
+    - name: "8080"
+      port: 8080
+      targetPort: 8080
+      protocol: TCP
+  type: {{ .Values.modules.fateboard.type }}
+  selector:
+    {{ .Values.partyId }}: python
+---
+{{ end }}
