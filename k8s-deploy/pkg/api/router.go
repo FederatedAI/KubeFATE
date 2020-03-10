@@ -9,7 +9,11 @@ const ApiVersion = "v1"
 func Router(r *gin.Engine) {
 
 	r.GET("/", func(c *gin.Context) {
-		c.JSON(200, gin.H{"msg": "kubefate run success"})
+		c.JSON(200, gin.H{
+			"msg":            "kubefate run success",
+			"api_version":     ApiVersion,
+			"service_version": ServiceVersion,
+		})
 	})
 
 	v1 := r.Group("/v1")
