@@ -11,7 +11,7 @@ WORKINGDIR=`pwd`
 deploy_dir=/data/projects/fate
 
 # fetch fate-python image
-source ${WORKINGDIR}/../.env
+source ${WORKINGDIR}/.env
 source ${WORKINGDIR}/parties.conf
 
 cd ${WORKINGDIR}
@@ -33,7 +33,7 @@ GenerateConfig() {
         eval processor_count=16
         eval venv_dir=/data/projects/python/venv
         eval python_path=${deploy_dir}/python:${deploy_dir}/eggroll/python
-        eval data_dir=${dir}/data-dir
+        eval data_dir=${deploy_dir}/data-dir
     
         eval egg_ip=(egg)
         eval egg_port=7888
@@ -79,7 +79,7 @@ GenerateConfig() {
         
         cp ./docker-compose.yml confs-$party_id/
         # generate conf dir
-        cp ${WORKINGDIR}/../.env ./confs-$party_id
+        cp ${WORKINGDIR}/.env ./confs-$party_id
         if [ "$RegistryURI" != "" ]
         then
           sed -i "s#PREFIX#${RegistryURI}#g" ./confs-$party_id/docker-compose.yml
@@ -284,7 +284,7 @@ EOF
     cd ${WORKINGDIR}
     rm -rf confs-exchange/
     mkdir -p confs-exchange/conf
-    cp ${WORKINGDIR}/../.env confs-exchange/
+    cp ${WORKINGDIR}/.env confs-exchange/
     cp docker-compose-exchange.yml confs-exchange/docker-compose.yml
     cp -r docker-example-dir-tree/proxy/conf confs-exchange/
     
@@ -341,7 +341,7 @@ EOF
         
         cp ./docker-compose-serving.yml serving-$party_id/docker-compose.yml
         # generate conf dir
-        cp ${WORKINGDIR}/../.env ./serving-$party_id
+        cp ${WORKINGDIR}/.env ./serving-$party_id
 
 
         # serving server
@@ -424,7 +424,7 @@ GenerateSplittingProxy() {
     cd ${WORKINGDIR}
     rm -rf confs-${party_id}/
     mkdir -p confs-${party_id}/conf
-    cp ${WORKINGDIR}/../.env confs-${party_id}
+    cp ${WORKINGDIR}/.env confs-${party_id}
     cp docker-compose-exchange.yml confs-${party_id}/docker-compose.yml
     cp -r docker-example-dir-tree/proxy/conf confs-${party_id}/
     if [ "$RegistryURI" != "" ]; then
