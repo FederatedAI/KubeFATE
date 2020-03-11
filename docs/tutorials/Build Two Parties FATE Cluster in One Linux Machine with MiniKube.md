@@ -1,18 +1,18 @@
 # Tutorial Goal
-In this tutorial, we will from scratch to install a MiniKube for Kubernetes, then install KubeFATE sevice in the Kubernetes cluster. Then, we will install a two parties FATE clusters. Each of them is deployed in a given namespace. We are able to run federated learning with these two parties, and check FATE-Dashboard for the status of learning job.
+In this tutorial, we will from scratch to install a MiniKube for Kubernetes and deploy KubeFATE sevice on it. Then, we will install a two parties FATE clusters. Each of them is deployed in a given namespace. We are able to run federated learning with these two parties, and check FATE-Dashboard for the status of learning job.
 
 After the tutorial, the deployment architecture looks like following diagram.
 
 <div align="center">
-  <img src="./images/goal.PNG">
+  <img src="./images/goal.png">
 </div>
 
 # Prerequisites
-1. A Linux machine. The verified OS is Ubuntu 18.04 LTS
-2. A domain name for ingress of KubeFATE service and FATE-Dashboard. A alternative is set host both in both tutorial machine and client to access FATE-Dashboard. In this tutorial, we suppose in no the latter case.  
+1. A Linux machine. The verified OS is Ubuntu 18.04 LTS. <font color="red">* The demo machine is 8 core, 32G memory.</font>
+2. A domain name for ingress of KubeFATE service and FATE-Dashboard. A alternative is set host both to deploying machine and client to access FATE-Dashboard. In this tutorial, we suppose to the latter case.  
 3. Docker have been installed in the Linux machine. To install a Docker, please refer to [Install Docker in Ubuntu](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
-4. Network connectivity
-5. Create a folder for all following commands
+4. Network connectivity to dockerhub, and google storage
+5. Create a folder for whole tutorial
 	```
 	cd ~ && mkdir demo && cd demo
 	```
@@ -21,7 +21,7 @@ After the tutorial, the deployment architecture looks like following diagram.
 
 # Start Tutorial
 ## Install related tools
-We have verified the following tools, which is latest version by the date drafting this tutorial. If these tools update, please refer to corresponding documents for how to find the given version of packages.
+The following tools and version have been verified, which are the latest version by the date drafting this tutorial.
 1. MiniKube: v1.7.3
 2. kubectl: v1.17.3
 3. kubefate:
@@ -52,12 +52,12 @@ commit: 436667c819c324e35d7e839f8116b968a2d0a3ff
 ### Download KubeFATE Release Pack and Install KubeFATE Command Lines
 Go to [KubeFATE Release](https://github.com/FederatedAI/KubeFATE/releases), and find the latest kubefate-k8s release pack. 
 ```
-curl -LO https://github.com/FederatedAI/KubeFATE/releases/download/v1.3.0/kubefate-k8s-v1.3.0.tar.gz && tar -xzf ./kubefate-k8s-v1.3.0.tar.gz
+curl -LO https://github.com/FederatedAI/KubeFATE/releases/download/v1.3.0/kubefate-k8s-v1.3.0-a.tar.gz && tar -xzf ./kubefate-k8s-v1.3.0-a.tar.gz
 ```
 Then we will get the release pack of KubeFATE, verify it,
 ```
 layne@machine:~/demo$ ls
-cluster.yaml  config.yaml  kubefate  kubefate-k8s-v1.3.0.tar.gz  kubefate.yaml  rbac-config.yaml
+cluster.yaml  config.yaml  kubefate  kubefate-k8s-v1.3.0-a.tar.gz  kubefate.yaml  rbac-config.yaml
 ```
 Move the kubefate executable binary to path,
 ```
@@ -67,7 +67,7 @@ Try to verify if kubefate works,
 ```
 layne@machine:~/demo$ kubefate version
 * kubefate service connection error, Get http://kubefate.net/v1/version: dial tcp: lookup kubefate.net: no such host
-* kubefate commandLine version=v1.0.1
+* kubefate commandLine version=v1.0.2
 ```
 It is fine only command line version shows and get error on KubeFATE service's version, because we have not deployed KubeFATE service yet.
 
@@ -149,8 +149,8 @@ rtt min/avg/max/mdev = 0.054/0.067/0.080/0.013 ms
 And the KubeFATE service version can be shown,
 ```
 layne@machine:~/demo$ kubefate version
-* kubefate service version=v1.0.1
-* kubefate commandLine version=v1.0.1
+* kubefate service version=v1.0.2
+* kubefate commandLine version=v1.0.2
 ```
 Okay. The preparation have been done. Let's install FATE.
 
@@ -170,11 +170,8 @@ For fate-9999.yaml, modify it as following,
 ```
 name: fate-9999
 namespace: fate-9999
-version: v1.3.0
+version: v1.3.0-a
 partyId: 9999
-exchange:
-  ip: 10.160.112.145
-  port: 30010
 modules:
   - proxy
   - egg
@@ -190,26 +187,27 @@ modules:
 proxy:
   type: NodePort
   nodePort: 30009
+  partyList:
+    - partyId: 10000
+      partyIp: 10.160.112.145
+      partyPort: 30010
 
 egg:
   count: 1
 ```
 
 We change following things:
-1. The exchange setting, IP to the machine's IP. In my case, it is 10.160.112.145, and port is 30010. Which will be the proxy of party 10000, which will collabrate to federated learning;
+1. Remove the exchange part, and use p2p mode;
 2. Change the proxy part setting, which set the nodePort to 30009. This is the port proxy of party 9999 listen to;
-3. Remove the partList of proxy part, we use direct connect mode rather than exchange in this tutorial;
+3. Change the partyList setting according to the proxy setting in party 10000. In my case, partyId is 10000, partyIp is 10.160.112.145 and partyPort is 30010;
 4. Change the count of egg setting from 3 to 1.
 
 For fate-10000, modify it as following,
 ```
 name: fate-10000
 namespace: fate-10000
-version: v1.3.0
+version: v1.3.0-a
 partyId: 10000
-exchange:
-  ip: 10.160.112.145
-  port: 30009
 modules:
   - proxy
   - egg
@@ -225,6 +223,10 @@ modules:
 proxy:
   type: NodePort
   nodePort: 30010
+  partyList:
+    - partyId: 9999
+      partyIp: 10.160.112.145
+      partyPort: 30009
 
 egg:
   count: 1
@@ -234,9 +236,9 @@ We change the following things:
 1. Change name to fate-10000;
 2. Namespace use fate-10000;
 3. partId use 10000;
-4. exchange points to the proxy of party 9999, which ip is 10.160.112.145 and port is 30009;
+4. Remove exchange part;
 5. nodePort of proxy part, set to 30010, which can be connected by proxy 9999;
-6. Remove partList of proxy part;
+6. Change the partyList according to proxy setting in party 9999;
 7. Change the count of egg setting from 3 to 1.
 
 Okay, we can start to install these two FATE cluster via KubeFATE with following command,
@@ -259,54 +261,77 @@ a3dd184f-084f-4d98-9841-29927bdbf627    admin   ClusterInstall  Success 2020-03-
 
 ## Verify the deployment
 ### Run min_test_task
-We use the min_test_task as example in FATE/examples to quick verify the deployment. Let the party 9999 as the host, while party 10000 as guest. The details of this example, please refer to [min_test_task README](https://github.com/FederatedAI/FATE/blob/master/examples/min_test_task/README.md)
+We use the [toy_example](https://github.com/FederatedAI/FATE/blob/master/examples/toy_example) in FATE/examples to quick verify the deployment. Let the party 10000 as the host, while party 9999 as guest, use cluster mode. The details of this example, please refer to [toy_example README](https://github.com/FederatedAI/FATE/blob/master/examples/toy_example/README.md).
 
-Find the python container with kubectl
-```
-layne@machine:~/demo$ kubectl get pod -n fate-9999|grep python*
-python-7b85c9ddc5-bjn64         2/2     Running   0          66m
-```
-The `python-7b85c9ddc5-bjn64` is the name of python pod (please replace it as your result), we enter its shell with command,
-```
-kubectl exec -it python-7b85c9ddc5-bjn64 -n fate-9999 -- /bin/bash
-```
-then run the host script,
-```
-(venv) [root@python-7b85c9ddc5-bjn64 python]# cd examples/min_test_task && sh run.sh host fast
-role is host
-task is fast
-upload_task, table_name:host_table_name_1583847607_2945
-upload_task, namespace:host_table_namespace_1583847607_2945
-Upload data config json: {'file': '/data/projects/fate/python/examples/min_test_task/../data/breast_a.csv', 'head': 1, 'partition': 10, 'work_mode': 1, 'table_name': 'host_table_name_1583847607_2945', 'namespace': 'host_table_namespace_1583847607_2945'}
-Start task: ['python', '/data/projects/fate/python/examples/min_test_task/../../fate_flow/fate_flow_client.py', '-f', 'upload', '-c', '/data/projects/fate/python/examples/min_test_task/test/upload_host.config_1583847607_7835']
-Upload output is {'data': {'board_url': 'http://fateboard:8080/index.html#/dashboard?job_id=202003101340078514261&role=local&party_id=0', 'job_dsl_path': '/data/projects/fate/python/jobs/202003101340078514261/job_dsl.json', 'job_runtime_conf_path': '/data/projects/fate/python/jobs/202003101340078514261/job_runtime_conf.json', 'logs_directory': '/data/projects/fate/python/logs/202003101340078514261', 'namespace': 'host_table_namespace_1583847607_2945', 'table_name': 'host_table_name_1583847607_2945'}, 'jobId': '202003101340078514261', 'retcode': 0, 'retmsg': 'success'}
-Start task: ['python', '/data/projects/fate/python/examples/min_test_task/../../fate_flow/fate_flow_client.py', '-f', 'table_info', '-t', 'host_table_name_1583847607_2945', '-n', 'host_table_namespace_1583847607_2945']
-{'data': {'count': 569, 'namespace': 'host_table_namespace_1583847607_2945', 'partition': 10, 'table_name': 'host_table_name_1583847607_2945'}, 'retcode': 0, 'retmsg': 'success'}
-Upload Data, role: host, count: {'data': {'count': 569, 'namespace': 'host_table_namespace_1583847607_2945', 'partition': 10, 'table_name': 'host_table_name_1583847607_2945'}, 'retcode': 0, 'retmsg': 'success'}
-The table name and namespace is needed by GUEST. To start a modeling task, please inform GUEST with the table name and namespace.
-finish upload intersect data
-*********************
-*******finish!*******
-(venv) [root@python-7b85c9ddc5-bjn64 min_test_task]# exit
-exit
-```
-Please note down the table namespace and table name in above return. In my case, namespace is `host_table_namespace_1583847607_2945` and table name is`host_table_name_1583847607_2945`. And type `exit` to quit the shell. 
-
-Then find python pod in party 10000,
+Firstly, find the python container of party 10000 with kubectl
 ```
 layne@machine:~/demo$ kubectl get pod -n fate-10000|grep python*
-python-dc94c9786-dk422          2/2     Running   0          77m
+python-dc94c9786-8jsgh          2/2     Running   0          3m13s
 ```
-In my case, `python-dc94c9786-dk422` is the pod of party 10000, go into it with,
+The `python-dc94c9786-8jsgh` is the name of python pod <font color="red">(please replace it as your result)</font>, we enter its shell with command,
 ```
-kubectl exec -it python-dc94c9786-dk422 -n fate-10000 -- /bin/bash
+kubectl exec -it python-dc94c9786-8jsgh -n fate-10000 -- /bin/bash
 ```
-Run the guest script,
-```
-cd examples/min_test_task && sh run.sh guest fast host_table_name_1583847607_2945 host_table_namespace_1583847607_2945
-```
-According to the guide [min_test_task README](https://github.com/FederatedAI/FATE/blob/master/examples/min_test_task/README.md), we need to set host table name and host table namespace as the attributes to run guest learning. Please replace the sample to your noted. Then, we got output similar to
+then run the toy_example,
 ```
 
+(venv) [root@python-dc94c9786-8jsgh python]# cd examples/toy_example/ && python run_toy_example.py 10000 9999 1
+stdout:{
+    "data": {
+        "board_url": "http://fateboard:8080/index.html#/dashboard?job_id=202003110905332206371&role=guest&party_id=10000",
+        "job_dsl_path": "/data/projects/fate/python/jobs/202003110905332206371/job_dsl.json",
+        "job_runtime_conf_path": "/data/projects/fate/python/jobs/202003110905332206371/job_runtime_conf.json",
+        "logs_directory": "/data/projects/fate/python/logs/202003110905332206371",
+        "model_info": {
+            "model_id": "guest-10000#host-9999#model",
+            "model_version": "202003110905332206371"
+        }
+    },
+    "jobId": "202003110905332206371",
+    "retcode": 0,
+    "retmsg": "success"
+}
+
+
+job status is running
+job status is running
+job status is running
+job status is running
+job status is running
+job status is running
+job status is running
+"2020-03-11 09:05:39,911 - secure_add_guest.py[line:101] - INFO: begin to init parameters of secure add example guest"
+"2020-03-11 09:05:39,911 - secure_add_guest.py[line:104] - INFO: begin to make guest data"
+"2020-03-11 09:05:42,576 - secure_add_guest.py[line:107] - INFO: split data into two random parts"
+"2020-03-11 09:05:51,661 - secure_add_guest.py[line:110] - INFO: share one random part data to host"
+"2020-03-11 09:05:52,444 - secure_add_guest.py[line:113] - INFO: get share of one random part data from host"
+"2020-03-11 09:05:57,566 - secure_add_guest.py[line:116] - INFO: begin to get sum of guest and host"
+"2020-03-11 09:05:58,571 - secure_add_guest.py[line:119] - INFO: receive host sum from guest"
+"2020-03-11 09:05:58,643 - secure_add_guest.py[line:126] - INFO: success to calculate secure_sum, it is 2000.0"
+(venv) [root@python-dc94c9786-8jsgh toy_example]#
 ```
+We can find the success calculation result in return, which means these two parties FATE-Cluster have worked as expect. 
+
 ### Check the FATE-Dashboard
+As the FATE-Dashboard is exposed as `http://${party_id}.fateboard.${serviceurl}` in KubeFATE deployments. In our case, should be:
+* Party 9999 FATE-Dashboard: http://9999.fateboard.kubefate.net/
+* Party 10000 FATE-Dashboard: http://10000.fateboard.kubefate.net/
+
+If no DNS service configured, we have to add these two url to our hosts file. In a Linux or macOS machine, 
+
+```
+sudo -- sh -c "echo \"10.160.112.145 9999.fateboard.kubefate.net\"  >> /etc/hosts"
+sudo -- sh -c "echo \"10.160.112.145 10000.fateboard.kubefate.net\"  >> /etc/hosts"
+```
+
+In a Windows machine, you have to add them to `C:\WINDOWS\system32\drivers\etc\hosts`, please refer to related documents. After changing the hosts, we are able to open the browser see the jobs in each party: 
+
+#### FATE-Dashboad 9999 as host,
+<div align="center">
+  <img src="./images/9999-dashboard.png" height = "500">
+</div>
+
+#### FATE-Dashboad 10000 as guest,
+<div align="center">
+  <img src="./images/10000-dashboard.png" height = "500">
+</div>
