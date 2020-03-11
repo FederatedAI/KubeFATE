@@ -53,6 +53,7 @@ func Test_checkClusterStatus(t *testing.T) {
 
 func TestGetPods(t *testing.T) {
 	type args struct {
+		name string
 		namespace string
 	}
 	tests := []struct {
@@ -64,14 +65,15 @@ func TestGetPods(t *testing.T) {
 		{
 			name: "",
 			args: args{
-				namespace: "",
+				name: "fate-10000",
+				namespace: "fate-10000",
 			},
 			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := GetPods(tt.args.namespace)
+			got, err := GetPods(tt.args.name,tt.args.namespace)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("GetPods() error = %v, wantErr %v", err, tt.wantErr)
 				return

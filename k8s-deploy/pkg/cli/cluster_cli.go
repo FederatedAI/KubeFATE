@@ -123,19 +123,18 @@ func ClusterInstallCommand() *cli.Command {
 			if !ok {
 				return errors.New("name not found, check your cluster file")
 			}
-			delete(m, "name")
+
 
 			namespace, ok := m["namespace"]
 			if !ok {
 				return errors.New("namespace not found, check your cluster file")
 			}
-			delete(m, "namespace")
 
 			version, ok := m["version"]
 			if !ok {
 				return errors.New("version not found, check your cluster file")
 			}
-			delete(m, "version")
+
 
 			var json = jsoniter.ConfigCompatibleWithStandardLibrary
 			valBJ, err := json.Marshal(m)
