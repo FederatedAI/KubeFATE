@@ -42,18 +42,16 @@ The following steps illustrate how to generate necessary configuration files and
 
 Before deploying the FATE system, multiple parties should be defined in the configuration file: `docker-deploy/parties.conf`. 
 
-In the following sample of `docker-deploy/parties.conf` , two parities are specified by id as `10000` and `9999`. Their training cluster are going to be deployed on hosts with IP addresses of *192.168.7.1* and *192.168.7.2*, respectively. And their serving cluster are going to be deployed on hosts with IP addresses of *192.168.7.3* and *192.168.7.4*, respectively.
+In the following sample of `docker-deploy/parties.conf` , two parities are specified by id as `10000` and `9999`. Their cluster are going to be deployed on hosts with IP addresses of *192.168.7.1* and *192.168.7.2*
 
 ```bash
 user=root
 dir=/data/projects/fate
 partylist=(10000 9999)
 partyiplist=(192.168.7.1 192.168.7.2)
-servingiplist=(192.168.7.3 192.168.7.4)
-exchangeip=192.168.7.1
+servingiplist=(192.168.7.1 192.168.7.2)
+exchangeip=
 ```
-
-If 'servingiplist' is the same as 'partyiplist', the training cluster and service cluster will be deployed on the same machine.
 
 By default, the exchange node won't be deployed. The exchange service runs on port 9371. If a exchange (co-locates on the host of party or standalone) node is needed, update the value of `exchangeip` to the IP address of the desired host.
 
@@ -79,17 +77,19 @@ $ bash docker_deploy.sh all
 
 The script copies tar files (e.g. `confs-<party-id>.tar` or `serving-<party-id>.tar`) to corresponding target hosts. It then launches a FATE cluster on each host using `docker-compose` commands.
 
-To deploy all parties training cluster, use the below command:
+By Default, the script will start the training and serving cluster simultaneously. If you need to start them separately, add the `--training` or `--serving` to the `docker_deploy.sh` as follows.
+
+(Optional) To deploy all parties training cluster, use the below command:
 ```bash
 $ bash docker_deploy.sh all --training
 ```
 
-To deploy all parties serving cluster, use the below command:
+(Optional) To deploy all parties serving cluster, use the below command:
 ```bash
 $ bash docker_deploy.sh all --serving
 ```
 
-To deploy FATE to a single target host, use the below command with the party's id (10000 in the below example):
+(Optional) To deploy FATE to a single target host, use the below command with the party's id (10000 in the below example):
 ```bash
 $ bash docker_deploy.sh 10000
 ```
