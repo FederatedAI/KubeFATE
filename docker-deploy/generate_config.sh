@@ -33,7 +33,7 @@ GenerateConfig() {
         eval processor_count=16
         eval venv_dir=/data/projects/python/venv
         eval python_path=${deploy_dir}/python:${deploy_dir}/eggroll/python
-        eval data_dir=${dir}/data-dir
+        eval data_dir=${deploy_dir}/data-dir
     
         eval egg_ip=(egg)
         eval egg_port=7888
