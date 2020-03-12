@@ -17,7 +17,7 @@ func VersionCommand() *cli.Command {
 		Name: "version",
 		Flags: []cli.Flag{
 		},
-		Usage: "show kubefate version",
+		Usage: "Show kubefate command line and service version",
 		Action: func(c *cli.Context) error {
 			serviceVersion, err := getServiceVersion()
 			if err != nil {

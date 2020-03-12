@@ -36,10 +36,10 @@ func ClusterListCommand() *cli.Command {
 				Name:    "all",
 				Aliases: []string{"A"},
 				Value:   false,
-				Usage:   "chart valTemVal.yaml",
+				Usage:   "List all clusters including deleted ones",
 			},
 		},
-		Usage: "show cluster list",
+		Usage: "Show all clusters list",
 		Action: func(c *cli.Context) error {
 			all := c.Bool("all")
 			cluster := new(Cluster)
@@ -55,7 +55,7 @@ func ClusterInfoCommand() *cli.Command {
 		Name: "describe",
 		Flags: []cli.Flag{
 		},
-		Usage: "show cluster info",
+		Usage: "Describe a cluster's detail info",
 		Action: func(c *cli.Context) error {
 			var uuid string
 			if c.Args().Len() > 0 {
@@ -75,7 +75,7 @@ func ClusterDeleteCommand() *cli.Command {
 		Aliases: []string{"del"},
 		Flags: []cli.Flag{
 		},
-		Usage: "cluster delete",
+		Usage: "Delete a cluster",
 		Action: func(c *cli.Context) error {
 			var uuid string
 			if c.Args().Len() > 0 {
@@ -102,7 +102,7 @@ func ClusterInstallCommand() *cli.Command {
 				Usage:   "chart valTemVal.yaml",
 			},
 		},
-		Usage: "cluster delete",
+		Usage: "Install a new cluster",
 		Action: func(c *cli.Context) error {
 
 			valTemValPath := c.String("file")
@@ -177,7 +177,7 @@ func ClusterUpdateCommand() *cli.Command {
 				Usage:   "chart valTemVal.yaml",
 			},
 		},
-		Usage: "cluster Upgrade",
+		Usage: "Update a cluster",
 		Action: func(c *cli.Context) error {
 			valTemValPath := c.String("file")
 

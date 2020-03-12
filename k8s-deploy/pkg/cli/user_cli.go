@@ -24,7 +24,7 @@ func UserListCommand() *cli.Command {
 		Aliases: []string{"ls"},
 		Flags: []cli.Flag{
 		},
-		Usage: "show job list",
+		Usage: "List all users",
 		Action: func(c *cli.Context) error {
 			User := new(User)
 			return getItemList(User)
@@ -37,7 +37,7 @@ func UserInfoCommand() *cli.Command {
 		Name: "describe",
 		Flags: []cli.Flag{
 		},
-		Usage: "show User info",
+		Usage: "Describe a user's detail info",
 		Action: func(c *cli.Context) error {
 			var uuid string
 			if c.Args().Len() > 0 {
