@@ -41,7 +41,7 @@ The connection to the server localhost:8080 was refused - did you specify the ri
 ```
 ### Install MiniKube
 ```
-curl -LO minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64 && chmod +x minikube && sudo mv ./minikube /usr/bin
+curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64 && mv minikube-linux-amd64 minikube && chmod +x minikube && sudo mv ./minikube /usr/bin
 ```
 Try to verify if MiniKube installed,
 ```
