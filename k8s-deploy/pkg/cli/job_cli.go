@@ -25,7 +25,7 @@ func JobListCommand() *cli.Command {
 		Aliases: []string{"ls"},
 		Flags: []cli.Flag{
 		},
-		Usage: "show job list",
+		Usage: "Show job list",
 		Action: func(c *cli.Context) error {
 			cluster := new(Job)
 			return getItemList(cluster)
@@ -39,7 +39,7 @@ func JobDeleteCommand() *cli.Command {
 		Aliases: []string{"del"},
 		Flags: []cli.Flag{
 		},
-		Usage: "show job list",
+		Usage: "Delete a job",
 		Action: func(c *cli.Context) error {
 			var uuid string
 			if c.Args().Len() > 0 {
@@ -60,10 +60,10 @@ func JobInfoCommand() *cli.Command {
 			&cli.StringFlag{
 				Name:  "uuid",
 				Value: "",
-				Usage: "uuid",
+				Usage: "Describe a job with given UUID",
 			},
 		},
-		Usage: "show job info",
+		Usage: "Show job's details info",
 		Action: func(c *cli.Context) error {
 
 			var uuid string

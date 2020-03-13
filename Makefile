@@ -14,7 +14,7 @@ build-docker-image:
 	$(call sub_make, ${K8S-DEPLOY}, build-docker-image)
 
 zip:
-	tar -czvf kubefate-docker-compose.tar.gz ./docker-deploy
+	tar -czvf kubefate-docker-compose.tar.gz ./docker-deploy/*
 
 release: zip
 	${call sub_make, ${K8S-DEPLOY}, release RELEASE_VERSION=v${RELEASE_VERSION}} && mv ${K8S-DEPLOY}/kubefate-k8s-v${RELEASE_VERSION}.tar.gz ./ && curl -LJO https://federatedai.github.io/KubeFATE/fate-${RELEASE_VERSION}.tgz

@@ -38,7 +38,7 @@ func ChartListCommand() *cli.Command {
 		Aliases: []string{"ls"},
 		Flags: []cli.Flag{
 		},
-		Usage: "show Chart list",
+		Usage: "List charts list",
 		Action: func(c *cli.Context) error {
 			cluster := new(Chart)
 			return getItemList(cluster)
@@ -51,7 +51,7 @@ func ChartInfoCommand() *cli.Command {
 		Name: "describe",
 		Flags: []cli.Flag{
 		},
-		Usage: "show chart info",
+		Usage: "Describe a chart's detail info",
 		Action: func(c *cli.Context) error {
 			var uuid string
 			if c.Args().Len() > 0 {
@@ -71,7 +71,7 @@ func ChartDeleteCommand() *cli.Command {
 		Aliases: []string{"del"},
 		Flags: []cli.Flag{
 		},
-		Usage: "chart delete",
+		Usage: "Delete a chart",
 		Action: func(c *cli.Context) error {
 			var uuid string
 			if c.Args().Len() > 0 {
@@ -97,11 +97,10 @@ func ChartCreateCommand() *cli.Command {
 				Name:    "file",
 				Aliases: []string{"f"},
 				Value:   "",
-				Usage:   "chart valTemVal.yaml",
-				Required: true,
+				Usage:   "Upload a chart with local given file",
 			},
 		},
-		Usage: "Chart upload",
+		Usage: "Upload a chart from local",
 		Action: func(c *cli.Context) error {
 
 			file := c.String("file")
@@ -177,7 +176,7 @@ func ChartCreateCommand() *cli.Command {
 			}
 
 			log.Debug().Int("Code", resp.StatusCode).Bytes("Body", respBody).Msg("ok")
-			fmt.Println("upload file success")
+			fmt.Println("Upload file success")
 			return nil
 		},
 	}

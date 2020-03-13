@@ -1,5 +1,5 @@
-# Kubernetes Deployment 
-We recommend use [Kubernetes](https://kubernetes.io/) as a underlying infrastructure to create and manage the FATE clusters in production environment. KubeFATE supports deploying multiple FATE clusters in one Kubernetes with different namespaces for development, test and production cases. Considering the various IT designed and standards in each company, the modules deployed should be customized. KubeFATE is isolated from the detail FATE configurations. 
+# Kubernetes Deployment
+We recommend use [Kubernetes](https://kubernetes.io/) as a underlying infrastructure to create and manage the FATE clusters in production environment. KubeFATE supports deploying multiple FATE clusters in one Kubernetes with different namespaces for development, test and production cases. Considering the various IT designed and standards in each company, the modules deployed should be customized. KubeFATE is isolated from the detail FATE configurations.
 
 If you focus on how to quickly use KubeFATE, please jump to [Use Scenarios](#use-scenarios) and [Command Line Reference](#command-line-reference) sections.
 
@@ -9,7 +9,7 @@ The very highlevel architecture of a multiple Federated Learning deployment (e.g
   <img src="./images/hamflp.PNG">
 </div>
 
-FateCloud which will be release later as a unified federated cloud management system, which will coordinate different parties. In each party, KubeFATE manage the infrastructure. 
+FateCloud which will be release later as a unified federated cloud management system, which will coordinate different parties. In each party, KubeFATE manage the infrastructure.
 
 * KubeFATE: Orchestrated FATE cluster inside one party, offer APIs for FATE Cloud Manager and other management portals
 * Harbor (Optional): Versioned FATE deployments and images management
@@ -29,13 +29,13 @@ The numbers marked in diagram:
 1. Auth & authz APIs for external calls
 2. Render templates via Helm;
 3. Persistent jobs and configurations of FATE deployment
-4. KubeFATE service is hosted in Kubernetes as one app 
+4. KubeFATE service is hosted in Kubernetes as one app
 
 There are two parts of KubeFATE:
-* The KubeFATE CLI. KubeFATE CLI is a executable binary helps to quickly initial and manage FATE cluster with interactive CLIs. It can be run outside of the Kubernetes, and does not require Kubernetes authz. Eventually, KubeFATE CLI will call KubeFATE Service for detail operations with KubeFATE user token. 
-* The KubeFATE Service. As KubeFATE provides RESTful APIs for manage FATE clusters. A KubeFATE service will be deployed in Kubernetes, and exposed APIs via [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/). For the auth and authz, KubeFATE service implements [JWT](https://jwt.io/introduction/), and neutral to other security solutions which can be added to Kubernetes ingress. 
+* The KubeFATE CLI. KubeFATE CLI is a executable binary helps to quickly initial and manage FATE cluster with interactive CLIs. It can be run outside of the Kubernetes, and does not require Kubernetes authz. Eventually, KubeFATE CLI will call KubeFATE Service for detail operations with KubeFATE user token.
+* The KubeFATE Service. As KubeFATE provides RESTful APIs for manage FATE clusters. A KubeFATE service will be deployed in Kubernetes, and exposed APIs via [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/). For the auth and authz, KubeFATE service implements [JWT](https://jwt.io/introduction/), and neutral to other security solutions which can be added to Kubernetes ingress.
 
-KubeFATE is designed to seperate the detail FATE cluster configuration including most of the version specified setting. Ideally, KubeFATE CLI and service can work for several FATE releases. 
+KubeFATE is designed to seperate the detail FATE cluster configuration including most of the version specified setting. Ideally, KubeFATE CLI and service can work for several FATE releases.
 
 ## Use Scenarios
 Suppose in a organization, there are two roles:
@@ -48,7 +48,7 @@ Suppose in a organization, there are two roles:
 
 ### Initial a new FATE deployment
 #### Create role, namespace and other resource in Kubernetes
-The sample yaml can be [rbac-config.yaml](./rbac-config.yaml). In the sample yaml, we create a kube-fate namespace for KubeFATE service. More limitation can be applied to kube-fate namespace, refer to [Kubernetes Namespace](https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/), [Configure Memory and CPU Quotas for Namespace](https://kubernetes.io/docs/tasks/administer-cluster/manage-resources/quota-memory-cpu-namespace/) 
+The sample yaml can be [rbac-config.yaml](./rbac-config.yaml). In the sample yaml, we create a kube-fate namespace for KubeFATE service. More limitation can be applied to kube-fate namespace, refer to [Kubernetes Namespace](https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/), [Configure Memory and CPU Quotas for Namespace](https://kubernetes.io/docs/tasks/administer-cluster/manage-resources/quota-memory-cpu-namespace/)
 ```
 kubectl apply -f ./rbac-config.yaml
 ```
@@ -65,6 +65,7 @@ Note that, the default username and password of KubeFATE service can be set in `
             - name: FATECLOUD_USER_PASSWORD
               value: "admin"
 ```
+The details of KubeFATE service configuration, please refer to: [KubeFATE service Configuration Guild](../docs/configurations/FATE_cluster_configuration.md).
 
 #### Prepare cluster conf. and deploy FATE
 When the system admin deployed KubeFATE service and prepared the namespace for FATE. The ML Infra. Ops. is able to start FATE deployment. According to the infomations from SA, there a `config.yaml` for `kubefate` CLI is required. It contains KubeFATE access username and password, the KubeFATE service URL.
@@ -77,7 +78,12 @@ user:
 serviceurl: kubefate.net
 ```
 
-And, according to the FATE deploy plan, create a `cluster.yaml` for cluster configuration. The details of Cluster configuration, please refer to: [FATE Cluster Configuration Guild](#). Then intall FATE cluster,
+|Name       |Type    |Description                                                       |
+|-----------|--------|------------------------------------------------------------------|
+|user       |mappings|User name and password when logging into KubeFATE service.        |
+|serviceurl |scalars |kubeFATE service's ingress domain name, defined in kubefate.yaml. |
+
+And, according to the FATE deploy plan, create a `cluster.yaml` for cluster configuration. The details of Cluster configuration, please refer to: [FATE Cluster Configuration Guild](../docs/configurations/FATE_cluster_configuration.md). Then intall FATE cluster,
 
 ```
 $ kubefate cluster install -f ./cluster.yaml
