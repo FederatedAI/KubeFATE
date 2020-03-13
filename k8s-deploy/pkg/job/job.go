@@ -14,6 +14,7 @@ type ClusterArgs struct {
 	Name         string `json:"name"`
 	Namespace    string `json:"namespace"`
 	ChartVersion string `json:"chart_version"`
+	Cover        bool   `json:"cover"`
 	Data         []byte `json:"data"`
 }
 
@@ -42,6 +43,10 @@ func ClusterInstall(clusterArgs *ClusterArgs, creator string) (*db.Job, error) {
 	//do job
 	go func() {
 		job.Status = db.Running_j
+
+		if clusterArgs.Cover {
+			_ = helmClean(clusterArgs.Name, clusterArgs.Namespace)
+		}
 
 		//create a cluster use parameter
 		cluster := db.NewCluster(clusterArgs.Name, clusterArgs.Namespace, clusterArgs.ChartVersion)
@@ -421,6 +426,11 @@ func uninstall(fc *db.Cluster) error {
 
 	_, err := service.Delete(fc.NameSpace, fc.Name)
 
+	return err
+}
+
+func helmClean(NameSpace, Name string) error {
+	_, err := service.Delete(NameSpace, Name)
 	return err
 }
 
