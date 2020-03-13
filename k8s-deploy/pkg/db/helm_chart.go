@@ -16,18 +16,20 @@ type HelmChart struct {
 	ValuesTemplate string        `json:"values_template"`
 	Templates      []*chart.File `json:"templates"`
 	Version        string        `json:"version"`
+	AppVersion     string        `json:"app_version"`
 }
 
 // NewHelmChart create a new helm chart
-func NewHelmChart(name string, chart string, values string, templates []*chart.File, version string) *HelmChart {
+func NewHelmChart(name string, chart string, values string, templates []*chart.File, version, appVersion string) *HelmChart {
 	helm := &HelmChart{
 
-		Uuid:      uuid.NewV4().String(),
-		Name:      name,
-		Chart:     chart,
-		Values:    values,
-		Templates: templates,
-		Version:   version,
+		Uuid:       uuid.NewV4().String(),
+		Name:       name,
+		Chart:      chart,
+		Values:     values,
+		Templates:  templates,
+		Version:    version,
+		AppVersion: appVersion,
 	}
 
 	return helm

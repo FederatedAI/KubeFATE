@@ -94,7 +94,7 @@ func (c *Cluster) outPutList(result interface{}) error {
 		return errors.New("type ClusterResultList not ok")
 	}
 	table := uitable.New()
-	table.AddRow("UUID", "NAME", "NAMESPACE", "REVISION", "STATUS", "CHART", "APP VERSION")
+	table.AddRow("UUID", "NAME", "NAMESPACE", "REVISION", "STATUS", "CHART", "ChartVERSION")
 	for _, r := range item.Data {
 		table.AddRow(r.Uuid, r.Name, r.NameSpace, r.Version, r.Status, r.ChartName, r.ChartVersion)
 	}
@@ -146,12 +146,12 @@ func (c *Cluster) outPutInfo(result interface{}) error {
 	table.AddRow("UUID", cluster.Uuid)
 	table.AddRow("Name", cluster.Name)
 	table.AddRow("NameSpace", cluster.NameSpace)
+	table.AddRow("ChartName", cluster.ChartName)
 	table.AddRow("ChartVersion", cluster.ChartVersion)
-	table.AddRow("REVISION", cluster.Version)
+	table.AddRow("Revision", cluster.Version)
 	//table.AddRow("Type", cluster.Type)
 	table.AddRow("Status", cluster.Status)
 	table.AddRow("Values", cluster.Values)
-	table.AddRow("ChartName", cluster.ChartName)
 	table.AddRow("Config", cluster.Config)
 	table.AddRow("Info", cluster.Info)
 	table.AddRow("")

@@ -25,10 +25,10 @@ func InitConfigForTest() {
 func TestMsa(t *testing.T) {
 
 	d := ClusterArgs{
-		Name:      "fate-10000",
-		Namespace: "fate-10000",
-		Version:   "V1.2.0",
-		Data:      []byte(`{"egg":{"count":3},"exchange":{"ip":"192.168.1.1","port":9370},"modules":["proxy","egg","fateboard","fateflow","federation","metaService","mysql","redis","roll","python"],"partyId":10000,"proxy":{"nodePort":30010,"type":"NodePort"}}`),
+		Name:         "fate-10000",
+		Namespace:    "fate-10000",
+		ChartVersion: "V1.2.0",
+		Data:         []byte(`{"egg":{"count":3},"exchange":{"ip":"192.168.1.1","port":9370},"modules":["proxy","egg","fateboard","fateflow","federation","metaService","mysql","redis","roll","python"],"partyId":10000,"proxy":{"nodePort":30010,"type":"NodePort"}}`),
 	}
 	b, err := json.Marshal(d)
 	if err != nil {
@@ -55,10 +55,10 @@ func TestClusterInstall(t *testing.T) {
 			name: "job install fate-8888",
 			args: args{
 				clusterArgs: &ClusterArgs{
-					Name:      "fate-8888",
-					Namespace: "fate-8888",
-					Version:   "v1.2.0",
-					Data:      []byte(`{ "partyId":8888,"endpoint": { "ip":"10.184.111.187","port":30008}}`),
+					Name:         "fate-8888",
+					Namespace:    "fate-8888",
+					ChartVersion: "v1.2.0",
+					Data:         []byte(`{ "partyId":8888,"endpoint": { "ip":"10.184.111.187","port":30008}}`),
 				},
 			},
 			want:    nil,

@@ -2,6 +2,7 @@ package cli
 
 import (
 	"errors"
+	"fate-cloud-agent/pkg/job"
 	"github.com/json-iterator/go"
 	"github.com/rs/zerolog/log"
 	"github.com/urfave/cli/v2"
@@ -44,7 +45,7 @@ func ClusterListCommand() *cli.Command {
 			all := c.Bool("all")
 			cluster := new(Cluster)
 			cluster.all = all
-			log.Debug().Bool("all",all).Msg("all")
+			log.Debug().Bool("all", all).Msg("all")
 			return getItemList(cluster)
 		},
 	}
@@ -96,10 +97,11 @@ func ClusterInstallCommand() *cli.Command {
 		Name: "install",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
-				Name:    "file",
-				Aliases: []string{"f"},
-				Value:   "",
-				Usage:   "chart valTemVal.yaml",
+				Name:     "file",
+				Aliases:  []string{"f"},
+				Value:    "",
+				Usage:    "chart cluster.yaml",
+				Required: true,
 			},
 		},
 		Usage: "cluster delete",
@@ -124,17 +126,15 @@ func ClusterInstallCommand() *cli.Command {
 				return errors.New("name not found, check your cluster file")
 			}
 
-
 			namespace, ok := m["namespace"]
 			if !ok {
 				return errors.New("namespace not found, check your cluster file")
 			}
 
-			version, ok := m["version"]
+			chartVersion, ok := m["chartVersion"]
 			if !ok {
 				return errors.New("version not found, check your cluster file")
 			}
-
 
 			var json = jsoniter.ConfigCompatibleWithStandardLibrary
 			valBJ, err := json.Marshal(m)
@@ -144,16 +144,11 @@ func ClusterInstallCommand() *cli.Command {
 			}
 
 			cluster := new(Cluster)
-			args := struct {
-				Name      string
-				Namespace string
-				Version   string
-				Data      []byte
-			}{
-				Namespace: namespace.(string),
-				Name:      name.(string),
-				Version:   version.(string),
-				Data:      valBJ,
+			args := &job.ClusterArgs{
+				Name:         name.(string),
+				Namespace:    namespace.(string),
+				ChartVersion: chartVersion.(string),
+				Data:         valBJ,
 			}
 
 			body, err := json.Marshal(args)
@@ -170,10 +165,11 @@ func ClusterUpdateCommand() *cli.Command {
 		Name: "update",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
-				Name:    "file",
-				Aliases: []string{"f"},
-				Value:   "",
-				Usage:   "chart valTemVal.yaml",
+				Name:     "file",
+				Aliases:  []string{"f"},
+				Value:    "",
+				Usage:    "chart cluster.yaml",
+				Required: true,
 			},
 		},
 		Usage: "cluster Upgrade",

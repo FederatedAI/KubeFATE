@@ -98,6 +98,7 @@ func ChartCreateCommand() *cli.Command {
 				Aliases: []string{"f"},
 				Value:   "",
 				Usage:   "chart valTemVal.yaml",
+				Required: true,
 			},
 		},
 		Usage: "Chart upload",
