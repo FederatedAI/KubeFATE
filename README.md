@@ -17,9 +17,9 @@ KubeFATE2
 |-- docker-deploy   
 |-- k8s-deploy   
 ```
-`docker-deploy`: The traditional  Docker Compose installation. The pricipal of `docker-deploy` is simple and quickly to set the environment up. Docker Compose can deploy FATE components on a single host. By using Docker Compose, FATE can be set up for environments of multiple parties which are collaborating in a federated manner. Please refer to [Docker Compose Deployment](./docker-deploy/README.md) for more details.
+`docker-deploy`: The pricipal of `docker-deploy` is simple and quickly to set the environment up. Docker Compose can deploy FATE components on a single host. By using Docker Compose, FATE can be set up for environments of multiple parties which are collaborating in a federated manner. Please refer to [Docker Compose Deployment](./docker-deploy/README.md) for more details.
 
-`k8s-deploy`: The new KubeFATE preview version. The k8s deployment is design for a real production deployed and managed environment. It designed for flexibility to suit different various environments.
+`k8s-deploy`: The k8s deployment is design for a real production deployed and managed environment. It designed for flexibility to suit different various environments.
 
 ### Major features of new KubeFATE k8s-deploy
   * Provide a single executable binary for initialing and managing FATE cluster
