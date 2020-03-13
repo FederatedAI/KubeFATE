@@ -87,16 +87,16 @@ GenerateConfig() {
           sed -i 's#image: "redis:5"#image: "${RegistryURI}/redis:5"#g' ./confs-$party_id/docker-compose.yml
         fi
 
-		# update the path of shared_dir
-		## handle examples
-		shared_example_dir="confs-${party_id}/shared_dir/examples"
-		mkdir -p "./$shared_example_dir"
-		sed -i "s|/path/to/host/dir/examples|${dir}/${shared_example_dir}|g" ./confs-$party_id/docker-compose.yml
+        # update the path of shared_dir
+        ## handle examples
+        shared_example_dir="confs-${party_id}/shared_dir/examples"
+        mkdir -p "./$shared_example_dir"
+        sed -i "s|/path/to/host/dir/examples|${dir}/${shared_example_dir}|g" ./confs-$party_id/docker-compose.yml
     
-		## handle federatedml
-		shared_federatedml_dir="confs-${party_id}/shared_dir/federatedml"
-		mkdir -p "./$shared_federatedml_dir"
-		sed -i "s|/path/to/host/dir/federatedml|${dir}/${shared_federatedml_dir}|g" ./confs-$party_id/docker-compose.yml
+        ## handle federatedml
+        shared_federatedml_dir="confs-${party_id}/shared_dir/federatedml"
+        mkdir -p "./$shared_federatedml_dir"
+        sed -i "s|/path/to/host/dir/federatedml|${dir}/${shared_federatedml_dir}|g" ./confs-$party_id/docker-compose.yml
 
         # egg config
         module_name=eggroll

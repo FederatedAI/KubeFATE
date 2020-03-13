@@ -1,229 +1,126 @@
-# Deployment on Kubernetes
-In a multi-node deployment scenario, a user can use [Kubernetes](https://kubernetes.io/) as their underlying infrastructure to create and manage the FATE cluster. To facilitate the deployment on Kubernetes, FATE provides scripts to generate deployment files automatically for users.
+# Kubernetes Deployment
+We recommend use [Kubernetes](https://kubernetes.io/) as a underlying infrastructure to create and manage the FATE clusters in production environment. KubeFATE supports deploying multiple FATE clusters in one Kubernetes with different namespaces for development, test and production cases. Considering the various IT designed and standards in each company, the modules deployed should be customized. KubeFATE is isolated from the detail FATE configurations.
 
-## Summary
+If you focus on how to quickly use KubeFATE, please jump to [Use Scenarios](#use-scenarios) and [Command Line Reference](#command-line-reference) sections.
 
-<div style="text-align:center", align=center>
-<img src="./images/k8s-summary.jpg" />
+## Highlevel Architecture of multiple Federated Learning Parties
+The very highlevel architecture of a multiple Federated Learning deployment (e.g. two parties) as follow image:
+<div align="center">
+  <img src="./images/hamflp.PNG">
 </div>
 
-Package the FATE component into a Pod, deploy two FATE parties to two namespaces, and each party has 8 pods.
-The relationship between the FATE component and the pod is as follows:
+FateCloud which will be release later as a unified federated cloud management system, which will coordinate different parties. In each party, KubeFATE manage the infrastructure.
 
-Pod            | Service URL                 | FATE component          | Expose Port
----------------|-----------------------------|-------------------------|------------
-egg            | egg.\<namespace>            | egg/Storage-Service-cxx | 7888,7778
-federation     | federation.\<namespace>     | federation              | 9394
-meta-service   | meta-service.\<namespace>   | meta-service            | 8590
-proxy          | proxy.\<namespace>          | proxy                   | 9370
-roll           | roll.\<namespace>           | roll                    | 8011
-redis          | redis.\<namespace>          | redis                   | 6379
-mysql          | mysql.\<namespace>          | mysql                   | 3306
-python         | fateflow.\<namespace><br/>fateboard.\<namespace> | fate-flow/fateboard     | 9360,9380,8080
+* KubeFATE: Orchestrated FATE cluster inside one party, offer APIs for FATE Cloud Manager and other management portals
+* Harbor (Optional): Versioned FATE deployments and images management
+* Kubernetes: Orchestration engine.
 
-## Prerequisites
-- A Linux laptop can run the installation command
-- A working Kubernetes cluster(v1.9+).
-- [The FATE Images](https://github.com/FederatedAI/FATE/tree/contributor_1.0_docker/docker-build) have been built and downloaded by nodes of Kubernetes cluster.
-- Helm v2.14.0 or above installed
+KubeFATE will responsible for:
+* Day 1 initialization: One executable binary to deploy a FATE cluster
+* Day 2 operations: Provides both executable binary and RESTful APIs to manage FATE clusters inside a party
 
-## Helm Introduction
-The Helm is a package management tool of Kubernetes, it simplifies the deployment and management of applications on Kubernetes. Before using the script, a user needs to install on his machine first. For more details about Helm and installation please refer to the [official page](https://helm.sh/docs/using_helm/).
-
-## Deploying FATE
-Download KubeFATE from [releases pages](https://github.com/FederatedAI/KubeFATE/releases), unzip it into folder KubeFATE
-
-By default, the script pulls the images from [Docker Hub](https://hub.docker.com/search?q=federatedai&type=image) during the deployment.
-
-### Use Third Party Registry (Optional)
-It is recommended that non-Internet clusters use [Harbor](https://goharbor.io/) as a third-party registry. Please refer to [this guide](https://github.com/FederatedAI/KubeFATE/blob/master/registry/install_harbor.md) to install Harbor. Change the `THIRDPARTYPREFIX` to Harbor hostname in the `.env` file. `192.168.10.1` is an example of Harbor ip.
-
-```bash
-$ cd KubeFATE/k8s-deploy/
-$ vi .env
-
-RegistryURI=192.168.10.1/federatedai
-```
-
-### Configure Parties
-Before deployment, a user needs to define the FATE parties in `KubeFATE/k8s-deploy/kube.cfg`, a sample is as follows:
-```bash
-partylist=(10000 9999)                              # partyid
-partyiplist=(192.168.11.2:30010 192.168.11.3:30009) # deploy parties Cluster any node iP/Port
-exchangeip=192.168.11.4:30000                       # deploy exchange Cluster any node iP/Port
-```
-The above sample defines two parties, these parties will be deployed on the same Kubernetes cluster but isolated by the namespace. Moreover, each party contains one Egg service.
-
-### Generating Deployment Files
-After finished the definition, use the following command to generate deployment files:
-```bash
-$ cd KubeFATE/k8s-deploy/
-$ bash create-helm-deploy.sh
-```
-According to the `kube.cfg`, the script creates three directories “fate-10000” 、“fate-9999”  and “fate-exchange” under the current path. The structure of each directory is as follows:
-```
-fate-*
-|-- templates   
-|-- Chart.yaml   
-|-- values.yaml
-```
-
-- The "templates" directory contains template files to deploy FATE components. 
-- The "Chart.yaml" file describes the Chart's information.
-- The "values.yaml" file defines the value used to render the templates.
-
-### Launching Deployment
-
-First make sure that the Kubernetes cluster has three namespaces, fate-9999 fate-10000 and fate-exchange. If there is no corresponding namespace, you can create it with the following command：
-```bash
-$ kubectl create namespace fate-9999
-$ kubectl create namespace fate-10000
-$ kubectl create namespace fate-exchange
-```
-Then check if you have permission to deploy tiller. If not, please add an account for it with the following command:
-```bash
-kubectl --namespace kube-system create serviceaccount tiller
-
-kubectl create clusterrolebinding tiller-cluster-rule \
---clusterrole=cluster-admin --serviceaccount=kube-system:tiller
-
-kubectl --namespace kube-system patch deploy tiller-deploy \
--p '{"spec":{"template":{"spec":{"serviceAccount":"tiller"}}}}' 
-```
-the console output should be:
-```
-serviceaccount "tiller" created
-clusterrolebinding "tiller-cluster-rule" created
-deployment "tiller-deploy" patched
-```
-Then run command to update:
-```bash
-helm repo update
-```
-
-After successfully updated, use the following commands to deploy parties.
-
-- Party-10000:
-```
-$ helm install --name=fate-10000 --namespace=fate-10000 ./fate-10000/ 
-```
-
-- Party-9999:
-```
-$ helm install --name=fate-9999 --namespace=fate-9999 ./fate-9999/ 
-```
-
-- Party-exchange:
-```
-$ helm install --name=fate-exchange --namespace=fate-exchange ./fate-exchange/ 
-```
-
-After the command returns, use `helm list` to fetch the status of deployment, an example output is as follows:
-```
-NAME         	REVISION	UPDATED                 	STATUS  	CHART              	APP VERSION	NAMESPACE    
-fate-10000   	1       	Tue Oct 29 03:47:05 2019	DEPLOYED	fate-party-1.3.0   	1.3.0      	fate-10000
-fate-9999    	1       	Tue Oct 29 03:46:58 2019	DEPLOYED	fate-party-1.3.0   	1.3.0      	fate-9999
-fate-exchange	1       	Tue Oct 29 03:46:53 2019	DEPLOYED	fate-exchange-1.3.0	1.3.0      	fate-exchange
-```
-
-In the above deployment, the data of "mysql", "redis" and "egg" will be persisted to the worker node that hosting the services(Pod). Which means if a service shifted to the other worker node, the service will be unable to read the previous data.
-
-A simple solution to persist the data is to use a NFS as the shared storage, so that the services can read/wirte data from/to the NFS directly. An user need to setup [NFS](https://help.ubuntu.com/lts/serverguide/network-file-system.html) first, then use the following command to deploy FATE:
-```
-$ helm install --set nfspath=${NfsPath} --set nfsserver=${NfsIp} --name=fate-* --namespace=fate-* ./fate-*/
-
-# NfsPath: The NFS exposed the path
-# NfsIp: The NFS IP address
-```
-
-### Verifying the Deployment
-To verify the deployment, the user can log in the `python` pod of his or her party and runs example cases.
-The following steps illustrate how to perform a test on `party-10000`:
-1. Log into the python container
-```bash
-$ kubectl exec -it -c python svc/fateflow bash -n fate-10000
-```
-2. Run the test toy_example
-```bash
-$ cd /data/projects/fate/python/examples/toy_example/
-$ python run_toy_example.py 10000 9999 1
-```
-3. Verify the output, a successful example is as follows:
-```
-"2019-08-29 07:21:34,118 - secure_add_guest.py[line:121] - INFO: success to calculate secure_sum, it is 2000.0000000000002"
-```
-The above example also shows that communication between two parties is working as intended, since the guest and the host of the example are `party-10000` and `party-9999`, respectively.
-
-## Custom Deployment (Optional)
-By default, the Kubernetes scheduler will balance the workload among the whole Kubernetes cluster. However, a user can deploy a service to a specified node by using [Node Selector](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector). This is useful when a service requires resources like GPU, or large size hard disk which are only available on some hosts.
-
-View your nodes by this command:  
-`$ kubectl get nodes -o wide`
-
-```bash
-NAME      STATUS    AGE       VERSION       INTERNAL-IP
-master    Ready     5d        v1.16.3       192.168.11.1
-node-0    Ready     5d        v1.16.3       192.168.11.2
-node-1    Ready     5d        v1.16.3       192.168.11.3
-node-2    Ready     5d        v1.16.3       192.168.11.4
-node-3    Ready     5d        v1.16.3       192.168.11.5
-```
-
-A user can tag a specified node with labels, for example:  
-```bash
-$ kubectl label nodes node-0 fedai.hostname=fate-node-0
-
-node "node-0" labeled
-```
-The above command tagged node-0 with a label `fedai.hostname=fate-node-0`.
-
-After tagging all nodes, verify that they are worked by running:  
-`$ kubectl get nodes --show-labels`
-```bash
-NAME      STATUS    AGE       VERSION   LABELS
-master    Ready     5d        v1.16.3   kubernetes.io/arch=amd64,kubernetes.io/hostname=master,kubernetes.io/os=linux,name=master,node-role.kubernetes.io/master=
-node-0    Ready     5d        v1.16.3   ..., fedai.hostname=fate-node-0, ...
-node-1    Ready     5d        v1.16.3   ..., fedai.hostname=fate-node-1, ...
-node-2    Ready     5d        v1.16.3   ..., fedai.hostname=fate-node-2, ...
-node-3    Ready     5d        v1.16.3   ..., fedai.hostname=fate-node-3, ...
-```
-
-With the use of node labels, a user can customize the deployment by configuring the "KubeFATE/k8s-deploy/kube.cfg". A sample is as follows:
-```bash
-...
-
-# Specify k8s node selector, default use fedai.hostname
-nodeLabel=fedai.hostname
-# Please fill in multiple label value for multiple eggs, and split with spaces
-eggList=(fate-node-0 fate-node-1) # This will deploy an egg service in node-0 and an egg service in node-1. If you only need one egg service, just fill one value.
-federation=fate-node-2
-metaService=fate-node-2
-mysql=fate-node-2
-proxy=fate-node-2
-python=fate-node-3
-redis=fate-node-3
-roll=fate-node-3
-```
-
-<div style="text-align:center", align=center>
-<img src="./images/k8s-cluster.jpg" />
+## Highlevel Architecture of KubeFATE
+The highlevel architecture of KubeFATE can be presented as follow image:
+<div align="center">
+  <img src="./images/kfha.PNG">
 </div>
 
-The above sample will deploy an `egg` service in node-0 and, an `egg` service in node-1, `federation`, `metaService`, `mysql`, `proxy` services to node-2 and `python`, `redis`, `roll` services to node-3. If no value is given, a service will be deployed in the cluster according to the strategy of the scheduler.
+The numbers marked in diagram:
+1. Auth & authz APIs for external calls
+2. Render templates via Helm;
+3. Persistent jobs and configurations of FATE deployment
+4. KubeFATE service is hosted in Kubernetes as one app
 
-By default, only one egg service will be deployed. To deploy multiple egg services, please fill in the `eggList` with the label of the Kubernetes nodes (Separated with spaces). Helm will deploy one egg service to each node.
+There are two parts of KubeFATE:
+* The KubeFATE CLI. KubeFATE CLI is a executable binary helps to quickly initial and manage FATE cluster with interactive CLIs. It can be run outside of the Kubernetes, and does not require Kubernetes authz. Eventually, KubeFATE CLI will call KubeFATE Service for detail operations with KubeFATE user token.
+* The KubeFATE Service. As KubeFATE provides RESTful APIs for manage FATE clusters. A KubeFATE service will be deployed in Kubernetes, and exposed APIs via [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/). For the auth and authz, KubeFATE service implements [JWT](https://jwt.io/introduction/), and neutral to other security solutions which can be added to Kubernetes ingress.
 
-### Multi module deployment
+KubeFATE is designed to seperate the detail FATE cluster configuration including most of the version specified setting. Ideally, KubeFATE CLI and service can work for several FATE releases.
 
-DMZ deployment reference document [DMZ deployment](DMZ-deploy_zh.md).
+## Use Scenarios
+Suppose in a organization, there are two roles:
+* System Admin: who responisble for the infrastructure management as well as Kubernetes administration
+* ML Infra. Ops.: who responsible for managing the machine learning cluster like FATE
 
-### **The Visualizations**
+<div align="center">
+  <img src="./images/swim.PNG">
+</div>
 
-if you kubernetes cluster deployment Ingress controller ( [ingress-nginx](https://kubernetes.github.io/ingress-nginx/deploy/) ), you can also access the FATEBoard through http://\<party-id\>.fateboard.fedai.org 
+### Initial a new FATE deployment
+#### Create role, namespace and other resource in Kubernetes
+The sample yaml can be [rbac-config.yaml](./rbac-config.yaml). In the sample yaml, we create a kube-fate namespace for KubeFATE service. More limitation can be applied to kube-fate namespace, refer to [Kubernetes Namespace](https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/), [Configure Memory and CPU Quotas for Namespace](https://kubernetes.io/docs/tasks/administer-cluster/manage-resources/quota-memory-cpu-namespace/)
+```
+kubectl apply -f ./rbac-config.yaml
+```
+#### Prepare domain and deploy KubeFATE in Kubernetes
+Because KubeFATE service expose RESTful APIs for external integrated system, system admin have to prepare a domain for KubeFATE service. In our sample config, there is `kubefate.net` . And also, system admin should create a namespace (e.g. fate-9999), limit its quota for FATE deployment, and give the infos to ML Infra. Ops.
+```
+kubectl apply -f ./kubefate.yaml
+kubectl create namespace fate-9999
+```
+Note that, the default username and password of KubeFATE service can be set in `kubefate.yaml` kubefate->containers->env as:
+```
+            - name: FATECLOUD_USER_USERNAME
+              value: "admin"
+            - name: FATECLOUD_USER_PASSWORD
+              value: "admin"
+```
+The details of KubeFATE service configuration, please refer to: [KubeFATE service Configuration Guild](../docs/configurations/FATE_cluster_configuration.md).
 
-You have to modify hosts before that
+#### Prepare cluster conf. and deploy FATE
+When the system admin deployed KubeFATE service and prepared the namespace for FATE. The ML Infra. Ops. is able to start FATE deployment. According to the infomations from SA, there a `config.yaml` for `kubefate` CLI is required. It contains KubeFATE access username and password, the KubeFATE service URL.
 
-```bash
-<node-ip> <party-id>.fateboard.fedai.org     # Add this record to hosts
+```
+user:
+  username: admin
+  password: admin
+
+serviceurl: kubefate.net
 ```
 
+|Name       |Type    |Description                                                       |
+|-----------|--------|------------------------------------------------------------------|
+|user       |mappings|User name and password when logging into KubeFATE service.        |
+|serviceurl |scalars |kubeFATE service's ingress domain name, defined in kubefate.yaml. |
+
+And, according to the FATE deploy plan, create a `cluster.yaml` for cluster configuration. The details of Cluster configuration, please refer to: [FATE Cluster Configuration Guild](../docs/configurations/FATE_cluster_configuration.md). Then intall FATE cluster,
+
+```
+$ kubefate cluster install -f ./cluster.yaml
+create job success, job id=fe846176-0787-4879-9d27-622692ce181c
+```
+#### Check the status of "Install Cluster" job
+A job will be created for installing FATE cluster. Use `kubefate job describe` to check the status of job, util we see the result turns to `install success`
+
+```
+$ kubefate job describe fe846176-0787-4879-9d27-622692ce181c
+StartTime       2020-03-04 06:34:25
+EndTime         2020-03-04 06:35:14
+Status          Success
+Creator         admin
+ClusterId       27e37a60-fffb-4031-a76f-990b2ff43cf2
+Result          install success
+SubJobs         []
+```
+#### Decribe the cluster and find FATE access infos
+When we see the `install cluster` job success, use `kubefate cluster describe` to check the FATE access infos
+```
+$ kubefate cluster describe 27e37a60-fffb-4031-a76f-990b2ff43cf2
+UUID            27e37a60-fffb-4031-a76f-990b2ff43cf2
+Name            fate-9999
+NameSpace       fate-9999
+ChartVersion    v1.2.0
+REVISION        1
+Status          Running
+Values          {"egg":{"count":3},"exchange":{"ip":"proxy.fate-10000","port":9370},"modules":["proxy","fateboard","fateflow","metaService","mysql","redis","roll","python"],"partyId":9999,"proxy":{"nodePort":30009,"type":"NodePort"}}
+ChartName       fate
+Info            map[]
+```
+
+### Other Common Use Scenarios
+#### [Add a <span style="color:red">NEW</span> FATE Version Support](#)
+#### [Update and Delete a FATE Cluster](#)
+
+## Command Line Reference
+## KubeFATE Service RESTful APIs Reference
+[API Reference](https://app.swaggerhub.com/apis-docs/vmware-octo/kubefate2/1.0.0-oas3#/cluster/createcluster)

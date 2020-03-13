@@ -1,0 +1,10 @@
+# Comm prefix FATECLOUD
+
+# TODO
+# persistent layer
+
+user:
+  username: admin
+  password: admin
+
+serviceurl: kubefate.net

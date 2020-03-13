@@ -1,0 +1,140 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kubefate
+  namespace: kube-fate
+  labels:
+    fate: kubefate
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      fate: kubefate
+  template:
+    metadata:
+      labels:
+        fate: kubefate
+    spec:
+      serviceAccount: kubefate-admin
+      containers:
+        - image: federatedai/kubefate:v1.0.2
+          imagePullPolicy: IfNotPresent
+          name: kubefate
+          env:
+            - name: FATECLOUD_MONGO_URL
+              value: "mongo:27017"
+            - name: FATECLOUD_MONGO_USERNAME
+              value: "root"
+            - name: FATECLOUD_MONGO_PASSWORD
+              value: "root"
+            - name: FATECLOUD_MONGO_DATABASE
+              value: "KubeFate"
+            - name: FATECLOUD_REPO_NAME
+              value: "kubefate"
+            - name: FATECLOUD_REPO_URL
+              value: "https://federatedai.github.io/KubeFATE/"
+            - name: FATECLOUD_USER_USERNAME
+              value: "admin"
+            - name: FATECLOUD_USER_PASSWORD
+              value: "admin"
+            - name: FATECLOUD_SERVER_ADDRESS
+              value: "0.0.0.0"
+            - name: FATECLOUD_SERVER_PORT
+              value: "8080"
+            - name: FATECLOUD_LOG_LEVEL
+              value: "debug"
+          ports:
+            - containerPort: 8080
+      restartPolicy: Always
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo
+  namespace: kube-fate
+  labels:
+    fate: mongo
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      fate: mongo
+  template:
+    metadata:
+      labels:
+        fate: mongo
+    spec:
+      containers:
+        - image: mongo
+          imagePullPolicy: IfNotPresent
+          name: mongo
+          env:
+            - name: MONGO_INITDB_ROOT_USERNAME
+              value: root
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              value: root
+          ports:
+            - containerPort: 27017
+          volumeMounts:
+            - name: mongo-data
+              mountPath: /data/db
+      restartPolicy: Always
+      volumes:
+        - name: mongo-data
+          hostPath:
+            path: /home/kubefate/mongodb/db
+            type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo
+  namespace: kube-fate
+  labels:
+    fate: mongo
+spec:
+  ports:
+    - name: "27017"
+      port: 27017
+      targetPort: 27017
+      protocol: TCP
+  type: ClusterIP
+  selector:
+    fate: mongo
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kubefate
+  namespace: kube-fate
+  labels:
+    fate: kubefate
+spec:
+  ports:
+    - name: "8080"
+      port: 8080
+      targetPort: 8080
+      protocol: TCP
+  type: ClusterIP
+  selector:
+    fate: kubefate
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: kubefate
+  namespace: kube-fate
+  annotations:
+spec:
+  rules:
+    - host: kubefate.net
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: kubefate
+              servicePort: 8080

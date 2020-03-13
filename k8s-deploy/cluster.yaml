@@ -1,0 +1,26 @@
+name: fate-9999
+namespace: fate-9999
+chartVersion: v1.3.0-a
+partyId: 9999
+modules:
+  - proxy
+  - egg
+  - federation
+  - metaService
+  - mysql
+  - redis
+  - roll
+  - python
+
+proxy:
+  type: NodePort
+  nodePort: 30009
+  partyList:
+    - partyId: 8888
+      partyIp: 192.168.1.10
+      partyPort: 30008
+  exchange:
+    ip: proxy.fate-10000
+    port: 9370
+egg:
+  count: 3
