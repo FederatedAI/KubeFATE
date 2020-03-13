@@ -124,7 +124,7 @@ func ChartRequestedTohelmChart(chartRequested *chart.Chart) (*db.HelmChart, erro
 	}
 
 	helmChart := db.NewHelmChart(chartRequested.Name(),
-		chartData, valuesData, chartRequested.Templates, chartRequested.AppVersion())
+		chartData, valuesData, chartRequested.Templates,chartRequested.Metadata.Version, chartRequested.AppVersion())
 
 	helmChart.ValuesTemplate = ValuesTemplate
 	return helmChart, nil

@@ -99,12 +99,12 @@ func (_ *Cluster) getCluster(c *gin.Context) {
 		c.JSON(500, gin.H{"error": err})
 		return
 	}
-	port, err := service.GetProxySvcNodePorts(cluster.NameSpace)
+	port, err := service.GetProxySvcNodePorts(cluster.Name, cluster.NameSpace)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err})
 		return
 	}
-	podList, err := service.GetPodList(cluster.NameSpace)
+	podList, err := service.GetPodList(cluster.Name, cluster.NameSpace)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err})
 		return
@@ -122,6 +122,12 @@ func (_ *Cluster) getCluster(c *gin.Context) {
 	}
 
 	cluster.Info["modules"] = podList
+
+	if cluster.ChartValues != nil {
+
+		cluster.Info["dashboard"] = cluster.ChartValues["host"].(map[string]interface{})["fateboard"]
+	}
+
 
 	if cluster.Config == nil {
 		cluster.Config = make(map[string]interface{})

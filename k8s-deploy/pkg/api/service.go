@@ -10,11 +10,12 @@ import (
 	"github.com/spf13/viper"
 )
 
-func initUser() {
+func initUser() error {
 	err := generateAdminUser()
 	if err != nil {
-		panic(fmt.Errorf("generate admin user error: %s\n", err))
+		return fmt.Errorf("generate admin user error: %s\n", err)
 	}
+	return nil
 }
 
 // Run starts the API server
@@ -22,7 +23,11 @@ func Run() {
 	log.Info().Msgf("logLevel: %v", viper.GetString("log.level"))
 	log.Info().Msgf("api version: %v", ApiVersion)
 	log.Info().Msgf("service version: %v", ServiceVersion)
-	initUser()
+	err := initUser()
+	if err != nil {
+		log.Error().Err(err).Msg("initUser error, ")
+		return
+	}
 	//err := service.InitKubeConfig()
 	//if err != nil {
 	//	panic(err)
@@ -53,5 +58,9 @@ func Run() {
 		log.Info().Msg("Listening and serving HTTP on " + address + ":" + port)
 	}
 
-	_ = r.Run(endpoint)
+	err = r.Run(endpoint)
+	if err != nil {
+		log.Error().Err(err).Msg("gin run error, ")
+		return
+	}
 }

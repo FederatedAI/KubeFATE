@@ -94,10 +94,11 @@ func (c *Cluster) outPutList(result interface{}) error {
 		return errors.New("type ClusterResultList not ok")
 	}
 	table := uitable.New()
-	table.AddRow("UUID", "NAME", "NAMESPACE", "REVISION", "STATUS", "CHART", "APP VERSION")
+	table.AddRow("UUID", "NAME", "NAMESPACE", "REVISION", "STATUS", "CHART", "ChartVERSION")
 	for _, r := range item.Data {
 		table.AddRow(r.Uuid, r.Name, r.NameSpace, r.Version, r.Status, r.ChartName, r.ChartVersion)
 	}
+	table.AddRow("")
 	return output.EncodeTable(os.Stdout, table)
 }
 
@@ -110,9 +111,8 @@ func (c *Cluster) outPutMsg(result interface{}) error {
 		return errors.New("type ClusterResultMsg not ok")
 	}
 
-	_, err := fmt.Fprintf(os.Stdout, "%s", item.Msg)
-
-	return err
+	fmt.Println(item.Msg)
+	return nil
 }
 
 func (c *Cluster) outPutErr(result interface{}) error {
@@ -124,9 +124,9 @@ func (c *Cluster) outPutErr(result interface{}) error {
 		return errors.New("type ClusterResultErr not ok")
 	}
 
-	_, err := fmt.Fprintf(os.Stdout, "%s", item.Error)
+	fmt.Println(item.Error)
 
-	return err
+	return nil
 }
 
 func (c *Cluster) outPutInfo(result interface{}) error {
@@ -146,15 +146,15 @@ func (c *Cluster) outPutInfo(result interface{}) error {
 	table.AddRow("UUID", cluster.Uuid)
 	table.AddRow("Name", cluster.Name)
 	table.AddRow("NameSpace", cluster.NameSpace)
+	table.AddRow("ChartName", cluster.ChartName)
 	table.AddRow("ChartVersion", cluster.ChartVersion)
-	table.AddRow("REVISION", cluster.Version)
+	table.AddRow("Revision", cluster.Version)
 	//table.AddRow("Type", cluster.Type)
 	table.AddRow("Status", cluster.Status)
 	table.AddRow("Values", cluster.Values)
-	table.AddRow("ChartName", cluster.ChartName)
 	table.AddRow("Config", cluster.Config)
 	table.AddRow("Info", cluster.Info)
-
+	table.AddRow("")
 	return output.EncodeTable(os.Stdout, table)
 }
 
@@ -167,6 +167,6 @@ func (c *Cluster) outPutJob(result interface{}) error {
 	if !ok {
 		return errors.New("type ClusterResult not ok")
 	}
-	fmt.Printf("create job success, job id=%s\n", item.Data.Uuid)
+	fmt.Printf("create job success, job id=%s\r\n", item.Data.Uuid)
 	return nil
 }

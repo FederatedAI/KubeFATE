@@ -45,7 +45,6 @@ var kubeFateDB *kubeFATEDatabase = nil
 
 // NewKubeFATEDatabase returns a singleton kubeFATEDatabase struct
 func newKubeFATEDatabase() error {
-	log.Debug().Msg("Initial Mongo Client with url: " + viper.GetString("mongo.url"))
 
 	tmpDd := &kubeFATEDatabase{
 		mongoURL:      viper.GetString("mongo.url"),
@@ -55,6 +54,8 @@ func newKubeFATEDatabase() error {
 		updateFlag:    false}
 
 	kubeFateDB = tmpDd
+
+	log.Debug().Msg("Initial Mongo Client with url: " + viper.GetString("mongo.url"))
 
 	return nil
 }
@@ -138,9 +139,8 @@ func ConnectDb() (*mongo.Database, error) {
 
 		opts := options.Client().ApplyURI(kubeFateDB.returnMongoInfo())
 		client, err := mongo.Connect(ctx, opts) // client
-
 		if err != nil {
-			log.Error().Msg(err.Error())
+			log.Error().Err(err).Msg("mongodb connection error, ")
 			return nil, err
 		}
 

@@ -11,10 +11,11 @@ import (
 )
 
 type ClusterArgs struct {
-	Name      string
-	Namespace string
-	Version   string
-	Data      []byte
+	Name         string `json:"name"`
+	Namespace    string `json:"namespace"`
+	ChartVersion string `json:"chart_version"`
+	Cover        bool   `json:"cover"`
+	Data         []byte `json:"data"`
 }
 
 func ClusterInstall(clusterArgs *ClusterArgs, creator string) (*db.Job, error) {
@@ -43,8 +44,12 @@ func ClusterInstall(clusterArgs *ClusterArgs, creator string) (*db.Job, error) {
 	go func() {
 		job.Status = db.Running_j
 
+		if clusterArgs.Cover {
+			_ = helmClean(clusterArgs.Name, clusterArgs.Namespace)
+		}
+
 		//create a cluster use parameter
-		cluster := db.NewCluster(clusterArgs.Name, clusterArgs.Namespace, clusterArgs.Version)
+		cluster := db.NewCluster(clusterArgs.Name, clusterArgs.Namespace, clusterArgs.ChartVersion)
 		job.ClusterId = cluster.Uuid
 
 		err := setJobByClusterId(job)
@@ -424,6 +429,11 @@ func uninstall(fc *db.Cluster) error {
 	return err
 }
 
+func helmClean(NameSpace, Name string) error {
+	_, err := service.Delete(NameSpace, Name)
+	return err
+}
+
 type Job interface {
 	save() error
 	doJob() error
@@ -449,7 +459,7 @@ func Run(j Job) (*db.Job, error) {
 
 	go func() {
 		//create a cluster use parameter
-		cluster := db.NewCluster(clusterArgs.Name, clusterArgs.Namespace,clusterArgs.Version)
+		cluster := db.NewCluster(clusterArgs.Name, clusterArgs.Namespace, clusterArgs.ChartVersion)
 		job.ClusterId = cluster.Uuid
 
 		err := install(cluster, clusterArgs.Data)
