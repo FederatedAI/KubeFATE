@@ -71,6 +71,8 @@ The details of KubeFATE service configuration, please refer to: [KubeFATE servic
 When the system admin deployed KubeFATE service and prepared the namespace for FATE. The ML Infra. Ops. is able to start FATE deployment. According to the infomations from SA, there a `config.yaml` for `kubefate` CLI is required. It contains KubeFATE access username and password, the KubeFATE service URL.
 
 ```
+log:
+  level: info
 user:
   username: admin
   password: admin
@@ -80,6 +82,7 @@ serviceurl: kubefate.net
 
 |Name       |Type    |Description                                                       |
 |-----------|--------|------------------------------------------------------------------|
+|log        |scalars |The log level of command line.                                    |
 |user       |mappings|User name and password when logging into KubeFATE service.        |
 |serviceurl |scalars |kubeFATE service's ingress domain name, defined in kubefate.yaml. |
 
