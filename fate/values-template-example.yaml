@@ -1,10 +1,7 @@
 name: fate-10000
 namespaces: fate-10000
-version: v1.3.0
+version: v1.3.0-a
 partyId: 10000
-exchange:
-  ip: 192.168.1.1
-  port: 9371
 modules:
   - proxy
   - egg
@@ -24,6 +21,8 @@ proxy:
   - partyId: 8888
     partyIp: 192.168.1.10
     partyPort: 30008
-
+  exchange:
+    ip: 192.168.1.1
+    port: 30000
 egg:
-  count: 1
+  count: 3

@@ -4,23 +4,99 @@
 ########################################################
 
 {{ if .Values.modules.proxy.include }}
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: proxy-config
+  labels:
+    fateMoudle: proxy
+    name: {{ .Values.partyName | quote  }}
+    partyId: {{ .Values.partyId | quote }}
+    owner: kubefate
+    cluster: fate
+data:
+  proxy.properties: |
+    coordinator={{ .Values.partyId }}
+    ip=0.0.0.0
+    port=9370
+    route.table=/data/projects/fate/proxy/conf/route_table.json
+    #server.crt=/Users/max-webank/Projects/fdn/fdn-proxy/src/main/resources/certs/server.crt
+    #server.key=/Users/max-webank/Projects/fdn/fdn-proxy/src/main/resources/certs/server-private.pem
+    root.crt=
+  route_table.json: |
+    {
+        "route_table": {
+            "default": {
+                "default": [
+                    {
+                      {{- if .Values.exchange -}}
+                        "ip": "{{ .Values.exchange.partyIp }}",
+                        "port": {{ .Values.exchange.partyPort }}
+                      {{- else -}}
+                        "ip": "proxy",
+                        "port": 9370
+                      {{- end -}}
+                    }
+                ]
+            },
+            {{- range .Values.partyList }}
+            "{{ .partyId }}": {
+                "default": [
+                    {
+                        "ip": "{{ .partyIp }}",
+                        "port": "{{ .partyPort }}"
+                    }
+                ]
+            },
+            {{- end }}
+            "{{ .Values.partyId }}": {
+                "fate": [
+                    {
+                        "ip": "{{ .Values.modules.federation.ip }}",
+                        "port": 9394
+                    }
+                ],
+                "fateflow": [
+                    {
+                        "ip": "{{ .Values.modules.fateflow.ip }}",
+                        "port": 9360
+                    }
+                ]
+            }
+        },
+        "permission": {
+            "default_allow": true
+        }
+    }
+---
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  labels:
-    {{ .Values.partyId }}: proxy
   name: proxy
+  labels:
+    fateMoudle: proxy
+    name: {{ .Values.partyName  | quote  }}
+    partyId: {{ .Values.partyId | quote  }}
+    owner: kubefate
+    cluster: fate
 spec:
   replicas: 1
   strategy:
     type: Recreate
   selector:
     matchLabels:
-      {{ .Values.partyId }}: proxy
+      fateMoudle: proxy
+      name: {{ .Values.partyName  | quote }}
+      partyId: {{ .Values.partyId | quote  }}
   template:
     metadata:
       labels:
-        {{ .Values.partyId }}: proxy
+        fateMoudle: proxy
+        name: {{ .Values.partyName | quote  }}
+        partyId: {{ .Values.partyId | quote  }}
+        owner: kubefate
+        cluster: fate
     spec:
       containers:
         - image: {{ .Values.image.registry }}/proxy:{{ .Values.image.tag }}
@@ -49,7 +125,11 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    {{ .Values.partyId }}: proxy
+    fateMoudle: proxy
+    name: {{ .Values.partyName | quote  }}
+    partyId: {{ .Values.partyId | quote }}
+    owner: kubefate
+    cluster: fate
   name: proxy
 spec:
   ports:
@@ -60,6 +140,8 @@ spec:
       protocol: TCP
   type: {{ .Values.modules.proxy.type }}
   selector:
-    {{ .Values.partyId }}: proxy
+    fateMoudle: proxy
+    name: {{ .Values.partyName }}
+    partyId: {{ .Values.partyId | quote  }}
 ---
 {{ end }}

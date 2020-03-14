@@ -4,23 +4,49 @@
 ########################################################
 
 {{ if .Values.modules.roll.include }}
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: roll-config
+  labels:
+    name: {{ .Values.partyName | quote  }}
+    partyId: {{ .Values.partyId | quote  }}
+    owner: kubefate
+    cluster: fate
+data:
+  roll.properties: |
+    party.id={{ .Values.partyId }}
+    service.port=8011
+    meta.service.ip={{ .Values.modules.metaService.ip }}
+    meta.service.port=8590
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  labels:
-    {{ .Values.partyId }}: roll
   name: roll
+  labels:
+    fateMoudle: roll
+    name: {{ .Values.partyName | quote  }}
+    partyId: {{ .Values.partyId | quote  }}
+    owner: kubefate
+    cluster: fate
 spec:
   replicas: 1
   strategy:
     type: Recreate
   selector:
     matchLabels:
-      {{ .Values.partyId }}: roll
+      fateMoudle: roll
+      name: {{ .Values.partyName | quote  }}
+      partyId: {{ .Values.partyId | quote  }}
   template:
     metadata:
       labels:
-        {{ .Values.partyId }}: roll
+        fateMoudle: roll
+        name: {{ .Values.partyName | quote  }}
+        partyId: {{ .Values.partyId | quote  }}
+        owner: kubefate
+        cluster: fate
     spec:
       containers:
         - image: {{ .Values.image.registry }}/roll:{{ .Values.image.tag }}
@@ -46,7 +72,11 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    {{ .Values.partyId }}: roll
+    fateMoudle: roll
+    name: {{ .Values.partyName | quote  }}
+    partyId: {{ .Values.partyId | quote  }}
+    owner: kubefate
+    cluster: fate
   name: roll
 spec:
   ports:
@@ -56,6 +86,8 @@ spec:
       protocol: TCP
   type: {{ .Values.modules.roll.type }}
   selector:
-    {{ .Values.partyId }}: roll
+    fateMoudle: roll
+    name: {{ .Values.partyName  | quote }}
+    partyId: {{ .Values.partyId | quote  }}
 ---
 {{ end }}
