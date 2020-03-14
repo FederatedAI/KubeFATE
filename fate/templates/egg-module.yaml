@@ -4,25 +4,127 @@
 ########################################################
 
 {{ if .Values.modules.egg.include }}
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: egg-config
+  labels:
+    fateMoudle: egg
+    name: {{ .Values.partyName | quote  }}
+    partyId: {{ .Values.partyId | quote  }}
+    owner: kubefate
+    cluster: fate
+data:
+  egg.properties: |
+    party.id={{ .Values.partyId }}
+    service.port=7888
+    eggroll.computing.engine.names=processor
+    eggroll.computing.processor.bootstrap.script=/data/projects/fate/eggroll/egg/conf/processor-starter.sh
+    eggroll.computing.processor.start.port=50000
+    eggroll.computing.processor.venv=/data/projects/python/venv
+    eggroll.computing.processor.engine-path=/data/projects/fate/eggroll/python/eggroll/computing/processor.py
+    eggroll.computing.processor.data-dir=/data/projects/fate/data-dir
+    eggroll.computing.processor.logs-dir=/data/projects/fate/eggroll/python/eggroll/logs/processor
+    eggroll.computing.processor.session.max.count=16
+    eggroll.computing.processor.python-path=/data/projects/fate/python:/data/projects/fate/eggroll/python
+  processor-starter.sh: |
+    #!/bin/bash
+    
+    ONE_ARG_LIST=(
+        "venv"
+        "python-path"
+        "engine-path"
+        "port"
+        "data-dir"
+        "logs-dir"
+        "node-manager"
+        "engine-addr"
+    )
+    
+    opts=$(getopt \
+        --longoptions "$(printf "%s:," "${ONE_ARG_LIST[@]}")" \
+        --name "$(basename "$0")" \
+        --options "" \
+        -- "$@"
+    )
+    
+    while [[ $# -gt 0 ]]; do
+       case "$1" in
+            --venv)
+                venv=$2
+                shift 2
+                ;;
+            --python-path)
+                python_path=$2
+                shift 2
+                ;;
+            --engine-path)
+                engine_path=$2
+                shift 2
+                ;;
+            --port)
+                port=$2
+                shift 2
+                ;;
+            --data-dir)
+                data_dir=$2
+                shift 2
+                ;;
+            --logs-dir)
+                logs_dir=$2
+                shift 2
+                ;;
+            --node-manager)
+                node_manager=$2
+                shift 2
+                ;;
+            --engine-addr)
+                engine_addr=$2
+                shift 2
+                ;;
+            *)
+                break
+                ;;
+        esac
+    done
+    
+    source ${venv}/bin/activate
+    export PYTHONPATH=$PYTHONPATH:${python_path}
+    PYTHON=${venv}/bin/python
+    cmd="python ${engine_path} -p ${port} -d ${data_dir} -m ${node_manager} -a $(hostname -I | awk '{print $1}')"
+    
+    mkdir -p ${logs_dir}
+    ${cmd} >> ${logs_dir}/processor-${port}.log 2>&1
+---
 {{- $root := . -}}
 {{- range .Values.eggList }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  labels:
-    {{ $root.Values.partyId }}: {{ .egg }}
   name: {{ .egg }}
+  labels:
+    fateMoudle: {{ .egg | quote  }}
+    name: {{ $root.Values.partyName | quote  }}
+    partyId: {{ $root.Values.partyId | quote  }}
+    owner: kubefate
+    cluster: fate
 spec:
   replicas: 1
   strategy:
     type: Recreate
   selector:
     matchLabels:
-      {{ $root.Values.partyId }}: {{ .egg }}
+      fateMoudle: {{ .egg | quote  }}
+      name: {{ $root.Values.partyName | quote  }}
+      partyId: {{ $root.Values.partyId | quote  }}
   template:
     metadata:
       labels:
-        {{ $root.Values.partyId }}: {{ .egg }}
+        fateMoudle: {{ .egg | quote  }}
+        name: {{ $root.Values.partyName | quote  }}
+        partyId: {{ $root.Values.partyId | quote  }}
+        owner: kubefate
+        cluster: fate
     spec:
       hostAliases:
       - ip: "127.0.0.1"
@@ -82,7 +184,11 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    {{ $root.Values.partyId }}: {{ .egg }}
+    fateMoudle: {{ .egg | quote  }}
+    name: {{ $root.Values.partyName | quote  }}
+    partyId: {{ $root.Values.partyId | quote  }}
+    owner: kubefate
+    cluster: fate
   name: {{ .egg }}
 spec:
   ports:
@@ -96,7 +202,9 @@ spec:
       protocol: TCP
   type: {{ $root.Values.modules.egg.type }}
   selector:
-    {{ $root.Values.partyId }}: {{ .egg }}
+    fateMoudle: {{ .egg | quote  }}
+    name: {{ $root.Values.partyName | quote  }}
+    partyId: {{ $root.Values.partyId | quote  }}
 ---
 {{- end }}
 {{ end }}

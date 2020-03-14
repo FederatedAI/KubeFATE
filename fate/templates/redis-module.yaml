@@ -4,23 +4,49 @@
 ########################################################
 
 {{ if .Values.modules.redis.include }}
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: redis-config
+  labels:
+    fateMoudle: redis
+    name: {{ .Values.partyName | quote  }}
+    partyId: {{ .Values.partyId  | quote }}
+    owner: kubefate
+    cluster: fate
+data:
+  redis.conf: |
+    bind 0.0.0.0
+    databases 50
+    always-show-logo yes
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: redis
   labels:
-    {{ .Values.partyId }}: redis
+    fateMoudle: redis
+    name: {{ .Values.partyName | quote  }}
+    partyId: {{ .Values.partyId | quote  }}
+    owner: kubefate
+    cluster: fate
 spec:
   replicas: 1
   strategy:
     type: Recreate
   selector:
     matchLabels:
-      {{ .Values.partyId }}: redis
+      fateMoudle: redis
+      name: {{ .Values.partyName | quote  }}
+      partyId: {{ .Values.partyId | quote  }}
   template:
     metadata:
       labels:
-        {{ .Values.partyId }}: redis
+        fateMoudle: redis
+        name: {{ .Values.partyName | quote  }}
+        partyId: {{ .Values.partyId | quote  }}
+        owner: kubefate
+        cluster: fate
     spec:
       containers:
         {{ if .Values.image.isThridParty}}
@@ -68,7 +94,11 @@ kind: Service
 metadata:
   name: redis
   labels:
-    {{ .Values.partyId }}: redis
+    fateMoudle: redis
+    name: {{ .Values.partyName | quote  }}
+    partyId: {{ .Values.partyId | quote  }}
+    owner: kubefate
+    cluster: fate
 spec:
   ports:
     - name: "6379"
@@ -77,6 +107,8 @@ spec:
       protocol: TCP
   type: {{ .Values.modules.redis.type }}
   selector:
-    {{ .Values.partyId }}: redis
+    fateMoudle: redis
+    name: {{ .Values.partyName | quote  }}
+    partyId: {{ .Values.partyId | quote  }}
 ---
 {{ end }}

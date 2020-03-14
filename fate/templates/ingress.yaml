@@ -7,9 +7,13 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: fateboard-ingress
-  annotations:
-    kubernetes.io/ingress.class: "nginx"
+  name: fateboard
+  labels:
+    fateMoudle: fateboard
+    name: {{ .Values.partyName | quote  }}
+    partyId: {{ .Values.partyId | quote  }}
+    owner: kubefate
+    cluster: fate
 spec:
   rules:
   - host: {{ .Values.host.fateboard }}

@@ -4,23 +4,54 @@
 ########################################################
 
 {{ if .Values.modules.metaService.include }}
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: meta-service-config
+  labels:
+    fateMoudle: meta-service
+    name: {{ .Values.partyName | quote  }}
+    partyId: {{ .Values.partyId | quote  }}
+    owner: kubefate
+    cluster: fate
+data:
+  meta-service.properties: |
+    party.id={{ .Values.partyId }}
+    service.port=8590
+    
+    jdbc.driver.classname=com.mysql.cj.jdbc.Driver
+    jdbc.url=jdbc:mysql://{{ .Values.modules.mysql.ip }}:3306/{{ .Values.mysql.mysql_database | default "fate" }}?useSSL=false&serverTimezone=UTC&characterEncoding=utf8&allowPublicKeyRetrieval=true
+    jdbc.username={{ .Values.mysql.mysql_user | default "fate" }}
+    jdbc.password={{ .Values.mysql.mysql_password | default "fate_dev" }}
+    target.project=meta-service
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  labels:
-    {{ .Values.partyId }}: meta-service
   name: meta-service
+  labels:
+    fateMoudle: meta-service
+    name: {{ .Values.partyName | quote  }}
+    partyId: {{ .Values.partyId | quote  }}
+    owner: kubefate
+    cluster: fate
 spec:
   replicas: 1
   strategy:
     type: Recreate
   selector:
     matchLabels:
-      {{ .Values.partyId }}: meta-service
+      fateMoudle: meta-service
+      name: {{ .Values.partyName | quote  }}
+      partyId: {{ .Values.partyId | quote  }}
   template:
     metadata:
       labels:
-        {{ .Values.partyId }}: meta-service
+        fateMoudle: meta-service
+        name: {{ .Values.partyName | quote  }}
+        partyId: {{ .Values.partyId | quote  }}
+        owner: kubefate
+        cluster: fate
     spec:
       containers:
         - image: {{ .Values.image.registry }}/meta-service:{{ .Values.image.tag }}
@@ -45,9 +76,13 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  labels:
-    {{ .Values.partyId }}: meta-service
   name: meta-service
+  labels:
+    fateMoudle: meta-service
+    name: {{ .Values.partyName | quote  }}
+    partyId: {{ .Values.partyId | quote  }}
+    owner: kubefate
+    cluster: fate
 spec:
   ports:
     - name: "8590"
@@ -56,6 +91,8 @@ spec:
       protocol: TCP
   type: {{ .Values.modules.metaService.type }}
   selector:
-    {{ .Values.partyId }}: meta-service
+    fateMoudle: meta-service
+    name: {{ .Values.partyName | quote  }}
+    partyId: {{ .Values.partyId | quote  }}
 ---
 {{ end }}

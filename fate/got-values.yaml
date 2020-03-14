@@ -11,10 +11,6 @@ partyName: fate-10000
 host:
   fateboard: 10000.fateboard.kubefate.net
 nodePort: 
-
-exchange:
-  partyIp: 10.184.111.187
-  partyPort: 30000
 mysql:
   mysql_root_password: fate_dev
   mysql_database: fate
@@ -23,9 +19,9 @@ mysql:
 redis:
   requirepass: fate_dev
 eggList:
-  - egg: egg
+  - egg: egg0
     nodeLabel: fedai.org
-    value: 
+    value:
 nodeSelector:
   fateboard:
     nodeLabel: fedai.org
@@ -54,12 +50,11 @@ nodeSelector:
   servingServer:
     nodeLabel: fedai.org
     value: 
-
-modules:
+modules: 
   proxy: 
     include: true
     ip: proxy
-    type: ClusterIP
+    type: NodePort
   egg: 
     include: true
     ip: egg

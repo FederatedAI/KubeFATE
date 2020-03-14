@@ -7,18 +7,23 @@ image:
   tag: 1.3.0-release
   pullPolicy: IfNotPresent
 partyId: {{ .partyId }}
+partyName: {{ .name }}
 host:
   fateboard: {{ .partyId }}.fateboard.kubefate.net
-nodePort: {{ .proxy.nodePort }}
+nodePort: {{ with .proxy }}{{ .nodePort }}{{ end }}
 
+{{- with .proxy.exchange }}
 exchange:
-  partyIp: {{ .exchange.ip }}
-  partyPort: {{ .exchange.port }}
-{{- range .proxy.partyList }}
+  partyIp: {{ .ip }}
+  partyPort: {{ .port }}
+{{- end }}
+{{- with .proxy }}
 partyList:
+{{- range .partyList }}
   - partyId: {{ .partyId }}
     partyIp: {{ .partyIp }}
     partyPort: {{ .partyPort }}
+{{- end }}
 {{- end }}
 mysql:
   mysql_root_password: fate_dev
@@ -28,11 +33,13 @@ mysql:
 redis:
   requirepass: fate_dev
 eggList:
+{{ with .egg }}
 {{- range .egg.count | int | until }}
   - egg: egg{{ . }}
     nodeLabel: fedai.org
     value:
 {{- end }}
+{{ end }}
 nodeSelector:
   fateboard:
     nodeLabel: fedai.org
