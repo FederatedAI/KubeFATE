@@ -1,0 +1,9 @@
+*.git
+*.todo
+*.helmignore
+fate/*-values.yaml
+*/temp*
+*/*/temp*
+temp?
+*.idea/
+*test*

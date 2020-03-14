@@ -1,4 +1,4 @@
 #!/bin/bash
 
-helm package ./fate/
+helm package ./fate/ -d package/
 helm repo index .
