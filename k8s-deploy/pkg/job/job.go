@@ -143,7 +143,12 @@ func ClusterInstall(clusterArgs *ClusterArgs, creator string) (*db.Job, error) {
 
 		deleteJob(job)
 
-		log.Debug().Interface("job", job).Msg("job run success")
+		if job.Status == db.Success_j {
+			log.Debug().Interface("job", job).Msg("job run success")
+		} else {
+			log.Warn().Interface("job", job).Msg("job run failed")
+		}
+
 	}()
 
 	return job, nil
@@ -264,7 +269,11 @@ func ClusterUpdate(clusterArgs *ClusterArgs, creator string) (*db.Job, error) {
 			log.Error().Err(err).Str("jobId", job.Uuid).Msg("update job By Uuid error")
 		}
 		deleteJob(job)
-		log.Debug().Interface("job", job).Msg("job run success")
+		if job.Status == db.Success_j {
+			log.Debug().Interface("job", job).Msg("job run success")
+		} else {
+			log.Warn().Interface("job", job).Msg("job run failed")
+		}
 	}()
 
 	return job, nil
@@ -366,7 +375,11 @@ func ClusterDelete(clusterId string, creator string) (*db.Job, error) {
 			log.Err(err).Str("jobId", job.Uuid).Msg("update job By Uuid error")
 		}
 		deleteJob(job)
-		log.Debug().Interface("job", job).Msg("job run success")
+		if job.Status == db.Success_j {
+			log.Debug().Interface("job", job).Msg("job run success")
+		} else {
+			log.Warn().Interface("job", job).Msg("job run failed")
+		}
 	}()
 
 	return job, nil

@@ -142,16 +142,19 @@ func (fc *FateChart) GetChartValues(v map[string]interface{}) (map[string]interf
 	template, err := fc.GetChartValuesTemplates()
 	if err != nil {
 		log.Err(err).Msg("GetChartValuesTemplates error")
+		return nil, err
 	}
 	values, err := MapToConfig(v, template)
 	if err != nil {
 		log.Err(err).Msg("MapToConfig error")
+		return nil, err
 	}
 	// values to map
 	vals := make(map[string]interface{})
 	err = yaml.Unmarshal([]byte(values), &vals)
 	if err != nil {
 		log.Err(err).Msg("values yaml Unmarshal error")
+		return nil, err
 	}
 	return vals, nil
 }
