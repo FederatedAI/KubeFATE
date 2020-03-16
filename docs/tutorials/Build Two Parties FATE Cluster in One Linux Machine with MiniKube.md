@@ -41,7 +41,7 @@ The connection to the server localhost:8080 was refused - did you specify the ri
 ```
 ### Install MiniKube
 ```
-curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64 && mv minikube-linux-amd64 minikube && chmod +x minikube && sudo mv ./minikube /usr/bin
+curl -LO https://github.com/kubernetes/minikube/releases/download/v1.7.3/minikube-linux-amd64 && mv minikube-linux-amd64 minikube && chmod +x minikube && sudo mv ./minikube /usr/bin
 ```
 Try to verify if MiniKube installed,
 ```
@@ -52,7 +52,7 @@ commit: 436667c819c324e35d7e839f8116b968a2d0a3ff
 ### Download KubeFATE Release Pack and Install KubeFATE Command Lines
 Go to [KubeFATE Release](https://github.com/FederatedAI/KubeFATE/releases), and find the latest kubefate-k8s release pack. 
 ```
-curl -LO https://github.com/FederatedAI/KubeFATE/releases/download/v1.3.0/kubefate-k8s-v1.3.0-a.tar.gz && tar -xzf ./kubefate-k8s-v1.3.0-a.tar.gz
+curl -LO https://github.com/FederatedAI/KubeFATE/releases/download/v1.3.0-a/kubefate-k8s-v1.3.0-a.tar.gz && tar -xzf ./kubefate-k8s-v1.3.0-a.tar.gz
 ```
 Then we will get the release pack of KubeFATE, verify it,
 ```
