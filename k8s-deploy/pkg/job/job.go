@@ -56,7 +56,7 @@ func ClusterInstall(clusterArgs *ClusterArgs, creator string) (*db.Job, error) {
 
 		if job.Status == db.Running_j {
 			cluster.Status = db.Creating_c
-			cluster.Version += 1
+
 			_, err = db.Save(cluster)
 			if err != nil {
 				log.Error().Err(err).Interface("cluster", cluster).Msg("save cluster error")
@@ -119,6 +119,7 @@ func ClusterInstall(clusterArgs *ClusterArgs, creator string) (*db.Job, error) {
 		//todo save cluster to db
 		if job.Status == db.Success_j {
 			cluster.Status = db.Running_c
+			cluster.Revision += 1
 			err = db.UpdateByUUID(cluster, job.ClusterId)
 			if err != nil {
 				log.Error().Err(err).Interface("cluster", cluster).Msg("update cluster error")
@@ -143,7 +144,12 @@ func ClusterInstall(clusterArgs *ClusterArgs, creator string) (*db.Job, error) {
 
 		deleteJob(job)
 
-		log.Debug().Interface("job", job).Msg("job run success")
+		if job.Status == db.Success_j {
+			log.Debug().Interface("job", job).Msg("job run success")
+		} else {
+			log.Warn().Interface("job", job).Msg("job run failed")
+		}
+
 	}()
 
 	return job, nil
@@ -194,8 +200,8 @@ func ClusterUpdate(clusterArgs *ClusterArgs, creator string) (*db.Job, error) {
 		}
 
 		cluster.Status = db.Updating_c
-		cluster.Version += 1
-		err = db.UpdateByUUID(cluster, job.ClusterId)
+
+		err = db.UpdateByUUID(cluster, cluster.Uuid)
 		if err != nil {
 			log.Error().Err(err).Interface("cluster", cluster).Msg("update cluster error")
 		}
@@ -240,6 +246,7 @@ func ClusterUpdate(clusterArgs *ClusterArgs, creator string) (*db.Job, error) {
 		// save cluster to db
 		if job.Status == db.Success_j {
 			cluster.Status = db.Running_c
+			cluster.Revision += 1
 			err = db.UpdateByUUID(cluster, job.ClusterId)
 			if err != nil {
 				log.Error().Err(err).Interface("cluster", cluster).Msg("update cluster error")
@@ -251,7 +258,8 @@ func ClusterUpdate(clusterArgs *ClusterArgs, creator string) (*db.Job, error) {
 		if job.Status != db.Success_j && job.Status != db.Canceled_j {
 			//todo helm rollBack
 
-			err = db.UpdateByUUID(cluster_old, job.ClusterId)
+
+			err = db.UpdateByUUID(cluster_old, cluster_old.Uuid)
 			if err != nil {
 				log.Error().Err(err).Interface("cluster", cluster).Msg("rollBACK cluster error")
 			}
@@ -264,7 +272,11 @@ func ClusterUpdate(clusterArgs *ClusterArgs, creator string) (*db.Job, error) {
 			log.Error().Err(err).Str("jobId", job.Uuid).Msg("update job By Uuid error")
 		}
 		deleteJob(job)
-		log.Debug().Interface("job", job).Msg("job run success")
+		if job.Status == db.Success_j {
+			log.Debug().Interface("job", job).Msg("job run success")
+		} else {
+			log.Warn().Interface("job", job).Msg("job run failed")
+		}
 	}()
 
 	return job, nil
@@ -342,13 +354,13 @@ func ClusterDelete(clusterId string, creator string) (*db.Job, error) {
 			job.Result = "Job canceled"
 		}
 
-		if job.Status == db.Success_j {
+		//if job.Status == db.Success_j {
 			err = db.ClusterDeleteByUUID(clusterId)
 			if err != nil {
 				log.Err(err).Interface("cluster", cluster).Msg("db delete cluster error")
 			}
 			log.Debug().Str("clusterUuid", clusterId).Msg("db delete cluster success")
-		}
+		//}
 
 		//// rollBACK
 		//if job.Status == db.Failed_j {
@@ -366,7 +378,11 @@ func ClusterDelete(clusterId string, creator string) (*db.Job, error) {
 			log.Err(err).Str("jobId", job.Uuid).Msg("update job By Uuid error")
 		}
 		deleteJob(job)
-		log.Debug().Interface("job", job).Msg("job run success")
+		if job.Status == db.Success_j {
+			log.Debug().Interface("job", job).Msg("job run success")
+		} else {
+			log.Warn().Interface("job", job).Msg("job run failed")
+		}
 	}()
 
 	return job, nil
@@ -401,26 +417,16 @@ func install(fc *db.Cluster, values []byte) error {
 }
 
 func upgrade(fc *db.Cluster, values []byte) error {
-	err := service.RepoAddAndUpdate()
+
+	err := uninstall(fc)
 	if err != nil {
 		return err
 	}
-	v := new(service.Value)
-	v.Val = values
-	v.T = "json"
-	fc.Values = string(values)
-	result, err := service.Upgrade(fc.NameSpace, fc.Name, fc.ChartVersion, v)
+	err = install(fc,values)
 	if err != nil {
 		return err
 	}
-
-	fc.ChartName = result.ChartName
-	fc.NameSpace = result.Namespace
-	fc.ChartVersion = result.ChartVersion
-	fc.ChartValues = result.ChartValues
-
 	return nil
-
 }
 func uninstall(fc *db.Cluster) error {
 

@@ -111,7 +111,7 @@ func TestFindClusterFindByUUID(t *testing.T) {
 				Uuid:      "2f41aabe-1610-4e4a-bc1c-9b24e9f8ec11",
 				Name:      "fate-8888",
 				NameSpace: "fate-8888",
-				Version:   1,
+				Revision:  1,
 				Metadata:  map[string]interface{}{},
 				Status:    Creating_c,
 			},
@@ -189,7 +189,7 @@ func TestFindClusterList(t *testing.T) {
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("FindClusterList() = %v, want %v", got, tt.want)
+				t.Errorf("FindClusterList() = %+v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -298,7 +298,7 @@ func TestCluster_IsExisted(t *testing.T) {
 				Uuid:         tt.fields.Uuid,
 				Name:         tt.fields.Name,
 				NameSpace:    tt.fields.NameSpace,
-				Version:      tt.fields.Version,
+				Revision:     tt.fields.Version,
 				ChartVersion: tt.fields.ChartVersion,
 				ChartValues:  tt.fields.ChartValues,
 				Values:       tt.fields.Values,

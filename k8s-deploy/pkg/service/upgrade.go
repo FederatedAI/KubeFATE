@@ -38,7 +38,7 @@ func Upgrade(namespace, name, chartVersion string, value *Value) (*Result, error
 		log.Err(err).Msg("GetFateChart error")
 		return nil,err
 	}
-	log.Debug().Interface("FateChart", fc).Msg("GetFateChart success")
+	log.Debug().Interface("FateChartName", fc.Name).Interface("FateChartVersion", fc.Version).Msg("GetFateChart success")
 
 	// fateChart to helmChart
 	ch, err := fc.ToHelmChart()

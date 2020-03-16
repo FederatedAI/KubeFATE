@@ -124,7 +124,7 @@ func ChartRequestedTohelmChart(chartRequested *chart.Chart) (*db.HelmChart, erro
 	}
 
 	helmChart := db.NewHelmChart(chartRequested.Name(),
-		chartData, valuesData, chartRequested.Templates,chartRequested.Metadata.Version, chartRequested.AppVersion())
+		chartData, valuesData, chartRequested.Templates, chartRequested.Metadata.Version, chartRequested.AppVersion())
 
 	helmChart.ValuesTemplate = ValuesTemplate
 	return helmChart, nil
@@ -142,16 +142,19 @@ func (fc *FateChart) GetChartValues(v map[string]interface{}) (map[string]interf
 	template, err := fc.GetChartValuesTemplates()
 	if err != nil {
 		log.Err(err).Msg("GetChartValuesTemplates error")
+		return nil, err
 	}
 	values, err := MapToConfig(v, template)
 	if err != nil {
-		log.Err(err).Msg("MapToConfig error")
+		log.Err(err).Interface("v", v).Interface("template", template).Msg("MapToConfig error")
+		return nil, err
 	}
 	// values to map
 	vals := make(map[string]interface{})
 	err = yaml.Unmarshal([]byte(values), &vals)
 	if err != nil {
 		log.Err(err).Msg("values yaml Unmarshal error")
+		return nil, err
 	}
 	return vals, nil
 }
