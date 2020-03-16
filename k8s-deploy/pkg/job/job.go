@@ -256,7 +256,7 @@ func ClusterUpdate(clusterArgs *ClusterArgs, creator string) (*db.Job, error) {
 		if job.Status != db.Success_j && job.Status != db.Canceled_j {
 			//todo helm rollBack
 
-			err = db.UpdateByUUID(cluster_old, job.ClusterId)
+			err = db.UpdateByUUID(cluster_old, cluster_old.Uuid)
 			if err != nil {
 				log.Error().Err(err).Interface("cluster", cluster).Msg("rollBACK cluster error")
 			}
@@ -351,13 +351,13 @@ func ClusterDelete(clusterId string, creator string) (*db.Job, error) {
 			job.Result = "Job canceled"
 		}
 
-		if job.Status == db.Success_j {
+		//if job.Status == db.Success_j {
 			err = db.ClusterDeleteByUUID(clusterId)
 			if err != nil {
 				log.Err(err).Interface("cluster", cluster).Msg("db delete cluster error")
 			}
 			log.Debug().Str("clusterUuid", clusterId).Msg("db delete cluster success")
-		}
+		//}
 
 		//// rollBACK
 		//if job.Status == db.Failed_j {
