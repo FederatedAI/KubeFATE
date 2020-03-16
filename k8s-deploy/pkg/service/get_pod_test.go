@@ -3,6 +3,7 @@ package service
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	"k8s.io/client-go/rest"
 )
@@ -53,7 +54,7 @@ func Test_checkClusterStatus(t *testing.T) {
 
 func TestGetPods(t *testing.T) {
 	type args struct {
-		name string
+		name      string
 		namespace string
 	}
 	tests := []struct {
@@ -65,21 +66,130 @@ func TestGetPods(t *testing.T) {
 		{
 			name: "",
 			args: args{
-				name: "fate-10000",
+				name:      "fate-10000",
+				namespace: "fate-10000",
+			},
+			wantErr: false,
+		},
+		{
+			name: "",
+			args: args{
+				name:      "fate-10000",
+				namespace: "fate-10000",
+			},
+			wantErr: false,
+		},
+		{
+			name: "",
+			args: args{
+				name:      "fate-10000",
+				namespace: "fate-10000",
+			},
+			wantErr: false,
+		},
+		{
+			name: "",
+			args: args{
+				name:      "fate-10000",
+				namespace: "fate-10000",
+			},
+			wantErr: false,
+		},
+		{
+			name: "",
+			args: args{
+				name:      "fate-10000",
+				namespace: "fate-10000",
+			},
+			wantErr: false,
+		},
+		{
+			name: "",
+			args: args{
+				name:      "fate-10000",
+				namespace: "fate-10000",
+			},
+			wantErr: false,
+		},
+		{
+			name: "",
+			args: args{
+				name:      "fate-10000",
+				namespace: "fate-10000",
+			},
+			wantErr: false,
+		},
+		{
+			name: "",
+			args: args{
+				name:      "fate-10000",
+				namespace: "fate-10000",
+			},
+			wantErr: false,
+		},
+		{
+			name: "",
+			args: args{
+				name:      "fate-10000",
+				namespace: "fate-10000",
+			},
+			wantErr: false,
+		},
+		{
+			name: "",
+			args: args{
+				name:      "fate-10000",
+				namespace: "fate-10000",
+			},
+			wantErr: false,
+		},
+		{
+			name: "",
+			args: args{
+				name:      "fate-10000",
+				namespace: "fate-10000",
+			},
+			wantErr: false,
+		},
+		{
+			name: "",
+			args: args{
+				name:      "fate-10000",
+				namespace: "fate-10000",
+			},
+			wantErr: false,
+		},
+		{
+			name: "",
+			args: args{
+				name:      "fate-10000",
+				namespace: "fate-10000",
+			},
+			wantErr: false,
+		},
+		{
+			name: "",
+			args: args{
+				name:      "fate-10000",
 				namespace: "fate-10000",
 			},
 			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
+		time.Sleep(time.Second)
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := GetPods(tt.args.name,tt.args.namespace)
+			labelSelector := fmt.Sprintf("name=%s", tt.args.namespace)
+			got, err := GetPods(tt.args.namespace, labelSelector)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("GetPods() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			fmt.Println("Namespace, Name, Status")
 			for _, v := range got.Items {
+				for _, vv := range v.Status.ContainerStatuses {
+					fmt.Println(vv.State.String())
+				}
 				fmt.Printf("%s, %s, %s\n", v.Namespace, v.Name, v.Status.Phase)
 			}
 		})

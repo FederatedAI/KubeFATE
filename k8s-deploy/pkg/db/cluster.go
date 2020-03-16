@@ -13,8 +13,8 @@ type Cluster struct {
 	Uuid      string `json:"uuid"`
 	Name      string `json:"name"`
 	NameSpace string `json:"namespaces"`
-	// Cluster version
-	Version int `json:"version"`
+	// Cluster revision
+	Revision int `json:"revision"`
 	// Helm chart version, example: fate v1.2.0
 	ChartVersion string                 `json:"chart_version"`
 	ChartValues  map[string]interface{} `json:"chart_values"`
@@ -118,7 +118,7 @@ func NewCluster(name string, nameSpaces, chartVersion string) *Cluster {
 		Uuid:         uuid.NewV4().String(),
 		Name:         name,
 		NameSpace:    nameSpaces,
-		Version:      0,
+		Revision:     0,
 		Status:       Creating_c,
 		ChartVersion: chartVersion,
 	}
@@ -146,7 +146,7 @@ func ClusterFindByUUID(uuid string) (*Cluster, error) {
 // ClusterFindByName get cluster from via name
 func ClusterFindByName(name, namespace string) (*Cluster, error) {
 
-	filter := bson.M{"name": name, "namespace": namespace}
+	filter := bson.M{"name": name, "namespace": namespace, "status": Running_c}
 	result, err := FindOneByFilter(new(Cluster), filter)
 	if err != nil {
 		return nil, err

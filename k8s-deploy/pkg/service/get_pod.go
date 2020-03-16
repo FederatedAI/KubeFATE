@@ -18,6 +18,11 @@ func GetPods(namespace, LabelSelector string) (*v1.PodList, error) {
 
 func checkPodStatus(pods *v1.PodList, ) bool {
 	for _, v := range pods.Items {
+		for _, vv := range v.Status.ContainerStatuses {
+			if vv.State.Running == nil {
+				return false
+			}
+		}
 		if v.Status.Phase != v1.PodRunning {
 			return false
 		}
@@ -38,7 +43,7 @@ func CheckClusterStatus(name, namespace string) (bool, error) {
 	return checkPodStatus(list), nil
 }
 
-func GetPodList(name,namespace string) ([]string, error) {
+func GetPodList(name, namespace string) ([]string, error) {
 	var labelSelector string
 	labelSelector = fmt.Sprintf("name=%s", name)
 	list, err := GetPods(namespace, labelSelector)

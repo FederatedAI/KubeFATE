@@ -67,7 +67,7 @@ func TestClusterInstall(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := ClusterInstall(tt.args.clusterArgs,"test")
+			got, err := ClusterInstall(tt.args.clusterArgs, "test")
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ClusterInstall() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -101,8 +101,52 @@ func TestClusterDelete(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got,_ := ClusterDelete(tt.args.clusterId,"test"); !reflect.DeepEqual(got, tt.want) {
+			if got, _ := ClusterDelete(tt.args.clusterId, "test"); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("ClusterDelete() = %v, want %v", got, tt.want)
+			}
+			time.Sleep(30 * time.Second)
+		})
+	}
+}
+
+func TestClusterUpdate(t *testing.T) {
+	InitConfigForTest()
+	type args struct {
+		clusterArgs *ClusterArgs
+		creator     string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *db.Job
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+		{
+			name:    "",
+			args:    args{
+				clusterArgs: &ClusterArgs{
+					Name:         "fate-10000",
+					Namespace:    "fate-10000",
+					ChartVersion: "v1.3.0-a",
+					Cover:        false,
+					Data:         []byte(`{"chartVersion":"v1.3.0-a","egg":{"count":1},"modules":["proxy","egg","federation","metaService","mysql","redis","roll","python"],"name":"fate-10000","namespace":"fate-10000","partyId":10000,"proxy":{"exchange":{"ip":"10.184.111.187","port":30000},"nodePort":30010,"type":"NodePort"}}`),
+				},
+				creator:     "admin",
+			},
+			want:    nil,
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := ClusterUpdate(tt.args.clusterArgs, tt.args.creator)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ClusterUpdate() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("ClusterUpdate() = %v, want %v", got, tt.want)
 			}
 			time.Sleep(30 * time.Second)
 		})
