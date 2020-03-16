@@ -12,13 +12,13 @@ host:
   fateboard: {{ .partyId }}.fateboard.kubefate.net
 nodePort: {{ with .proxy }}{{ .nodePort }}{{ end }}
 
-{{- with .proxy.exchange }}
 exchange:
+{{- with .proxy.exchange }}
   partyIp: {{ .ip }}
   partyPort: {{ .port }}
 {{- end }}
-{{- with .proxy }}
 partyList:
+{{- with .proxy }}
 {{- range .partyList }}
   - partyId: {{ .partyId }}
     partyIp: {{ .partyIp }}
@@ -34,7 +34,7 @@ redis:
   requirepass: fate_dev
 eggList:
 {{ with .egg }}
-{{- range .egg.count | int | until }}
+{{- range .count | int | until }}
   - egg: egg{{ . }}
     nodeLabel: fedai.org
     value:
