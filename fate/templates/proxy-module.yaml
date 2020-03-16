@@ -29,9 +29,9 @@ data:
             "default": {
                 "default": [
                     {
-                      {{- if .Values.exchange -}}
-                        "ip": "{{ .Values.exchange.partyIp }}",
-                        "port": {{ .Values.exchange.partyPort }}
+                      {{- with .Values.exchange -}}
+                        "ip": "{{ .partyIp }}",
+                        "port": {{ .partyPort }}
                       {{- else -}}
                         "ip": "proxy",
                         "port": 9370
