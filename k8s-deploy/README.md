@@ -121,8 +121,8 @@ Info            map[]
 ```
 
 ### Other Common Use Scenarios
-#### [Add a <span style="color:red">NEW</span> FATE Version Support](#)
-#### [Update and Delete a FATE Cluster](#)
+#### [Manage FATE and FATE-Serving Version](../docs/Manage_FATE_and_FATE-Serving_Version.md)
+#### [Update and Delete a FATE Cluster](../docs/Update_and_Delete_a_FATE_Cluster.md)
 
 ## Command Line Reference
 ## KubeFATE Service RESTful APIs Reference
