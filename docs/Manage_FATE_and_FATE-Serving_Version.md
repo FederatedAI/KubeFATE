@@ -40,7 +40,7 @@ ca3f7843-749a-4f69-9f6b-4c544a7623ac    fate    v1.3.0-a        v1.3.0
 
 Then, we can deploy the fate cluster of v1.3.0-a version. The detail of cluster.yaml please refer to: [FATE Cluster Configuration](./configurations/FATE_cluster_configuration.md)
 ```
-clusterType: fate
+chartName: fate
 chartVersion: v1.3.0-a
 ```
 
