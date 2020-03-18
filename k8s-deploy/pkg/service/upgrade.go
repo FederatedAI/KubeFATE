@@ -9,7 +9,7 @@ import (
 	"os"
 )
 
-func Upgrade(namespace, name, chartVersion string, value *Value) (*Result, error)  {
+func Upgrade(namespace, name, chartName, chartVersion string, value *Value) (*Result, error) {
 
 	EnvCs.Lock()
 	err := os.Setenv("HELM_NAMESPACE", namespace)
@@ -23,7 +23,7 @@ func Upgrade(namespace, name, chartVersion string, value *Value) (*Result, error
 	client := action.NewUpgrade(cfg)
 
 	if err := cfg.Init(settings.RESTClientGetter(), settings.Namespace(), os.Getenv("HELM_DRIVER"), debug); err != nil {
-		return nil,err
+		return nil, err
 	}
 
 	client.Namespace = settings.Namespace()
@@ -33,10 +33,10 @@ func Upgrade(namespace, name, chartVersion string, value *Value) (*Result, error
 		client.Version = ">0.0.0-0"
 	}
 
-	fc, err := GetFateChart(chartVersion)
+	fc, err := GetFateChart(chartName, chartVersion)
 	if err != nil {
 		log.Err(err).Msg("GetFateChart error")
-		return nil,err
+		return nil, err
 	}
 	log.Debug().Interface("FateChartName", fc.Name).Interface("FateChartVersion", fc.Version).Msg("GetFateChart success")
 
@@ -44,14 +44,14 @@ func Upgrade(namespace, name, chartVersion string, value *Value) (*Result, error
 	ch, err := fc.ToHelmChart()
 	if err != nil {
 		log.Err(err).Msg("GetFateChart error")
-		return nil,err
+		return nil, err
 	}
 
 	// template to values map
 	v, err := value.Unmarshal()
 	if err != nil {
 		log.Err(err).Msg("values yaml Unmarshal error")
-		return  nil,err
+		return nil, err
 	}
 	log.Debug().Fields(v).Msg("temp values:")
 
@@ -59,13 +59,13 @@ func Upgrade(namespace, name, chartVersion string, value *Value) (*Result, error
 	val, err := fc.GetChartValues(v)
 	if err != nil {
 		log.Err(err).Msg("values yaml Unmarshal error")
-		return nil,err
+		return nil, err
 	}
 	log.Debug().Fields(val).Msg("chart values: ")
 
 	if req := ch.Metadata.Dependencies; req != nil {
 		if err := action.CheckDependencies(ch, req); err != nil {
-			return nil,err
+			return nil, err
 		}
 	}
 
@@ -75,13 +75,13 @@ func Upgrade(namespace, name, chartVersion string, value *Value) (*Result, error
 
 	rel, err := client.Run(name, ch, val)
 	if err != nil {
-		return nil,errors.Wrap(err, "UPGRADE FAILED")
+		return nil, errors.Wrap(err, "UPGRADE FAILED")
 	}
 	return &Result{
-		Namespace:   settings.Namespace(),
-		ChartName:   fc.Name,
+		Namespace:    settings.Namespace(),
+		ChartName:    fc.Name,
 		ChartVersion: fc.Version,
-		ChartValues: val,
-		release:     rel,
-	},nil
+		ChartValues:  val,
+		release:      rel,
+	}, nil
 }

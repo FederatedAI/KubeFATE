@@ -50,9 +50,9 @@ func (fc *FateChart) save() error {
 	return nil
 }
 
-func (fc *FateChart) read(version string) (*FateChart, error) {
+func (fc *FateChart) read(chartName, chartVersion string) (*FateChart, error) {
 
-	helmChart, err := db.FindHelmByVersion(version)
+	helmChart, err := db.FindHelmByNameAndVersion(chartName, chartVersion)
 	if err != nil {
 		return nil, err
 	}
@@ -60,14 +60,14 @@ func (fc *FateChart) read(version string) (*FateChart, error) {
 		return nil, errors.New("find chart error")
 	}
 
-	log.Debug().Interface("helmChart version", helmChart.Version).Msg("find chart from db success")
+	log.Debug().Str("ChartName", helmChart.Name).Str("chartVersion", helmChart.Version).Msg("find chart from db success")
 
 	return &FateChart{
 		HelmChart: helmChart,
 	}, nil
 }
-func (fc *FateChart) load(version string) (*FateChart, error) {
-	chartPath := GetChartPath()
+func (fc *FateChart) load(name, version string) (*FateChart, error) {
+	chartPath := GetChartPath(name)
 	settings := cli.New()
 
 	cfg := new(action.Configuration)
@@ -160,19 +160,19 @@ func (fc *FateChart) GetChartValues(v map[string]interface{}) (map[string]interf
 }
 
 // todo  get chart by version from repository
-func GetFateChart(version string) (*FateChart, error) {
-	chartVersion := version
+func GetFateChart(chartName, chaerVersion string) (*FateChart, error) {
+	chartVersion := chaerVersion
 	//if version == "" {
 	//	chartVersion = latestChartVersion
 	//}
 	fc := new(FateChart)
-	fc, err := fc.read(chartVersion)
+	fc, err := fc.read(chartName, chartVersion)
 	if err == nil {
 		return fc, nil
 	}
-	log.Debug().Interface("read error", err).Msg("read version FateChart err")
+	log.Warn().Interface("read error", err).Msg("read version FateChart err")
 
-	fc, err = fc.load(chartVersion)
+	fc, err = fc.load(chartName, chartVersion)
 	if err != nil {
 		return nil, err
 	}
@@ -190,8 +190,8 @@ func (fc *FateChart) ToHelmChart() (*chart.Chart, error) {
 	return ConvertToChart(fc.HelmChart)
 }
 
-func GetChartPath() string {
-	ChartPath := viper.GetString("repo.name") + "/fate"
+func GetChartPath(name string) string {
+	ChartPath := viper.GetString("repo.name") + "/" + name
 	log.Debug().Str("ChartPath", ChartPath).Msg("ChartPath")
 	return ChartPath
 }

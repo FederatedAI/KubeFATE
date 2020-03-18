@@ -40,13 +40,13 @@ func TestHelmChart_FindHelmByVersion(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := FindHelmByVersion(tt.args.version)
+			got, err := FindHelmByNameAndVersion(tt.args.version)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("HelmChart.FindHelmByVersion() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("HelmChart.FindHelmByNameAndVersion() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("HelmChart.FindHelmByVersion() = %+v, want %v", got, tt.want)
+				t.Errorf("HelmChart.FindHelmByNameAndVersion() = %+v, want %v", got, tt.want)
 			}
 		})
 	}

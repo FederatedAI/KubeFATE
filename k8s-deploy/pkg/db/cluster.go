@@ -113,13 +113,14 @@ func (cluster *Cluster) FromBson(m *bson.M) (interface{}, error) {
 }
 
 // NewCluster create cluster object with basic argument
-func NewCluster(name string, nameSpaces, chartVersion string) *Cluster {
+func NewCluster(name string, nameSpaces, chartName, chartVersion string) *Cluster {
 	cluster := &Cluster{
 		Uuid:         uuid.NewV4().String(),
 		Name:         name,
 		NameSpace:    nameSpaces,
 		Revision:     0,
 		Status:       Creating_c,
+		ChartName:    chartName,
 		ChartVersion: chartVersion,
 	}
 

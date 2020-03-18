@@ -4,11 +4,9 @@ import (
 	"testing"
 )
 
-
-
 func TestNewFateCluster(t *testing.T) {
 	InitConfigForTest()
-	fate := NewCluster("fate-cluster1", "fate-nameSpaces","v1.3.0")
+	fate := NewCluster("fate-cluster1", "fate-nameSpaces", "fate", "v1.3.0")
 	clusterUuid, error := Save(fate)
 	if error == nil {
 		t.Log("uuid: ", clusterUuid)
@@ -36,12 +34,12 @@ func TestFindFateClusterByUuid(t *testing.T) {
 	}
 }
 
-
 func TestDeleteClusterByUUID(t *testing.T) {
 	InitConfigForTest()
 	fate := &Cluster{}
 	DeleteByUUID(fate, clusterJustAddedUuid)
 }
+
 //
 //func TestReturnMethods(t *testing.T) {
 //	InitConfigForTest()
