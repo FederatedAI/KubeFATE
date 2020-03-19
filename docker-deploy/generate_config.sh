@@ -30,7 +30,7 @@ GenerateConfig() {
         eval serving_ip=\${servingiplist[${i}]}
     
         eval processor_port=50000
-        eval processor_count=16
+        eval processor_count=2
         eval venv_dir=/data/projects/python/venv
         eval python_path=${deploy_dir}/python:${deploy_dir}/eggroll/python
         eval data_dir=${deploy_dir}/data-dir
