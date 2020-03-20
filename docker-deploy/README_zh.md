@@ -213,11 +213,11 @@ $ python run_toy_example.py 10000 9999 1        #验证
 ###### 进入fate_flow目录
 `$ cd fate_flow`
 
-###### 修改examples/upload_host.json 
+###### 修改examples/upload_guest.json 
 `$ vi examples/upload_guest.json`
 ```
 {
-  "file": "examples/data/breast_a.csv",
+  "file": "examples/data/breast_b.csv",
   "head": 1,
   "partition": 10,
   "work_mode": 1,
