@@ -13,7 +13,7 @@ KubeFATE supports the deployment of FATE via Docker Compose and Kubernetes. We r
 
 ## Project Structure
 ```
-KubeFATE2
+KubeFATE
 |-- docker-deploy   
 |-- k8s-deploy   
 ```
