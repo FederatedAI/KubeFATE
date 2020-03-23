@@ -13,9 +13,11 @@ host:
 nodePort: {{ with .proxy }}{{ .nodePort }}{{ end }}
 
 exchange:
-{{- with .proxy.exchange }}
+{{- with .proxy }}
+{{- with .exchange }}
   partyIp: {{ .ip }}
   partyPort: {{ .port }}
+{{- end }}
 {{- end }}
 partyList:
 {{- with .proxy }}
@@ -33,13 +35,13 @@ mysql:
 redis:
   requirepass: fate_dev
 eggList:
-{{ with .egg }}
+{{- with .egg }}
 {{- range .count | int | until }}
   - egg: egg{{ . }}
     nodeLabel: fedai.org
     value:
 {{- end }}
-{{ end }}
+{{- end }}
 nodeSelector:
   fateboard:
     nodeLabel: fedai.org
@@ -108,4 +110,9 @@ modules:
   python: 
     include: {{ has "python" .modules }}
     ip: python
+    type: ClusterIP
+  serving: 
+    include: true
+    ip: {{ .servingIp }}
+    port: {{ .servingPort }}
     type: ClusterIP

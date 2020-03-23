@@ -1,0 +1,90 @@
+#nfspath: /data/fate-data
+#nfsserver: 192.168.0.2
+
+partyId: {{ .partyId }}     # required
+partyName: {{ .name }}     # required
+
+# containers images 
+image:
+  registry: federatedai
+  isThridParty:
+  tag: 1.2.2-release
+  pullPolicy: IfNotPresent
+
+
+{{- with .persistent }}
+{{ if eq .type "nfs" }}
+nfs:
+  server: {{ .server }}
+  path: {{ .path }}
+{{ end }}
+{{- end }}
+
+
+{{- if .servingProxy }}
+servingProxy: 
+  include: {{ has "servingProxy" .modules }}
+  ip: serving-proxy                 # required
+  intraPort: 8879                # required
+  interPort: 8869
+  type: NodePort
+  nodePort: 30110
+  ingerssHost: {{ .servingProxy.ingerssHost | default "{{ .partyId }}.serving-proxy.kubefate.net" }}
+  partyList:
+    {{- range .servingProxy.partyList }}
+    - partyId: {{ .partyId }}
+      partyIp: {{ .partyIp }}
+      partyPort: {{ .partyPort }}
+    {{- end }}
+  exchange:
+    {{- with .servingProxy.exchange }}
+    partyIp: {{ .ip }}
+    partyPort: {{ .port }}
+    {{- end }}
+  nodeSelector:
+{{- else }}
+servingProxy: 
+  include: true
+  ip: serving-proxy                 # required
+  intraPort: 8879                # required
+  interPort: 8869
+  type: NodePort
+  nodePort: 30110
+  ingerssHost: {{ .partyId }}.serving-proxy.kubefate.net
+  partyList:
+    - partyId: 9999
+      partyIp: 192.168.9.1
+      partyPort: 30109
+  nodeSelector:
+{{- end }}
+
+servingRedis:
+  include: true             # required
+  ip: serving-redis         # required
+  port: 6379                # required
+  type: ClusterIP           
+  password: fate_dev        # required
+  nodeSelector:
+
+{{- if .servingProxy }}
+servingServer:
+  include: {{ has "servingServer" .modules }}             # required
+  ip: serving-server        # required
+  port: 8000                # required
+  type: ClusterIP
+  fateflow:
+    {{- with .servingServer.fateflow }}
+    ip: {{ .ip }}
+    port: {{ .port }}
+    {{- end }}
+  nodeSelector:
+{{- else }}
+servingServer:
+  include: true             # required
+  ip: serving-server        # required
+  port: 8000                # required
+  type: ClusterIP
+  fateflow:
+    ip: fateflow.fate-10000
+    port: 9380
+{{- end }}
