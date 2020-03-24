@@ -166,11 +166,11 @@ For more details about the testing result, please refer to `python/examples/toy_
 ##### Go to `fate_flow` dir
 `$ cd fate_flow`
 
-##### Modify examples/upload_host.json 
+##### Modify examples/upload_guest.json 
 `$ vi examples/upload_guest.json`
 ```
 {
-  "file": "examples/data/breast_a.csv",
+  "file": "examples/data/breast_b.csv",
   "head": 1,
   "partition": 10,
   "work_mode": 1,
