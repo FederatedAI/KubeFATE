@@ -1,5 +1,6 @@
 name: fate-9999
 namespace: fate-9999
+chartName: fate
 chartVersion: v1.3.0-a
 partyId: 9999
 modules:
@@ -24,3 +25,6 @@ proxy:
     port: 9370
 egg:
   count: 3
+  processor: 4
+servingIp: serving-server.fate-serving-10000
+servingPort: 8000

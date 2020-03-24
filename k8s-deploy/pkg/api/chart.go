@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
 	"helm.sh/helm/v3/pkg/chart/loader"
+	"os"
 	"path/filepath"
 )
 
@@ -48,6 +49,8 @@ func (_ *Chart) createChart(c *gin.Context) {
 
 	// Upload the file to specific dst.
 	err = c.SaveUploadedFile(file, fileName)
+	// delete file
+	defer os.Remove(fileName)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return

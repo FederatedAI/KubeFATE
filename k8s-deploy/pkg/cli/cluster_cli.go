@@ -144,6 +144,12 @@ func ClusterInstallCommand() *cli.Command {
 				return errors.New("chartVersion not found, check your cluster file")
 			}
 
+			chartName, ok := m["chartName"]
+			if !ok {
+				chartName = ""
+				//return errors.New("chartName not found, check your cluster file")
+			}
+
 			var json = jsoniter.ConfigCompatibleWithStandardLibrary
 			valBJ, err := json.Marshal(m)
 
@@ -155,6 +161,7 @@ func ClusterInstallCommand() *cli.Command {
 			args := &job.ClusterArgs{
 				Name:         name.(string),
 				Namespace:    namespace.(string),
+				ChartName:    chartName.(string),
 				ChartVersion: chartVersion.(string),
 				Cover:        cover,
 				Data:         valBJ,

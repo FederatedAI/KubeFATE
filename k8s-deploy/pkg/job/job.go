@@ -6,13 +6,13 @@ import (
 	"fate-cloud-agent/pkg/service"
 	"fmt"
 	"github.com/rs/zerolog/log"
-	"github.com/spf13/viper"
 	"time"
 )
 
 type ClusterArgs struct {
 	Name         string `json:"name"`
 	Namespace    string `json:"namespace"`
+	ChartName    string `json:"chart_name"`
 	ChartVersion string `json:"chart_version"`
 	Cover        bool   `json:"cover"`
 	Data         []byte `json:"data"`
@@ -49,7 +49,7 @@ func ClusterInstall(clusterArgs *ClusterArgs, creator string) (*db.Job, error) {
 		}
 
 		//create a cluster use parameter
-		cluster := db.NewCluster(clusterArgs.Name, clusterArgs.Namespace, clusterArgs.ChartVersion)
+		cluster := db.NewCluster(clusterArgs.Name, clusterArgs.Namespace, clusterArgs.ChartName, clusterArgs.ChartVersion)
 		job.ClusterId = cluster.Uuid
 
 		err := setJobByClusterId(job)
@@ -258,7 +258,6 @@ func ClusterUpdate(clusterArgs *ClusterArgs, creator string) (*db.Job, error) {
 		if job.Status != db.Success_j && job.Status != db.Canceled_j {
 			//todo helm rollBack
 
-
 			err = db.UpdateByUUID(cluster_old, cluster_old.Uuid)
 			if err != nil {
 				log.Error().Err(err).Interface("cluster", cluster).Msg("rollBACK cluster error")
@@ -355,11 +354,11 @@ func ClusterDelete(clusterId string, creator string) (*db.Job, error) {
 		}
 
 		//if job.Status == db.Success_j {
-			err = db.ClusterDeleteByUUID(clusterId)
-			if err != nil {
-				log.Err(err).Interface("cluster", cluster).Msg("db delete cluster error")
-			}
-			log.Debug().Str("clusterUuid", clusterId).Msg("db delete cluster success")
+		err = db.ClusterDeleteByUUID(clusterId)
+		if err != nil {
+			log.Err(err).Interface("cluster", cluster).Msg("db delete cluster error")
+		}
+		log.Debug().Str("clusterUuid", clusterId).Msg("db delete cluster success")
 		//}
 
 		//// rollBACK
@@ -392,16 +391,19 @@ func install(fc *db.Cluster, values []byte) error {
 
 	err := service.RepoAddAndUpdate()
 	if err != nil {
-		return err
+		log.Warn().Err(err).Msg("RepoAddAndUpdate error, check kubefate.yaml at env FATECLOUD_REPO_URL values,")
 	}
 	v := new(service.Value)
 	v.Val = values
 	v.T = "json"
 
-	fc.ChartName = viper.GetString("repo.name") + "/fate"
 	fc.Values = string(values)
 
-	result, err := service.Install(fc.NameSpace, fc.Name, fc.ChartVersion, v)
+	if fc.ChartName == "" {
+		fc.ChartName = "fate"
+	}
+
+	result, err := service.Install(fc.NameSpace, fc.Name,fc.ChartName, fc.ChartVersion, v)
 	if err != nil {
 		return err
 	}
@@ -422,7 +424,7 @@ func upgrade(fc *db.Cluster, values []byte) error {
 	if err != nil {
 		return err
 	}
-	err = install(fc,values)
+	err = install(fc, values)
 	if err != nil {
 		return err
 	}
@@ -465,7 +467,7 @@ func Run(j Job) (*db.Job, error) {
 
 	go func() {
 		//create a cluster use parameter
-		cluster := db.NewCluster(clusterArgs.Name, clusterArgs.Namespace, clusterArgs.ChartVersion)
+		cluster := db.NewCluster(clusterArgs.Name, clusterArgs.Namespace, clusterArgs.ChartName, clusterArgs.ChartVersion)
 		job.ClusterId = cluster.Uuid
 
 		err := install(cluster, clusterArgs.Data)

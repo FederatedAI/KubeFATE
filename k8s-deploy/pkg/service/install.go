@@ -23,7 +23,7 @@ type Result struct {
 
 // install is create a cluster
 // value is a json ,
-func Install(namespace, name, chartVersion string, value *Value) (*Result, error) {
+func Install(namespace, name, chartName,chartVersion string, value *Value) (*Result, error) {
 
 	EnvCs.Lock()
 	err := os.Setenv("HELM_NAMESPACE", namespace)
@@ -47,7 +47,7 @@ func Install(namespace, name, chartVersion string, value *Value) (*Result, error
 	//	return nil, err
 	//}
 	// get chart by version from repository
-	fc, err := GetFateChart(chartVersion)
+	fc, err := GetFateChart(chartName,chartVersion)
 	if err != nil {
 		log.Err(err).Msg("GetFateChart error")
 		return nil, err

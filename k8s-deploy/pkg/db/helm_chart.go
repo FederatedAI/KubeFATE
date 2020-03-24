@@ -71,8 +71,8 @@ func (helm *HelmChart) FindHelmByNameAndVersion(name string, version string) *He
 }
 
 // FindHelmByNameAndVersion find helm chart via name and version
-func FindHelmByVersion(version string) (*HelmChart, error) {
-	filter := bson.M{"version": version}
+func FindHelmByNameAndVersion(name, version string) (*HelmChart, error) {
+	filter := bson.M{"name": name, "version": version}
 	helm := new(HelmChart)
 	result, err := FindByFilter(helm, filter)
 	if err != nil {
