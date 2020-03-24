@@ -62,6 +62,7 @@ modules:
     type: ClusterIP
   egg: 
     include: true
+    processorSessionMaxCount: 4
     ip: egg
     type: ClusterIP
   fateboard: 

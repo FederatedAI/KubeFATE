@@ -1,5 +1,5 @@
 name: fate-10000
-namespaces: fate-10000
+namespace: fate-10000
 chartName: fate
 chartVersion: v1.3.0-a
 partyId: 10000
@@ -25,6 +25,7 @@ proxy:
 
 egg:
   count: 3
+  processor: 4
 
 servingIp: serving-server.fate-serving-10000
 servingPort: 8000

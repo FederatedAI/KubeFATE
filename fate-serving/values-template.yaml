@@ -28,7 +28,7 @@ servingProxy:
   intraPort: 8879                # required
   interPort: 8869
   type: NodePort
-  nodePort: 30110
+  nodePort: {{ .servingProxy.nodePort }}
   ingerssHost: {{ .servingProxy.ingerssHost | default "{{ .partyId }}.serving-proxy.kubefate.net" }}
   partyList:
     {{- range .servingProxy.partyList }}

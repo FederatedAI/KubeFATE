@@ -25,7 +25,7 @@ data:
     eggroll.computing.processor.engine-path=/data/projects/fate/eggroll/python/eggroll/computing/processor.py
     eggroll.computing.processor.data-dir=/data/projects/fate/data-dir
     eggroll.computing.processor.logs-dir=/data/projects/fate/eggroll/python/eggroll/logs/processor
-    eggroll.computing.processor.session.max.count=8
+    eggroll.computing.processor.session.max.count={{ .Values.modules.egg.processorSessionMaxCount }}
     eggroll.computing.processor.python-path=/data/projects/fate/python:/data/projects/fate/eggroll/python
   processor-starter.sh: |
     #!/bin/bash

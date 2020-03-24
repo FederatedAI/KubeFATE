@@ -1,5 +1,5 @@
 name: fate-serving-10000
-namespaces: fate-serving-10000
+namespace: fate-serving-10000
 chartName: fate-serving
 chartVersion: v1.2.2
 partyId: 10000
@@ -21,6 +21,6 @@ servingProxy:
 
 servingServer:
   fateflow:
-    ip: fateflow.fate-9999
+    ip: fateflow.fate-10000
     port: 9380
 
