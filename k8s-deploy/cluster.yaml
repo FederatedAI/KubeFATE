@@ -25,3 +25,6 @@ proxy:
     port: 9370
 egg:
   count: 3
+  processor: 4
+servingIp: serving-server.fate-serving-10000
+servingPort: 8000
