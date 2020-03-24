@@ -1,0 +1,46 @@
+#nfspath: /data/fate-data
+#nfsserver: 192.168.0.2
+
+partyId: 9999     # required
+partyName: fate-serving-9999     # required
+
+# containers images 
+image:
+  registry: federatedai     # required
+  isThridParty:
+  tag: 1.2.2-release        # required
+  pullPolicy: IfNotPresent  # required
+
+servingProxy: 
+  include: true             # required
+  ip: serving-proxy                 # required
+  intraPort: 8879                # required
+  interPort: 8869
+  type: NodePort
+  nodePort: 30109
+  ingerssHost: 9999.serving-proxy.kubefate.net
+  partyList:
+  - partyId: 10000
+    partyIp: 10.184.111.187
+    partyPort: 30110
+  nodeSelector:
+
+servingRedis:
+  include: true             # required
+  ip: serving-redis                 # required
+  port: 6379                # required
+  type: ClusterIP           
+  password: fate_dev     # required
+  nodeSelector:
+
+servingServer:
+  include: true             # required
+  ip: serving-server        # required
+  port: 8000                # required
+  type: ClusterIP
+  fateflow:
+    ip: fateflow.fate-9999
+    port: 9380
+  nodeSelector:
+
+

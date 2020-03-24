@@ -1,0 +1,26 @@
+name: fate-serving-10000
+namespace: fate-serving-10000
+chartName: fate-serving
+chartVersion: v1.2.2
+partyId: 10000
+modules:
+  - servingProxy
+  - servingRedis
+  - servingServer
+
+servingProxy: 
+  nodePort: 30110
+  ingerssHost: 10000.serving-proxy.kubefate.net
+  partyList:
+  - partyId: 9999
+    partyIp: 192.168.1.1
+    partyPort: 30109
+#  exchange:
+#    ip: 192.168.1.1
+#    port: 30100
+
+servingServer:
+  fateflow:
+    ip: fateflow.fate-10000
+    port: 9380
+

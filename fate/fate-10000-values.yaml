@@ -6,15 +6,15 @@ image:
   isThridParty:
   tag: 1.3.0-release
   pullPolicy: IfNotPresent
-partyId: 9999
-partyName: fate-9999
+partyId: 10000
+partyName: fate-10000
 host:
-  fateboard: 9999.fateboard.kubefate.net
-nodePort: 
+  fateboard: 10000.fateboard.kubefate.net
+nodePort: 30010
 
 exchange:
   partyIp: 10.184.111.187
-  partyPort: 30010
+  partyPort: 30009
 mysql:
   mysql_root_password: fate_dev
   mysql_database: fate
@@ -59,10 +59,9 @@ modules:
   proxy: 
     include: true
     ip: proxy
-    type: ClusterIP
+    type: NodePort
   egg: 
     include: true
-    processorSessionMaxCount: 4
     ip: egg
     type: ClusterIP
   fateboard: 
@@ -99,6 +98,6 @@ modules:
     type: ClusterIP
   serving: 
     include: true
-    ip: serving-server.fate-serving-9999
-    port: 80000
+    ip: serving-server.fate-serving-10000
+    port: 8000
     type: ClusterIP
