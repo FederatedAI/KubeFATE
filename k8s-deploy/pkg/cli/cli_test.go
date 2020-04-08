@@ -1,7 +1,7 @@
 package cli
 
 import (
-	"fate-cloud-agent/pkg/utils/logging"
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/utils/logging"
 	"os"
 	"testing"
 )

@@ -2,9 +2,9 @@
 package job
 
 import (
-	"fate-cloud-agent/pkg/db"
-	"fate-cloud-agent/pkg/service"
 	"fmt"
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/db"
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/service"
 	"github.com/rs/zerolog/log"
 	"time"
 )
@@ -403,7 +403,7 @@ func install(fc *db.Cluster, values []byte) error {
 		fc.ChartName = "fate"
 	}
 
-	result, err := service.Install(fc.NameSpace, fc.Name,fc.ChartName, fc.ChartVersion, v)
+	result, err := service.Install(fc.NameSpace, fc.Name, fc.ChartName, fc.ChartVersion, v)
 	if err != nil {
 		return err
 	}

@@ -15,8 +15,8 @@ func TestGetIngressUrl(t *testing.T) {
 	}{
 		// TODO: Add test cases.
 		{
-			name:    "",
-			args:    args{
+			name: "",
+			args: args{
 				name:      "",
 				namespace: "default",
 			},

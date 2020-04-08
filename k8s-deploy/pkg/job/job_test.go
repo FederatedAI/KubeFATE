@@ -3,10 +3,10 @@ package job
 
 import (
 	"encoding/json"
-	"fate-cloud-agent/pkg/db"
-	"fate-cloud-agent/pkg/utils/config"
-	"fate-cloud-agent/pkg/utils/logging"
 	"fmt"
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/db"
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/utils/config"
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/utils/logging"
 	"reflect"
 	"testing"
 	"time"
@@ -123,8 +123,8 @@ func TestClusterUpdate(t *testing.T) {
 	}{
 		// TODO: Add test cases.
 		{
-			name:    "",
-			args:    args{
+			name: "",
+			args: args{
 				clusterArgs: &ClusterArgs{
 					Name:         "fate-10000",
 					Namespace:    "fate-10000",
@@ -132,7 +132,7 @@ func TestClusterUpdate(t *testing.T) {
 					Cover:        false,
 					Data:         []byte(`{"chartVersion":"v1.3.0-a","egg":{"count":1},"modules":["proxy","egg","federation","metaService","mysql","redis","roll","python"],"name":"fate-10000","namespace":"fate-10000","partyId":10000,"proxy":{"exchange":{"ip":"10.184.111.187","port":30000},"nodePort":30010,"type":"NodePort"}}`),
 				},
-				creator:     "admin",
+				creator: "admin",
 			},
 			want:    nil,
 			wantErr: false,

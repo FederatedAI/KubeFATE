@@ -1,9 +1,9 @@
 package cli
 
 import (
-	"fate-cloud-agent/pkg/utils/config"
-	"fate-cloud-agent/pkg/utils/logging"
 	"fmt"
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/utils/config"
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/utils/logging"
 	"github.com/dgrijalva/jwt-go"
 	"reflect"
 	"testing"
@@ -97,8 +97,8 @@ func TestResponse_Unmarshal(t *testing.T) {
 
 func TestGetToken(t *testing.T) {
 	claims := &jwt.MapClaims{
-		"id": "admin",
-		"exp": time.Now().Add(300000 * time.Second).Unix(),
+		"id":       "admin",
+		"exp":      time.Now().Add(300000 * time.Second).Unix(),
 		"orig_iat": time.Now().Add(300000 * time.Second).Unix(),
 	}
 

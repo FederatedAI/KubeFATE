@@ -7,9 +7,8 @@ import (
 
 func JobCommand() *cli.Command {
 	return &cli.Command{
-		Name: "job",
-		Flags: []cli.Flag{
-		},
+		Name:  "job",
+		Flags: []cli.Flag{},
 		Subcommands: []*cli.Command{
 			JobListCommand(),
 			JobInfoCommand(),
@@ -21,11 +20,10 @@ func JobCommand() *cli.Command {
 
 func JobListCommand() *cli.Command {
 	return &cli.Command{
-		Name: "list",
+		Name:    "list",
 		Aliases: []string{"ls"},
-		Flags: []cli.Flag{
-		},
-		Usage: "Show job list",
+		Flags:   []cli.Flag{},
+		Usage:   "Show job list",
 		Action: func(c *cli.Context) error {
 			cluster := new(Job)
 			return getItemList(cluster)
@@ -35,11 +33,10 @@ func JobListCommand() *cli.Command {
 
 func JobDeleteCommand() *cli.Command {
 	return &cli.Command{
-		Name: "delete",
+		Name:    "delete",
 		Aliases: []string{"del"},
-		Flags: []cli.Flag{
-		},
-		Usage: "Delete a job",
+		Flags:   []cli.Flag{},
+		Usage:   "Delete a job",
 		Action: func(c *cli.Context) error {
 			var uuid string
 			if c.Args().Len() > 0 {

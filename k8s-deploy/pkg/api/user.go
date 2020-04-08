@@ -1,7 +1,7 @@
 package api
 
 import (
-	"fate-cloud-agent/pkg/db"
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/db"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
@@ -39,10 +39,10 @@ func generateAdminUser() error {
 	if !u.IsExisted() {
 		uuid, err := db.Save(u)
 		if err != nil {
-			log.Err(err).Str("userName",username).Msg("user save error")
+			log.Err(err).Str("userName", username).Msg("user save error")
 			return err
 		}
-		log.Info().Str("userUuid",uuid).Str("userName",username).Msg("user  save success")
+		log.Info().Str("userUuid", uuid).Str("userName", username).Msg("user  save success")
 	}
 	return nil
 }

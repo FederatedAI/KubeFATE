@@ -1,8 +1,8 @@
 package api
 
 import (
-	"fate-cloud-agent/pkg/utils/config"
-	"fate-cloud-agent/pkg/utils/logging"
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/utils/config"
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/utils/logging"
 	"github.com/spf13/viper"
 	"testing"
 )

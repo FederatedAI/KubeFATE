@@ -2,8 +2,8 @@ package cli
 
 import (
 	"errors"
-	"fate-cloud-agent/pkg/db"
 	"fmt"
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/db"
 	"github.com/gosuri/uitable"
 	"helm.sh/helm/v3/pkg/cli/output"
 	"os"
@@ -77,9 +77,9 @@ func (c *Chart) outPutList(result interface{}) error {
 		return errors.New("type ChartResultList not ok")
 	}
 	table := uitable.New()
-	table.AddRow("UUID", "NAME", "VERSION","APPVERSION")
+	table.AddRow("UUID", "NAME", "VERSION", "APPVERSION")
 	for _, r := range item.Data {
-		table.AddRow(r.Uuid, r.Name, r.Version,r.AppVersion)
+		table.AddRow(r.Uuid, r.Name, r.Version, r.AppVersion)
 	}
 	table.AddRow("")
 	return output.EncodeTable(os.Stdout, table)

@@ -2,7 +2,7 @@ package job
 
 import (
 	"errors"
-	"fate-cloud-agent/pkg/db"
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/db"
 	"sync"
 )
 

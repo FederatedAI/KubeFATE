@@ -2,7 +2,7 @@ package db
 
 import (
 	"context"
-	"fate-cloud-agent/pkg/utils/config"
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/utils/config"
 	"os"
 	"testing"
 	"time"

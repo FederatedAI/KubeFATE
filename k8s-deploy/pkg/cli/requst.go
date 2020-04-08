@@ -3,9 +3,9 @@ package cli
 import (
 	"bytes"
 	"encoding/json"
-	"fate-cloud-agent/pkg/api"
-	"fate-cloud-agent/pkg/db"
 	"fmt"
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/api"
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/db"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"

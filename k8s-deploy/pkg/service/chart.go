@@ -17,7 +17,7 @@ import (
 	"encoding/json"
 	"encoding/xml"
 
-	"fate-cloud-agent/pkg/db"
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/db"
 	"github.com/spf13/viper"
 	"helm.sh/helm/v3/pkg/getter"
 	"helm.sh/helm/v3/pkg/repo"

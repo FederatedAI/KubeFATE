@@ -1,9 +1,9 @@
 package api
 
 import (
-	"fate-cloud-agent/pkg/db"
-	"fate-cloud-agent/pkg/job"
-	"fate-cloud-agent/pkg/service"
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/db"
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/job"
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/service"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
 )
@@ -127,7 +127,6 @@ func (_ *Cluster) getCluster(c *gin.Context) {
 
 		cluster.Info["dashboard"] = cluster.ChartValues["host"].(map[string]interface{})["fateboard"]
 	}
-
 
 	if cluster.Config == nil {
 		cluster.Config = make(map[string]interface{})

@@ -1,7 +1,7 @@
 package cli
 
 import (
-	"fate-cloud-agent/pkg/api"
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/api"
 	"github.com/urfave/cli/v2"
 )
 

@@ -104,7 +104,6 @@ func FindByUUID(repository Repository, uuid string) (interface{}, error) {
 	return r, nil
 }
 
-
 // FindByUUID find the object from the database via uuid
 func FindOneByUUID(repository Repository, uuid string) (interface{}, error) {
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)

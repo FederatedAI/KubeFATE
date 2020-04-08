@@ -2,8 +2,8 @@ package db
 
 import (
 	"context"
-	"fate-cloud-agent/pkg/utils/logging"
 	"fmt"
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/utils/logging"
 	"reflect"
 	"testing"
 	"time"

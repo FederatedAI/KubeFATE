@@ -1,8 +1,8 @@
 package service
 
 import (
-	"fate-cloud-agent/pkg/utils/config"
-	"fate-cloud-agent/pkg/utils/logging"
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/utils/config"
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/utils/logging"
 	"github.com/spf13/viper"
 	"reflect"
 	"testing"
@@ -19,10 +19,11 @@ func TestInstall(t *testing.T) {
 		panic(err)
 	}
 	type args struct {
-		namespace string
-		name      string
-		version   string
-		value     *Value
+		namespace    string
+		name         string
+		chartName    string
+		chartVersion string
+		value        *Value
 	}
 	tests := []struct {
 		name    string
@@ -34,10 +35,11 @@ func TestInstall(t *testing.T) {
 		{
 			name: "install fate",
 			args: args{
-				namespace: "fate-10000",
-				name:      "fate-10000",
-				version:   "v1.2.0",
-				value:     &Value{Val: []byte(`{ "partyId":10000,"endpoint": { "ip":"10.184.111.187","port":30000}}`), T: "json"},
+				namespace:    "fate-10000",
+				name:         "fate-10000",
+				chartName:    "fate",
+				chartVersion: "v1.2.0",
+				value:        &Value{Val: []byte(`{ "partyId":10000,"endpoint": { "ip":"10.184.111.187","port":30000}}`), T: "json"},
 			},
 			want: &releaseElement{
 				Name:       "fate",
@@ -52,7 +54,7 @@ func TestInstall(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Install(tt.args.namespace, tt.args.name, tt.args.version, tt.args.value)
+			got, err := Install(tt.args.namespace, tt.args.name, tt.args.chartName, tt.args.chartVersion, tt.args.value)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Install() error = %v, wantErr %v", err, tt.wantErr)
 				return

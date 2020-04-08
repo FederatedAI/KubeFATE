@@ -3,8 +3,8 @@ package cli
 import (
 	"bytes"
 	"errors"
-	"fate-cloud-agent/pkg/api"
 	"fmt"
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/api"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
 	"github.com/urfave/cli/v2"
@@ -19,9 +19,8 @@ import (
 
 func ChartCommand() *cli.Command {
 	return &cli.Command{
-		Name: "chart",
-		Flags: []cli.Flag{
-		},
+		Name:  "chart",
+		Flags: []cli.Flag{},
 		Subcommands: []*cli.Command{
 			ChartListCommand(),
 			ChartInfoCommand(),
@@ -36,9 +35,8 @@ func ChartListCommand() *cli.Command {
 	return &cli.Command{
 		Name:    "list",
 		Aliases: []string{"ls"},
-		Flags: []cli.Flag{
-		},
-		Usage: "List charts list",
+		Flags:   []cli.Flag{},
+		Usage:   "List charts list",
 		Action: func(c *cli.Context) error {
 			cluster := new(Chart)
 			return getItemList(cluster)
@@ -48,9 +46,8 @@ func ChartListCommand() *cli.Command {
 
 func ChartInfoCommand() *cli.Command {
 	return &cli.Command{
-		Name: "describe",
-		Flags: []cli.Flag{
-		},
+		Name:  "describe",
+		Flags: []cli.Flag{},
 		Usage: "Describe a chart's detail info",
 		Action: func(c *cli.Context) error {
 			var uuid string
@@ -69,9 +66,8 @@ func ChartDeleteCommand() *cli.Command {
 	return &cli.Command{
 		Name:    "delete",
 		Aliases: []string{"del"},
-		Flags: []cli.Flag{
-		},
-		Usage: "Delete a chart",
+		Flags:   []cli.Flag{},
+		Usage:   "Delete a chart",
 		Action: func(c *cli.Context) error {
 			var uuid string
 			if c.Args().Len() > 0 {

@@ -18,7 +18,7 @@ func GetIngress(name, namespace string) (*v1beta1.Ingress, error) {
 	return ingress, err
 }
 
-func GetIngressUrl(name, namespace string) (string,error) {
+func GetIngressUrl(name, namespace string) (string, error) {
 
 	ingress, err := GetIngress(name, namespace)
 	if err != nil {

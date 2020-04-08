@@ -2,8 +2,8 @@ package cli
 
 import (
 	"errors"
-	"fate-cloud-agent/pkg/db"
 	"fmt"
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/db"
 	"github.com/gosuri/uitable"
 	"github.com/rs/zerolog/log"
 	"helm.sh/helm/v3/pkg/cli/output"
@@ -68,7 +68,6 @@ func (c *Job) outPut(result interface{}, Type int) error {
 	default:
 		return fmt.Errorf("no type %d", Type)
 	}
-	return nil
 }
 
 func (c *Job) outPutList(result interface{}) error {
