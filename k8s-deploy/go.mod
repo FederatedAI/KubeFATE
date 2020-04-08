@@ -1,4 +1,4 @@
-module fate-cloud-agent
+module github.com/FederatedAI/KubeFATE/k8s-deploy
 
 go 1.13
 
