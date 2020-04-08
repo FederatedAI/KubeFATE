@@ -168,7 +168,7 @@ func ClusterInstallCommand() *cli.Command {
 			if err != nil {
 				return err
 			}
-			return postItem(cluster, body)
+			return PostItem(cluster, body)
 		},
 	}
 }

@@ -21,7 +21,7 @@ type Item interface {
 	outPut(result interface{}, Type int) error
 }
 
-func postItem(i Item, Body []byte) error {
+func PostItem(i Item, Body []byte) error {
 	req := &request{
 		Type: "POST",
 		Path: i.getRequestPath(),
