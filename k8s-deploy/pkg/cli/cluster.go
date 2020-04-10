@@ -2,8 +2,8 @@ package cli
 
 import (
 	"errors"
-	"fate-cloud-agent/pkg/db"
 	"fmt"
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/db"
 	"github.com/gosuri/uitable"
 	"helm.sh/helm/v3/pkg/cli/output"
 	"os"
@@ -82,7 +82,6 @@ func (c *Cluster) outPut(result interface{}, Type int) error {
 	default:
 		return fmt.Errorf("no type %d", Type)
 	}
-	return nil
 }
 
 func (c *Cluster) outPutList(result interface{}) error {

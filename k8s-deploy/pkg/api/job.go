@@ -1,7 +1,7 @@
 package api
 
 import (
-	"fate-cloud-agent/pkg/db"
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/db"
 	"github.com/gin-gonic/gin"
 )
 

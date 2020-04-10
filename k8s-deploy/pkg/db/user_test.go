@@ -47,5 +47,3 @@ func TestFindByUUID(t *testing.T) {
 	results, _ := FindByUUID(user, userJustAddedUuid)
 	t.Log(ToJson(results))
 }
-
-

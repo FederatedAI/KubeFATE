@@ -1,10 +1,10 @@
 package main
 
 import (
-	"fate-cloud-agent/pkg/cli"
-	"fate-cloud-agent/pkg/utils/config"
-	"fate-cloud-agent/pkg/utils/logging"
 	"fmt"
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/cli"
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/utils/config"
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/utils/logging"
 	"os"
 )
 

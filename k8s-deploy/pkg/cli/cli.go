@@ -9,9 +9,7 @@ import (
 func initCommandLine() *cli.App {
 	app := &cli.App{
 
-		Flags: []cli.Flag{
-
-		},
+		Flags: []cli.Flag{},
 		Commands: []*cli.Command{
 			serviceCommand(),
 			ClusterCommand(),

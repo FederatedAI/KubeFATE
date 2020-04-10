@@ -28,7 +28,6 @@ func MapToConfig(m map[string]interface{}, templates string) (string, error) {
 
 }
 
-
 func funcMap() template.FuncMap {
 	f := sprig.TxtFuncMap()
 	delete(f, "env")

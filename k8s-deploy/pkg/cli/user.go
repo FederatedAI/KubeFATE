@@ -2,8 +2,8 @@ package cli
 
 import (
 	"errors"
-	"fate-cloud-agent/pkg/db"
 	"fmt"
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/db"
 	"github.com/gosuri/uitable"
 	"helm.sh/helm/v3/pkg/cli/output"
 	"os"

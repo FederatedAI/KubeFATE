@@ -165,4 +165,3 @@ func Disconnect() error {
 func Ping() error {
 	return nil
 }
-

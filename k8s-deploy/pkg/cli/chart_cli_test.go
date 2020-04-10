@@ -1,7 +1,7 @@
 package cli
 
 import (
-	"fate-cloud-agent/pkg/utils/logging"
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/utils/logging"
 	"os"
 	"testing"
 )
@@ -19,7 +19,7 @@ func TestChartCreateCommand(t *testing.T) {
 	}{
 		{
 			"chart upload",
-			args{[]string{os.Args[0], "chart", "upload", "-f","X:/AI/owlet42/KubeFATE/k8s-deploy/docs/fate-party-1.3.0.tgz"}},
+			args{[]string{os.Args[0], "chart", "upload", "-f", "X:/AI/owlet42/KubeFATE/k8s-deploy/docs/fate-party-1.3.0.tgz"}},
 		},
 	}
 	for _, tt := range tests {

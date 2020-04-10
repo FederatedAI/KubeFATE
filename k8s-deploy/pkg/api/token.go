@@ -1,7 +1,7 @@
 package api
 
 import (
-	"fate-cloud-agent/pkg/db"
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/db"
 	"time"
 
 	jwt "github.com/appleboy/gin-jwt/v2"
@@ -100,4 +100,3 @@ func initAuthmiddleware() error {
 	AuthMiddleware = tmpAuth
 	return err
 }
-

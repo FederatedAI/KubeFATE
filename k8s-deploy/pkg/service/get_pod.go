@@ -16,7 +16,7 @@ func GetPods(namespace, LabelSelector string) (*v1.PodList, error) {
 	return pods, err
 }
 
-func checkPodStatus(pods *v1.PodList, ) bool {
+func checkPodStatus(pods *v1.PodList) bool {
 	for _, v := range pods.Items {
 		for _, vv := range v.Status.ContainerStatuses {
 			if vv.State.Running == nil {

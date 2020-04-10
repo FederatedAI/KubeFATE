@@ -13,7 +13,7 @@ func GetNodeIp() ([]string, error) {
 
 	var nodeIp []string
 	for _, v := range svcs.Items {
-		nodeIp = append(nodeIp,v.Status.Addresses[0].Address)
+		nodeIp = append(nodeIp, v.Status.Addresses[0].Address)
 	}
 	return nodeIp, nil
 }
