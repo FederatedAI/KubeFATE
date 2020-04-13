@@ -60,7 +60,7 @@ func PostItem(i Item, Body []byte) error {
 	}
 	return nil
 }
-func putItem(i Item, Body []byte) error {
+func PutItem(i Item, Body []byte) error {
 	req := &request{
 		Type: "PUT",
 		Path: i.getRequestPath(),
@@ -100,7 +100,7 @@ func putItem(i Item, Body []byte) error {
 	return nil
 }
 
-func getItem(i Item, UUID string) error {
+func GetItem(i Item, UUID string) error {
 	req := &request{
 		Type: "GET",
 		Path: i.getRequestPath() + UUID,
@@ -142,7 +142,7 @@ func getItem(i Item, UUID string) error {
 	return nil
 }
 
-func getItemList(i Item) error {
+func GetItemList(i Item) error {
 	req := &request{
 		Type: "GET",
 		Path: i.getRequestPath() + i.addArgs(),
@@ -186,7 +186,7 @@ func getItemList(i Item) error {
 	return nil
 }
 
-func deleteItem(i Item, UUID string) error {
+func DeleteItem(i Item, UUID string) error {
 	req := &request{
 		Type: "DELETE",
 		Path: i.getRequestPath() + UUID,
@@ -230,7 +230,7 @@ func deleteItem(i Item, UUID string) error {
 	return nil
 }
 
-func errOutPut(err error) {
+func ErrOutPut(err error) {
 	out := os.Stdout
 	_, _ = fmt.Fprintf(out, "%s", err)
 }
