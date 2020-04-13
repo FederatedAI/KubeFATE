@@ -28,13 +28,13 @@ import (
 //	loginJsonB, err := json.Marshal(login)
 //
 //	body := bytes.NewReader(loginJsonB)
-//	request, err := http.NewRequest("POST", loginUrl, body)
+//	Request, err := http.NewRequest("POST", loginUrl, body)
 //	if err != nil {
 //		panic(err)
 //	}
 //
 //	var resp *http.Response
-//	resp, err = http.DefaultClient.Do(request)
+//	resp, err = http.DefaultClient.Do(Request)
 //	if err != nil {
 //		panic(err)
 //	}
@@ -44,13 +44,13 @@ import (
 //		panic(err)
 //	}
 //
-//	result := map[string]interface{}{}
+//	Result := map[string]interface{}{}
 //
-//	err = json.Unmarshal(rbody, &result)
+//	err = json.Unmarshal(rbody, &Result)
 //	if err != nil {
 //		panic(err)
 //	}
-//	return fmt.Sprint(result["token"])
+//	return fmt.Sprint(Result["token"])
 //}
 
 func getToken() (string, error) {
@@ -68,7 +68,7 @@ func getToken() (string, error) {
 	return accessToken, nil
 }
 
-type request struct {
+type Request struct {
 	Type string
 	Path string
 	Body []byte
@@ -79,7 +79,7 @@ type Response struct {
 	Body []byte
 }
 
-func Send(r *request) (*Response, error) {
+func Send(r *Request) (*Response, error) {
 	serviceUrl := viper.GetString("serviceurl")
 	apiVersion := api.ApiVersion + "/"
 	if serviceUrl == "" {
@@ -116,13 +116,13 @@ func Send(r *request) (*Response, error) {
 	}, nil
 }
 
-type result struct {
+type Result struct {
 	Data []*db.Job
 	Msg  string
 }
 
-func (r *Response) Unmarshal() *result {
-	res := new(result)
+func (r *Response) Unmarshal() *Result {
+	res := new(Result)
 	_ = json.Unmarshal(r.Body, &res)
 	return res
 }

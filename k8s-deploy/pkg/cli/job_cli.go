@@ -26,7 +26,7 @@ func JobListCommand() *cli.Command {
 		Usage:   "Show job list",
 		Action: func(c *cli.Context) error {
 			cluster := new(Job)
-			return getItemList(cluster)
+			return GetItemList(cluster)
 		},
 	}
 }
@@ -45,7 +45,7 @@ func JobDeleteCommand() *cli.Command {
 				return errors.New("not uuid")
 			}
 			cluster := new(Job)
-			return deleteItem(cluster, uuid)
+			return DeleteItem(cluster, uuid)
 		},
 	}
 }
@@ -70,7 +70,7 @@ func JobInfoCommand() *cli.Command {
 				return errors.New("not uuid")
 			}
 			Job := new(Job)
-			return getItem(Job, uuid)
+			return GetItem(Job, uuid)
 		},
 	}
 }

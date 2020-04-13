@@ -18,7 +18,7 @@ func VersionCommand() *cli.Command {
 		Flags: []cli.Flag{},
 		Usage: "Show kubefate command line and service version",
 		Action: func(c *cli.Context) error {
-			serviceVersion, err := getServiceVersion()
+			serviceVersion, err := GetServiceVersion()
 			if err != nil {
 				fmt.Printf("* kubefate service connection error, %s\r\n", err.Error())
 			} else {
@@ -30,8 +30,8 @@ func VersionCommand() *cli.Command {
 	}
 }
 
-func getServiceVersion() (string, error) {
-	r := &request{
+func GetServiceVersion() (string, error) {
+	r := &Request{
 		Type: "GET",
 		Path: "version",
 		Body: nil,

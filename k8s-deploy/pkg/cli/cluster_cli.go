@@ -45,7 +45,7 @@ func ClusterListCommand() *cli.Command {
 			cluster := new(Cluster)
 			cluster.all = all
 			log.Debug().Bool("all", all).Msg("all")
-			return getItemList(cluster)
+			return GetItemList(cluster)
 		},
 	}
 }
@@ -63,7 +63,7 @@ func ClusterInfoCommand() *cli.Command {
 				return errors.New("not uuid")
 			}
 			cluster := new(Cluster)
-			return getItem(cluster, uuid)
+			return GetItem(cluster, uuid)
 		},
 	}
 }
@@ -84,7 +84,7 @@ func ClusterDeleteCommand() *cli.Command {
 
 			cluster := new(Cluster)
 			log.Debug().Str("uuid", uuid).Msg("cluster delete uuid")
-			return deleteItem(cluster, uuid)
+			return DeleteItem(cluster, uuid)
 		},
 	}
 }
@@ -237,7 +237,7 @@ func ClusterUpdateCommand() *cli.Command {
 			if err != nil {
 				return err
 			}
-			return putItem(cluster, body)
+			return PutItem(cluster, body)
 		},
 	}
 }

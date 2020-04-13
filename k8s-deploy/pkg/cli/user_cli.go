@@ -25,7 +25,7 @@ func UserListCommand() *cli.Command {
 		Usage:   "List all users",
 		Action: func(c *cli.Context) error {
 			User := new(User)
-			return getItemList(User)
+			return GetItemList(User)
 		},
 	}
 }
@@ -43,7 +43,7 @@ func UserInfoCommand() *cli.Command {
 				return errors.New("not uuid")
 			}
 			User := new(User)
-			return getItem(User, uuid)
+			return GetItem(User, uuid)
 		},
 	}
 }

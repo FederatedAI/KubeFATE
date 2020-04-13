@@ -39,7 +39,7 @@ func ChartListCommand() *cli.Command {
 		Usage:   "List charts list",
 		Action: func(c *cli.Context) error {
 			cluster := new(Chart)
-			return getItemList(cluster)
+			return GetItemList(cluster)
 		},
 	}
 }
@@ -57,7 +57,7 @@ func ChartInfoCommand() *cli.Command {
 				return errors.New("not uuid")
 			}
 			cluster := new(Chart)
-			return getItem(cluster, uuid)
+			return GetItem(cluster, uuid)
 		},
 	}
 }
@@ -78,7 +78,7 @@ func ChartDeleteCommand() *cli.Command {
 
 			cluster := new(Chart)
 			log.Debug().Str("uuid", uuid).Msg("Chart delete uuid")
-			return deleteItem(cluster, uuid)
+			return DeleteItem(cluster, uuid)
 
 		},
 	}
@@ -134,7 +134,7 @@ func ChartCreateCommand() *cli.Command {
 			log.Debug().Str("contentType", contentType).Msg("contentType")
 			bodyWriter.Close()
 
-			r := &request{
+			r := &Request{
 				Type: "POST",
 				Path: "chart",
 				Body: bodyBuf.Bytes(),
