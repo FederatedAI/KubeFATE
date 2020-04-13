@@ -22,7 +22,7 @@ type Item interface {
 }
 
 func PostItem(i Item, Body []byte) error {
-	req := &request{
+	req := &Request{
 		Type: "POST",
 		Path: i.getRequestPath(),
 		Body: Body,
@@ -61,7 +61,7 @@ func PostItem(i Item, Body []byte) error {
 	return nil
 }
 func PutItem(i Item, Body []byte) error {
-	req := &request{
+	req := &Request{
 		Type: "PUT",
 		Path: i.getRequestPath(),
 		Body: Body,
@@ -101,7 +101,7 @@ func PutItem(i Item, Body []byte) error {
 }
 
 func GetItem(i Item, UUID string) error {
-	req := &request{
+	req := &Request{
 		Type: "GET",
 		Path: i.getRequestPath() + UUID,
 		Body: nil,
@@ -143,7 +143,7 @@ func GetItem(i Item, UUID string) error {
 }
 
 func GetItemList(i Item) error {
-	req := &request{
+	req := &Request{
 		Type: "GET",
 		Path: i.getRequestPath() + i.addArgs(),
 		Body: nil,
@@ -187,7 +187,7 @@ func GetItemList(i Item) error {
 }
 
 func DeleteItem(i Item, UUID string) error {
-	req := &request{
+	req := &Request{
 		Type: "DELETE",
 		Path: i.getRequestPath() + UUID,
 		Body: nil,

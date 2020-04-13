@@ -134,7 +134,7 @@ func ChartCreateCommand() *cli.Command {
 			log.Debug().Str("contentType", contentType).Msg("contentType")
 			bodyWriter.Close()
 
-			r := &request{
+			r := &Request{
 				Type: "POST",
 				Path: "chart",
 				Body: bodyBuf.Bytes(),

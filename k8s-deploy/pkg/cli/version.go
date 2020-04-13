@@ -31,7 +31,7 @@ func VersionCommand() *cli.Command {
 }
 
 func GetServiceVersion() (string, error) {
-	r := &request{
+	r := &Request{
 		Type: "GET",
 		Path: "version",
 		Body: nil,
