@@ -261,7 +261,7 @@ a3dd184f-084f-4d98-9841-29927bdbf627    admin   ClusterInstall  Success 2020-03-
 
 ## Verify the deployment
 ### Run toy_example
-We use the [toy_example](https://github.com/FederatedAI/FATE/blob/master/examples/toy_example) in FATE/examples to quick verify the deployment. Let the party 10000 as the host, while party 9999 as guest, use cluster mode. The details of this example, please refer to [toy_example README](https://github.com/FederatedAI/FATE/blob/master/examples/toy_example/README.md).
+We use the [toy_example](https://github.com/FederatedAI/FATE/blob/master/examples/toy_example) in FATE/examples to quick verify the deployment. Let the party 10000 as the guest, while party 9999 as host, use cluster mode. The details of this example, please refer to [toy_example README](https://github.com/FederatedAI/FATE/blob/master/examples/toy_example/README.md).
 
 Firstly, find the python container of party 10000 with kubectl
 ```
