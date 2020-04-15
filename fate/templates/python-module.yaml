@@ -39,9 +39,13 @@ data:
                 "host": "{{ .Values.modules.federation.ip }}", 
                 "port": 9394
             },
+            {{ if .Values.modules.serving }}
+            "servings": ["{{ .Values.modules.serving.ip }}:{{ .Values.modules.serving.port }}"],
+            {{ end }}
             "clustercomm": {
                 "host": "{{ .Values.modules.federation.ip }}",
                 "port": 9394
+
             }
         }
     }

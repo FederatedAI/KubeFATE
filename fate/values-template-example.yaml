@@ -1,7 +1,9 @@
 name: fate-10000
-namespaces: fate-10000
-version: v1.3.0-a
+namespace: fate-10000
+chartName: fate
+chartVersion: v1.3.0-a
 partyId: 10000
+registry: federatedai
 modules:
   - proxy
   - egg
@@ -19,11 +21,13 @@ proxy:
   type: NodePort
   nodePort: 30010
   partyList:
-  - partyId: 8888
+  - partyId: 9999
     partyIp: 192.168.1.10
-    partyPort: 30008
-  exchange:
-    ip: 192.168.1.1
-    port: 30000
+    partyPort: 30009
+
 egg:
   count: 3
+  processor: 4
+
+servingIp: serving-server.fate-serving-10000
+servingPort: 8000

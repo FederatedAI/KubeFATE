@@ -10,8 +10,7 @@ partyId: 9999
 partyName: fate-9999
 host:
   fateboard: 9999.fateboard.kubefate.net
-  client: 9999.notebook.kubefate.net
-nodePort: 
+nodePort: 30009
 
 exchange:
   partyIp: 10.184.111.187
@@ -55,9 +54,6 @@ nodeSelector:
   servingServer:
     nodeLabel: fedai.org
     value: 
-  client:
-    nodeLabel: fedai.org
-    value:
 
 modules:
   proxy: 
@@ -66,7 +62,6 @@ modules:
     type: NodePort
   egg: 
     include: true
-    processorSessionMaxCount: 4
     ip: egg
     type: ClusterIP
   fateboard: 
@@ -101,12 +96,8 @@ modules:
     include: true
     ip: python
     type: ClusterIP
-  client: 
-    include: true
-    ip: client
-    type: ClusterIP
   serving: 
     include: true
     ip: serving-server.fate-serving-9999
-    port: 80000
+    port: 8000
     type: ClusterIP
