@@ -13,6 +13,7 @@ modules:
   - redis
   - roll
   - python
+  - client
 
 proxy: 
   type: NodePort

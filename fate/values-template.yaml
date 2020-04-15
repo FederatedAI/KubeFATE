@@ -10,6 +10,7 @@ partyId: {{ .partyId }}
 partyName: {{ .name }}
 host:
   fateboard: {{ .partyId }}.fateboard.kubefate.net
+  client: {{ .partyId }}.notebook.kubefate.net
 nodePort: {{ with .proxy }}{{ .nodePort }}{{ end }}
 
 exchange:
@@ -108,4 +109,8 @@ modules:
   python: 
     include: {{ has "python" .modules }}
     ip: python
+    type: ClusterIP
+  client: 
+    include: {{ has "client" .modules }}
+    ip: client
     type: ClusterIP

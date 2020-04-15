@@ -25,3 +25,26 @@ spec:
           servicePort: 8080
 ---
 {{ end }}
+
+{{ if .Values.modules.client.include }}
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: client
+  labels:
+    fateMoudle: client
+    name: {{ .Values.partyName | quote  }}
+    partyId: {{ .Values.partyId | quote  }}
+    owner: kubefate
+    cluster: fate
+spec:
+  rules:
+  - host: {{ .Values.host.client }}
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: notebook
+          servicePort: 20000
+---
+{{ end }}

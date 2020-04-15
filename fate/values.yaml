@@ -5,16 +5,21 @@ image:
   registry: federatedai
   isThridParty:
   tag: 1.3.0-release
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
 partyId: 10000
 partyName: fate-10000
 host:
   fateboard: 10000.fateboard.kubefate.net
-nodePort: 
+  client: 10000.notebook.kubefate.net
+nodePort: 30010
 
 exchange:
   partyIp: 10.184.111.187
   partyPort: 30000
+partyList:
+  - partyId: 9999
+    partyIp: 10.193.11.46
+    partyPort: 30009
 mysql:
   mysql_root_password: fate_dev
   mysql_database: fate
@@ -54,12 +59,15 @@ nodeSelector:
   servingServer:
     nodeLabel: fedai.org
     value: 
+  client:
+    nodeLabel: fedai.org
+    value:
 
 modules:
   proxy: 
     include: true
     ip: proxy
-    type: ClusterIP
+    type: NodePort
   egg: 
     include: true
     ip: egg
@@ -95,4 +103,8 @@ modules:
   python: 
     include: true
     ip: python
+    type: ClusterIP
+  client: 
+    include: true
+    ip: client
     type: ClusterIP
