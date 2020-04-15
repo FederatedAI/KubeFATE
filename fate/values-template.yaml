@@ -2,7 +2,7 @@
 #nfsserver: 192.168.0.2
 
 image:
-  registry: {{ .federatedai }}
+  registry: {{ .registry | default "federatedai" }}
   isThridParty:
   tag: 1.3.0-release
   pullPolicy: IfNotPresent
