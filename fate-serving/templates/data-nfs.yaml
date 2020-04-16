@@ -1,0 +1,47 @@
+########################################################
+# Copyright 2019-2020 program was created VMware, Inc. #
+# SPDX-License-Identifier: Apache-2.0                  #
+########################################################
+
+{{- if and .Values.nfspath (.Values.nfsserver) }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .Values.partyId }}-pv-volume
+  labels:
+    pv: {{ .Values.partyId }}-pv-volume
+    name: {{ .Values.partyName | quote  }}
+    partyId: {{ .Values.partyId | quote  }}
+    owner: kubefate
+    cluster: fate
+spec:
+  capacity:
+    storage: 100Mi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    path: {{ .Values.nfspath }}
+    server: {{ .Values.nfsserver }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.partyId }}-pv-claim
+  labels:
+    name: {{ .Values.partyName | quote  }}
+    partyId: {{ .Values.partyId | quote  }}
+    owner: kubefate
+    cluster: fate
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: ""
+  resources:
+    requests:
+      storage: 100Mi
+  selector:
+    matchLabels:
+      pv: {{ .Values.partyId }}-pv-volume
+      name: {{ .Values.partyName | quote  }}
+      partyId: {{ .Values.partyId | quote  }}
+{{- end }}
