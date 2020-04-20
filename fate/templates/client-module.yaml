@@ -35,13 +35,13 @@ data:
                 "grpc.port": 9360,
                 "http.port": 9380
             }, 
-            "federation": {
-                "host": "{{ .Values.modules.federation.ip }}", 
-                "port": 9394
-            }
             {{ if .Values.modules.serving }}
             "servings": ["{{ .Values.modules.serving.ip }}:{{ .Values.modules.serving.port }}"],
             {{ end }}
+            "federation": {
+                "host": "{{ .Values.modules.federation.ip }}", 
+                "port": 9394
+            }     
         }
     }
 ---
@@ -81,6 +81,9 @@ spec:
         - image: {{ .Values.image.registry }}/client:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           name: client
+          env:
+            - name: partyId
+              value: {{ .Values.partyId | quote  }}
           ports:
             - containerPort: 20000
           volumeMounts:
