@@ -3,6 +3,7 @@ namespace: fate-10000
 chartName: fate
 chartVersion: v1.3.0-a
 partyId: 10000
+registry: federatedai
 modules:
   - proxy
   - egg
@@ -14,6 +15,7 @@ modules:
   - redis
   - roll
   - python
+  - client
 
 proxy: 
   type: NodePort
