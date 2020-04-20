@@ -1,0 +1,116 @@
+########################################################
+# Copyright 2019-2020 program was created VMware, Inc. #
+# SPDX-License-Identifier: Apache-2.0                  #
+########################################################
+
+{{ if .Values.servingRedis.include }}
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: serving-redis-config
+  labels:
+    fateMoudle: serving-redis
+    name: {{ .Values.partyName | quote  }}
+    partyId: {{ .Values.partyId  | quote }}
+    owner: kubefate
+    cluster: fate-serving
+data:
+  redis.conf: |
+    bind 0.0.0.0
+    databases 50
+    always-show-logo yes
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: serving-redis
+  labels:
+    fateMoudle: serving-redis
+    name: {{ .Values.partyName | quote  }}
+    partyId: {{ .Values.partyId | quote  }}
+    owner: kubefate
+    cluster: fate-serving
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      fateMoudle: serving-redis
+      name: {{ .Values.partyName | quote  }}
+      partyId: {{ .Values.partyId | quote  }}
+  template:
+    metadata:
+      labels:
+        fateMoudle: serving-redis
+        name: {{ .Values.partyName | quote  }}
+        partyId: {{ .Values.partyId | quote  }}
+        owner: kubefate
+        cluster: fate-serving
+    spec:
+      containers:
+        {{- if .Values.image.isThridParty }}
+        - image: {{ .Values.image.registry }}/redis:5
+        {{- else }}
+        - image: redis:5
+        {{- end }}
+          name: serving-redis
+          ports:
+            - containerPort: 6379
+              name: redis
+          command:
+            - "redis-server"
+          args:
+            - "/usr/local/etc/redis/redis.conf"
+            - "--requirepass"
+            - "{{ .Values.servingRedis.password | default "fate_dev" }}"
+          volumeMounts:
+            - mountPath: /usr/local/etc/redis/redis.conf
+              name: serving-redis-confs
+              subPath: redis.conf
+            {{- if and .Values.nfspath ( .Values.nfsserver ) }}
+            - name: serving-redis-persistent-storage
+              subPath: serving-redis-{{ .Values.partyId }}
+              mountPath: /var/lib/redis
+            {{- end }}
+      {{- with .Values.servingRedis.nodeSelector }}
+      nodeSelector:
+      {{- range $k,$v := . }}
+        {{ $k }}: {{ $v }}
+      {{- end }}
+      {{- end }}
+      restartPolicy: Always
+      volumes:
+        - name: serving-redis-confs
+          configMap:
+            name: serving-redis-config
+        {{- if and .Values.nfspath ( .Values.nfsserver ) }}
+        - name: serving-redis-persistent-storage
+          persistentVolumeClaim:
+            claimName: {{ .Values.partyId }}-pv-claim
+        {{- end }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: serving-redis
+  labels:
+    fateMoudle: serving-redis
+    name: {{ .Values.partyName | quote  }}
+    partyId: {{ .Values.partyId | quote  }}
+    owner: kubefate
+    cluster: fate-serving
+spec:
+  ports:
+    - name: "6379"
+      port: 6379
+      targetPort: 6379
+      protocol: TCP
+  type: {{ .Values.servingRedis.type }}
+  selector:
+    fateMoudle: serving-redis
+    name: {{ .Values.partyName | quote  }}
+    partyId: {{ .Values.partyId | quote  }}
+---
+{{ end }}
