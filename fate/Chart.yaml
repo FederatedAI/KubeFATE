@@ -2,4 +2,4 @@ apiVersion: v1
 appVersion: v1.3.0
 description: A Helm chart for fate-party
 name: fate
-version: v1.3.0-b
+version: v1.3.0-c

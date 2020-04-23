@@ -3,7 +3,7 @@ entries:
   fate:
   - apiVersion: v1
     appVersion: v1.3.0
-    created: "2020-03-24T12:25:33.6052502+08:00"
+    created: "2020-04-23T14:56:15.5125065+08:00"
     description: A Helm chart for fate-party
     digest: 965d92134bbafba670d1d738f92d9198b231e69fe4e726ba35661f4d1b21fa24
     name: fate
@@ -12,16 +12,25 @@ entries:
     version: 1.3.0
   - apiVersion: v1
     appVersion: v1.3.0
-    created: "2020-03-24T12:25:33.6222508+08:00"
+    created: "2020-04-23T14:56:15.5215069+08:00"
     description: A Helm chart for fate-party
-    digest: 016dc59c98ee05e27adc461b5d81cb695ddad76b0589061490b7b356db33e824
+    digest: 7d6121440795f88ef75175503ea57645fa96c8d1b1e99bb18d2ca61dd7a86b3e
+    name: fate
+    urls:
+    - package/fate-v1.3.0-c.tgz
+    version: v1.3.0-c
+  - apiVersion: v1
+    appVersion: v1.3.0
+    created: "2020-04-23T14:56:15.5195084+08:00"
+    description: A Helm chart for fate-party
+    digest: a43141013a6a056b7a2680d03629da102361078edece31c17f70d426e1d05845
     name: fate
     urls:
     - package/fate-v1.3.0-b.tgz
     version: v1.3.0-b
   - apiVersion: v1
     appVersion: v1.3.0
-    created: "2020-03-24T12:25:33.6192471+08:00"
+    created: "2020-04-23T14:56:15.5175053+08:00"
     description: A Helm chart for fate-party
     digest: 4d09058c05f02377642a2224aad43599df9fe77b089947f2e2080b1b8c547bd7
     name: fate
@@ -30,7 +39,7 @@ entries:
     version: v1.3.0-a
   - apiVersion: v1
     appVersion: v1.2.0
-    created: "2020-03-24T12:25:33.5942485+08:00"
+    created: "2020-04-23T14:56:15.5095051+08:00"
     description: A Helm chart for fate-party
     digest: d5e8c02cc542a659f71c561fdac680bc28b1986af7af34fdf375b634646584e5
     name: fate
@@ -40,11 +49,11 @@ entries:
   fate-serving:
   - apiVersion: v1
     appVersion: v1.2.2
-    created: "2020-03-24T12:25:33.6062502+08:00"
+    created: "2020-04-23T14:56:15.5155068+08:00"
     description: A Helm chart for fate serving
-    digest: a9b19d91a1586733e6e67c6e72bb76be1df4120f3ee91919647387774da30444
+    digest: efeacc47f097dcc94e074c5d8ff795adf8e0b8b03539ab2acb26ab42b653731f
     name: fate-serving
     urls:
     - package/fate-serving-v1.2.2.tgz
     version: v1.2.2
-generated: "2020-03-24T12:25:33.5812446+08:00"
+generated: "2020-04-23T14:56:15.5025065+08:00"
