@@ -35,6 +35,10 @@ data:
                 "grpc.port": 9360,
                 "http.port": 9380
             }, 
+            "fml_agent": {
+                "host": "{{ .Values.modules.fateflow.ip }}", 
+                "port": 8484
+            }, 
             {{ if .Values.modules.serving }}
             "servings": ["{{ .Values.modules.serving.ip }}:{{ .Values.modules.serving.port }}"],
             {{ end }}
