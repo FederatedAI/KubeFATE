@@ -39,6 +39,10 @@ data:
                 "host": "{{ .Values.modules.federation.ip }}", 
                 "port": 9394
             },
+            "fml_agent": {
+                "host": "{{ .Values.modules.fateflow.ip }}", 
+                "port": 8484
+            },
             {{ if .Values.modules.serving }}
             "servings": ["{{ .Values.modules.serving.ip }}:{{ .Values.modules.serving.port }}"],
             {{ end }}
@@ -256,6 +260,7 @@ spec:
           ports:
             - containerPort: 9360
             - containerPort: 9380
+            - containerPort: 8484
           volumeMounts:
             - mountPath: /data/projects/fate/python/eggroll/conf/server_conf.json
               name: python-confs
@@ -313,6 +318,10 @@ spec:
     - name: "9380"
       port: 9380
       targetPort: 9380
+      protocol: TCP
+    - name: "8484"
+      port: 8484
+      targetPort: 8484
       protocol: TCP
   type: {{ .Values.modules.fateflow.type }}
   selector:
