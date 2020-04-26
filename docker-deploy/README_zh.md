@@ -43,7 +43,7 @@ $ docker pull mysql:8
 对于中国的用户可以用以下方式下载镜像包：
 ```bash
 $ wget https://webank-ai-1251170195.cos.ap-guangzhou.myqcloud.com/fate_<version>-images.tar.gz 
-$ docker load fate_<version>-images.tar.gz 
+$ docker load --input fate_<version>-images.tar.gz 
 ```
 
 检查所有镜像是否下载成功。
