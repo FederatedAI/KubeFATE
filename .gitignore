@@ -1,3 +1,5 @@
 *.conf
 *.cfg
 *.idea/
+*bin/
+*.todo

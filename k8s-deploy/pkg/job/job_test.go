@@ -27,7 +27,8 @@ func TestMsa(t *testing.T) {
 	d := ClusterArgs{
 		Name:         "fate-10000",
 		Namespace:    "fate-10000",
-		ChartVersion: "V1.2.0",
+		ChartName:    "fate",
+		ChartVersion: "v1.3.0-a",
 		Data:         []byte(`{"egg":{"count":3},"exchange":{"ip":"192.168.1.1","port":9370},"modules":["proxy","egg","fateboard","fateflow","federation","metaService","mysql","redis","roll","python"],"partyId":10000,"proxy":{"nodePort":30010,"type":"NodePort"}}`),
 	}
 	b, err := json.Marshal(d)
@@ -57,7 +58,9 @@ func TestClusterInstall(t *testing.T) {
 				clusterArgs: &ClusterArgs{
 					Name:         "fate-8888",
 					Namespace:    "fate-8888",
-					ChartVersion: "v1.2.0",
+					ChartName:    "fate",
+					ChartVersion: "v1.3.0-a",
+					Cover:        true,
 					Data:         []byte(`{ "partyId":8888,"endpoint": { "ip":"10.184.111.187","port":30008}}`),
 				},
 			},
