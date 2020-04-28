@@ -129,11 +129,12 @@ func TestClusterUpdate(t *testing.T) {
 			name: "",
 			args: args{
 				clusterArgs: &ClusterArgs{
-					Name:         "fate-10000",
-					Namespace:    "fate-10000",
-					ChartVersion: "v1.3.0-a",
+					Name:         "fate-9999",
+					Namespace:    "fate-9999",
+					ChartName:    "fate",
+					ChartVersion: "v1.3.0-b",
 					Cover:        false,
-					Data:         []byte(`{"chartVersion":"v1.3.0-a","egg":{"count":1},"modules":["proxy","egg","federation","metaService","mysql","redis","roll","python"],"name":"fate-10000","namespace":"fate-10000","partyId":10000,"proxy":{"exchange":{"ip":"10.184.111.187","port":30000},"nodePort":30010,"type":"NodePort"}}`),
+					Data:         []byte(`{"chartName":"fate","chartVersion":"v1.3.0-b","egg":{"count":1},"modules":["proxy","egg","federation","metaService","mysql","redis","roll","python"],"name":"fate-10000","namespace":"fate-10000","partyId":10000,"proxy":{"exchange":{"ip":"10.184.111.187","port":30000},"nodePort":30010,"type":"NodePort"}}`),
 				},
 				creator: "admin",
 			},
