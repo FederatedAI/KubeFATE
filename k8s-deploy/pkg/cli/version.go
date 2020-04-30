@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/api"
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/service"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
 	"github.com/urfave/cli/v2"
@@ -19,12 +20,13 @@ func VersionCommand() *cli.Command {
 		Usage: "Show kubefate command line and service version",
 		Action: func(c *cli.Context) error {
 			serviceVersion, err := GetServiceVersion()
+			clientVersion := service.GetVersion()
 			if err != nil {
 				fmt.Printf("* kubefate service connection error, %s\r\n", err.Error())
 			} else {
 				fmt.Printf("* kubefate service version=%s\r\n", serviceVersion)
 			}
-			fmt.Printf("* kubefate commandLine version=%s\r\n", api.ServiceVersion)
+			fmt.Printf("* kubefate commandLine version=%#v\r\n", *clientVersion)
 			return nil
 		},
 	}
@@ -69,7 +71,7 @@ func GetServiceVersion() (string, error) {
 
 	type VersionResultMsg struct {
 		Msg     string
-		Version string
+		Version service.Version
 	}
 
 	VersionResult := new(VersionResultMsg)
@@ -80,5 +82,5 @@ func GetServiceVersion() (string, error) {
 	}
 
 	log.Debug().Int("Code", resp.StatusCode).Bytes("Body", respBody).Msg("ok")
-	return VersionResult.Version, err
+	return fmt.Sprintf("%#v", VersionResult.Version), err
 }
