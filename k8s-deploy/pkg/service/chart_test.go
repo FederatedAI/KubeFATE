@@ -46,6 +46,7 @@ func TestGetChartPath(t *testing.T) {
 	logging.InitLog()
 	_ = os.Setenv("FATECLOUD_CHART_PATH", "./")
 	type args struct {
+		name    string
 		version string
 	}
 	tests := []struct {
@@ -57,6 +58,7 @@ func TestGetChartPath(t *testing.T) {
 		{
 			name: "test",
 			args: args{
+				name:    "fate",
 				version: "v1.2.0",
 			},
 			want: viper.GetString("chart.path") + "fate/v1.2.0/",
@@ -64,7 +66,7 @@ func TestGetChartPath(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := GetChartPath(); got != tt.want {
+			if got := GetChartPath(tt.args.name); got != tt.want {
 				t.Errorf("GetChartPath() = %v, want %v", got, tt.want)
 			}
 		})
@@ -76,6 +78,7 @@ func TestGetFateChart(t *testing.T) {
 	logging.InitLog()
 	_ = os.Setenv("FATECLOUD_CHART_PATH", "../../")
 	type args struct {
+		name    string
 		version string
 	}
 	var tests = []struct {
@@ -88,6 +91,7 @@ func TestGetFateChart(t *testing.T) {
 		{
 			name: "test",
 			args: args{
+				name:    "fate",
 				version: "v1.2.0",
 			},
 			want:    nil,
@@ -96,7 +100,7 @@ func TestGetFateChart(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := GetFateChart(tt.args.version)
+			got, err := GetFateChart(tt.args.name, tt.args.version)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("GetFateChart() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -114,6 +118,7 @@ func TestFateChart_read(t *testing.T) {
 		HelmChart *db.HelmChart
 	}
 	type args struct {
+		name    string
 		version string
 	}
 	var tests = []struct {
@@ -130,6 +135,7 @@ func TestFateChart_read(t *testing.T) {
 				HelmChart: new(db.HelmChart),
 			},
 			args: args{
+				name:    "fate",
 				version: "v1.2.0",
 			},
 			want:    "v1.2.0",
@@ -141,7 +147,7 @@ func TestFateChart_read(t *testing.T) {
 			fc := &FateChart{
 				HelmChart: tt.fields.HelmChart,
 			}
-			got, err := fc.read(tt.args.version)
+			got, err := fc.read(tt.args.name, tt.args.version)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("FateChart.read() error = %v, wantErr %v", err, tt.wantErr)
 				return

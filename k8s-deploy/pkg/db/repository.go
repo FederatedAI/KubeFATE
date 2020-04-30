@@ -19,7 +19,8 @@ type Repository interface {
 // Save the object in the database
 func Save(repository Repository) (string, error) {
 
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 
 	db, err := ConnectDb()
 	if err != nil {
@@ -36,7 +37,8 @@ func Save(repository Repository) (string, error) {
 
 // Find find the objects from the database
 func Find(repository Repository) ([]interface{}, error) {
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 	db, err := ConnectDb()
 	if err != nil {
 		log.Println(err)
@@ -71,7 +73,8 @@ func Find(repository Repository) ([]interface{}, error) {
 
 // FindByUUID find the object from the database via uuid
 func FindByUUID(repository Repository, uuid string) (interface{}, error) {
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 	db, err := ConnectDb()
 	if err != nil {
 		log.Println(err)
@@ -106,7 +109,8 @@ func FindByUUID(repository Repository, uuid string) (interface{}, error) {
 
 // FindByUUID find the object from the database via uuid
 func FindOneByUUID(repository Repository, uuid string) (interface{}, error) {
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 	db, err := ConnectDb()
 	if err != nil {
 		log.Println(err)
@@ -140,7 +144,8 @@ func FindOneByUUID(repository Repository, uuid string) (interface{}, error) {
 
 // UpdateByUUID Update the object in the database via uuid
 func UpdateByUUID(repository Repository, uuid string) error {
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 	db, err := ConnectDb()
 	if err != nil {
 		log.Println(err)
@@ -154,7 +159,7 @@ func UpdateByUUID(repository Repository, uuid string) error {
 	}
 
 	update := bson.D{
-		{"$set", doc},
+		{Key: "$set", Value: doc},
 	}
 	filter := bson.M{"uuid": uuid}
 	collection.FindOneAndUpdate(ctx, filter, update)
@@ -184,14 +189,15 @@ func ToJson(r interface{}) string {
 
 // DeleteByUUID delete object from database via uuid
 func DeleteByUUID(repository Repository, uuid string) (int64, error) {
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 	db, err := ConnectDb()
 	if err != nil {
 		log.Println(err)
 		return 0, err
 	}
 	collection := db.Collection(repository.getCollection())
-	filter := bson.D{{"uuid", uuid}}
+	filter := bson.D{{Key: "uuid", Value: uuid}}
 	deleteResult, err := collection.DeleteMany(ctx, filter)
 	if err != nil {
 		log.Fatal(err)
@@ -203,14 +209,15 @@ func DeleteByUUID(repository Repository, uuid string) (int64, error) {
 
 // DeleteByUUID delete object from database via uuid
 func DeleteOneByUUID(repository Repository, uuid string) error {
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 	db, err := ConnectDb()
 	if err != nil {
 		log.Println(err)
 		return err
 	}
 	collection := db.Collection(repository.getCollection())
-	filter := bson.D{{"uuid", uuid}}
+	filter := bson.D{{Key: "uuid", Value: uuid}}
 	r, err := collection.DeleteOne(ctx, filter)
 	if err != nil {
 		return err
@@ -223,7 +230,8 @@ func DeleteOneByUUID(repository Repository, uuid string) error {
 
 // FindByFilter find objects from database via custom filter, such as: findByName, findByStatus
 func FindByFilter(repository Repository, filter bson.M) ([]interface{}, error) {
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 	db, err := ConnectDb()
 	if err != nil {
 		log.Println(err)
@@ -258,7 +266,8 @@ func FindByFilter(repository Repository, filter bson.M) ([]interface{}, error) {
 
 // FindByFilter find objects from database via custom filter, such as: findByName, findByStatus
 func FindOneByFilter(repository Repository, filter bson.M) (interface{}, error) {
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 	db, err := ConnectDb()
 	if err != nil {
 		log.Println(err)

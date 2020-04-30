@@ -20,7 +20,7 @@ type Job struct {
 	Creator   string        `json:"creator"`
 	SubJobs   []string      `json:"sub-jobs"`
 	Status    JobStatus     `json:"status"`
-	timeLimit time.Duration `json:"time_limit"`
+	TimeLimit time.Duration `json:"time_limit"`
 }
 
 type JobList []*Job
@@ -112,7 +112,7 @@ func NewJob(method string, creator string) *Job {
 		Creator:   creator,
 		StartTime: time.Now(),
 		Status:    Pending_j,
-		timeLimit: 1 * time.Hour,
+		TimeLimit: 1 * time.Hour,
 	}
 
 	return job
@@ -184,5 +184,5 @@ func JobDeleteByUUID(uuid string) error {
 }
 
 func (job *Job) TimeOut() bool {
-	return time.Now().After(job.StartTime.Add(job.timeLimit))
+	return time.Now().After(job.StartTime.Add(job.TimeLimit))
 }

@@ -198,7 +198,8 @@ func TestFindClusterList(t *testing.T) {
 func TestClusterDeleteAll(t *testing.T) {
 	InitConfigForTest()
 
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 	db, err := ConnectDb()
 	if err != nil {
 		log.Error().Err(err).Msg("ConnectDb")

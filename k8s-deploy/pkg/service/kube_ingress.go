@@ -6,25 +6,30 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func GetIngress(name, namespace string) (*v1beta1.Ingress, error) {
+func GetIngress(name, namespace string) (*v1beta1.IngressList, error) {
 	clientset, err := getClientset()
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	ingressName := "fateboard"
+	ingressList, err := clientset.ExtensionsV1beta1().Ingresses(namespace).List(metav1.ListOptions{})
 
-	ingress, err := clientset.ExtensionsV1beta1().Ingresses(namespace).Get(ingressName, metav1.GetOptions{})
-	return ingress, err
+	return ingressList, err
 }
 
-func GetIngressUrl(name, namespace string) (string, error) {
+func GetIngressUrl(name, namespace string) ([]string, error) {
+	var urls []string
 
-	ingress, err := GetIngress(name, namespace)
+	ingressList, err := GetIngress(name, namespace)
 	if err != nil {
 		fmt.Println(err)
-		return "", err
+		return nil, err
+	}
+	for _, ingress := range ingressList.Items {
+		for _, v := range ingress.Spec.Rules {
+			urls = append(urls, v.Host)
+		}
 	}
 
-	return ingress.Spec.Rules[0].Host, nil
+	return urls, nil
 }

@@ -6,9 +6,9 @@ type endpoint struct {
 }
 
 type boostrapParties struct {
-	partyId   string   `json:"party_id"`
-	endpoint  endpoint `json:"endpoint"`
-	partyType string   `json:"party_type"`
+	PartyId   string   `json:"party_id"`
+	Endpoint  endpoint `json:"endpoint"`
+	PartyType string   `json:"party_type"`
 }
 type installCluster struct {
 	Name            string           `json:"name"`
