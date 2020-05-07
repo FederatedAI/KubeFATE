@@ -24,17 +24,8 @@ volumes:
       device: /path/to/host/dir/federatedml
 
 services:
-  federation:
-    image: "${PREFIX}/federation:${TAG}"
-    expose:
-      - 9394
-    volumes:
-      - ./confs/federation/conf:/data/projects/fate/federation/conf
-    networks:
-      - fate-network
-
-  proxy:
-    image: "${PREFIX}/proxy:${TAG}"
+  rollsite:
+    image: "${PREFIX}/eggroll:${TAG}"
     ports:
       - "9370:9370"
     environment:
@@ -57,7 +48,7 @@ services:
       - meta-service
       - python
 
-  roll:
+  clustermanager:
     image: "${PREFIX}/roll:${TAG}"
     expose:
       - 8011
@@ -70,7 +61,7 @@ services:
     depends_on:
       - meta-service
 
-  egg:
+  nodemanager:
     image: "${PREFIX}/egg:${TAG}"
     expose:
       - 7888
@@ -112,19 +103,6 @@ services:
     networks:
       - fate-network
 
-  meta-service:
-    image: "${PREFIX}/meta-service:${TAG}"
-    expose:
-      - 8590
-    environment:
-      PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION: python
-    volumes:
-      - ./confs/meta-service/conf:/data/projects/fate/meta-service/conf
-    depends_on:
-      - mysql
-    networks:
-      - fate-network
-
   mysql:
     image: "mysql:8"
     expose:
@@ -140,14 +118,3 @@ services:
       MYSQL_PASSWORD: fate_dev
     networks:
       - fate-network
-
-  redis:
-    image: "redis:5"
-    expose:
-      - 6379
-    command: redis-server --requirepass fate_dev
-    volumes:
-      - ./confs/redis/data:/data
-    networks:
-      - fate-network
-
