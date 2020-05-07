@@ -29,12 +29,12 @@ partyList:
 {{- end }}
 {{- end }}
 mysql:
-  mysql_root_password: fate_dev
-  mysql_database: fate
-  mysql_user: fate
-  mysql_password: fate_dev
+  mysql_root_password: {{.externalMysqlRootPassword|default "fate_dev"}}
+  mysql_database: {{.externalMysqlDatabase|default "fate"}}
+  mysql_user: {{.externalMysqlUser|default "fate"}}
+  mysql_password: {{.externalMysqlPassword|default "fate_dev"}}
 redis:
-  requirepass: fate_dev
+  requirepass: {{.externalRedisPassword|default "fate_dev"}}
 eggList:
 {{- with .egg }}
 {{- range .count | int | until }}
@@ -99,11 +99,11 @@ modules:
     type: ClusterIP
   mysql: 
     include: {{ has "mysql" .modules }}
-    ip: mysql
+    ip: {{.externalMysqlIp|default "mysql"}}
     type: ClusterIP
   redis: 
     include: {{ has "redis" .modules }}
-    ip: redis
+    ip: {{.externalRedisIp|default "redis"}}
     type: ClusterIP
   roll: 
     include: {{ has "roll" .modules }}
