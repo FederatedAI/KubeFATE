@@ -29,10 +29,10 @@ GenerateConfig() {
         eval data_dir=${deploy_dir}/data-dir
     
         eval nodemanager_ip=(egg)
-        eval nodemanager_port=4670
+        eval nodemanager_port=4671
     
         eval clustermanager_ip=clustermanager
-        eval clustermanager_port=4671
+        eval clustermanager_port=4670
 
         eval proxy_ip=rollsite
         eval proxy_port=9370
@@ -79,7 +79,7 @@ GenerateConfig() {
         # egg config
         module_name=eggroll
 	#db connect inf
-        sed -i "s#<jdbc.url>#jdbc:mysql://${db_ip}:3306/${db_name}?characterEncoding=utf8\&characterSetResults=utf8\&autoReconnect=true\&failOverReadOnly=false\&serverTimezone=GMT%2B8#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
+        sed -i "s#<jdbc.url>#jdbc:mysql://${db_ip}:3306/${db_name}/eggroll_meta?useSSL=false&serverTimezone=UTC&characterEncoding=utf8&allowPublicKeyRetrieval=true#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
 	sed -i "s#<jdbc.username>#${db_user}#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
         sed -i "s#<jdbc.password>#${db_password}#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
 
