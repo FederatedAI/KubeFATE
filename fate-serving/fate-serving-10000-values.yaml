@@ -21,7 +21,7 @@ servingProxy:
   ingerssHost: 10000.serving-proxy.kubefate.net
   partyList:
   - partyId: 9999
-    partyIp: 10.184.111.187
+    partyIp: 192.168.100.123
     partyPort: 30109
   nodeSelector:
 

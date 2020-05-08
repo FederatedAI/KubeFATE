@@ -14,7 +14,7 @@ host:
 nodePort: 
 
 exchange:
-  partyIp: 10.184.111.187
+  partyIp: 192.168.100.123
   partyPort: 30010
 mysql:
   mysql_root_password: fate_dev
