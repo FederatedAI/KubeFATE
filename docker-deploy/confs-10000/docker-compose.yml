@@ -1,0 +1,112 @@
+########################################################
+# Copyright 2019-2020 program was created VMware, Inc. #
+# SPDX-License-Identifier: Apache-2.0                  #
+########################################################
+version: '3'
+networks:
+  fate-network:
+
+volumes:
+  fate_flow_logs:
+  shared_dir_examples:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/luke/Documents/github/KubeFATE/docker-deploy/confs-10000/shared_dir/examples
+  shared_dir_federatedml:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/luke/Documents/github/KubeFATE/docker-deploy/confs-10000/shared_dir/federatedml
+
+services:
+  rollsite:
+    image: "${PREFIX}/eggroll:${TAG}"
+    ports:
+      - "9370:9370"
+    environment:
+      PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION: python
+    volumes:
+      - ./confs/eggroll/conf:/data/projects/fate/eggroll/conf
+    networks:
+      - fate-network
+    command: ["bash", "-c", "java -Dlog4j.configurationFile=$${EGGROLL_HOME}/conf/log4j2.properties -cp $${EGGROLL_HOME}/lib/*:$${EGGROLL_HOME}/conf/ com.webank.eggroll.rollsite.Proxy -c $${EGGROLL_HOME}/conf/eggroll.properties"]
+  
+  fateboard:
+    image: "${PREFIX}/fateboard:${TAG}"
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./confs/fateboard/conf:/data/projects/fate/fateboard/conf
+      - fate_flow_logs:/data/projects/fate/python/logs
+    networks:
+      - fate-network
+    depends_on:
+      - python
+  
+  clustermanager:
+    image: "${PREFIX}/eggroll:${TAG}"
+    expose:
+      - 4670 
+    volumes:
+      - ./confs/eggroll/conf:/data/projects/fate/eggroll/conf
+    environment:
+      PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION: python
+    networks:
+      - fate-network
+    command: ["bash", "-c", "java -Dlog4j.configurationFile=$${EGGROLL_HOME}/conf/log4j2.properties -cp $${EGGROLL_HOME}/lib/*: com.webank.eggroll.core.Bootstrap --bootstraps com.webank.eggroll.core.resourcemanager.ClusterManagerBootstrap -c $${EGGROLL_HOME}/conf/eggroll.properties -p 4670 -s 'EGGROLL_DEAMON'"]
+  
+  nodemanager:
+    image: "${PREFIX}/eggroll:${TAG}"
+    expose:
+      - 4671
+    environment:
+      PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION: cpp 
+      # PYTHONPATH: /data/projects/fate/eggroll/python
+      # GLOG_log_dir: /data/projects/fate/eggroll/storage-service-cxx/logs
+    volumes:
+        - ./confs/eggroll/conf:/data/projects/fate/eggroll/conf
+        - ./confs/fate_flow/conf/server_conf.json:/data/projects/fate/python/arch/conf/server_conf.json
+        - ./confs/data-dir:/data/projects/eggroll/data
+    networks:
+      - fate-network
+    command: ["bash", "-c", "java -Dlog4j.configurationFile=$${EGGROLL_HOME}/conf/log4j2.properties -cp $${EGGROLL_HOME}/lib/*: com.webank.eggroll.core.Bootstrap --bootstraps com.webank.eggroll.core.resourcemanager.NodeManagerBootstrap -c $${EGGROLL_HOME}/conf/eggroll.properties -p 4671 -s 'EGGROLL_DEAMON'"]
+  
+  python:
+    image: "${PREFIX}/python:${TAG}"
+    ports:
+      - "9360:9360"
+      - "9380:9380"
+    restart: always
+    volumes:
+      - shared_dir_federatedml:/data/projects/fate/python/federatedml
+      - shared_dir_examples:/data/projects/fate/python/examples
+      - ./confs/fate_flow/conf/settings.py:/data/projects/fate/python/fate_flow/settings.py
+      - ./confs/fate_flow/conf/base_conf.yaml:/data/projects/fate/python/arch/conf/base_conf.yaml
+      - ./confs/fate_flow/conf/server_conf.json:/data/projects/fate/python/arch/conf/server_conf.json
+      - fate_flow_logs:/data/projects/fate/python/logs
+    depends_on:
+      - mysql
+      - rollsite
+      - clustermanager
+      - nodemanager
+    networks:
+      - fate-network
+
+  mysql:
+    image: "mysql:8"
+    expose:
+      - 3306
+    volumes:
+      - ./confs/mysql/init:/docker-entrypoint-initdb.d/
+      - ./confs/mysql/data:/var/lib/mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: fate_dev
+      MYSQL_DATABASE: fate
+      MYSQL_USER: fate
+      MYSQL_PASSWORD: fate_dev
+    networks:
+      - fate-network
