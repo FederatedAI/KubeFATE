@@ -24,61 +24,61 @@ volumes:
       device: /path/to/host/dir/federatedml
 
 services:
-  rollsite:
-    image: "${PREFIX}/eggroll:${TAG}"
-    ports:
-      - "9370:9370"
-    environment:
-      PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION: python
-    volumes:
-      - ./confs/proxy/conf:/data/projects/fate/proxy/conf
-    networks:
-      - fate-network
-
-  fateboard:
-    image: "${PREFIX}/fateboard:${TAG}"
-    ports:
-      - "8080:8080"
-    volumes:
-      - ./confs/fateboard/conf:/data/projects/fate/fateboard/conf
-      - fate_flow_logs:/data/projects/fate/python/logs
-    networks:
-      - fate-network
-    depends_on:
-      - meta-service
-      - python
-
-  clustermanager:
-    image: "${PREFIX}/roll:${TAG}"
-    expose:
-      - 8011
-    volumes:
-      - ./confs/roll/conf:/data/projects/fate/roll/conf
-    environment:
-      PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION: python
-    networks:
-      - fate-network
-    depends_on:
-      - meta-service
-
-  nodemanager:
-    image: "${PREFIX}/egg:${TAG}"
-    expose:
-      - 7888
-      - 7778
-      - "50000-60000"
-    environment:
-      PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION: cpp 
-      LD_LIBRARY_PATH: $$LD_LIBRARY_PATH:/usr/local/lib:/data/projects/fate/eggroll/storage-service-cxx/third_party/lib
-      PYTHONPATH: /data/projects/fate/eggroll/python
-      GLOG_log_dir: /data/projects/fate/eggroll/storage-service-cxx/logs
-    volumes:
-        - ./confs/egg/conf:/data/projects/fate/eggroll/egg/conf
-        - ./confs/federatedml/conf/server_conf.json:/data/projects/fate/eggroll/python/eggroll/conf/server_conf.json
-        - ./confs/egg/data-dir:/data/projects/fate/data-dir
-    networks:
-      - fate-network
-
+        #  rollsite:
+        #    image: "${PREFIX}/eggroll:${TAG}"
+        #    ports:
+        #      - "9370:9370"
+        #    environment:
+        #      PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION: python
+        #    volumes:
+        #      - ./confs/proxy/conf:/data/projects/fate/proxy/conf
+        #    networks:
+        #      - fate-network
+        #
+        #  fateboard:
+        #    image: "${PREFIX}/fateboard:${TAG}"
+        #    ports:
+        #      - "8080:8080"
+        #    volumes:
+        #      - ./confs/fateboard/conf:/data/projects/fate/fateboard/conf
+        #      - fate_flow_logs:/data/projects/fate/python/logs
+        #    networks:
+        #      - fate-network
+        #    depends_on:
+        #      - meta-service
+        #      - python
+        #
+        #  clustermanager:
+        #    image: "${PREFIX}/roll:${TAG}"
+        #    expose:
+        #      - 8011
+        #    volumes:
+        #      - ./confs/roll/conf:/data/projects/fate/roll/conf
+        #    environment:
+        #      PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION: python
+        #    networks:
+        #      - fate-network
+        #    depends_on:
+        #      - meta-service
+        #
+        #  nodemanager:
+        #    image: "${PREFIX}/egg:${TAG}"
+        #    expose:
+        #      - 7888
+        #      - 7778
+        #      - "50000-60000"
+        #    environment:
+        #      PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION: cpp 
+        #      LD_LIBRARY_PATH: $$LD_LIBRARY_PATH:/usr/local/lib:/data/projects/fate/eggroll/storage-service-cxx/third_party/lib
+        #      PYTHONPATH: /data/projects/fate/eggroll/python
+        #      GLOG_log_dir: /data/projects/fate/eggroll/storage-service-cxx/logs
+        #    volumes:
+        #        - ./confs/egg/conf:/data/projects/fate/eggroll/egg/conf
+        #        - ./confs/federatedml/conf/server_conf.json:/data/projects/fate/eggroll/python/eggroll/conf/server_conf.json
+        #        - ./confs/egg/data-dir:/data/projects/fate/data-dir
+        #    networks:
+        #      - fate-network
+        #
   python:
     image: "${PREFIX}/python:${TAG}"
     ports:
@@ -88,18 +88,15 @@ services:
     volumes:
       - shared_dir_federatedml:/data/projects/fate/python/federatedml
       - shared_dir_examples:/data/projects/fate/python/examples
-      - ./confs/federatedml/conf:/data/projects/fate/python/arch/conf
-      - ./confs/federatedml/conf:/data/projects/fate/python/eggroll/conf
       - ./confs/fate_flow/conf/settings.py:/data/projects/fate/python/fate_flow/settings.py
+      - ./confs/fate_flow/conf/base_conf.yaml:/data/projects/fate/python/arch/conf/base_conf.yaml
       - ./confs/fate_flow/conf/server_conf.json:/data/projects/fate/python/arch/conf/server_conf.json
       - fate_flow_logs:/data/projects/fate/python/logs
     depends_on:
-      - redis
-      - meta-service
-      - proxy
-      - roll
-      - egg
       - mysql
+       #  - rollsite
+       #  - clustermanager
+       #  - nodemanager
     networks:
       - fate-network
 
