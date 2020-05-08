@@ -17,7 +17,7 @@ After the tutorial, the deployment architecture looks like following diagram.
 	cd ~ && mkdir demo && cd demo
 	```
 
-**<div align="center"><font color="red">!!!Note: in this tutorial, the IP of machine we used is 10.160.112.145. Please change it to your machine's IP in all following commands and config files.</font></div>**
+**<div align="center"><font color="red">!!!Note: in this tutorial, the IP of machine we used is 192.168.100.123. Please change it to your machine's IP in all following commands and config files.</font></div>**
 
 # Start Tutorial
 ## Install related tools
@@ -113,8 +113,8 @@ pod/kubefate-6d576d6c88-mz6ds   1/1     Running   0          16s
 pod/mongo-56684d6c86-4ff5m      1/1     Running   0          16s
 
 NAME               TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)     AGE
-service/kubefate   ClusterIP   10.111.165.189   <none>        8080/TCP    16s
-service/mongo      ClusterIP   10.98.194.57     <none>        27017/TCP   16s
+service/kubefate   ClusterIP   192.168.100.123   <none>        8080/TCP    16s
+service/mongo      ClusterIP   192.168.100.124     <none>        27017/TCP   16s
 
 NAME                       READY   UP-TO-DATE   AVAILABLE   AGE
 deployment.apps/kubefate   1/1     1            1           16s
@@ -125,7 +125,7 @@ replicaset.apps/kubefate-6d576d6c88   1         1         1       16s
 replicaset.apps/mongo-56684d6c86      1         1         1       16s
 
 NAME                          HOSTS          ADDRESS          PORTS   AGE
-ingress.extensions/kubefate   kubefate.net   10.160.112.145   80      16s
+ingress.extensions/kubefate   kubefate.net   192.168.100.123   80      16s
 ```
 
 It means KubeFATE service have been deployed. 
@@ -133,14 +133,14 @@ It means KubeFATE service have been deployed.
 ### Add kubefate.net to host file
 Note: if we have the domain name setup, this step can be skipped.
 ```
-sudo -- sh -c "echo \"10.160.112.145 kubefate.net\"  >> /etc/hosts"
+sudo -- sh -c "echo \"192.168.100.123 kubefate.net\"  >> /etc/hosts"
 ```
 Verify it as,
 ```
 layne@machine:~/demo$ ping -c 2 kubefate.net
-PING kubefate.net (10.160.112.145) 56(84) bytes of data.
-64 bytes from kubefate.net (10.160.112.145): icmp_seq=1 ttl=64 time=0.080 ms
-64 bytes from kubefate.net (10.160.112.145): icmp_seq=2 ttl=64 time=0.054 ms
+PING kubefate.net (192.168.100.123) 56(84) bytes of data.
+64 bytes from kubefate.net (192.168.100.123): icmp_seq=1 ttl=64 time=0.080 ms
+64 bytes from kubefate.net (192.168.100.123): icmp_seq=2 ttl=64 time=0.054 ms
 
 --- kubefate.net ping statistics ---
 2 packets transmitted, 2 received, 0% packet loss, time 1006ms
@@ -189,7 +189,7 @@ proxy:
   nodePort: 30009
   partyList:
     - partyId: 10000
-      partyIp: 10.160.112.145
+      partyIp: 192.168.100.123
       partyPort: 30010
 
 egg:
@@ -199,7 +199,7 @@ egg:
 We change following things:
 1. Remove the exchange part, and use p2p mode;
 2. Change the proxy part setting, which set the nodePort to 30009. This is the port proxy of party 9999 listen to;
-3. Change the partyList setting according to the proxy setting in party 10000. In my case, partyId is 10000, partyIp is 10.160.112.145 and partyPort is 30010;
+3. Change the partyList setting according to the proxy setting in party 10000. In my case, partyId is 10000, partyIp is 192.168.100.123 and partyPort is 30010;
 4. Change the count of egg setting from 3 to 1.
 
 For fate-10000, modify it as following,
@@ -225,7 +225,7 @@ proxy:
   nodePort: 30010
   partyList:
     - partyId: 9999
-      partyIp: 10.160.112.145
+      partyIp: 192.168.100.123
       partyPort: 30009
 
 egg:
@@ -320,8 +320,8 @@ As the FATE-Dashboard is exposed as `http://${party_id}.fateboard.${serviceurl}`
 If no DNS service configured, we have to add these two url to our hosts file. In a Linux or macOS machine, 
 
 ```
-sudo -- sh -c "echo \"10.160.112.145 9999.fateboard.kubefate.net\"  >> /etc/hosts"
-sudo -- sh -c "echo \"10.160.112.145 10000.fateboard.kubefate.net\"  >> /etc/hosts"
+sudo -- sh -c "echo \"192.168.100.123 9999.fateboard.kubefate.net\"  >> /etc/hosts"
+sudo -- sh -c "echo \"192.168.100.123 10000.fateboard.kubefate.net\"  >> /etc/hosts"
 ```
 
 In a Windows machine, you have to add them to `C:\WINDOWS\system32\drivers\etc\hosts`, please refer to related documents. After changing the hosts, we are able to open the browser see the jobs in each party: 
