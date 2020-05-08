@@ -6,66 +6,52 @@ import (
 	"fmt"
 	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/api"
 	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/db"
-	"github.com/dgrijalva/jwt-go"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
 	"io/ioutil"
 	"net/http"
-	"time"
 )
-
-//func getToken_old() string {
-//
-//	serviceurl := viper.GetString("serviceurl")
-//
-//	loginUrl := "http://" + serviceurl + "/v1/user/login"
-//
-//	login := map[string]string{
-//		"username": viper.GetString("user.username"),
-//		"password": viper.GetString("user.password"),
-//	}
-//
-//	loginJsonB, err := json.Marshal(login)
-//
-//	body := bytes.NewReader(loginJsonB)
-//	Request, err := http.NewRequest("POST", loginUrl, body)
-//	if err != nil {
-//		panic(err)
-//	}
-//
-//	var resp *http.Response
-//	resp, err = http.DefaultClient.Do(Request)
-//	if err != nil {
-//		panic(err)
-//	}
-//
-//	rbody, err := ioutil.ReadAll(resp.Body)
-//	if err != nil {
-//		panic(err)
-//	}
-//
-//	Result := map[string]interface{}{}
-//
-//	err = json.Unmarshal(rbody, &Result)
-//	if err != nil {
-//		panic(err)
-//	}
-//	return fmt.Sprint(Result["token"])
-//}
 
 func getToken() (string, error) {
 
-	claims := &jwt.MapClaims{
-		"id":       viper.GetString("user.username"),
-		"exp":      time.Now().Add(30 * time.Second).Unix(),
-		"orig_iat": time.Now().Add(30 * time.Second).Unix(),
+	serviceurl := viper.GetString("serviceurl")
+
+	loginUrl := "http://" + serviceurl + "/v1/user/login"
+
+	login := map[string]string{
+		"username": viper.GetString("user.username"),
+		"password": viper.GetString("user.password"),
 	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims) //生成token
-	accessToken, err := token.SignedString([]byte("secret key"))
+
+	loginJsonB, err := json.Marshal(login)
+
+	body := bytes.NewReader(loginJsonB)
+	Request, err := http.NewRequest("POST", loginUrl, body)
 	if err != nil {
 		return "", err
 	}
-	return accessToken, nil
+
+	var resp *http.Response
+	resp, err = http.DefaultClient.Do(Request)
+	if err != nil {
+		return "", err
+	}
+
+	rbody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+
+	Result := map[string]interface{}{}
+
+	err = json.Unmarshal(rbody, &Result)
+	if err != nil {
+		return "", err
+	}
+	token := fmt.Sprint(Result["token"])
+
+	log.Debug().Str("token", token).Msg("get token success")
+	return token, nil
 }
 
 type Request struct {

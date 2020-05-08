@@ -2,6 +2,8 @@ package db
 
 import (
 	"bytes"
+	"crypto/md5"
+	"fmt"
 
 	"github.com/satori/go.uuid"
 	"go.mongodb.org/mongo-driver/bson"
@@ -10,7 +12,7 @@ import (
 type User struct {
 	Uuid     string     `json:"uuid"`
 	Username string     `json:"username"`
-	Password string     `json:"password"`
+	Password string     `json:"password,omitempty"`
 	Email    string     `json:"email"`
 	Status   UserStatus `json:"userStatus"`
 }
@@ -38,11 +40,16 @@ func (s UserStatus) MarshalJSON() ([]byte, error) {
 	return buffer.Bytes(), nil
 }
 
+func encryption(plaintext string) string {
+	secretaries := md5.Sum([]byte(plaintext + "kubefate salt"))
+	return fmt.Sprintf("%x", secretaries)
+}
+
 func NewUser(username string, password string, email string) *User {
 	u := &User{
 		Uuid:     uuid.NewV4().String(),
 		Username: username,
-		Password: password,
+		Password: encryption(password),
 		Email:    email,
 		Status:   Deprecate_u,
 	}
@@ -71,7 +78,7 @@ func (user *User) FromBson(m *bson.M) (interface{}, error) {
 }
 
 func (user *User) IsValid() bool {
-	filter := bson.M{"username": user.Username, "password": user.Password}
+	filter := bson.M{"username": user.Username, "password": encryption(user.Password)}
 	users, err := FindByFilter(user, filter)
 	if err != nil || len(users) == 0 {
 		return false
@@ -86,4 +93,10 @@ func (user *User) IsExisted() bool {
 		return false
 	}
 	return true
+}
+
+func (user *User) Update() error {
+	user.Password = encryption(user.Password)
+	err := UpdateByUUID(user, user.Uuid)
+	return err
 }
