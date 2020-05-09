@@ -25,7 +25,7 @@ package service
 //				name:      "fate-10000",
 //				version:   "v1.2.0",
 //				value:     &Value{
-//					Val: []byte(`{ "partyId":10000,"endpoint": { "ip":"10.184.111.187","port":30030}}`),
+//					Val: []byte(`{ "partyId":10000,"endpoint": { "ip":"192.168.100.123","port":30030}}`),
 //					T:   "json",
 //				},
 //			},

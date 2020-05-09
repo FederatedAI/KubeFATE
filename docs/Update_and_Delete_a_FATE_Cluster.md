@@ -18,9 +18,9 @@ ChartName       fate
 ChartVersion    v1.3.0-a                                                                                                                                                                                                                                    
 Revision        1                                                                                                                                                                                                                                           
 Status          Running                                                                                                                                                                                                                                     
-Values          {"chartVersion":"v1.3.0-a","egg":{"count":1},"modules":["proxy","egg","federation","metaService","mysql","redis","roll","python"],"name":"fate-10000","namespace":"fate-10000","partyId":10000,"proxy":{"nodePort":30010,"partyList":[{"partyId":9999,"partyIp":"10.160.112.145","partyPort":30009}],"type":"NodePort"}}
-Config          map[chartVersion:v1.3.0-a egg:map[count:1] modules:[proxy egg federation metaService mysql redis roll python] name:fate-10000 namespace:fate-10000 partyId:10000 proxy:map[nodePort:30010 partyList:[map[partyId:9999 partyIp:10.160.112.145 partyPort:30009]] type:NodePort]]
-Info            map[dashboard:10000.fateboard.kubefate.net ip:10.160.112.145 modules:[egg0-5b44548fbd-rvmd8 federation-6d799b5cfd-d92wq meta-service-54db9f8fbc-2n9w2 mysql-6bc77fc46c-5dq2w proxy-8d758c997-sgpdr python-77bb96fd78-rfq5s redis-9546f56b-fw5cf roll-77dfbb54dc-g897x] port:30010]
+Values          {"chartVersion":"v1.3.0-a","egg":{"count":1},"modules":["proxy","egg","federation","metaService","mysql","redis","roll","python"],"name":"fate-10000","namespace":"fate-10000","partyId":10000,"proxy":{"nodePort":30010,"partyList":[{"partyId":9999,"partyIp":"192.168.100.123","partyPort":30009}],"type":"NodePort"}}
+Config          map[chartVersion:v1.3.0-a egg:map[count:1] modules:[proxy egg federation metaService mysql redis roll python] name:fate-10000 namespace:fate-10000 partyId:10000 proxy:map[nodePort:30010 partyList:[map[partyId:9999 partyIp:192.168.100.123 partyPort:30009]] type:NodePort]]
+Info            map[dashboard:10000.fateboard.kubefate.net ip:192.168.100.123 modules:[egg0-5b44548fbd-rvmd8 federation-6d799b5cfd-d92wq meta-service-54db9f8fbc-2n9w2 mysql-6bc77fc46c-5dq2w proxy-8d758c997-sgpdr python-77bb96fd78-rfq5s redis-9546f56b-fw5cf roll-77dfbb54dc-g897x] port:30010]
 
 ```
 
@@ -51,7 +51,7 @@ proxy:
   nodePort: 30009
   partyList:
     - partyId: 10000
-      partyIp: 10.160.112.145
+      partyIp: 192.168.100.123
       partyPort: 30010
 egg:
   count: 2
