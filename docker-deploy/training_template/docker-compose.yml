@@ -101,9 +101,7 @@ services:
       - ./confs/mysql/data:/var/lib/mysql
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: fate_dev
-      MYSQL_DATABASE: fate
-      MYSQL_USER: fate
-      MYSQL_PASSWORD: fate_dev
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+
     networks:
       - fate-network

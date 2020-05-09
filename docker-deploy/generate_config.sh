@@ -46,10 +46,10 @@ GenerateConfig() {
         eval fate_flow_grpc_port=9360
         eval fate_flow_http_port=9380
     
-        eval db_ip=mysql
-        eval db_user=fate
-        eval db_password=fate_dev
-        eval db_name=fate
+        eval db_ip=${mysql_ip}
+        eval db_user=${mysql_user}
+        eval db_password=${mysql_password}
+        eval db_name=${mysql_db}
     
         eval exchange_ip=${exchangeip}
     
@@ -115,6 +115,8 @@ GenerateConfig() {
         # mysql
         # sed -i "s/eggroll_meta/${db_name}/g" ./confs-$party_id/confs/mysql/init/create-eggroll-meta-tables.sql
         echo > ./confs-$party_id/confs/mysql/init/insert-node.sql
+	echo "CREATE DATABASE IF NOT EXISTS ${db_name};" >> ./confs-$party_id/confs/mysql/init/insert-node.sql
+	echo "CREATE USER '${db_user}'@'%' IDENTIFIED BY '${db_password}';" >> ./confs-$party_id/confs/mysql/init/insert-node.sql
 	echo "GRANT ALL ON *.* TO '${db_user}'@'%';" >> ./confs-$party_id/confs/mysql/init/insert-node.sql
 	echo 'USE `eggroll_meta`;' >> ./confs-$party_id/confs/mysql/init/insert-node.sql
         echo "INSERT INTO server_node (host, port, node_type, status) values ('${clustermanager_ip}', '${clustermanager_port_db}', 'CLUSTER_MANAGER', 'HEALTHY');" >> ./confs-$party_id/confs/mysql/init/insert-node.sql
