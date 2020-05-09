@@ -1,0 +1,30 @@
+{
+    "servers": {
+        "proxy": {
+            "host": "proxy",
+            "port": 9370
+        },
+        "fateboard": {
+            "host": "fateboard",
+            "port": 8080
+        },
+        "roll": {
+            "host": "roll",
+            "port": 8011
+        },
+        "fateflow": {
+            "host": "python",
+            "grpc.port": 9360,
+            "http.port": 9380
+        },
+        "federation": {
+            "host": "federation",
+            "port": 9394
+        },
+        "clustercomm": {
+            "host": "federation",
+            "port": 9394
+        },
+        "servings": ["serving:8000"]
+    }
+}

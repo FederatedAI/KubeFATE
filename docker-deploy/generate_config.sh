@@ -55,9 +55,9 @@ GenerateConfig() {
     
         rm -rf confs-$party_id/
         mkdir -p confs-$party_id/confs
-        cp -r docker-example-dir-tree/* confs-$party_id/confs/
+        cp -r training_template/docker-example-dir-tree/* confs-$party_id/confs/
         
-        cp ./docker-compose.yml confs-$party_id/
+        cp training_template/docker-compose.yml confs-$party_id/
         # generate conf dir
         cp ${WORKINGDIR}/.env ./confs-$party_id
         if [ "$RegistryURI" != "" ]
@@ -264,9 +264,9 @@ EOF
 
     	    rm -rf serving-$party_id/
     	    mkdir -p serving-$party_id/confs
-    	    cp -r docker-serving/* serving-$party_id/confs/
+    	    cp -r serving_template/docker-serving/* serving-$party_id/confs/
     	    
-    	    cp ./docker-compose-serving.yml serving-$party_id/docker-compose.yml
+    	    cp serving_template/docker-compose-serving.yml serving-$party_id/docker-compose.yml
     	    # generate conf dir
     	    cp ${WORKINGDIR}/.env ./serving-$party_id
 
