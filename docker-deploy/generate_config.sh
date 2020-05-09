@@ -211,18 +211,20 @@ EOF
   		module_name=exchange
   		cd ${WORKINGDIR}
   		rm -rf confs-exchange/
-  		mkdir -p confs-exchange/conf
+  		mkdir -p confs-exchange/conf/
   		cp ${WORKINGDIR}/.env confs-exchange/
-  		cp docker-compose-exchange.yml confs-exchange/docker-compose.yml
-  		cp -r docker-example-dir-tree/proxy/conf confs-exchange/
+  		cp training_template/docker-compose-exchange.yml confs-exchange/docker-compose.yml
+                cp -r training_template/docker-example-dir-tree/eggroll/conf/* confs-exchange/conf/
   		
   		if [ "$RegistryURI" != "" ]; then
   		    sed -i "s#PREFIX#RegistryURI#g" ./confs-exchange/docker-compose.yml
   		fi
-  		sed -i "s/port=.*/port=${proxy_port}/g" ./confs-exchange/conf/proxy.properties
-  		sed -i "s#route.table=.*#route.table=${deploy_dir}/proxy/conf/route_table.json#g" ./confs-exchange/conf/proxy.properties
-  		sed -i "s/coordinator=.*/coordinator=${party_id}/g" ./confs-exchange/conf/proxy.properties
-  		sed -i "s/ip=.*/ip=0.0.0.0/g" ./confs-exchange/conf/proxy.properties
+
+	        sed -i "s#<rollsite.host>#${proxy_ip}#g" ./confs-exchange/conf/eggroll.properties
+	        sed -i "s#<rollsite.port>#${proxy_port}#g" ./confs-exchange/conf/eggroll.properties
+	        sed -i "s#<party.id>#exchange#g" ./confs-exchange/conf/eggroll.properties
+  		sed -i "s/coordinator=.*/coordinator=exchange/g" ./confs-exchange/conf/eggroll.properties
+  		sed -i "s/ip=.*/ip=0.0.0.0/g" ./confs-exchange/conf/eggroll.properties
   		
   		cat > ./confs-exchange/conf/route_table.json <<EOF
 {
