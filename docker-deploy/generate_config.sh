@@ -28,11 +28,13 @@ GenerateConfig() {
         eval python_path=${deploy_dir}/python:${deploy_dir}/eggroll/python
         eval data_dir=${deploy_dir}/data-dir
     
-        eval nodemanager_ip=(egg)
+        eval nodemanager_ip=(nodemanager)
         eval nodemanager_port=4671
+        eval nodemanager_port_db=9461
     
         eval clustermanager_ip=clustermanager
         eval clustermanager_port=4670
+        eval clustermanager_port_db=9460
 
         eval proxy_ip=rollsite
         eval proxy_port=9370
@@ -79,7 +81,8 @@ GenerateConfig() {
         # egg config
         module_name=eggroll
 	#db connect inf
-        sed -i "s#<jdbc.url>#jdbc:mysql://${db_ip}:3306/${db_name}/eggroll_meta?useSSL=false&serverTimezone=UTC&characterEncoding=utf8&allowPublicKeyRetrieval=true#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
+	# use the fixed db name here
+        sed -i "s#<jdbc.url>#jdbc:mysql://${db_ip}:3306/eggroll_meta?useSSL=false\&serverTimezone=UTC\&characterEncoding=utf8\&allowPublicKeyRetrieval=true#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
 	sed -i "s#<jdbc.username>#${db_user}#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
         sed -i "s#<jdbc.password>#${db_password}#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
 
@@ -104,17 +107,20 @@ GenerateConfig() {
         # fateboard
         sed -i "s#^server.port=.*#server.port=${fateboard_port}#g" ./confs-$party_id/confs/fateboard/conf/application.properties
         sed -i "s#^fateflow.url=.*#fateflow.url=http://${fate_flow_ip}:${fate_flow_http_port}#g" ./confs-$party_id/confs/fateboard/conf/application.properties
-        sed -i "s/^spring.datasource.username=.*/spring.datasource.username=${db_user}/g" ./confs-$party_id/confs/fateboard/conf/application.properties
-        sed -i "s/^spring.datasource.password=.*/spring.datasource.password=${db_password}/g" ./confs-$party_id/confs/fateboard/conf/application.properties
+        sed -i "s#<jdbc.username>#${db_user}#g" ./confs-$party_id/confs/fateboard/conf/application.properties
+        sed -i "s#<jdbc.password>#${db_password}#g" ./confs-$party_id/confs/fateboard/conf/application.properties
+        sed -i "s#<jdbc.url>#jdbc:mysql://${db_ip}:3306/${db_name}?characterEncoding=utf8\&characterSetResults=utf8\&autoReconnect=true\&failOverReadOnly=false\&serverTimezone=GMT%2B8#g" ./confs-$party_id/confs/fateboard/conf/application.properties
         echo fateboard module of $party_id done!
     
         # mysql
-        sed -i "s/eggroll_meta/${db_name}/g" ./confs-$party_id/confs/mysql/init/create-eggroll-meta-tables.sql
+        # sed -i "s/eggroll_meta/${db_name}/g" ./confs-$party_id/confs/mysql/init/create-eggroll-meta-tables.sql
         echo > ./confs-$party_id/confs/mysql/init/insert-node.sql
-        echo "INSERT INTO node (ip, port, node_type, status) values ('${clustermanager_ip}', '${clustermanger_port}', 'ROLL', 'HEALTHY');" >> ./confs-$party_id/confs/mysql/init/insert-node.sql
+	echo "GRANT ALL ON *.* TO '${db_user}'@'%';" >> ./confs-$party_id/confs/mysql/init/insert-node.sql
+	echo 'USE `eggroll_meta`;' >> ./confs-$party_id/confs/mysql/init/insert-node.sql
+        echo "INSERT INTO server_node (host, port, node_type, status) values ('${clustermanager_ip}', '${clustermanager_port_db}', 'CLUSTER_MANAGER', 'HEALTHY');" >> ./confs-$party_id/confs/mysql/init/insert-node.sql
         for ((j=0;j<${#nodemanager_ip[*]};j++))
         do
-            echo "INSERT INTO node (ip, port, node_type, status) values ('${nodemanager_ip[j]}', '${nodemanager_port}', 'EGG', 'HEALTHY');" >> ./confs-$party_id/confs/mysql/init/insert-node.sql
+            echo "INSERT INTO server_node (host, port, node_type, status) values ('${nodemanager_ip[j]}', '${nodemanager_port_db}', 'NODE_MANAGER', 'HEALTHY');" >> ./confs-$party_id/confs/mysql/init/insert-node.sql
         done
         echo "show tables;" >> ./confs-$party_id/confs/mysql/init/insert-node.sql
         echo "select * from node;" >> ./confs-$party_id/confs/mysql/init/insert-node.sql

@@ -1,5 +1,6 @@
 -- create database if not exists
 CREATE DATABASE IF NOT EXISTS `eggroll_meta`;
+CREATE DATABASE IF NOT EXISTS `fate`;
 
 -- all operation under this database
 USE `eggroll_meta`;
@@ -121,3 +122,4 @@ CREATE TABLE IF NOT EXISTS `session_processor` (
 ) DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
 
 CREATE INDEX `idx_session_processor_si` ON `session_processor` (`session_id`);
+
