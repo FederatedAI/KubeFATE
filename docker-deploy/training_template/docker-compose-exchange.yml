@@ -2,8 +2,9 @@ version: '3'
 
 services:
   exchange:
-    image: "${PREFIX}/proxy:${TAG}"
+    image: "${PREFIX}/eggroll:${TAG}"
     ports:
       - "9371:9370"
     volumes:
-      - ./conf:/data/projects/fate/proxy/conf
+      - ./conf:/data/projects/fate/eggroll/conf
+    command: ["bash", "-c", "java -Dlog4j.configurationFile=$${EGGROLL_HOME}/conf/log4j2.properties -cp $${EGGROLL_HOME}/lib/*:$${EGGROLL_HOME}/conf/ com.webank.eggroll.rollsite.Proxy -c $${EGGROLL_HOME}/conf/eggroll.properties"]
