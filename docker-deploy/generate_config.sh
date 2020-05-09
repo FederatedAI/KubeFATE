@@ -134,7 +134,6 @@ GenerateConfig() {
         sed -i "s/passwd:.*/passwd: '${db_password}'/g" ./confs-$party_id/confs/fate_flow/conf/base_conf.yaml
         sed -i "s/host: 192.168.0.1*/host: '${db_ip}'/g" ./confs-$party_id/confs/fate_flow/conf/base_conf.yaml
         sed -i "s/name:.*/name: '${db_name}'/g" ./confs-$party_id/confs/fate_flow/conf/base_conf.yaml
-        sed -i "s/serving:8000/${serving_ip}:8000/g" ./confs-$party_id/confs/fate_flow/conf/server_conf.json
     
         cat > ./confs-$party_id/confs/fate_flow/conf/server_conf.json <<EOF
 {
@@ -153,7 +152,7 @@ GenerateConfig() {
             "http.port": ${fate_flow_http_port}
         },
         "servings": [
-          "serving:8000"
+          "${servingiplist[${i}]}:8000"
         ]
     }
 }
