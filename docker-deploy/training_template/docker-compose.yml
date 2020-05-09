@@ -75,6 +75,7 @@ services:
     ports:
       - "9360:9360"
       - "9380:9380"
+      - "8484:8484"
     restart: always
     volumes:
       - shared_dir_federatedml:/data/projects/fate/python/federatedml
@@ -89,6 +90,19 @@ services:
       - rollsite
       - clustermanager
       - nodemanager
+    networks:
+      - fate-network
+
+  client:
+    image: "${PREFIX}/client:${TAG}"
+    ports:
+      - "20000:20000"
+    restart: always
+    volumes:
+      - ./confs/fate_flow/conf/settings.py:/data/projects/fate/python/fate_flow/settings.py
+      - ./confs/fate_flow/conf/server_conf.json:/data/projects/fate/python/arch/conf/server_conf.json
+    depends_on:
+      - python
     networks:
       - fate-network
 

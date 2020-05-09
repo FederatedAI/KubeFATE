@@ -45,6 +45,7 @@ GenerateConfig() {
         eval fate_flow_ip=python
         eval fate_flow_grpc_port=9360
         eval fate_flow_http_port=9380
+	eval fml_agent_port=8484
     
         eval db_ip=${mysql_ip}
         eval db_user=${mysql_user}
@@ -150,6 +151,10 @@ GenerateConfig() {
             "host": "${fate_flow_ip}",
             "grpc.port": ${fate_flow_grpc_port},
             "http.port": ${fate_flow_http_port}
+        },
+        "fml_agent":  {
+            "host": "${fate_flow_ip}",
+            "port": ${fml_agent_port}
         },
         "servings": [
           "${servingiplist[${i}]}:8000"
