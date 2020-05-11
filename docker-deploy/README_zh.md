@@ -50,13 +50,10 @@ $ docker load --input fate_<version>-images.tar.gz
 ```bash
 $ docker images
 REPOSITORY                         TAG 
-federatedai/egg                    <version>-release
+federatedai/eggroll                <version>-release
 federatedai/fateboard              <version>-release
-federatedai/meta-service           <version>-release
 federatedai/python                 <version>-release
-federatedai/roll                   <version>-release
-federatedai/proxy                  <version>-release
-federatedai/federation             <version>-release
+federatedai/client                 <version>-release
 federatedai/serving-server         <version>-release
 federatedai/serving-proxy          <version>-release
 redis                              5
@@ -139,19 +136,26 @@ $ docker ps
 
 ```
 CONTAINER ID        IMAGE                                     COMMAND                  CREATED             STATUS              PORTS                                 NAMES
-f8ae11a882ba        fatetest/fateboard:<version>-release      "/bin/sh -c 'cd /dat…"   5 days ago          Up 5 days           0.0.0.0:8080->8080/tcp                confs-10000_fateboard_1
-d72995355962        fatetest/python:<version>-release         "/bin/bash -c 'sourc…"   5 days ago          Up 5 days           9360/tcp, 9380/tcp                    confs-10000_python_1
-dffc70fc68ac        fatetest/egg:<version>-release            "/bin/sh -c 'cd /dat…"   7 days ago          Up 7 days           7778/tcp, 7888/tcp, 50001-50004/tcp   confs-10000_egg_1
-dc23d75692b0        fatetest/roll:<version>-release           "/bin/sh -c 'cd roll…"   7 days ago          Up 7 days           8011/tcp                              confs-10000_roll_1
-7e52b1b06d1a        fatetest/meta-service:<version>-release   "/bin/sh -c 'java -c…"   7 days ago          Up 7 days           8590/tcp                              confs-10000_meta-service_1
-50a6323f5cb8        fatetest/proxy:<version>-release          "/bin/sh -c 'cd /dat…"   7 days ago          Up 7 days           0.0.0.0:9370->9370/tcp                confs-10000_proxy_1
-4526f8e57004        redis:5                                   "docker-entrypoint.s…"   7 days ago          Up 7 days           6379/tcp                              confs-10000_redis_1
-586f3f2fe191        fatetest/federation:<version>-release     "/bin/sh -c 'cd /dat…"   7 days ago          Up 7 days           9394/tcp                              confs-10000_federation_1
-ec434dcbbff1        mysql:8                                   "docker-entrypoint.s…"   7 days ago          Up 7 days           3306/tcp, 33060/tcp                   confs-10000_mysql_1
-68b1d6c68b6c        federatedai/serving-proxy:<version>-release    "/bin/sh -c 'java -D…"   32 hours ago        Up 32 hours         0.0.0.0:8059->8059/tcp, 0.0.0.0:8869->8869/tcp, 8879/tcp   serving-10000_serving-proxy_1
-7937ecf2974e        redis:5                                    "docker-entrypoint.s…"   32 hours ago        Up 32 hours         6379/tcp                                                   serving-10000_redis_1
-00a8d98021a6        federatedai/serving-server:<version>-release   "/bin/sh -c 'java -c…"   32 hours ago        Up 32 hours         0.0.0.0:8000->8000/tcp                                     serving-10000_serving-server_1
-luke@luke-machine:~$ 
+69b8b36af395        federatedai/eggroll:<tag>          "bash -c 'java -Dlog…"   2 hours ago         Up 2 hours    
+      0.0.0.0:9371->9370/tcp                                                   confs-exchange_exchange_1
+71cd792ba088        federatedai/serving-proxy:<tag>    "/bin/sh -c 'java -D…"   2 hours ago         Up 2 hours    
+      0.0.0.0:8059->8059/tcp, 0.0.0.0:8869->8869/tcp, 8879/tcp                 serving-10000_serving-proxy_1
+2c79047918c6        federatedai/serving-server:<tag>   "/bin/sh -c 'java -c…"   2 hours ago         Up 2 hours    
+      0.0.0.0:8000->8000/tcp                                                   serving-10000_serving-server_1
+b1a5384a55dc        redis:5                                    "docker-entrypoint.s…"   2 hours ago         Up 2 hours    
+      6379/tcp                                                                 serving-10000_redis_1
+321c4e29313b        federatedai/client:<tag>           "/bin/sh -c 'sleep 5…"   2 hours ago         Up 2 hours    
+      0.0.0.0:20000->20000/tcp                                                 confs-10000_client_1
+c1b3190126ab        federatedai/fateboard:<tag>        "/bin/sh -c 'java -D…"   2 hours ago         Up 2 hours    
+      0.0.0.0:8080->8080/tcp                                                   confs-10000_fateboard_1
+cc679996e79f        federatedai/python:<tag>           "/bin/sh -c 'sleep 5…"   2 hours ago         Up 2 hours    
+      0.0.0.0:8484->8484/tcp, 0.0.0.0:9360->9360/tcp, 0.0.0.0:9380->9380/tcp   confs-10000_python_1
+c79800300000        federatedai/eggroll:<tag>          "bash -c 'java -Dlog…"   2 hours ago         Up 2 hours    
+      4671/tcp                                                                 confs-10000_nodemanager_1
+ee2f1c3aad99        federatedai/eggroll:<tag>          "bash -c 'java -Dlog…"   2 hours ago         Up 2 hours    
+      4670/tcp                                                                 confs-10000_clustermanager_1
+a1f784882d20        federatedai/eggroll:<tag>          "bash -c 'java -Dlog…"   2 hours ago         Up 2 hours          0.0.0.0:9370->9370/tcp                                                   confs-10000_rollsite_1
+2b4526e6d534        mysql:8                                    "docker-entrypoint.s…"   2 hours ago         Up 2 hours          3306/tcp, 33060/tcp  
 ```
 
 ####  验证部署
