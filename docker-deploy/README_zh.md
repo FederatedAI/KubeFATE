@@ -300,6 +300,15 @@ output：
 }
 ```
 
+###### 查看训练任务状态
+`$  python fate_flow_client.py -f query_task -j 202003060553168191842 | grep f_status`
+
+output:
+```
+"f_status": "success",
+"f_status": "success",
+```
+
 ###### 修改加载模型的配置
 `$ vi examples/publish_load_model.json`
 
@@ -324,6 +333,23 @@ output：
 
 ###### 加载模型
 `$ python fate_flow_client.py -f load -c examples/publish_load_model.json`
+
+output:
+```
+{
+    "data": {
+        "guest": {
+            "9999": 0
+        },
+        "host": {
+            "10000": 0
+        }
+    },
+    "jobId": "202005120554339112925",
+    "retcode": 0,
+    "retmsg": "success"
+}
+```
 
 ###### 修改绑定模型的配置
 `$ vi examples/bind_model_service.json`
@@ -352,15 +378,19 @@ output：
 ###### 绑定模型
 `$ python fate_flow_client.py -f bind -c examples/bind_model_service.json`
 
+output:
+```
+{
+    "retcode": 0,
+    "retmsg": "service id is test"
+}
+```
+
 ###### 在线测试
 发送以下信息到{SERVING_SERVICE_IP}:8059/federation/v1/inference
 
 ```
-# HTTP Method：POST
-# HEADERs:
-#   - Content-Type：application/json
-
-{
+$ curl -X POST -H 'Content-Type: application/json' -i 'http://192.168.7.1:8059/federation/v1/inference' --data '{
   "head": {
     "serviceId": "test"
   },
@@ -378,7 +408,7 @@ output：
       "x9": -0.733474,
     }
   }
-}
+}'
 ```
 
 output:

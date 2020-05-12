@@ -130,7 +130,7 @@ a1f784882d20        federatedai/eggroll:<tag>          "bash -c 'java -Dlog…" 
 On the target node of each party, a container named  `confs-<party_id>_python_1` should have been created and running the `fate-flow` service. For example, on Party 10000's node, run the following commands to verify the deployment:
 ```bash
 $ docker exec -it confs-10000_python_1 bash
-$ cd /data/projects/python/examples/toy_example/
+$ cd /data/projects/fate/python/examples/toy_example/
 $ python run_toy_example.py 10000 9999 1
 ```
 If the test passed, the output may look like the following:
@@ -260,6 +260,16 @@ output：
 }
 ```
 
+##### Check status of training jobs
+`$ python fate_flow_client.py -f query_task -j 202003060553168191842 | grep f_status`
+
+output:
+```
+"f_status": "success",
+"f_status": "success",
+
+```
+
 ##### Modify the configuration of loading model
 `$ vi examples/publish_load_model.json`
 
@@ -284,6 +294,23 @@ output：
 
 ##### Load model
 `$ python fate_flow_client.py -f load -c examples/publish_load_model.json`
+
+output:
+```
+{
+    "data": {
+        "guest": {
+            "9999": 0
+        },
+        "host": {
+            "10000": 0
+        }
+    },
+    "jobId": "202005120554339112925",
+    "retcode": 0,
+    "retmsg": "success"
+}
+```
 
 ##### Modify the configuration of binding model
 `$ vi examples/bind_model_service.json`
@@ -312,15 +339,19 @@ output：
 ##### Bind model
 `$ python fate_flow_client.py -f bind -c examples/bind_model_service.json`
 
+output:
+```
+{
+    "retcode": 0,
+    "retmsg": "service id is test"
+}
+```
+
 ##### Test the online serving
 Send the following message to {SERVING_SERVICE_IP}:8059/federation/v1/inference
 
 ```
-# HTTP Method：POST
-# HEADERs:
-#   - Content-Type：application/json
-
-{
+$ curl -X POST -H 'Content-Type: application/json' -i 'http://192.168.7.1:8059/federation/v1/inference' --data '{
   "head": {
     "serviceId": "test"
   },
@@ -338,7 +369,7 @@ Send the following message to {SERVING_SERVICE_IP}:8059/federation/v1/inference
       "x9": -0.733474,
     }
   }
-}
+}'
 ```
 
 output:
