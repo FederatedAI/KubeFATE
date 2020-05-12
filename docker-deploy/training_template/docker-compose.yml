@@ -8,6 +8,7 @@ networks:
 
 volumes:
   fate_flow_logs:
+  download_dir:
   shared_dir_examples:
     driver: local
     driver_opts:
@@ -75,11 +76,11 @@ services:
     ports:
       - "9360:9360"
       - "9380:9380"
-      - "8484:8484"
     restart: always
     volumes:
       - shared_dir_federatedml:/data/projects/fate/python/federatedml
       - shared_dir_examples:/data/projects/fate/python/examples
+      - download_dir:/data/projects/fate/python/download_dir
       - ./confs/fate_flow/conf/settings.py:/data/projects/fate/python/fate_flow/settings.py
       - ./confs/fate_flow/conf/base_conf.yaml:/data/projects/fate/python/arch/conf/base_conf.yaml
       - ./confs/fate_flow/conf/server_conf.json:/data/projects/fate/python/arch/conf/server_conf.json
@@ -99,6 +100,7 @@ services:
       - "20000:20000"
     restart: always
     volumes:
+      - download_dir:/data/projects/fate/python/download_dir
       - ./confs/fate_flow/conf/settings.py:/data/projects/fate/python/fate_flow/settings.py
       - ./confs/fate_flow/conf/server_conf.json:/data/projects/fate/python/arch/conf/server_conf.json
     depends_on:
