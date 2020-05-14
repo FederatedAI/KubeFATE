@@ -5,6 +5,9 @@
 version: '3'
 networks:
   fate-network:
+    ipam:
+      config:
+      - subnet: 192.167.0.0/16
 
 volumes:
   fate_flow_logs:

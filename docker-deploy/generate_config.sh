@@ -126,7 +126,7 @@ GenerateConfig() {
             echo "INSERT INTO server_node (host, port, node_type, status) values ('${nodemanager_ip[j]}', '${nodemanager_port_db}', 'NODE_MANAGER', 'HEALTHY');" >> ./confs-$party_id/confs/mysql/init/insert-node.sql
         done
         echo "show tables;" >> ./confs-$party_id/confs/mysql/init/insert-node.sql
-        echo "select * from node;" >> ./confs-$party_id/confs/mysql/init/insert-node.sql
+        echo "select * from server_node;" >> ./confs-$party_id/confs/mysql/init/insert-node.sql
         echo mysql module of $party_id done!
 
         # fate_flow
