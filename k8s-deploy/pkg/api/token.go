@@ -60,7 +60,7 @@ func initAuthmiddleware() error {
 			if err := c.ShouldBindJSON(loginVals); err != nil {
 				return "", jwt.ErrMissingLoginValues
 			}
-			log.Debug().Msg("Login user info: " + db.ToJson(loginVals))
+			log.Debug().Msg("Login user name: " + loginVals.Username)
 			if loginVals.IsValid() {
 				return loginVals, nil
 			}

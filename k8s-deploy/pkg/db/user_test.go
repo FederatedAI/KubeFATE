@@ -3,10 +3,11 @@ package db
 import (
 	"context"
 	"fmt"
-	"github.com/rs/zerolog/log"
-	"go.mongodb.org/mongo-driver/bson"
 	"testing"
 	"time"
+
+	"github.com/rs/zerolog/log"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 var userJustAddedUuid string
@@ -37,15 +38,6 @@ func TestIsExisted(t *testing.T) {
 	}
 }
 
-func TestIsValid(t *testing.T) {
-	InitConfigForTest()
-	u := NewUser("Layne", "test", "email@vmware.com")
-	result := u.IsValid()
-	if result {
-		t.Log("User Layne exists.")
-	}
-}
-
 func TestFindByUUID(t *testing.T) {
 	InitConfigForTest()
 	user := &User{}
@@ -56,6 +48,7 @@ func TestFindByUUID(t *testing.T) {
 func Test_encryption(t *testing.T) {
 	type args struct {
 		plaintext string
+		salt      string
 	}
 	tests := []struct {
 		name string
@@ -67,13 +60,14 @@ func Test_encryption(t *testing.T) {
 			name: "",
 			args: args{
 				plaintext: "123",
+				salt:      "456",
 			},
-			want: "6fcd47b86e4d288a322cd198c72c7f12",
+			want: "9a5f5c39f26968a2b8c359eb03f5b5bcb38123c921cf2e078c31c8563bf52f900a1e3076270579d932c4db02fac68052ce52bae57f513afb24f9eb200b0efa72c74ec829083ba1fdd6830539741de4b7a4e04e6cef0f787664d212dfeca8af52335f71906fba07ed1009518634587e7c5be6fbb0cdd4142edbfccb37119e4831114b5198a4eef6a2874d6bef89f97652d9111e4162e69dc540609e063b660e718511040679f7bff0ab44143d7b85b690eea88309ee57b89c3094b2db55f7226e333d065c712c8576eec3960d424e5b8395d1753d63c60fdbf2200b4a0fe0007073b907affa73e5b57abc1e1a965487618f27e97d1387c431c0c66352e7955f68",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := encryption(tt.args.plaintext); got != tt.want {
+			if got := encryption(tt.args.plaintext, tt.args.salt); got != tt.want {
 				t.Errorf("encryption() = %v, want %v", got, tt.want)
 			}
 		})
@@ -100,4 +94,62 @@ func TestUserDeleteAll(t *testing.T) {
 	}
 	fmt.Println(r)
 	return
+}
+
+func TestUser_IsValid(t *testing.T) {
+	InitConfigForTest()
+	type fields struct {
+		Uuid     string
+		Username string
+		Password string
+		Salt     string
+		Email    string
+		Status   UserStatus
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   bool
+	}{
+		// TODO: Add test cases.
+		{
+			name: "",
+			fields: fields{
+				Username: "Layne",
+				Password: "test",
+			},
+			want: true,
+		},
+		{
+			name: "",
+			fields: fields{
+				Username: "Layne",
+				Password: "admin",
+			},
+			want: false,
+		},
+		{
+			name: "",
+			fields: fields{
+				Username: "admin",
+				Password: "admin",
+			},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			user := &User{
+				Uuid:     tt.fields.Uuid,
+				Username: tt.fields.Username,
+				Password: tt.fields.Password,
+				Salt:     tt.fields.Salt,
+				Email:    tt.fields.Email,
+				Status:   tt.fields.Status,
+			}
+			if got := user.IsValid(); got != tt.want {
+				t.Errorf("User.IsValid() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }

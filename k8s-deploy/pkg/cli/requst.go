@@ -3,6 +3,7 @@ package cli
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/api"
 	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/db"
@@ -48,6 +49,11 @@ func getToken() (string, error) {
 	if err != nil {
 		return "", err
 	}
+
+	if resp.StatusCode != http.StatusOK {
+		return "", errors.New(fmt.Sprint(Result["message"]))
+	}
+
 	token := fmt.Sprint(Result["token"])
 
 	log.Debug().Str("token", token).Msg("get token success")
