@@ -1,30 +1,69 @@
 name: fate-9999
 namespace: fate-9999
 chartName: fate
-chartVersion: v1.3.0-a
+chartVersion: v1.4.0
 partyId: 9999
+registry: ""
+pullPolicy: 
+persistence: false
 modules:
-  - proxy
-  - egg
-  - federation
-  - metaService
+  - rollsite
+  - clustermanager
+  - nodemanager
   - mysql
-  - redis
-  - roll
   - python
+  - client
 
-proxy:
+rollsite: 
   type: NodePort
   nodePort: 30009
-  partyList:
-    - partyId: 8888
-      partyIp: 192.168.1.10
-      partyPort: 30008
   exchange:
-    ip: proxy.fate-10000
-    port: 9370
-egg:
-  count: 3
-  processor: 4
-servingIp: serving-server.fate-serving-10000
-servingPort: 8000
+    ip: 192.168.1.1
+    port: 30000
+  partyList:
+  - partyId: 10000
+    partyIp: 192.168.10.1
+    partyPort: 30010
+  nodeSelector: {}
+
+nodemanager:
+  count: 0                       # nodemanager的数量 默认配置
+  sessionProcessorsPerNode: 4    # eggroll.session.processors.per.node配置
+  list:                          # 自定义nodemanager配置 与count同时生效说
+  - name: nodemanager
+    nodeSelector: {}
+    sessionProcessorsPerNode: 2
+    subPath: "nodemanager"
+    existingClaim: ""
+    storageClass: "nodemanager"
+    accessMode: ReadWriteOnce
+    size: 1Gi
+
+python:
+  fateflowType: NodePort
+  fateflowNodePort: 30109
+  nodeSelector: {}
+
+mysql: 
+  nodeSelector: {}
+  ip: mysql
+  port: 3306
+  database: eggroll_meta
+  user: fate
+  password: fate_dev
+  subPath: ""
+  existingClaim: ""
+  storageClass: "mysql"
+  accessMode: ReadWriteOnce
+  size: 1Gi
+
+# 如果不安装MySQL的时候配置
+externalMysqlIp: mysql
+externalMysqlPort: 3306
+externalMysqlDatabase: eggroll_meta
+externalMysqlUser: fate
+externalMysqlPassword: fate_dev
+
+
+servingIp: 192.168.9.1
+servingPort: 30209
