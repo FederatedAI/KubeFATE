@@ -14,8 +14,6 @@ Compose是用于定义和运行多容器Docker应用程序的工具。通过Comp
 
 两个可以互通的FATE实例，每个实例均包括FATE所有组件。
 
-![](images/images.png)
-
 ### 准备工作
 
 1. 两个主机（物理机或者虚拟机，都是Centos7系统）；
@@ -27,13 +25,9 @@ Compose是用于定义和运行多容器Docker应用程序的工具。通过Comp
 如果运行机没有FATE组件的镜像，可以通过以下命令从Docker Hub获取镜像。FATE镜像的版本`<version>`可在[release页面](https://github.com/FederatedAI/FATE/releases)上查看，其中serving镜像的版本信息在[这个页面](https://github.com/FederatedAI/FATE-Serving/releases)：
 
 ```bash
-$ docker pull federatedai/egg:<version>-release
+$ docker pull federatedai/eggroll:<version>-release
 $ docker pull federatedai/fateboard:<version>-release
-$ docker pull federatedai/meta-service:<version>-release
 $ docker pull federatedai/python:<version>-release
-$ docker pull federatedai/roll:<version>-release
-$ docker pull federatedai/proxy:<version>-release
-$ docker pull federatedai/federation:<version>-release
 $ docker pull federatedai/serving-server:<version>-release
 $ docker pull federatedai/serving-proxy:<version>-release
 $ docker pull redis:5
