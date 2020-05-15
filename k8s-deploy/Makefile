@@ -1,17 +1,8 @@
-NAME = federatedai/kubefate
-VERSION = v1.0.2
+NAME ?= federatedai/kubefate
+VERSION ?= v1.0.2
 
 # Image URL to use all building/pushing image targets
-IMG ?= controller:latest
-# Produce CRDs that work back to Kubernetes 1.11 (no version conversion)
-CRD_OPTIONS ?= "crd:trivialVersions=true"
-
-# Get the currently used golang install path (in GOPATH/bin, unless GOBIN is set)
-ifeq (,$(shell go env GOBIN))
-GOBIN=$(shell go env GOPATH)/bin
-else
-GOBIN=$(shell go env GOBIN)
-endif
+IMG ?= federatedai/kubefate:latest
 
 all: kubefate
 
@@ -34,6 +25,14 @@ fmt:
 # Run go vet against code
 vet:
 	go vet ./...
+
+# Build the docker image
+docker-build: test
+	docker build . -t ${IMG}
+
+# Push the docker image
+docker-push:
+	docker push ${IMG}
 
 build-linux-binary:
 	go build -a -ldflags '-s' -installsuffix cgo -o kubefate kubefate.go

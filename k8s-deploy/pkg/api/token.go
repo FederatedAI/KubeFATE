@@ -2,6 +2,7 @@ package api
 
 import (
 	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/db"
+	"k8s.io/apimachinery/pkg/util/rand"
 	"time"
 
 	jwt "github.com/appleboy/gin-jwt/v2"
@@ -24,10 +25,14 @@ func GetAuthMiddleware() (*jwt.GinJWTMiddleware, error) {
 	return AuthMiddleware, err
 }
 
+func generateKey() []byte {
+	return []byte(rand.String(32))
+}
+
 func initAuthmiddleware() error {
 	tmpAuth, err := jwt.New(&jwt.GinJWTMiddleware{
 		Realm:       "gin jwt",
-		Key:         []byte("secret key"),
+		Key:         generateKey(),
 		Timeout:     time.Minute * 30,
 		MaxRefresh:  time.Minute * 30,
 		IdentityKey: identityKey,
@@ -55,7 +60,7 @@ func initAuthmiddleware() error {
 			if err := c.ShouldBindJSON(loginVals); err != nil {
 				return "", jwt.ErrMissingLoginValues
 			}
-			log.Debug().Msg("Login user info: " + db.ToJson(loginVals))
+			log.Debug().Msg("Login user name: " + loginVals.Username)
 			if loginVals.IsValid() {
 				return loginVals, nil
 			}

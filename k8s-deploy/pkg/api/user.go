@@ -79,7 +79,7 @@ func (*User) setUser(c *gin.Context) {
 		return
 	}
 	user.Uuid = userId
-	err := db.UpdateByUUID(user, userId)
+	err := user.Update()
 	if err != nil {
 		c.JSON(500, gin.H{"error": err})
 	}
