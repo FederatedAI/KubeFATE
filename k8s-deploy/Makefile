@@ -1,5 +1,5 @@
 NAME ?= federatedai/kubefate
-VERSION ?= v1.0.2
+VERSION ?= v1.0.3
 
 # Image URL to use all building/pushing image targets
 IMG ?= federatedai/kubefate:latest
@@ -27,18 +27,15 @@ vet:
 	go vet ./...
 
 # Build the docker image
-docker-build: test
-	docker build . -t ${IMG}
+docker-build: fmt vet
+	docker build . -t ${IMG} --build-arg LDFLAGS=$(shell sh ./generate-ldflags.sh)
 
 # Push the docker image
 docker-push:
 	docker push ${IMG}
 
 build-linux-binary:
-	go build -a -ldflags '-s' -installsuffix cgo -o kubefate kubefate.go
-
-build-docker-image:
-	docker build -t ${NAME}:${VERSION} .
+	go build -a -ldflags "$(shell sh ./generate-ldflags.sh)" -installsuffix cgo -o kubefate kubefate.go
 
 release: build-linux-binary
 	tar -czvf kubefate-k8s-${RELEASE_VERSION}.tar.gz kubefate cluster.yaml cluster-serving.yaml config.yaml kubefate.yaml rbac-config.yaml
