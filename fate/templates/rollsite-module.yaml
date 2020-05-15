@@ -1,0 +1,136 @@
+########################################################
+# Copyright 2019-2020 program was created VMware, Inc. #
+# SPDX-License-Identifier: Apache-2.0                  #
+########################################################
+
+{{ if .Values.modules.rollsite.include }}
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: rollsite-config
+  labels:
+    fateMoudle: rollsite
+{{ include "fate.labels" . | indent 4 }}
+data:
+  route_table.json: |
+    {
+        "route_table": {
+            "default": {
+                "default": [
+                    {
+                      {{- with .Values.exchange }}
+                        "ip": "{{ .partyIp }}",
+                        "port": {{ .partyPort }}
+                      {{- else }}
+                        "ip": "proxy",
+                        "port": 9370
+                      {{- end }}
+                    }
+                ]
+            },
+            {{- range .Values.partyList }}
+            "{{ .partyId }}": {
+                "default": [
+                    {
+                        "ip": "{{ .partyIp }}",
+                        "port": "{{ .partyPort }}"
+                    }
+                ]
+            },
+            {{- end }}
+            "{{ .Values.partyId }}": {
+                "fateflow": [
+                    {
+                        "ip": "{{ .Values.modules.python.fateflowIp }}",
+                        "port": 9360
+                    }
+                ]
+            }
+        },
+        "permission": {
+            "default_allow": true
+        }
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rollsite
+  labels:
+    fateMoudle: rollsite
+{{ include "fate.labels" . | indent 4 }}
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      fateMoudle: rollsite
+{{ include "fate.matchLabels" . | indent 6 }}
+  template:
+    metadata:
+      labels:
+        fateMoudle: rollsite
+{{ include "fate.labels" . | indent 8 }}
+    spec:
+      hostAliases:
+      - ip: "127.0.0.1"
+        hostnames:
+        - rollsite
+      containers:
+        - env:
+          - name: PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION
+            value: python
+          image: {{ .Values.image.registry }}/eggroll:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          name: rollsite
+          command:
+          - bash
+          - -c
+          - "java -Dlog4j.configurationFile=$${EGGROLL_HOME}/conf/log4j2.properties -cp $${EGGROLL_HOME}/lib/*:$${EGGROLL_HOME}/conf/ com.webank.eggroll.rollsite.Proxy -c $${EGGROLL_HOME}/conf/eggroll.properties"
+          ports:
+            - containerPort: 9370
+          volumeMounts:
+            - mountPath: /data/projects/fate/eggroll/conf/route_table.json
+              name: rollsite-confs
+              subPath: route_table.json
+            - mountPath: /data/projects/fate/eggroll/conf/eggroll.properties
+              name: eggroll-confs
+              subPath: eggroll.properties
+      {{- with .Values.modules.rollsite.nodeSelector }}
+      nodeSelector: 
+      {{- range $k, $v := . }}
+        {{ $k }}: {{ $v }}
+      {{- end }}
+      {{- end }}
+      restartPolicy: Always
+      volumes:
+        - name: rollsite-confs
+          configMap:
+            name: rollsite-config
+        - name: eggroll-confs
+          configMap:
+            name: eggroll-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rollsite
+  labels:
+    fateMoudle: rollsite
+{{ include "fate.labels" . | indent 4 }}
+spec:
+  ports:
+    - name: "9370"
+      port: 9370
+      targetPort: 9370
+      {{- with .Values.nodePort }}
+      nodePort: {{ . }}
+      {{- end }}
+      protocol: TCP
+  type: {{ .Values.modules.rollsite.type }}
+  selector:
+    fateMoudle: rollsite
+{{ include "fate.matchLabels" . | indent 4 }}
+---
+{{ end }}

@@ -9,64 +9,56 @@ apiVersion: v1
 metadata:
   name: python-config
   labels:
-    fateMoudle: fateflow
-    name: {{ .Values.partyName | quote  }}
-    partyId: {{ .Values.partyId | quote  }}
-    owner: kubefate
-    cluster: fate
+    fateMoudle: python
+{{ include "fate.labels" . | indent 4 }}
 data:
   server_conf.json: |
     {
         "servers": {
             "proxy": {
-                "host": "{{ .Values.modules.proxy.ip }}", 
+                "host": "{{ .Values.modules.rollsite.ip }}", 
                 "port": 9370
             }, 
             "fateboard": {
-                "host": "{{ .Values.modules.fateboard.ip }}", 
+                "host": "{{ .Values.modules.python.fateboardIp }}", 
                 "port": 8080
             }, 
-            "roll": {
-                "host": "{{ .Values.modules.roll.ip }}", 
-                "port": 8011
-            }, 
             "fateflow": {
-                "host": "{{ .Values.modules.fateflow.ip }}", 
+                "host": "{{ .Values.modules.python.fateflowIp }}", 
                 "grpc.port": 9360,
                 "http.port": 9380
             }, 
-            "federation": {
-                "host": "{{ .Values.modules.federation.ip }}", 
-                "port": 9394
-            },
+            {{- if .Values.modules.serving }}
+            "servings": [
+                "{{ .Values.modules.serving.ip }}:{{ .Values.modules.serving.port }}"
+            ],
+            {{- end }}
             "fml_agent": {
-                "host": "{{ .Values.modules.fateflow.ip }}", 
+                "host": "{{ .Values.modules.python.fateflowIp }}", 
                 "port": 8484
-            },
-            {{ if .Values.modules.serving }}
-            "servings": ["{{ .Values.modules.serving.ip }}:{{ .Values.modules.serving.port }}"],
-            {{ end }}
-            "clustercomm": {
-                "host": "{{ .Values.modules.federation.ip }}",
-                "port": 9394
-
             }
         }
     }
-  settings.py: |
+  settings.py: | 
     # -*- coding: utf-8 -*-
     import os
     
-    from arch.api.utils import file_utils
-    from arch.api.utils import log_utils
+    from arch.api import Backend
+    from arch.api.utils import file_utils, log_utils, core_utils
     from fate_flow.entity.runtime_config import RuntimeConfig
-    from arch.api.utils.core import get_lan_ip
+    from arch.api.utils.core_utils import get_lan_ip
+    from arch.api.utils.conf_utils import get_base_config
     import __main__
     
     from fate_flow.utils.setting_utils import CenterConfig
     
+    
     WORK_MODE = 1
+    BACKEND = Backend.EGGROLL
     USE_LOCAL_DATABASE = True
+    
+    # upload data
+    USE_LOCAL_DATA = True
     
     # Local authentication switch
     USE_AUTHENTICATION = False
@@ -80,28 +72,12 @@ data:
     ZOOKEEPER_HOSTS = ['127.0.0.1:2181']
     
     MAX_CONCURRENT_JOB_RUN = 5
-    MAX_CONCURRENT_JOB_RUN_HOST = 10
+    MAX_CONCURRENT_JOB_RUN_HOST = 5
     _ONE_DAY_IN_SECONDS = 60 * 60 * 24
-    DEFAULT_GRPC_OVERALL_TIMEOUT = 60 * 1000  # ms
+    DEFAULT_GRPC_OVERALL_TIMEOUT = 60 * 1000 * 60  # ms
     JOB_DEFAULT_TIMEOUT = 7 * 24 * 60 * 60
-    REDIS_QUEUE_DB_INDEX = 0
-    
-    DATABASE = {
-        'name': '{{ .Values.mysql.mysql_database | default "fate" }}',
-        'user': '{{ .Values.mysql.mysql_user | default "fate" }}',
-        'passwd': '{{ .Values.mysql.mysql_password | default "fate_dev" }}',
-        'host': '{{ .Values.modules.mysql.ip }}',
-        'port': 3306,
-        'max_connections': 100,
-        'stale_timeout': 30,
-    }
-    
-    REDIS = {
-        'host': '{{ .Values.modules.redis.ip }}',
-        'port': 6379,
-        'password': '{{ .Values.redis.requirepass | default "fate_dev" }}',
-        'max_connections': 500
-    }
+    DATABASE = get_base_config("database", {})
+    DEFAULT_MODEL_STORE_ADDRESS = get_base_config("default_model_store_address", {})
     
     '''
     Constants
@@ -112,12 +88,12 @@ data:
     MAIN_MODULE = os.path.relpath(__main__.__file__)
     SERVER_MODULE = 'fate_flow_server.py'
     TASK_EXECUTOR_MODULE = 'driver/task_executor.py'
-    DEFAULT_WORKFLOW_DATA_TYPE = ['train_input', 'data_input', 'id_library_input', 'model', 'predict_input',
-                                  'predict_output', 'evaluation_output', 'intersect_data_output']
+    TEMP_DIRECTORY = os.path.join(file_utils.get_project_base_directory(), "fate_flow", "temp")
     HEADERS = {
         'Content-Type': 'application/json',
         'Connection': 'close'
     }
+    DETECT_TABLE = ("fate_flow_detect_table_namespace", "fate_flow_detect_table_name", 16)
     # fate-serving
     SERVINGS_ZK_PATH = '/FATE-SERVICES/serving/online/publishLoad/providers'
     FATE_FLOW_ZK_PATH = '/FATE-SERVICES/flow/online/transfer/providers'
@@ -127,23 +103,27 @@ data:
     FATE_MANAGER_NODE_CHECK = '/node/management/check'
     
     # logger
+    log_utils.LoggerFactory.LEVEL = 10
+    # {CRITICAL: 50, FATAL:50, ERROR:40, WARNING:30, WARN:30, INFO:20, DEBUG:10, NOTSET:0}
     log_utils.LoggerFactory.set_directory(os.path.join(file_utils.get_project_base_directory(), 'logs', 'fate_flow'))
     stat_logger = log_utils.getLogger("fate_flow_stat")
     detect_logger = log_utils.getLogger("fate_flow_detect")
     access_logger = log_utils.getLogger("fate_flow_access")
-     
+    audit_logger = log_utils.audit_logger()
     
     """
     Services 
     """
-    IP = '0.0.0.0'
-    GRPC_PORT = 9360
-    HTTP_PORT = 9380
+    IP = get_base_config("fate_flow", {}).get("host", "0.0.0.0")
+    HTTP_PORT = get_base_config("fate_flow", {}).get("http_port")
+    GRPC_PORT = get_base_config("fate_flow", {}).get("grpc_port")
+    
     # standalone job will be send to the standalone job server when FATE-Flow work on cluster deploy mode,
     # but not the port for FATE-Flow on standalone deploy mode.
     CLUSTER_STANDALONE_JOB_SERVER_PORT = 9381
     
     
+    # services ip and port
     SERVER_CONF_PATH = 'arch/conf/server_conf.json'
     SERVING_PATH = '/servers/servings'
     server_conf = file_utils.load_json_conf(SERVER_CONF_PATH)
@@ -156,35 +136,64 @@ data:
     MANAGER_HOST = server_conf.get(SERVERS).get('fatemanager', {}).get('host')
     MANAGER_PORT = server_conf.get(SERVERS).get('fatemanager', {}).get('port')
     SERVINGS = CenterConfig.get_settings(path=SERVING_PATH, servings_zk_path=SERVINGS_ZK_PATH,
-                                        use_zk=USE_CONFIGURATION_CENTER, hosts=ZOOKEEPER_HOSTS,
-                                        server_conf_path=SERVER_CONF_PATH)
+                                         use_zk=USE_CONFIGURATION_CENTER, hosts=ZOOKEEPER_HOSTS,
+                                         server_conf_path=SERVER_CONF_PATH)
     BOARD_DASHBOARD_URL = 'http://%s:%d/index.html#/dashboard?job_id={}&role={}&party_id={}' % (BOARD_HOST, BOARD_PORT)
+    
+    # switch
+    SAVE_AS_TASK_INPUT_DATA_SWITCH = True
+    SAVE_AS_TASK_INPUT_DATA_IN_MEMORY = True
+    
+    # init
     RuntimeConfig.init_config(WORK_MODE=WORK_MODE)
     RuntimeConfig.init_config(HTTP_PORT=HTTP_PORT)
+    RuntimeConfig.init_config(BACKEND=BACKEND)
+    
+  base_conf.yaml: |
+    work_mode: 1
+    fate_flow:
+      host: 0.0.0.0
+      http_port: 9380
+      grpc_port: 9360
+    database:
+      name: '{{ .Values.modules.mysql.database }}'
+      user: '{{ .Values.modules.mysql.user }}'
+      passwd: '{{ .Values.modules.mysql.password }}'
+      host: '{{ .Values.modules.mysql.ip }}'
+      port: {{ .Values.modules.mysql.port }}
+      max_connections: 100
+      stale_timeout: 30
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      password: WEBANK_2014_fate_dev
+      max_connections: 500
+      db: 0
+    default_model_store_address:
+      storage: redis
+      host: 127.0.0.1
+      port: 6379
+      password: fate_dev
+      db: 0
 ---
-
 kind: ConfigMap
 apiVersion: v1
 metadata:
   name: fateboard-config
   labels:
     fateMoudle: fateboard
-    name: {{ .Values.partyName | quote  }}
-    partyId: {{ .Values.partyId | quote  }}
-    owner: kubefate
-    cluster: fate
+{{ include "fate.labels" . | indent 4 }}
 data:
   application.properties: |
     server.port=8080
-    fateflow.url=http://{{ .Values.modules.fateflow.ip }}:9380
+    fateflow.url=http://{{ .Values.modules.python.fateflowIp }}:9380
     spring.datasource.driver-Class-Name=com.mysql.cj.jdbc.Driver
-    management.endpoints.web.exposure.include=*
     spring.http.encoding.charset=UTF-8
     spring.http.encoding.enabled=true
     server.tomcat.uri-encoding=UTF-8
-    spring.datasource.url=jdbc:mysql://{{ .Values.modules.mysql.ip }}:3306/{{ .Values.mysql.mysql_database | default "fate" }}?characterEncoding=utf8&characterSetResults=utf8&autoReconnect=true&failOverReadOnly=false&serverTimezone=GMT%2B8
-    spring.datasource.username={{ .Values.mysql.mysql_user | default "fate" }}
-    spring.datasource.password={{ .Values.mysql.mysql_password | default "fate_dev" }}
+    fateboard.datasource.jdbc-url=jdbc:mysql://{{ .Values.modules.mysql.ip }}:{{ .Values.modules.mysql.port }}/{{ .Values.modules.mysql.database }}?characterEncoding=utf8&characterSetResults=utf8&autoReconnect=true&failOverReadOnly=false&serverTimezone=GMT%2B8
+    fateboard.datasource.username={{ .Values.modules.mysql.user }}
+    fateboard.datasource.password={{ .Values.modules.mysql.password }}
     server.tomcat.max-threads=1000
     server.tomcat.max-connections=20000
 ---
@@ -194,10 +203,7 @@ metadata:
   name: python
   labels:
     fateMoudle: python
-    name: {{ .Values.partyName | quote  }}
-    partyId: {{ .Values.partyId | quote  }}
-    owner: kubefate
-    cluster: fate
+{{ include "fate.labels" . | indent 4 }}
 spec:
   replicas: 1
   strategy:
@@ -205,16 +211,12 @@ spec:
   selector:
     matchLabels:
       fateMoudle: python
-      name: {{ .Values.partyName  | quote }}
-      partyId: {{ .Values.partyId | quote  }}
+{{ include "fate.matchLabels" . | indent 6 }}
   template:
     metadata:
       labels:
         fateMoudle: python
-        name: {{ .Values.partyName | quote  }}
-        partyId: {{ .Values.partyId | quote  }}
-        owner: kubefate
-        cluster: fate
+{{ include "fate.labels" . | indent 8 }}
     spec:
       hostAliases:
       - ip: "127.0.0.1"
@@ -225,13 +227,15 @@ spec:
         name: mysql
         env:
         - name: MYSQL_DATABASE
-          value: {{ .Values.mysql.mysql_database }}
+          value: {{ .Values.modules.mysql.database }}
         - name: MYSQL_USER
-          value: {{ .Values.mysql.mysql_user }}
+          value: {{ .Values.modules.mysql.user }}
         - name: MYSQL_PASSWORD
-          value: {{ .Values.mysql.mysql_password }}
+          value: {{ .Values.modules.mysql.password }}
         - name: MYSQL_HOST
-          value: mysql
+          value: {{ .Values.modules.mysql.ip }}
+        - name: MYSQL_PORT
+          value: {{ .Values.modules.mysql.port  | quote }}
         command:
         - /bin/bash
         - -c
@@ -243,8 +247,8 @@ spec:
               checkMySQLCount=$[checkMySQLCount+1]
               echo "Waiting for mysql started. check count: $checkMySQLCount"
               sleep 2
-
-              state=`mysqladmin ping -h ${MYSQL_HOST} -u${MYSQL_USER} -p${MYSQL_PASSWORD}| awk '{print $3}'`
+              
+              state=`mysqladmin ping -h ${MYSQL_HOST} --port=${MYSQL_PORT} -u${MYSQL_USER} -p${MYSQL_PASSWORD}| awk '{print $3}'`
               if [ "$state" == "alive" ]; then
                 echo "mysql server has been already started."
               break
@@ -265,11 +269,17 @@ spec:
             - mountPath: /data/projects/fate/python/eggroll/conf/server_conf.json
               name: python-confs
               subPath: server_conf.json
+            - mountPath: /data/projects/fate/eggroll/conf/eggroll.properties
+              name: eggroll-confs
+              subPath: eggroll.properties
             - mountPath: /data/projects/fate/python/arch/conf/server_conf.json
               name: python-confs
               subPath: server_conf.json
             - mountPath: /data/projects/fate/python/fate_flow/settings.py
               subPath: settings.py
+              name: python-confs
+            - mountPath: /data/projects/fate/python/arch/conf/base_conf.yaml
+              subPath: base_conf.yaml
               name: python-confs
             - name: logs
               mountPath: /data/projects/fate/python/logs
@@ -284,15 +294,20 @@ spec:
               subPath: application.properties
             - name: logs
               mountPath: /data/projects/fate/python/logs
-      {{ if .Values.nodeSelector.python.value}}
-      nodeSelector:
-        {{ .Values.nodeSelector.python.nodeLabel }}: {{ .Values.nodeSelector.python.value }}
-      {{ end }}
+      {{- with .Values.modules.python.nodeSelector }}
+      nodeSelector: 
+      {{- range $k, $v := . }}
+        {{ $k }}: {{ $v }}
+      {{- end }}
+      {{- end }}
       restartPolicy: Always
       volumes:
         - name: python-confs
           configMap:
             name: python-config
+        - name: eggroll-confs
+          configMap:
+            name: eggroll-config
         - name: fateboard-confs
           configMap:
             name: fateboard-config
@@ -305,10 +320,7 @@ metadata:
   name: fateflow
   labels:
     fateMoudle: python
-    name: {{ .Values.partyName | quote  }}
-    partyId: {{ .Values.partyId | quote  }}
-    owner: kubefate
-    cluster: fate
+{{ include "fate.labels" . | indent 4 }}
 spec:
   ports:
     - name: "9360"
@@ -317,17 +329,19 @@ spec:
       protocol: TCP
     - name: "9380"
       port: 9380
+      {{- with .Values.modules.python.fateflowNodePort }}
+      nodePort: {{ . }}
+      {{- end }}
       targetPort: 9380
       protocol: TCP
     - name: "8484"
       port: 8484
       targetPort: 8484
       protocol: TCP
-  type: {{ .Values.modules.fateflow.type }}
+  type: {{ .Values.modules.python.fateflowType }}
   selector:
     fateMoudle: python
-    name: {{ .Values.partyName | quote  }}
-    partyId: {{ .Values.partyId | quote  }}
+{{ include "fate.matchLabels" . | indent 4 }}
 ---
 apiVersion: v1
 kind: Service
@@ -335,20 +349,16 @@ metadata:
   name: fateboard
   labels:
     fateMoudle: python
-    name: {{ .Values.partyName | quote  }}
-    partyId: {{ .Values.partyId | quote  }}
-    owner: kubefate
-    cluster: fate
+{{ include "fate.labels" . | indent 4 }}
 spec:
   ports:
     - name: "8080"
       port: 8080
       targetPort: 8080
       protocol: TCP
-  type: {{ .Values.modules.fateboard.type }}
+  type: {{ .Values.modules.python.fateboardType }}
   selector:
     fateMoudle: python
-    name: {{ .Values.partyName | quote  }}
-    partyId: {{ .Values.partyId | quote  }}
+{{ include "fate.matchLabels" . | indent 4 }}
 ---
 {{ end }}

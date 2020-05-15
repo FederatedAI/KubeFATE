@@ -1,0 +1,56 @@
+########################################################
+# Copyright 2019-2020 program was created VMware, Inc. #
+# SPDX-License-Identifier: Apache-2.0                  #
+########################################################
+
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: eggroll-config
+  labels:
+    fateMoudle: eggroll
+    name: {{ .Values.partyName | quote  }}
+    partyId: {{ .Values.partyId | quote  }}
+    owner: kubefate
+    cluster: fate
+data:
+  eggroll.properties: |
+    [eggroll]
+    eggroll.resourcemanager.clustermanager.jdbc.driver.class.name=com.mysql.cj.jdbc.Driver
+    eggroll.resourcemanager.clustermanager.jdbc.url=jdbc:mysql://{{ .Values.modules.mysql.ip }}:{{ .Values.modules.mysql.port }}/{{ .Values.modules.mysql.database }}?useSSL=false&serverTimezone=UTC&characterEncoding=utf8&allowPublicKeyRetrieval=true
+    eggroll.resourcemanager.clustermanager.jdbc.username={{ .Values.modules.mysql.user }}
+    eggroll.resourcemanager.clustermanager.jdbc.password={{ .Values.modules.mysql.password }}
+    
+    eggroll.data.dir=data/
+    eggroll.logs.dir=logs/
+    eggroll.resourcemanager.clustermanager.host=clustermanager
+    eggroll.resourcemanager.clustermanager.port=4670
+    eggroll.resourcemanager.nodemanager.port=4671
+    eggroll.resourcemanager.process.tag={{ .Values.partyId }}
+    
+    eggroll.bootstrap.root.script=bin/eggroll_boot.sh
+    
+    eggroll.resourcemanager.bootstrap.egg_pair.exepath=bin/roll_pair/egg_pair_bootstrap.sh
+    eggroll.resourcemanager.bootstrap.egg_pair.venv=/data/projects/python/venv
+    eggroll.resourcemanager.bootstrap.egg_pair.pythonpath=/data/projects/fate/python:/data/projects/fate/eggroll/python
+    eggroll.resourcemanager.bootstrap.egg_pair.filepath=python/eggroll/roll_pair/egg_pair.py
+    
+    
+    eggroll.resourcemanager.bootstrap.roll_pair_master.exepath=bin/roll_pair/roll_pair_master_bootstrap.sh
+    eggroll.resourcemanager.bootstrap.roll_pair_master.javahome=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.252.b09-2.el7_8.x86_64/jre
+    eggroll.resourcemanager.bootstrap.roll_pair_master.classpath=conf/:lib/*
+    eggroll.resourcemanager.bootstrap.roll_pair_master.mainclass=com.webank.eggroll.rollpair.RollPairMasterBootstrap
+    eggroll.resourcemanager.bootstrap.roll_pair_master.jvm.options=
+    
+    # roll site
+    eggroll.rollsite.coordinator={{ .Values.partyName }}
+    eggroll.rollsite.host=rollsite
+    eggroll.rollsite.port=9370
+    eggroll.rollsite.party.id={{ .Values.partyId }}
+    eggroll.rollsite.route.table.path=conf/route_table.json
+    
+    
+    eggroll.session.processors.per.node=2
+    eggroll.session.start.timeout.ms=180000
+    eggroll.rollsite.adapter.sendbuf.size=1048576
+    eggroll.rollpair.transferpair.sendbuf.size=4150000

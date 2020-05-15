@@ -10,10 +10,7 @@ metadata:
   name: fateboard
   labels:
     fateMoudle: fateboard
-    name: {{ .Values.partyName | quote  }}
-    partyId: {{ .Values.partyId | quote  }}
-    owner: kubefate
-    cluster: fate
+{{ include "fate.labels" . | indent 4 }}
 spec:
   rules:
   - host: {{ .Values.host.fateboard }}
@@ -33,10 +30,7 @@ metadata:
   name: client
   labels:
     fateMoudle: client
-    name: {{ .Values.partyName | quote  }}
-    partyId: {{ .Values.partyId | quote  }}
-    owner: kubefate
-    cluster: fate
+{{ include "fate.labels" . | indent 4 }}
 spec:
   rules:
   - host: {{ .Values.host.client }}

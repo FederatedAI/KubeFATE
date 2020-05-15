@@ -1,5 +1,3 @@
-#nfspath: /data/fate-data
-#nfsserver: 192.168.0.2
 
 partyId: 9999     # required
 partyName: fate-serving-9999     # required
@@ -11,6 +9,9 @@ image:
   tag: 1.2.2-release        # required
   pullPolicy: IfNotPresent  # required
 
+persistence:
+  enabled: false
+
 servingProxy: 
   include: true             # required
   ip: serving-proxy                 # required
@@ -18,9 +19,10 @@ servingProxy:
   type: NodePort
   nodePort: 30109
   ingerssHost: 9999.serving-proxy.kubefate.net
+  nodeSelector: {}
   partyList:
   - partyId: 10000
-    partyIp: 192.168.100.123
+    partyIp: 192.168.10.1
     partyPort: 30110
 
 servingRedis:
@@ -29,17 +31,26 @@ servingRedis:
   port: 6379                # required
   type: ClusterIP           
   password: fate_dev     # required
-  nodeSelector:
-
+  nodeSelector: {}
+  subPath: ""
+  existingClaim: ""
+  storageClass: "serving-redis"
+  accessMode: ReadWriteOnce
+  size: 1Gi
 
 servingServer:
   include: true             # required
   ip: serving-server        # required
   port: 8000                # required
-  type: ClusterIP
+  type: NodePort
+  nodePort: 30209
   fateflow:
     ip: fateflow
     port: 9380
-  nodeSelector:
-
+  nodeSelector:  {}
+  subPath: ""
+  existingClaim: ""
+  storageClass: "serving-server"
+  accessMode: ReadWriteOnce
+  size: 1Gi
 
