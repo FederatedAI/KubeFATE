@@ -1,125 +1,161 @@
-#nfspath: /data/fate-data
-#nfsserver: 192.168.0.2
 
 image:
   registry: {{ .registry | default "federatedai" }}
-  isThridParty:
-  tag: 1.3.0-release
+  isThridParty: {{ empty .registry | ternary  "false" "true" }}
+  tag: 1.4.0-release
   pullPolicy: {{ .pullPolicy | default "IfNotPresent" }}
+
 partyId: {{ .partyId }}
 partyName: {{ .name }}
+
 host:
   fateboard: {{ .partyId }}.fateboard.kubefate.net
   client: {{ .partyId }}.notebook.kubefate.net
-nodePort: {{ with .proxy }}{{ .nodePort }}{{ end }}
+
+nodePort: {{ with .rollsite }}{{ .nodePort }}{{ end }}
 
 exchange:
-{{- with .proxy }}
+{{- with .rollsite }}
 {{- with .exchange }}
   partyIp: {{ .ip }}
   partyPort: {{ .port }}
 {{- end }}
 {{- end }}
+
 partyList:
-{{- with .proxy }}
+{{- with .rollsite }}
 {{- range .partyList }}
   - partyId: {{ .partyId }}
     partyIp: {{ .partyIp }}
     partyPort: {{ .partyPort }}
 {{- end }}
 {{- end }}
-mysql:
-  mysql_root_password: {{.externalMysqlRootPassword|default "fate_dev"}}
-  mysql_database: {{.externalMysqlDatabase|default "fate"}}
-  mysql_user: {{.externalMysqlUser|default "fate"}}
-  mysql_password: {{.externalMysqlPassword|default "fate_dev"}}
-redis:
-  requirepass: {{.externalRedisPassword|default "fate_dev"}}
-eggList:
-{{- with .egg }}
-{{- range .count | int | until }}
-  - egg: egg{{ . }}
-    nodeLabel: fedai.org
-    value:
-{{- end }}
-{{- end }}
-nodeSelector:
-  fateboard:
-    nodeLabel: fedai.org
-    value: 
-  federation:
-    nodeLabel: fedai.org
-    value: 
-  metaService:
-    nodeLabel: fedai.org
-    value: 
-  mysql:
-    nodeLabel: fedai.org
-    value: 
-  proxy:
-    nodeLabel: fedai.org
-    value: 
-  python:
-    nodeLabel: fedai.org
-    value: 
-  redis:
-    nodeLabel: fedai.org
-    value: 
-  roll:
-    nodeLabel: fedai.org
-    value: 
-  servingServer:
-    nodeLabel: fedai.org
-    value: 
-modules: 
-  proxy: 
-    include: {{ has "proxy" .modules }}
-    ip: proxy
-    type: {{ .proxy.type | default "ClusterIP" }}
-  egg: 
-    include: {{ has "egg" .modules }}
-    processorSessionMaxCount: {{ .egg.processor }}
-    ip: egg
-    type: ClusterIP
-  fateboard: 
-    include: {{ has "fateboard" .modules }}
-    ip: fateboard
-    type: ClusterIP
-  fateflow: 
-    include: {{ has "fateflow" .modules }}
-    ip: fateflow
-    type: ClusterIP
-  federation: 
-    include: {{ has "federation" .modules }}
-    ip: federation
-    type: ClusterIP
-  metaService: 
-    include: {{ has "metaService" .modules }}
-    ip: meta-service
-    type: ClusterIP
-  mysql: 
-    include: {{ has "mysql" .modules }}
-    ip: {{.externalMysqlIp|default "mysql"}}
-    type: ClusterIP
-  redis: 
-    include: {{ has "redis" .modules }}
-    ip: {{.externalRedisIp|default "redis"}}
-    type: ClusterIP
-  roll: 
-    include: {{ has "roll" .modules }}
-    ip: roll
-    type: ClusterIP
+
+persistence:
+  enabled: {{ .persistence | default "false" }}
+
+modules:
+  rollsite: 
+    include: {{ has "rollsite" .modules }}
+    ip: rollsite
+    type: {{ .rollsite.type | default "ClusterIP" }}
+    {{- with .rollsite }}
+    {{- with .nodeSelector }}
+    nodeSelector: 
+    {{- range $k, $v := . }}
+      {{ $k }}: {{ $v }}
+    {{- end }}
+    {{- end }}
+    {{- end }}
   python: 
     include: {{ has "python" .modules }}
-    ip: python
+    fateboardIp: fateboard
+    fateboardType: ClusterIP
+    fateflowIp: fateflow
+    {{- with .python }}
+    fateflowType: {{ .fateflowType | default "ClusterIP" }}
+    fateflowNodePort: {{ .fateflowNodePort }}
+    {{- with .nodeSelector }}
+    nodeSelector: 
+    {{- range $k, $v := . }}
+      {{ $k }}: {{ $v }}
+    {{- end }}
+    {{- end }}
+    {{- end }}
+  clustermanager: 
+    include: {{ has "clustermanager" .modules }}
+    ip: clustermanager
     type: ClusterIP
+    {{- with .clustermanager }}
+    {{- with .nodeSelector }}
+    nodeSelector: 
+    {{- range $k, $v := . }}
+      {{ $k }}: {{ $v }}
+    {{- end }}
+    {{- end }}
+    {{- end }}
+  nodemanager:  
+    include: {{ has "nodemanager" .modules }}
+    list:
+    {{- with .nodemanager }}
+    {{- $nodemanager := . }}
+    {{- range .count | int | until }}
+    - name: nodemanager-{{ . }}
+      nodeSelector: {}
+      sessionProcessorsPerNode: {{ $nodemanager.sessionProcessorsPerNode }}
+      subPath: "nodemanager-{{ . }}"
+      existingClaim: ""
+      storageClass: "nodemanager-{{ . }}"
+      accessMode: ReadWriteOnce
+      size: 1Gi
+    {{- end }}
+
+    {{- range  $nodemanager.list }}
+    - name: {{ .name }}
+      {{- with .nodeSelector }}
+      nodeSelector: 
+      {{- range $k, $v := . }}
+        {{ $k }}: {{ $v }}
+      {{- end }}
+      {{- end }}
+      sessionProcessorsPerNode: {{ .sessionProcessorsPerNode }}
+      subPath: {{ .subPath }}
+      existingClaim: {{ .existingClaim }}
+      storageClass: {{ .storageClass }}
+      accessMode: {{ .accessMode }}
+      size: {{ .size }}
+    {{- end }}
+    {{- end }}
   client: 
     include: {{ has "client" .modules }}
     ip: client
     type: ClusterIP
-  serving: 
-    include: true
+    {{- with .client }}
+    {{- with .nodeSelector }}
+    nodeSelector: 
+    {{- range $k, $v := . }}
+      {{ $k }}: {{ $v }}
+    {{- end }}
+    {{- end }}
+    {{- end }}
+  mysql: 
+    {{- if .mysql }}
+    include: {{ has "mysql" .modules }}
+    type: ClusterIP
+    {{- with .mysql }}
+    {{- with .nodeSelector }}
+    nodeSelector: 
+    {{- range $k, $v := . }}
+      {{ $k }}: {{ $v }}
+    {{- end }}
+    {{- end }}
+    {{- end }}
+    ip: {{ .mysql.ip | default "mysql" }}
+    port: {{ .mysql.port | default "3306" }}
+    database: {{ .mysql.database | default "eggroll_meta" }}
+    user: {{ .mysql.user | default "fate" }}
+    password: {{ .mysql.password | default "fate_dev" }}
+    subPath: {{ .mysql.subPath }}
+    existingClaim: {{ .mysql.existingClaim }}
+    storageClass: {{ .mysql.storageClass }}
+    accessMode: {{ .mysql.accessMode | default "ReadWriteOnce" }}
+    size: {{ .mysql.size | default "1Gi" }}
+    {{- else }}
+    include: {{ has "mysql" .modules }}
+    type: ClusterIP
+    nodeSelector: {}
+    ip: {{ .externalMysqlIp | default "mysql" }}
+    port: {{ .externalMysqlPort | default "3306" }}
+    database: {{ .externalMysqlDatabase | default "eggroll_meta" }}
+    user: {{ .externalMysqlUser | default "fate" }}
+    password: {{ .externalMysqlPassword | default "fate_dev" }}
+    subPath: ""
+    existingClaim: ""
+    storageClass: "mysql"
+    accessMode: ReadWriteOnce
+    size: 1Gi
+    {{- end }}
+  serving:
     ip: {{ .servingIp }}
     port: {{ .servingPort }}
-    type: ClusterIP
     

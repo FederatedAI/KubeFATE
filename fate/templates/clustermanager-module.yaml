@@ -1,0 +1,79 @@
+########################################################
+# Copyright 2019-2020 program was created VMware, Inc. #
+# SPDX-License-Identifier: Apache-2.0                  #
+########################################################
+
+{{ if .Values.modules.clustermanager.include }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: clustermanager
+  labels:
+    fateMoudle: clustermanager
+{{ include "fate.labels" . | indent 4 }}
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      fateMoudle: clustermanager
+{{ include "fate.matchLabels" . | indent 6 }}
+  template:
+    metadata:
+      labels:
+        fateMoudle: clustermanager
+{{ include "fate.labels" . | indent 8 }}
+    spec:
+      hostAliases:
+      - ip: "127.0.0.1"
+        hostnames:
+        - "clustermanager"
+      containers:
+        - env:
+          - name: PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION
+            value: python 
+          image: {{ .Values.image.registry }}/eggroll:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          name: clustermanager
+          command:
+          - bash
+          - -c
+          - "java -Dlog4j.configurationFile=$${EGGROLL_HOME}/conf/log4j2.properties -cp $${EGGROLL_HOME}/lib/*: com.webank.eggroll.core.Bootstrap --bootstraps com.webank.eggroll.core.resourcemanager.ClusterManagerBootstrap -c $${EGGROLL_HOME}/conf/eggroll.properties -p 4670 -s 'EGGROLL_DEAMON'"
+          ports:
+            - containerPort: 4670
+          volumeMounts:
+            - mountPath: /data/projects/fate/eggroll/conf/eggroll.properties
+              name: eggroll-confs
+              subPath: eggroll.properties
+      {{- with .Values.modules.mysql.nodeSelector }}
+      nodeSelector: 
+      {{- range $k, $v := . }}
+        {{ $k }}: {{ $v }}
+      {{- end }}
+      {{- end }}
+      restartPolicy: Always
+      volumes:
+        - name: eggroll-confs
+          configMap:
+            name: eggroll-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: clustermanager
+  labels:
+    fateMoudle: clustermanager
+{{ include "fate.labels" . | indent 4 }}
+spec:
+  ports:
+    - name: "4670"
+      port: 4670
+      targetPort: 4670
+      protocol: TCP
+  type: {{ .Values.modules.clustermanager.type }}
+  selector:
+    fateMoudle: clustermanager
+{{ include "fate.matchLabels" . | indent 4 }}
+---
+{{ end }}

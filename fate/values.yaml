@@ -1,112 +1,90 @@
-#nfspath: /data/fate-data
-#nfsserver: 192.168.0.2
 
 image:
   registry: federatedai
   isThridParty:
-  tag: 1.3.0-release
+  tag: 1.4.0-release
   pullPolicy: IfNotPresent
+  
 partyId: 9999
 partyName: fate-9999
+
 host:
   fateboard: 9999.fateboard.kubefate.net
   client: 9999.notebook.kubefate.net
-nodePort: 
 
 exchange:
-  partyIp: 192.168.100.123
+  partyIp: 192.168.1.1
+  partyPort: 30000
+
+partyList:
+- partyId: 8888
+  partyIp: 192.168.8.1
+  partyPort: 30008
+- partyId: 10000
+  partyIp: 192.168.10.1
   partyPort: 30010
-mysql:
-  mysql_root_password: fate_dev
-  mysql_database: fate
-  mysql_user: fate
-  mysql_password: fate_dev
-redis:
-  requirepass: fate_dev
-eggList:
-  - egg: egg
-    nodeLabel: fedai.org
-    value: 
-nodeSelector:
-  fateboard:
-    nodeLabel: fedai.org
-    value: 
-  federation:
-    nodeLabel: fedai.org
-    value: 
-  metaService:
-    nodeLabel: fedai.org
-    value: 
-  mysql:
-    nodeLabel: fedai.org
-    value: 
-  proxy:
-    nodeLabel: fedai.org
-    value: 
-  python:
-    nodeLabel: fedai.org
-    value: 
-  redis:
-    nodeLabel: fedai.org
-    value: 
-  roll:
-    nodeLabel: fedai.org
-    value: 
-  servingServer:
-    nodeLabel: fedai.org
-    value: 
-  client:
-    nodeLabel: fedai.org
-    value:
+
+persistence:
+  enabled: false
 
 modules:
-  proxy: 
+  rollsite: 
     include: true
-    ip: proxy
+    ip: rollsite
     type: NodePort
-  egg: 
-    include: true
-    processorSessionMaxCount: 4
-    ip: egg
-    type: ClusterIP
-  fateboard: 
-    include: true
-    ip: fateboard
-    type: ClusterIP
-  fateflow: 
-    include: true
-    ip: fateflow
-    type: ClusterIP
-  federation: 
-    include: true
-    ip: federation
-    type: ClusterIP
-  metaService: 
-    include: true
-    ip: meta-service
-    type: ClusterIP
-  mysql: 
-    include: true
-    ip: mysql
-    type: ClusterIP
-  redis: 
-    include: true
-    ip: redis
-    type: ClusterIP
-  roll: 
-    include: true
-    ip: roll
-    type: ClusterIP
+    nodePort: 30009
+    nodeSelector: {}
   python: 
     include: true
-    ip: python
+    fateboardIp: fateboard
+    fateboardType: ClusterIP
+    fateflowIp: fateflow
+    fateflowType: ClusterIP
+    nodeSelector: {}
+  clustermanager: 
+    include: true
+    ip: clustermanager
     type: ClusterIP
+    nodeSelector: {}
+  nodemanager:  
+    include: true
+    list:
+    - name: nodemanager-0
+      nodeSelector: {}
+      sessionProcessorsPerNode: 2
+      subPath: "nodemanager-0"
+      existingClaim: ""
+      storageClass: "nodemanager-0"
+      accessMode: ReadWriteOnce
+      size: 1Gi
+    - name: nodemanager-1
+      nodeSelector: {}
+      sessionProcessorsPerNode: 2
+      subPath: "nodemanager-1"
+      existingClaim: ""
+      storageClass: "nodemanager-1"
+      accessMode: ReadWriteOnce
+      size: 1Gi
   client: 
     include: true
     ip: client
     type: ClusterIP
-  serving: 
+    nodeSelector: {}
+  mysql: 
     include: true
-    ip: serving-server.fate-serving-9999
-    port: 80000
     type: ClusterIP
+    nodeSelector: {}
+    ip: mysql
+    port: 3306
+    database: eggroll_meta
+    user: fate
+    password: fate_dev
+    subPath: "mysql"
+    existingClaim: ""
+    claimName: mysql-data
+    storageClass: "mysql"
+    accessMode: ReadWriteOnce
+    size: 1Gi
+  serving:
+    ip: 192.168.9.1
+    port: 30209

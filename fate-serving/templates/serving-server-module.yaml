@@ -115,6 +115,9 @@ spec:
             - mountPath: /data/projects/fate/serving-server/conf/serving-server.properties
               name: serving-server-confs
               subPath: serving-server.properties
+            - name: data
+              mountPath: /root/.fate
+              subPath: {{ .Values.servingServer.subPath }}
       {{- with .Values.servingServer.nodeSelector }}
       nodeSelector:
       {{- range $k,$v := . }}
@@ -126,6 +129,14 @@ spec:
         - name: serving-server-confs
           configMap:
             name: serving-server-config
+        {{- if not .Values.persistence.enabled }}
+        - name: data
+          emptyDir: {}
+        {{- else if .Values.servingServer.existingClaim }}
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ .Values.servingServer.existingClaim | default  "serving-server-data" }}
+        {{- end }}
 ---
 apiVersion: v1
 kind: Service
@@ -142,6 +153,9 @@ spec:
     - name: "8000"
       port: 8000
       targetPort: 8000
+      {{- with .Values.servingServer.nodePort }}
+      nodePort: {{ . }}
+      {{- end }}
       protocol: TCP
   type: {{ .Values.servingServer.type }}
   selector:
@@ -149,4 +163,29 @@ spec:
     name: {{ .Values.partyName | quote  }}
     partyId: {{ .Values.partyId | quote  }}
 ---
+{{- if and .Values.persistence.enabled (not .Values.servingServer.existingClaim) }}
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: serving-server-data
+  labels:
+    fateMoudle: serving-server
+    name: {{ .Values.partyName | quote  }}
+    partyId: {{ .Values.partyId | quote  }}
+    owner: kubefate
+    cluster: fate-serving
+spec:
+  accessModes: 
+    - {{ .Values.servingServer.accessMode }}
+  resources:
+    requests:
+      storage: {{ .Values.servingServer.size }}
+  {{- if .Values.servingServer.storageClass }}
+    {{- if eq "-" .Values.servingServer.storageClass }}
+  storageClassName: ""
+    {{- else }}
+  storageClassName: {{ .Values.servingServer.storageClass }}
+    {{- end }}
+  {{- end }}
+{{- end }}
 {{ end }}
