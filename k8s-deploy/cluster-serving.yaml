@@ -42,8 +42,7 @@ servingRedis:
   storageClass: "serving-redis"
   accessMode: ReadWriteOnce
   size: 1Gi
-  
-# 如果不安装Redis的时候配置
+
 externalRedisIp: serving-redis
 externalRedisPort: 6379
 externalRedisDatabase: 0

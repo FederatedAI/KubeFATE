@@ -1,6 +1,7 @@
 package api
 
 import (
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/service"
 	"github.com/gin-gonic/gin"
 )
 
@@ -12,7 +13,7 @@ func Router(r *gin.Engine) {
 		c.JSON(200, gin.H{
 			"msg":             "kubefate run success",
 			"api_version":     ApiVersion,
-			"service_version": ServiceVersion,
+			"service_version": service.GetVersion(),
 		})
 	})
 

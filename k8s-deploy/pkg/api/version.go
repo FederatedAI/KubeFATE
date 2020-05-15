@@ -5,8 +5,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-const ServiceVersion = "v1.0.2"
-
 type Version struct {
 }
 
