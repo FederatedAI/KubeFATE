@@ -1,23 +1,50 @@
 name: fate-serving-9999
 namespace: fate-serving-9999
 chartName: fate-serving
-chartVersion: v1.2.2
+chartVersion: v1.2.2-a
 partyId: 9999
+registry: ""
+pullPolicy: 
+persistence: false
 modules:
   - servingProxy
   - servingRedis
   - servingServer
 
 servingProxy: 
-  nodePort: 30109
+  nodePort: 30309
   ingerssHost: 9999.serving-proxy.kubefate.net
   partyList:
   - partyId: 10000
-    partyIp: 192.168.100.123
-    partyPort: 30110
+    partyIp: 192.168.10.1
+    partyPort: 30310
+  exchange:
+    ip: 192.168.1.1
+    port: 30100
 
 servingServer:
+  type: NodePort
+  nodePort: 30209
   fateflow:
-    ip: fateflow.fate-9999
-    port: 9380
+    ip: 192.168.9.1
+    port: 30109
+  subPath: ""
+  existingClaim: ""
+  storageClass: "serving-server"
+  accessMode: ReadWriteOnce
+  size: 1Gi
 
+servingRedis:
+  password: fate_dev
+  nodeSelector: {}
+  subPath: ""
+  existingClaim: ""
+  storageClass: "serving-redis"
+  accessMode: ReadWriteOnce
+  size: 1Gi
+  
+# 如果不安装Redis的时候配置
+externalRedisIp: serving-redis
+externalRedisPort: 6379
+externalRedisDatabase: 0
+externalRedisPassword: fate_dev
