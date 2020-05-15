@@ -1,18 +1,11 @@
-NAME ?= federatedai/kubefate
-VERSION ?= v1.0.3
-
 # Image URL to use all building/pushing image targets
 IMG ?= federatedai/kubefate:latest
 
-all: kubefate
+all: release
 
 # Run tests
 test: fmt vet
 	go test ./... -coverprofile cover.out
-
-# Build manager binary
-kubefate: fmt vet
-	go build -o bin/kubefate kubefate.go
 
 # Run against the configured Kubernetes cluster in ~/.kube/config
 run: fmt vet
