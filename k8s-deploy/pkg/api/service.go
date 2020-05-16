@@ -2,7 +2,6 @@ package api
 
 import (
 	"fmt"
-	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/service"
 	"os"
 
 	"github.com/gin-contrib/logger"
@@ -23,7 +22,7 @@ func initUser() error {
 func Run() {
 	log.Info().Msgf("logLevel: %v", viper.GetString("log.level"))
 	log.Info().Msgf("api version: %v", ApiVersion)
-	log.Info().Msgf("service version: %#v", *service.GetVersion())
+	log.Info().Msgf("service version: %v", ServiceVersion)
 	err := initUser()
 	if err != nil {
 		log.Error().Err(err).Msg("initUser error, ")
