@@ -12,7 +12,6 @@ modules:
   - nodemanager
   - mysql
   - python
-  - client
 
 rollsite: 
   type: NodePort

@@ -21,6 +21,7 @@ servingProxy:
   exchange:
     ip: 192.168.1.1
     port: 30100
+  nodeSelector: {}
 
 servingServer:
   type: NodePort
@@ -33,6 +34,7 @@ servingServer:
   storageClass: "serving-server"
   accessMode: ReadWriteOnce
   size: 1Gi
+  nodeSelector: {}
 
 servingRedis:
   password: fate_dev
