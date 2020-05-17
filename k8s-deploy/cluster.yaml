@@ -56,11 +56,11 @@ mysql:
   accessMode: ReadWriteOnce
   size: 1Gi
 
-externalMysqlIp: mysql
-externalMysqlPort: 3306
-externalMysqlDatabase: eggroll_meta
-externalMysqlUser: fate
-externalMysqlPassword: fate_dev
+# externalMysqlIp: mysql
+# externalMysqlPort: 3306
+# externalMysqlDatabase: eggroll_meta
+# externalMysqlUser: fate
+# externalMysqlPassword: fate_dev
 
 servingIp: 192.168.9.1
 servingPort: 30209

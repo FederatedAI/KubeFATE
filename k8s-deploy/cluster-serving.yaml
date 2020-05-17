@@ -45,7 +45,7 @@ servingRedis:
   accessMode: ReadWriteOnce
   size: 1Gi
 
-externalRedisIp: serving-redis
-externalRedisPort: 6379
-externalRedisDatabase: 0
-externalRedisPassword: fate_dev
+# externalRedisIp: serving-redis
+# externalRedisPort: 6379
+# externalRedisDatabase: 0
+# externalRedisPassword: fate_dev
