@@ -6,7 +6,7 @@ partyName: {{ .name }}
 image:
   registry: {{ .registry | default "federatedai" }}
   isThridParty: {{ empty .registry | ternary  "false" "true" }}
-  tag: 1.2.2-release
+  tag: 1.2.4-release
   pullPolicy: {{ .pullPolicy | default "IfNotPresent" }}
 
 persistence:
