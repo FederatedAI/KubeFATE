@@ -6,7 +6,7 @@ partyName: fate-serving-9999     # required
 image:
   registry: federatedai     # required
   isThridParty:
-  tag: 1.2.2-release        # required
+  tag: 1.2.4-release        # required
   pullPolicy: IfNotPresent  # required
 
 persistence:
