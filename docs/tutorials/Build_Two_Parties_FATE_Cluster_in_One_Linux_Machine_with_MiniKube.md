@@ -12,8 +12,9 @@ After the tutorial, the deployment architecture looks like following diagram.
 2. A domain name for ingress of KubeFATE service and FATE-Dashboard. A alternative is set host both to deploying machine and client to access FATE-Dashboard. In this tutorial, we suppose to the latter case.  
 3. Docker have been installed in the Linux machine. To install a Docker, please refer to [Install Docker in Ubuntu](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
 4. Network connectivity to dockerhub, and google storage
-5. Create a folder for whole tutorial
+5. Setup the global KubeFATE version using in the tutorial and create a folder for whole tutorial. We use KubeFATE v1.3.0-a in this tutorial, other version should be similar.
 	```
+  export version=v1.3.0-a
 	cd ~ && mkdir demo && cd demo
 	```
 
@@ -25,7 +26,7 @@ The following tools and version have been verified, which are the latest version
 1. MiniKube: v1.7.3
 2. kubectl: v1.17.3
 3. kubefate:
-	* Release: v1.3.1-a
+	* Release: v1.3.0-a
 	* Service version: v1.0.2
 	* Commandline version: v1.0.2
 
@@ -52,7 +53,7 @@ commit: 436667c819c324e35d7e839f8116b968a2d0a3ff
 ### Download KubeFATE Release Pack and Install KubeFATE Command Lines
 Go to [KubeFATE Release](https://github.com/FederatedAI/KubeFATE/releases), and find the latest kubefate-k8s release pack. 
 ```
-curl -LO https://github.com/FederatedAI/KubeFATE/releases/download/v1.3.0-a/kubefate-k8s-v1.3.0-a.tar.gz && tar -xzf ./kubefate-k8s-v1.3.0-a.tar.gz
+curl -LO https://github.com/FederatedAI/KubeFATE/releases/download/${version}/kubefate-k8s-${version}.tar.gz && tar -xzf ./kubefate-k8s-${version}.tar.gz
 ```
 Then we will get the release pack of KubeFATE, verify it,
 ```
@@ -274,7 +275,6 @@ kubectl exec -it python-dc94c9786-8jsgh -n fate-10000 -- /bin/bash
 ```
 then run the toy_example,
 ```
-
 (venv) [root@python-dc94c9786-8jsgh python]# cd examples/toy_example/ && python run_toy_example.py 10000 9999 1
 stdout:{
     "data": {

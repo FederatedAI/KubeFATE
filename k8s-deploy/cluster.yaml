@@ -12,6 +12,7 @@ modules:
   - nodemanager
   - mysql
   - python
+# - client
 
 rollsite: 
   type: NodePort
@@ -56,11 +57,13 @@ mysql:
   accessMode: ReadWriteOnce
   size: 1Gi
 
+# If use external MySQL, uncomment and change this section
 # externalMysqlIp: mysql
 # externalMysqlPort: 3306
 # externalMysqlDatabase: eggroll_meta
 # externalMysqlUser: fate
 # externalMysqlPassword: fate_dev
 
-servingIp: 192.168.9.1
-servingPort: 30209
+# If FATE-Serving deployed, uncomment and change
+# servingIp: 192.168.9.1
+# servingPort: 30209
