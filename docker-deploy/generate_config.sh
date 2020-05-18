@@ -280,7 +280,11 @@ EOF
 
 
     	    # serving server
-    	    sed -i "s/127.0.0.1:9380/${party_ip}:9380/g" ./serving-$party_id/confs/serving-server/conf/serving-server.properties
+            sed -i "s/127.0.0.1:9380/${party_ip}:9380/g" ./serving-$party_id/confs/serving-server/conf/serving-server.properties
+            sed -i "s/<redis.ip>/${redis_ip}/g" ./serving-$party_id/confs/serving-server/conf/serving-server.properties
+            sed -i "s/<redis.port>/${redis_port}/g" ./serving-$party_id/confs/serving-server/conf/serving-server.properties
+            sed -i "s/<redis.password>/${redis_password}/g" ./serving-$party_id/confs/serving-server/conf/serving-server.properties
+            sed -i "s/<redis.password>/${redis_password}/g" ./serving-$party_id/docker-compose.yml
 
     	    # serving proxy
     	    sed -i "s/coordinator=partyid/coordinator=${party_id}/g" ./serving-$party_id/confs/serving-proxy/conf/application.properties

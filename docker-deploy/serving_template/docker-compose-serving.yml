@@ -35,7 +35,7 @@ services:
     image: "redis:5"
     expose:
       - 6379
-    command: redis-server --requirepass fate_dev
+    command: redis-server --requirepass <redis.password>
     volumes:
       - ./confs/redis/data:/data
     networks:
