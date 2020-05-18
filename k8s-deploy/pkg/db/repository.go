@@ -228,6 +228,25 @@ func DeleteOneByUUID(repository Repository, uuid string) error {
 	return nil
 }
 
+// DeleteByFilter delete object from database via Filter
+func DeleteByFilter(repository Repository, filter bson.M) (int64, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	db, err := ConnectDb()
+	if err != nil {
+		log.Println(err)
+		return 0, err
+	}
+	collection := db.Collection(repository.getCollection())
+
+	deleteResult, err := collection.DeleteMany(ctx, filter)
+	if err != nil {
+		log.Fatal(err)
+		return 0, err
+	}
+
+	return deleteResult.DeletedCount, err
+}
 // FindByFilter find objects from database via custom filter, such as: findByName, findByStatus
 func FindByFilter(repository Repository, filter bson.M) ([]interface{}, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
