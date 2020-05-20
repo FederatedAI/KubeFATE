@@ -7,8 +7,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
 	"helm.sh/helm/v3/pkg/chart/loader"
-	"os"
-	"path/filepath"
 )
 
 type Chart struct {
@@ -39,40 +37,18 @@ func (_ *Chart) createChart(c *gin.Context) {
 
 	log.Debug().Str("Filename", file.Filename).Msg("upload file")
 
-	//path := "/data/projects/fatecloud/"
-	path, _ := filepath.Abs(".")
-	log.Debug().Str("path", path).Msg("path")
-
-	fileName := filepath.Join(path, file.Filename)
-
-	log.Debug().Str("fileName", fileName).Msg("fileName")
-
-	// Upload the file to specific dst.
-	err = c.SaveUploadedFile(file, fileName)
-	// delete file
-	defer os.Remove(fileName)
+	f, err := file.Open()
 	if err != nil {
-		c.JSON(500, gin.H{"error": err.Error()})
+		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
-	// Check chart dependencies to make sure all are present in /charts
-	chartRequested, err := loader.Load(fileName)
-	if err != nil {
-		c.JSON(500, gin.H{"error": err.Error()})
-		return
-	}
+	chartRequested, err := loader.LoadArchive(f)
 
 	helmChart, err := service.ChartRequestedTohelmChart(chartRequested)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
-
-	//helmUUID, err := db.Save(helmChart)
-	//if err != nil {
-	//	c.JSON(500, gin.H{"error": err.Error()})
-	//	return
-	//}
 
 	helmUUID, err := db.ChartSave(helmChart)
 	if err != nil {
