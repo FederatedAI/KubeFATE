@@ -13,10 +13,9 @@ After the tutorial, the deployment architecture looks like following diagram.
 3. Docker have been installed in the Linux machine. To install a Docker, please refer to [Install Docker in Ubuntu](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
 4. Network connectivity to dockerhub, and google storage
 5. Setup the global KubeFATE version using in the tutorial and create a folder for whole tutorial. We use KubeFATE v1.3.0-a in this tutorial, other version should be similar.
-	```
-  export version=v1.3.0-a
-	cd ~ && mkdir demo && cd demo
-	```
+```
+export version=v1.3.0-a && cd ~ && mkdir demo && cd demo
+```
 
 **<div align="center"><font color="red">!!!Note: in this tutorial, the IP of machine we used is 192.168.100.123. Please change it to your machine's IP in all following commands and config files.</font></div>**
 
