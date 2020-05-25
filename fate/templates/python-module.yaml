@@ -332,10 +332,8 @@ spec:
             name: fateboard-config
         - name: logs
           emptyDir: {}
-        {{- if .Values.modules.client.include }}
         - name: download-dir
           emptyDir: {}
-        {{- end }}
 ---
 apiVersion: v1
 kind: Service
