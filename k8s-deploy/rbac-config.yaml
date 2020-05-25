@@ -23,3 +23,15 @@ subjects:
   - kind: ServiceAccount
     name: kubefate-admin
     namespace: kube-fate
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: kubefate-secret
+  namespace: kube-fate
+type: Opaque
+stringData:
+  kubefateUsername: admin
+  kubefatePassword: admin
+  mongoUsername: root
+  mongoPassword: root

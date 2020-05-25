@@ -26,9 +26,15 @@ spec:
             - name: FATECLOUD_MONGO_URL
               value: "mongo:27017"
             - name: FATECLOUD_MONGO_USERNAME
-              value: "root"
+              valueFrom:
+                secretKeyRef:
+                  name: kubefate-secret
+                  key: mongoUsername
             - name: FATECLOUD_MONGO_PASSWORD
-              value: "root"
+              valueFrom:
+                secretKeyRef:
+                  name: kubefate-secret
+                  key: mongoPassword
             - name: FATECLOUD_MONGO_DATABASE
               value: "KubeFate"
             - name: FATECLOUD_REPO_NAME
@@ -36,9 +42,15 @@ spec:
             - name: FATECLOUD_REPO_URL
               value: "https://federatedai.github.io/KubeFATE/"
             - name: FATECLOUD_USER_USERNAME
-              value: "admin"
+              valueFrom:
+                secretKeyRef:
+                  name: kubefate-secret
+                  key: kubefateUsername
             - name: FATECLOUD_USER_PASSWORD
-              value: "admin"
+              valueFrom:
+                secretKeyRef:
+                  name: kubefate-secret
+                  key: kubefatePassword
             - name: FATECLOUD_SERVER_ADDRESS
               value: "0.0.0.0"
             - name: FATECLOUD_SERVER_PORT
@@ -74,9 +86,15 @@ spec:
           name: mongo
           env:
             - name: MONGO_INITDB_ROOT_USERNAME
-              value: root
+              valueFrom:
+                secretKeyRef:
+                  name: kubefate-secret
+                  key: mongoUsername
             - name: MONGO_INITDB_ROOT_PASSWORD
-              value: root
+              valueFrom:
+                secretKeyRef:
+                  name: kubefate-secret
+                  key: mongoPassword
           ports:
             - containerPort: 27017
           volumeMounts:
@@ -128,7 +146,6 @@ kind: Ingress
 metadata:
   name: kubefate
   namespace: kube-fate
-  annotations:
 spec:
   rules:
     - host: kubefate.net
