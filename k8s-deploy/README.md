@@ -66,7 +66,7 @@ Because KubeFATE service expose RESTful APIs for external integrated system, sys
 kubectl apply -f ./kubefate.yaml
 kubectl create namespace fate-9999
 ```
-The details of KubeFATE service configuration, please refer to: [KubeFATE service Configuration Guild](../docs/configurations/FATE_cluster_configuration.md).
+The details of KubeFATE service configuration, please refer to: [KubeFATE service Configuration Guild](../docs/configurations/kubefate_service_configuration.md).
 
 #### Prepare cluster conf. and deploy FATE
 When the system admin deployed KubeFATE service and prepared the namespace for FATE. The ML Infra. Ops. is able to start FATE deployment. According to the infomations from SA, there a `config.yaml` for `kubefate` CLI is required. It contains KubeFATE access username and password, the KubeFATE service URL.
