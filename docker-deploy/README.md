@@ -45,7 +45,7 @@ Before deploying the FATE system, multiple parties should be defined in the conf
 In the following sample of `docker-deploy/parties.conf` , two parities are specified by id as `10000` and `9999`. Their cluster are going to be deployed on hosts with IP addresses of *192.168.7.1* and *192.168.7.2*
 
 ```bash
-user=root
+user=fate
 dir=/data/projects/fate
 partylist=(10000 9999)
 partyiplist=(192.168.7.1 192.168.7.2)
@@ -53,9 +53,32 @@ servingiplist=(192.168.7.1 192.168.7.2)
 exchangeip=
 ```
 
+On the host running FATE, the user is non root and needs`/data/projects/fate` folder permission and docker permission. No other action is required if the user is root.
+
+```bash
+# Create a fate user whose group is docker
+[user@localhost]$ sudo useradd -s /bin/bash -g docker -d /home/fate fate
+# Set user password
+[user@localhost]$ sudo passwd fate
+# Create docker-compose deployment directory
+[user@localhost]$ sudo mkdir -p /data/projects/fate
+# Modify the corresponding users and groups of docker-compose deployment directory
+[user@localhost]$ sudo chown -R fate:docker /data/projects/fate
+# Select users
+[user@localhost]$ sudo su fate
+# Check whether you have docker permission
+[fate@localhost]$ docker ps
+CONTAINER ID  IMAGE   COMMAND   CREATED   STATUS    PORTS   NAMES
+# View docker-compose deployment directory
+[fate@localhost]$ ls -l /data/projects/
+total 0
+drwxr-xr-x. 2 fate docker 6 May 27 00:51 fate
+```
+
 By default, the exchange node won't be deployed. The exchange service runs on port 9371. If a exchange (co-locates on the host of party or standalone) node is needed, update the value of `exchangeip` to the IP address of the desired host.
 
 After completing the above configuration file, use the following commands to generate configuration of target hosts.  
+
 ```bash
 $ cd docker-deploy
 $ bash generate_config.sh
