@@ -52,18 +52,19 @@ The sample yaml can be [rbac-config.yaml](./rbac-config.yaml). In the sample yam
 ```
 kubectl apply -f ./rbac-config.yaml
 ```
+Note that, the default username and password of KubeFATE service can be set in `rbac-config.yaml` Secret->kubefate-secret->stringData as:
+
+```
+stringData:
+  kubefateUsername: admin
+  kubefatePassword: admin
+```
+
 #### Prepare domain and deploy KubeFATE in Kubernetes
 Because KubeFATE service expose RESTful APIs for external integrated system, system admin have to prepare a domain for KubeFATE service. In our sample config, there is `kubefate.net` . And also, system admin should create a namespace (e.g. fate-9999), limit its quota for FATE deployment, and give the infos to ML Infra. Ops.
 ```
 kubectl apply -f ./kubefate.yaml
 kubectl create namespace fate-9999
-```
-Note that, the default username and password of KubeFATE service can be set in `kubefate.yaml` kubefate->containers->env as:
-```
-            - name: FATECLOUD_USER_USERNAME
-              value: "admin"
-            - name: FATECLOUD_USER_PASSWORD
-              value: "admin"
 ```
 The details of KubeFATE service configuration, please refer to: [KubeFATE service Configuration Guild](../docs/configurations/FATE_cluster_configuration.md).
 
