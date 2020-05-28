@@ -99,7 +99,7 @@ spec:
               name: python-confs
               subPath: server_conf.json
             - name: data-dir
-              mountPath: /data/projects/eggroll/data
+              mountPath: /data/projects/fate/eggroll/data
               subPath: {{ $nodemanager.subPath }}
       {{- with $nodemanager.nodeSelector }}
       nodeSelector: 
