@@ -92,7 +92,7 @@ RegistryURI=192.168.10.1/federatedai
 下面是修改好的文件，`party 10000`的集群将部署在*192.168.7.1*上，而`party 9999`的集群将部署在*192.168.7.2*上。
 
 ```
-user=root                                   # 运行FATE容器的用户
+user=fate                                   # 运行FATE容器的用户
 dir=/data/projects/fate                     # docker-compose部署目录
 partylist=(10000 9999)                      # 组织id
 partyiplist=(192.168.7.1 192.168.7.2)       # id对应训练集群ip
@@ -103,6 +103,28 @@ exchangeip=                                 # 通信组件标识
 **注意**: 默认情况下不会部署exchange组件。如需部署，用户可以把服务器IP填入上述配置文件的`exchangeip`中，该组件的默认监听端口为9371
 
 在运行部署脚本之前，需要确保部署机器可以ssh免密登录到两个运行节点主机上。user代表免密的用户。
+
+在运行FATE的主机上，user是非root用户的，需要有`/data/projects/fate`文件夹权限和docker权限。如果是root用户则不需要任何其他操作。
+
+```bash
+# 创建一个组为docker的fate用户
+[user@localhost]$ sudo useradd -s /bin/bash -g docker -d /home/fate fate
+# 设置用户密码
+[user@localhost]$ sudo passwd fate
+# 创建docker-compose部署目录
+[user@localhost]$ sudo mkdir -p /data/projects/fate
+# 修改docker-compose部署目录对应用户和组
+[user@localhost]$ sudo chown -R fate:docker /data/projects/fate
+# 选择用户
+[user@localhost]$ sudo su fate
+# 查看是否拥有docker权限
+[fate@localhost]$ docker ps
+CONTAINER ID  IMAGE   COMMAND   CREATED   STATUS    PORTS   NAMES
+# 查看docker-compose部署目录
+[fate@localhost]$ ls -l /data/projects/
+total 0
+drwxr-xr-x. 2 fate docker 6 May 27 00:51 fate
+```
 
 #### 执行部署脚本
 以下修改可在任意机器执行。
