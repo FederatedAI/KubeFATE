@@ -69,16 +69,15 @@ GenerateConfig() {
         fi
 
         # update the path of shared_dir
-        ## handle examples
-        shared_example_dir="confs-${party_id}/shared_dir/examples"
-        mkdir -p "./$shared_example_dir"
-        sed -i "s|/path/to/host/dir/examples|${dir}/${shared_example_dir}|g" ./confs-$party_id/docker-compose.yml
-    
-        ## handle federatedml
-        shared_federatedml_dir="confs-${party_id}/shared_dir/federatedml"
-        mkdir -p "./$shared_federatedml_dir"
-        sed -i "s|/path/to/host/dir/federatedml|${dir}/${shared_federatedml_dir}|g" ./confs-$party_id/docker-compose.yml
+        shared_dir="confs-${party_id}/shared_dir"
 
+	# create directories
+	for value in "examples" "federatedml" "data"
+	do
+		mkdir -p ${shared_dir}/${value}
+	done
+
+        sed -i "s|{/path/to/host/dir}|${dir}/${shared_dir}|g" ./confs-$party_id/docker-compose.yml
         # egg config
         module_name=eggroll
 	#db connect inf
