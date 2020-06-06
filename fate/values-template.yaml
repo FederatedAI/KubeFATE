@@ -9,11 +9,13 @@ partyId: {{ .partyId }}
 partyName: {{ .name }}
 
 host:
-  ingressType: {{ .ingressType | default "nginx" }}
   fateboard: {{ .partyId }}.fateboard.kubefate.net
   client: {{ .partyId }}.notebook.kubefate.net
 
 nodePort: {{ with .rollsite }}{{ .nodePort }}{{ end }}
+
+istio:
+  enabled: {{ .enableIstio | default false }}
 
 exchange:
 {{- with .rollsite }}

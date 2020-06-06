@@ -5,8 +5,8 @@ chartVersion: v1.4.0
 partyId: 10000
 registry: ""
 pullPolicy: 
-ingressType: nginx 
 persistence: false
+enableIstio: false
 modules:
   - rollsite
   - clustermanager

@@ -8,7 +8,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-{{ if eq .Values.host.ingressType "nginx"}}
 {{ if .Values.modules.python.include }}
 apiVersion: extensions/v1beta1
 kind: Ingress
@@ -47,5 +46,4 @@ spec:
           serviceName: notebook
           servicePort: 20000
 ---
-{{ end }}
 {{ end }}
