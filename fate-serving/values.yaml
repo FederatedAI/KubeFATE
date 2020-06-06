@@ -54,3 +54,5 @@ servingServer:
   accessMode: ReadWriteOnce
   size: 1Gi
 
+istio:
+  enabled: false

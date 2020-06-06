@@ -48,3 +48,6 @@ externalRedisIp: serving-redis
 externalRedisPort: 6379
 externalRedisDatabase: 0
 externalRedisPassword: fate_dev
+
+istio:
+  enabled: false
