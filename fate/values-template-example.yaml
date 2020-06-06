@@ -5,7 +5,7 @@ chartVersion: v1.4.0
 partyId: 10000
 registry: ""
 pullPolicy: 
-ingressType: istio
+ingressType: nginx 
 persistence: false
 modules:
   - rollsite
