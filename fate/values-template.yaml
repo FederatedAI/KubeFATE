@@ -9,6 +9,7 @@ partyId: {{ .partyId }}
 partyName: {{ .name }}
 
 host:
+  ingressType: {{ .ingressType | default "nginx" }}
   fateboard: {{ .partyId }}.fateboard.kubefate.net
   client: {{ .partyId }}.notebook.kubefate.net
 
