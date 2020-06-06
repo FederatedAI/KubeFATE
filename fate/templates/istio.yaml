@@ -49,6 +49,61 @@ spec:
         host: fateboard.{{ .Values.partyName }}.svc.cluster.local
         port:
           number: 8080
+  - match:
+    - headers:
+        referer:
+          regex: .*\/fateboard-{{ .Values.partyId }}\/$
+      uri:
+        prefix: /queryLogSize
+    route:
+    - destination:
+        host: fateboard.{{ .Values.partyName }}.svc.cluster.local
+        port:
+          number: 8080
+  - match:
+    - headers:
+        referer:
+          regex: .*\/fateboard-{{ .Values.partyId }}\/$
+      uri:
+        prefix: /v1
+    route:
+    - destination:
+        host: fateboard.{{ .Values.partyName }}.svc.cluster.local
+        port:
+          number: 8080
+  - match:
+    - headers:
+        referer:
+          regex: .*\/fateboard-{{ .Values.partyId }}\/$
+      uri:
+        prefix: /ssh
+    route:
+    - destination:
+        host: fateboard.{{ .Values.partyName }}.svc.cluster.local
+        port:
+          number: 8080
+  - match:
+    - headers:
+        referer:
+          regex: .*\/fateboard-{{ .Values.partyId }}\/$
+      uri:
+        prefix: /log
+    route:
+    - destination:
+        host: fateboard.{{ .Values.partyName }}.svc.cluster.local
+        port:
+          number: 8080
+  - match:
+    - headers:
+        referer:
+          regex: .*\/fateboard-{{ .Values.partyId }}\/$
+      uri:
+        prefix: /job
+    route:
+    - destination:
+        host: fateboard.{{ .Values.partyName }}.svc.cluster.local
+        port:
+          number: 8080
 {{ end }}
 {{ if .Values.modules.client.include }}  
   - match:
