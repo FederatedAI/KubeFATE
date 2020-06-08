@@ -1,0 +1,59 @@
+# Copyright 2019-2020 VMware, Inc.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License
+
+{{ if .Values.istio.enabled }}
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+    name: {{ .Values.partyName }}-gateway
+    # namespace: {{.Namespace}}
+spec:
+  selector:
+    istio: ingressgateway # use istio default controller
+  servers:
+  - port:
+      number: 80 
+      name: http
+      protocol: HTTP
+    hosts:
+    - "*"
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: fate-serving-ingress
+  labels:
+      fateMoudle: serving-proxy
+      name: {{ .Values.partyName | quote  }}
+      partyId: {{ .Values.partyId | quote  }}
+      owner: kubefate
+      cluster: fate
+  # namespace: {{.Namespace}}
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - {{ .Values.partyName }}-gateway
+  http:
+{{ if .Values.servingProxy.include }}
+  - match:
+    - uri:
+        prefix: /serving-proxy-{{ .Values.partyId }}
+    rewrite:
+      uri: /
+    route:
+    - destination:
+        host: serving-proxy.{{ .Values.partyName }}.svc.cluster.local
+        port:
+          number: 8059 
+{{ end }}
+
+{{ end }}

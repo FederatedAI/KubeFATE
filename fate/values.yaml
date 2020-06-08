@@ -8,6 +8,9 @@ image:
 partyId: 9999
 partyName: fate-9999
 
+istio:
+  enabled: false
+
 host:
   fateboard: 9999.fateboard.kubefate.net
   client: 9999.notebook.kubefate.net

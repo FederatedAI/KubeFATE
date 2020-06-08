@@ -131,3 +131,6 @@ servingServer:
   accessMode: ReadWriteOnce
   size: 1Gi
 {{- end }}
+
+istio:
+  enabled: {{ .istio.enabled | default false }
