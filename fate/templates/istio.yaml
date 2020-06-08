@@ -108,7 +108,7 @@ spec:
 {{ if .Values.modules.client.include }}  
   - match:
     - uri:
-        prefix: /client-{{ .Values.partyId }}
+        prefix: /notebook-{{ .Values.partyId }}
     rewrite:
       uri: /
     route:
