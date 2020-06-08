@@ -53,7 +53,7 @@ data:
     eggroll.rollsite.host=rollsite
     eggroll.rollsite.port=9370
     eggroll.rollsite.party.id={{ .Values.partyId }}
-    eggroll.rollsite.route.table.path=conf/route_table.json
+    eggroll.rollsite.route.table.path=conf/route_table/route_table.json
     
     
     eggroll.session.processors.per.node=2
