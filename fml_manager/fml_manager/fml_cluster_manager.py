@@ -18,7 +18,7 @@ class ClusterManager:
         self.name = cluster_name
 
     # get configmap in dict
-    def FetchConfigmap(self, component):
+    def fetch_config_map(self, component):
        args ="kubectl get configmap {} -n {} -o json".format(component, self.namespace).split(" ") 
        try:
            data, err = subprocess.Popen(args, stdout=subprocess.PIPE).communicate()
@@ -27,14 +27,14 @@ class ClusterManager:
            print(error)
     
     # get route table in dict
-    def FetchRouteTable(self, configmap):
+    def fetch_route_table(self, configmap):
        route_table_json = json.loads(configmap["data"]["route_table.json"]) 
        return route_table_json 
     
-    def UpdateConfigMap(self, configmap, route_table):
+    def update_config_map(self, configmap, route_table):
         configmap["data"]["route_table.json"] = json.dumps(route_table)
     
-    def PatchConfigMap(self, configmap, component):
+    def patch_config_map(self, configmap, component):
         args = "kubectl patch configmap {} -n {} --patch".format(component, self.namespace).split(" ")
         args.append(json.dumps(configmap))
         try:
@@ -43,25 +43,25 @@ class ClusterManager:
         except Execption as error:
             print(error)
 
-    def GetRouteTable(self):
+    def get_route_table(self):
         # get configmap in dict
-        configmap = self.FetchConfigmap("proxy-config")
+        configmap = self.fe t ch("proxy-config")
 
         # get route table in dict
-        route_table = self.FetchRouteTable(configmap)
+        route_table = self.fetch_route_table(configmap)
         return route_table
 
-    def SetRouteTable(self, route_table):
+    def set_route_table(self, route_table):
         # get configmap in dict
-        configmap = self.FetchConfigmap("proxy-config")
+        configmap = self.fetch_config_map("proxy-config")
 
         # paste upate to the configmap
-        self.UpdateConfigMap(configmap, route_table)
+        self.update_config_map(configmap, route_table)
 
         # patch config
-        self.PatchConfigMap(configmap, "proxy-config")
+        self.patch_config_map(configmap, "proxy-config")
 
-    def GetEntrypoint(self):
+    def get_entry_point(self):
         get_address = "kubectl get nodes -o jsonpath=\'{$.items[0].status.addresses[?(@.type==\'InternalIP\')].address}\'"
         get_port = "kubectl get service proxy -n {0} -o jsonpath=\'{{.spec.ports[0].nodePort}}\'".format(self.namespace)
 
