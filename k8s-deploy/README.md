@@ -1,7 +1,7 @@
 # Kubernetes Deployment
 We recommend use [Kubernetes](https://kubernetes.io/) as a underlying infrastructure to create and manage the FATE clusters in production environment. KubeFATE supports deploying multiple FATE clusters in one Kubernetes with different namespaces for development, test and production cases. Considering the various IT designed and standards in each company, the modules deployed should be customized. KubeFATE is isolated from the detail FATE configurations.
 
-If you focus on how to quickly use KubeFATE, please jump to [Use Scenarios](#use-scenarios) and [Command Line Reference](#command-line-reference) sections.
+If you focus on how to quickly use KubeFATE, please jump to [Use Scenarios](#use-scenarios) section.
 
 ## Highlevel Architecture of multiple Federated Learning Parties
 The very highlevel architecture of a multiple Federated Learning deployment (e.g. two parties) as follow image:
@@ -9,9 +9,7 @@ The very highlevel architecture of a multiple Federated Learning deployment (e.g
   <img src="./images/hamflp.PNG">
 </div>
 
-FateCloud which will be release later as a unified federated cloud management system, which will coordinate different parties. In each party, KubeFATE manage the infrastructure.
-
-* KubeFATE: Orchestrated FATE cluster inside one party, offer APIs for FATE Cloud Manager and other management portals
+* KubeFATE: Orchestrated FATE cluster inside one party, offer APIs for FATE-Cloud Manager and other management portals
 * Harbor (Optional): Versioned FATE deployments and images management
 * Kubernetes: Orchestration engine.
 
@@ -126,6 +124,5 @@ Info            map[dashboard:[9999.fateboard.kubefate.net] ip:10.117.32.181 ...
 #### [Manage FATE and FATE-Serving Version](../docs/Manage_FATE_and_FATE-Serving_Version.md)
 #### [Update and Delete a FATE Cluster](../docs/Update_and_Delete_a_FATE_Cluster.md)
 
-## Command Line Reference
 ## KubeFATE Service RESTful APIs Reference
 [API Reference](https://app.swaggerhub.com/apis-docs/vmware-octo/kubefate2/1.0.0-oas3#/cluster/createcluster)
