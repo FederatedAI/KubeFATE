@@ -25,13 +25,19 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: /path/to/host/dir/examples
+      device: {/path/to/host/dir}/examples
   shared_dir_federatedml:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: /path/to/host/dir/federatedml
+      device: {/path/to/host/dir}/federatedml
+  shared_dir_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: {/path/to/host/dir}/data
 
 services:
   rollsite:
@@ -77,7 +83,7 @@ services:
     volumes:
         - ./confs/eggroll/conf:/data/projects/fate/eggroll/conf
         - ./confs/fate_flow/conf/server_conf.json:/data/projects/fate/python/arch/conf/server_conf.json
-        - ./confs/data-dir:/data/projects/eggroll/data
+        - shared_dir_data:/data/projects/fate/eggroll/data
     networks:
       - fate-network
     command: ["bash", "-c", "java -Dlog4j.configurationFile=$${EGGROLL_HOME}/conf/log4j2.properties -cp $${EGGROLL_HOME}/lib/*: com.webank.eggroll.core.Bootstrap --bootstraps com.webank.eggroll.core.resourcemanager.NodeManagerBootstrap -c $${EGGROLL_HOME}/conf/eggroll.properties -p 4671 -s 'EGGROLL_DEAMON'"]
