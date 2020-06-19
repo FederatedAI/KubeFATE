@@ -17,7 +17,7 @@ spec:
       labels:
         fate: kubefate
     spec:
-      serviceAccount: kubefate-admin
+      serviceAccountName: kubefate-admin
       containers:
         - image: federatedai/kubefate:v1.0.3
           imagePullPolicy: IfNotPresent
@@ -141,7 +141,7 @@ spec:
   selector:
     fate: kubefate
 ---
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
   name: kubefate
