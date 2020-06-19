@@ -59,7 +59,12 @@ func ClusterInstall(clusterArgs *ClusterArgs, creator string) (*db.Job, error) {
 		job.Status = db.Running_j
 
 		if clusterArgs.Cover {
-			_ = helmClean(clusterArgs.Name, clusterArgs.Namespace)
+			log.Info().Msg("Overwrite current installation")
+			err = helmClean(clusterArgs.Name, clusterArgs.Namespace)
+			if err != nil {
+				log.Error().Msg("helmClean error")
+			}
+			log.Info().Msg("HelmClean success")
 		}
 
 		//create a cluster use parameter
