@@ -15,7 +15,6 @@
 package cli
 
 import (
-	"fmt"
 	"github.com/urfave/cli/v2" // imports as package "cli"
 	"sort"
 )
@@ -39,10 +38,7 @@ func initCommandLine() *cli.App {
 	return app
 }
 
-func Run(Args []string) {
+func Run(Args []string) error {
 	app := initCommandLine()
-	err := app.Run(Args)
-	if err != nil {
-		fmt.Println(err)
-	}
+	return app.Run(Args)
 }

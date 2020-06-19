@@ -25,10 +25,14 @@ import (
 func main() {
 	if err := config.InitConfig(); err != nil {
 		fmt.Printf("Unable to read in configuration: %s\n", err)
-		return
+		os.Exit(1)
 	}
 
 	logging.InitLog()
 
-	cli.Run(os.Args)
+	err := cli.Run(os.Args)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 }
