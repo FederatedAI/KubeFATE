@@ -155,13 +155,14 @@ DeployPartyInternal() {
   echo "$target_party_ip training cluster copy is ok!"
   ssh -tt $user@$target_party_ip<< eeooff
 mkdir -p $dir
+rm -f $dir/confs-$target_party_id.tar
 mv ~/confs-$target_party_id.tar $dir
 cd $dir
 tar -xzf confs-$target_party_id.tar
 cd confs-$target_party_id
 docker-compose down
-docker volume rm confs-${target_party_id}_shared_dir_examples
-docker volume rm confs-${target_party_id}_shared_dir_federatedml
+docker volume rm -f confs-${target_party_id}_shared_dir_examples
+docker volume rm -f confs-${target_party_id}_shared_dir_federatedml
 docker-compose up -d
 cd ../
 rm -f confs-${target_party_id}.tar
@@ -201,6 +202,7 @@ DeployPartyServing() {
   echo "party $target_party_id serving cluster copy is ok!"
   ssh -tt $user@$target_party_serving_ip<< eeooff
 mkdir -p $dir
+rm -f $dir/serving-$target_party_id.tar
 mv ~/serving-$target_party_id.tar $dir
 cd $dir
 tar -xzf serving-$target_party_id.tar
