@@ -13,14 +13,14 @@
 from fml_manager import ClusterManager
 if __name__ == "__main__":
     # init the cluster manager
-    cluster_manager = ClusterManager("fate-9999", "fatesample")
+    cluster_manager = ClusterManager("fate-10000", "fatesample")
 
     # get route table
-    route_table=cluster_manager.GetRouteTable()
+    route_table=cluster_manager.get_route_table()
     route_table["route_table"]["9999"] = {'default': [{'ip': '192.168.0.1', 'port': 9370}]}
 
     # update route table
-    cluster_manager.SetRouteTable(route_table)
+    cluster_manager.set_route_table(route_table)
 
     # get entrypoint
-    cluster_manager.GetEntrypoint()
+    print(cluster_manager.get_entry_point())
