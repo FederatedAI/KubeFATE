@@ -116,10 +116,9 @@ services:
     ports:
       - "20000:20000"
     restart: always
-    volumes:
-      - download_dir:/data/projects/fate/python/download_dir
-      - ./confs/fate_flow/conf/settings.py:/data/projects/fate/python/fate_flow/settings.py
-      - ./confs/fate_flow/conf/server_conf.json:/data/projects/fate/python/arch/conf/server_conf.json
+    environment:
+      FATE_FLOW_HOST: "python:9380"
+      FATE_SERVING_HOST: "fate-serving:8059"
     depends_on:
       - python
     networks:

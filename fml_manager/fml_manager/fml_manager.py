@@ -164,7 +164,7 @@ class FMLManager:
             data_files = {
                 "file": open(url, "rb")
             }
-            response = requests.post("/".join([self.server_url, "data", "upload"]), data=post_data, files=data_files)
+            response = requests.post("/".join([self.server_url, "data", "upload"]), params=post_data, files=data_files)
 
             if temp_file is not None and os.path.exists(temp_file):
                 print("Delete temp file...")
