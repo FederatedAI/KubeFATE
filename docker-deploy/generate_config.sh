@@ -75,6 +75,9 @@ GenerateConfig() {
           #sed -i 's#image: "redis:5"#image: "${RegistryURI}/redis:5"#g' ./confs-$party_id/docker-compose.yml
         fi
 
+	# update serving ip
+	sed -i "s/fate-serving/${serving_ip}/g" ./confs-$party_id/docker-compose.yml
+
         # update the path of shared_dir
         shared_dir="confs-${party_id}/shared_dir"
 
