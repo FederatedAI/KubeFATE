@@ -119,6 +119,8 @@ services:
     environment:
       FATE_FLOW_HOST: "python:9380"
       FATE_SERVING_HOST: "fate-serving:8059"
+    volumes:
+      - download_dir:/fml_manager/Examples/download_dir
     depends_on:
       - python
     networks:
