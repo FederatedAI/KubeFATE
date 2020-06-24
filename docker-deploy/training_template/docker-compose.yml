@@ -110,7 +110,7 @@ services:
       - nodemanager
     networks:
       - fate-network
-
+    
   client:
     image: "${PREFIX}/client:${TAG}"
     ports:
