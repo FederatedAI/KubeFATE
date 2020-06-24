@@ -72,15 +72,23 @@ data:
     # zookeeper
     USE_CONFIGURATION_CENTER = False
     ZOOKEEPER_HOSTS = ['127.0.0.1:2181']
-    
+
+    # job maximum number  of the initiator
     MAX_CONCURRENT_JOB_RUN = 5
+
+    # Limit the number of jobs on the host side
+    LIMIT_ROLE = 'host'
     MAX_CONCURRENT_JOB_RUN_HOST = 5
+    RE_ENTRY_QUEUE_TIME = 2*60
+    RE_ENTRY_QUEUE_MAX = 60
+
+
     _ONE_DAY_IN_SECONDS = 60 * 60 * 24
     DEFAULT_GRPC_OVERALL_TIMEOUT = 60 * 1000 * 60  # ms
     JOB_DEFAULT_TIMEOUT = 7 * 24 * 60 * 60
     DATABASE = get_base_config("database", {})
     DEFAULT_MODEL_STORE_ADDRESS = get_base_config("default_model_store_address", {})
-    
+
     '''
     Constants
     '''
@@ -103,7 +111,7 @@ data:
     # fate-manager
     FATE_MANAGER_GET_NODE_INFO = '/node/info'
     FATE_MANAGER_NODE_CHECK = '/node/management/check'
-    
+
     # logger
     log_utils.LoggerFactory.LEVEL = 10
     # {CRITICAL: 50, FATAL:50, ERROR:40, WARNING:30, WARN:30, INFO:20, DEBUG:10, NOTSET:0}
@@ -112,19 +120,19 @@ data:
     detect_logger = log_utils.getLogger("fate_flow_detect")
     access_logger = log_utils.getLogger("fate_flow_access")
     audit_logger = log_utils.audit_logger()
-    
+
     """
-    Services 
+    Services
     """
     IP = get_base_config("fate_flow", {}).get("host", "0.0.0.0")
     HTTP_PORT = get_base_config("fate_flow", {}).get("http_port")
     GRPC_PORT = get_base_config("fate_flow", {}).get("grpc_port")
-    
+
     # standalone job will be send to the standalone job server when FATE-Flow work on cluster deploy mode,
     # but not the port for FATE-Flow on standalone deploy mode.
     CLUSTER_STANDALONE_JOB_SERVER_PORT = 9381
-    
-    
+
+
     # services ip and port
     SERVER_CONF_PATH = 'arch/conf/server_conf.json'
     SERVING_PATH = '/servers/servings'
@@ -141,16 +149,17 @@ data:
                                          use_zk=USE_CONFIGURATION_CENTER, hosts=ZOOKEEPER_HOSTS,
                                          server_conf_path=SERVER_CONF_PATH)
     BOARD_DASHBOARD_URL = 'http://%s:%d/index.html#/dashboard?job_id={}&role={}&party_id={}' % (BOARD_HOST, BOARD_PORT)
-    
+
     # switch
     SAVE_AS_TASK_INPUT_DATA_SWITCH = True
     SAVE_AS_TASK_INPUT_DATA_IN_MEMORY = True
-    
+    ALIGN_TASK_INPUT_DATA_PARTITION_SWITCH = True
+
     # init
     RuntimeConfig.init_config(WORK_MODE=WORK_MODE)
     RuntimeConfig.init_config(HTTP_PORT=HTTP_PORT)
     RuntimeConfig.init_config(BACKEND=BACKEND)
-    
+
   base_conf.yaml: |
     work_mode: 1
     fate_flow:
@@ -249,7 +258,7 @@ spec:
               checkMySQLCount=$[checkMySQLCount+1]
               echo "Waiting for mysql started. check count: $checkMySQLCount"
               sleep 2
-              
+
               state=`mysqladmin ping -h ${MYSQL_HOST} --port=${MYSQL_PORT} -u${MYSQL_USER} -p${MYSQL_PASSWORD}| awk '{print $3}'`
               if [ "$state" == "alive" ]; then
                 echo "mysql server has been already started."
@@ -294,19 +303,15 @@ spec:
           env:
             - name: partyId
               value: {{ .Values.partyId | quote  }}
+            - name: FATE_FLOW_HOST
+              value: "fateflow:9380"
+            - name: FATE_SERVING_HOST
+              value: "{{.Values.modules.serving.ip}}:{{.Values.modules.serving.port}}"
           ports:
             - containerPort: 20000
           volumeMounts:
-            - mountPath: /data/projects/fate/python/arch/conf/server_conf.json
-              name: python-confs
-              subPath: server_conf.json
-            - mountPath: /data/projects/fate/python/fate_flow/settings.py
-              subPath: settings.py
-              name: python-confs
-            - name: logs
-              mountPath: /data/projects/fate/client/logs
             - name: download-dir
-              mountPath: /data/projects/fate/python/download_dir
+              mountPath: /fml_manager/Examples/download_dir
         {{- end }}
         - image: {{ .Values.image.registry }}/fateboard:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -320,7 +325,7 @@ spec:
             - name: logs
               mountPath: /data/projects/fate/python/logs
       {{- with .Values.modules.python.nodeSelector }}
-      nodeSelector: 
+      nodeSelector:
       {{- range $k, $v := . }}
         {{ $k }}: {{ $v }}
       {{- end }}
