@@ -129,7 +129,7 @@ spec:
     - name: "9370"
       port: 9370
       targetPort: 9370
-      {{- with .Values.nodePort }}
+      {{- with .Values.modules.rollsite.nodePort }}
       nodePort: {{ . }}
       {{- end }}
       protocol: TCP
