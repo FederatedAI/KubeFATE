@@ -100,6 +100,23 @@ class FMLManager:
 
         return self.submit_job(dsl_data, config_data)
 
+    def query_job_status(self, query_conditions):
+        for i in range(500):
+            time.sleep(1)
+            try:
+                guest_status = self.query_job(query_conditions).json()["data"][0]["f_status"]
+            except Exception as e:
+                print("Failed to fetch status: ", e)
+    
+            print("Status: %s" % guest_status)
+            if guest_status == "failed":
+                print("Failed")
+                raise Exception("Failed to upload data.")
+            if guest_status == "success":
+                print("Success")
+                break
+
+
     def query_job(self, query_conditions):
         response = requests.post("/".join([self.server_url, "job", "query"]), json=query_conditions)
         return self.prettify(response)
