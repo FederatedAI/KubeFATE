@@ -6,6 +6,7 @@ FML Manager version | KubeFATE version 1.3.x | KubeFATE version 1.4.x
 ---|---|---
 0.2.0 | incompatible | compatible
 0.3.0 | incompatible | compatible
+0.4.0 | incompatible | compatible
 
 - incompatible: the combination does not work at all
 - compatible: all Kubeflow features have been tested and verified for the Kubernetes version

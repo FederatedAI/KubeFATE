@@ -100,6 +100,25 @@ class FMLManager:
 
         return self.submit_job(dsl_data, config_data)
 
+    def query_job_status(self, query_conditions):
+        job_status = "failed"
+        for i in range(500):
+            time.sleep(1)
+            try:
+                guest_status = self.query_job(query_conditions).json()["data"][0]["f_status"]
+            except Exception as e:
+                print("Failed to fetch status: ", e)
+    
+            print("Status: %s" % guest_status)
+            if guest_status == "failed":
+                job_status = "failed"
+                raise Exception("Failed to upload data.")
+            if guest_status == "success":
+                job_status = "success"
+                break
+        return job_status
+
+
     def query_job(self, query_conditions):
         response = requests.post("/".join([self.server_url, "job", "query"]), json=query_conditions)
         return self.prettify(response)
@@ -483,18 +502,22 @@ class HttpDownloader:
 
     def download_to(self, path_to_save):
         r = requests.get(self.url, allow_redirects=True)
-        filename = __get_filename_from_cd(r.headers.get('content-disposition'))
+        filename = self.__get_filename_from_cd(r.headers.get('content-disposition'))
         temp_file_to_write = os.path.join(file_utils.get_project_base_directory(), filename)
         open(temp_file_to_write, 'wb').write(r.content)
 
         return temp_file_to_write
 
-    def __get_filename_from_cd(cd):
+    def __get_filename_from_cd(self, cd):
         """
         Get filename from content-disposition
         """
         if not cd:
-            return None
+            # just return file name
+            fname = self.url.split('/')[-1]
+            if len(fname) == 0:
+                return None
+            return fname
         fname = re.findall('filename=(.+)', cd)
         if len(fname) == 0:
             return None
