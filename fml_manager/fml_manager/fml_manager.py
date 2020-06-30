@@ -494,7 +494,11 @@ class HttpDownloader:
         Get filename from content-disposition
         """
         if not cd:
-            return None
+            # just return file name
+            fname = self.url.split('/')[-1]
+            if len(fname) == 0:
+                return None
+            return fname
         fname = re.findall('filename=(.+)', cd)
         if len(fname) == 0:
             return None
