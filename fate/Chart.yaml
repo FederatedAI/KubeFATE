@@ -2,4 +2,4 @@ apiVersion: v1
 appVersion: v1.4.0
 description: A Helm chart for fate-training
 name: fate
-version: v1.4.0-a
+version: v1.4.0-b
