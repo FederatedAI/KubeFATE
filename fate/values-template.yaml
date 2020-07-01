@@ -15,7 +15,7 @@ host:
 nodePort: {{ with .rollsite }}{{ .nodePort }}{{ end }}
 
 istio:
-  enabled: {{ .istio.enabled | default false }}
+  enabled: {{ with .istio }}{{ .enabled | default false }}{{ end }}
 
 exchange:
 {{- with .rollsite }}
