@@ -124,10 +124,10 @@ spec:
         {{- if not $root.Values.persistence.enabled }}
         - name: data-dir
           emptyDir: {}
-        {{- else if $nodemanager.existingClaim }}
+        {{- else }}
         - name: data-dir
           persistentVolumeClaim:
-            claimName: {{ $nodemanager.existingClaim | default  (  $nodemanager.name  "-data") }}
+            claimName: {{ $nodemanager.existingClaim | default | print $nodemanager.name  "-data"  }}
         {{- end }}
 ---
 apiVersion: v1
