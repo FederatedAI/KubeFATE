@@ -15,7 +15,7 @@ host:
 nodePort: {{ with .rollsite }}{{ .nodePort }}{{ end }}
 
 istio:
-  enabled: {{ with .istio }}{{ .enabled | default false }}{{ end }}
+  enabled: {{ .istio.enabled | default false }}
 
 exchange:
 {{- with .rollsite }}
@@ -88,9 +88,9 @@ modules:
       sessionProcessorsPerNode: {{ $nodemanager.sessionProcessorsPerNode }}
       subPath: "nodemanager-{{ . }}"
       existingClaim: ""
-      storageClass: "{{ $nodemanager.storageClass }}"
-      accessMode: {{ $nodemanager.accessMode }}
-      size: {{ $nodemanager.size }}
+      storageClass: "nodemanager-{{ . }}"
+      accessMode: ReadWriteOnce
+      size: 1Gi
     {{- end }}
 
     {{- range  $nodemanager.list }}
