@@ -210,7 +210,7 @@ spec:
         {{- if not .Values.persistence.enabled }}
         - name: data
           emptyDir: {}
-        {{- else }}
+        {{- else if .Values.modules.mysql.existingClaim }}
         - name: data
           persistentVolumeClaim:
             claimName: {{ .Values.modules.mysql.existingClaim | default  "mysql-data" }}
