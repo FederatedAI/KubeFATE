@@ -29,9 +29,12 @@ rollsite:
   nodeSelector: {}
 
 nodemanager:
-  count: 3                       # nodemanager的数量 默认配置
-  sessionProcessorsPerNode: 4    # eggroll.session.processors.per.node配置
-  list:                          # 自定义nodemanager配置 与count同时生效说
+  count: 3
+  sessionProcessorsPerNode: 4
+  storageClass: "nodemanagers"
+  accessMode: ReadWriteOnce
+  size: 2Gi
+  list:
   - name: nodemanager
     nodeSelector: {}
     sessionProcessorsPerNode: 2
@@ -59,12 +62,12 @@ mysql:
   accessMode: ReadWriteOnce
   size: 1Gi
 
-# 如果不安装MySQL的时候配置
-externalMysqlIp: mysql
-externalMysqlPort: 3306
-externalMysqlDatabase: eggroll_meta
-externalMysqlUser: fate
-externalMysqlPassword: fate_dev
+#
+#externalMysqlIp: mysql
+#externalMysqlPort: 3306
+#externalMysqlDatabase: eggroll_meta
+#externalMysqlUser: fate
+#externalMysqlPassword: fate_dev
 
 
 servingIp: 192.168.9.1
