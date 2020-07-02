@@ -88,9 +88,9 @@ modules:
       sessionProcessorsPerNode: {{ $nodemanager.sessionProcessorsPerNode }}
       subPath: "nodemanager-{{ . }}"
       existingClaim: ""
-      storageClass: "nodemanager-{{ . }}"
-      accessMode: ReadWriteOnce
-      size: 1Gi
+      storageClass: "{{ $nodemanager.storageClass }}"
+      accessMode: {{ $nodemanager.accessMode }}
+      size: {{ $nodemanager.size }}
     {{- end }}
 
     {{- range  $nodemanager.list }}
