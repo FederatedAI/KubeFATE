@@ -126,13 +126,11 @@ func NewCluster(name string, nameSpaces, chartName, chartVersion string) *Cluste
 	return cluster
 }
 
-// 写入数据库之前，对数据做类型转换
 func (s MapStringInterface) Value() (driver.Value, error) {
 	bJson, err := json.Marshal(s)
 	return bJson, err
 }
 
-// 将数据库中取出的数据，赋值给目标类型
 func (s *MapStringInterface) Scan(v interface{}) error {
 	return json.Unmarshal(v.([]byte), s)
 }

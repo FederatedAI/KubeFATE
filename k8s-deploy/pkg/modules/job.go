@@ -130,14 +130,11 @@ func NewJob(method string, creator string) *Job {
 	return job
 }
 
-
-// 写入数据库之前，对数据做类型转换
 func (s SubJobs) Value() (driver.Value, error) {
 	bJson, err := json.Marshal(s)
 	return bJson, err
 }
 
-// 将数据库中取出的数据，赋值给目标类型
 func (s *SubJobs) Scan(v interface{}) error {
 	return json.Unmarshal(v.([]byte), s)
 }
