@@ -26,15 +26,15 @@ import (
 )
 
 type Job struct {
-	Uuid      string        `json:"uuid"`
+	Uuid      string        `json:"uuid" gorm:"type:varchar(36);index:uuid;unique"`
 	StartTime time.Time     `json:"start_time" gorm:"default:Null"`
 	EndTime   time.Time     `json:"end_time" gorm:"default:Null"`
-	Method    string        `json:"method"`
-	Result    string        `json:"result"`
-	ClusterId string        `json:"cluster_id"`
-	Creator   string        `json:"creator"`
+	Method    string        `json:"method" gorm:"type:varchar(16);not null"`
+	Result    string        `json:"result"  gorm:"type:varchar(255)"`
+	ClusterId string        `json:"cluster_id" gorm:"type:varchar(36)"`
+	Creator   string        `json:"creator" gorm:"type:varchar(16);not null"`
 	SubJobs   SubJobs       `json:"sub-jobs" gorm:"type:blob"`
-	Status    JobStatus     `json:"status"`
+	Status    JobStatus     `json:"status"  gorm:"size:8"`
 	TimeLimit time.Duration `json:"time_limit"`
 
 	gorm.Model
@@ -53,7 +53,7 @@ const (
 	EXEC
 )
 
-type JobStatus int
+type JobStatus int8
 
 const (
 	Pending_j JobStatus = iota + 1

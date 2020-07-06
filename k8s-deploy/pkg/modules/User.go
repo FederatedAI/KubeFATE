@@ -28,12 +28,12 @@ import (
 const saltSize = 128
 
 type User struct {
-	Uuid     string     `json:"uuid,omitempty"  gorm:"index:uuid;unique"`
+	Uuid     string     `json:"uuid,omitempty"  gorm:"type:varchar(36);index:uuid;unique"`
 	Username string     `json:"username,omitempty" gorm:"index:username;unique;not null"`
-	Password string     `json:"password,omitempty" gorm:"type:varchar(512)"`
-	Salt     string     `json:"salt,omitempty"`
-	Email    string     `json:"email,omitempty"`
-	Status   UserStatus `json:"userStatus,omitempty"`
+	Password string     `json:"password,omitempty" gorm:"type:varchar(512);not null"`
+	Salt     string     `json:"salt,omitempty" gorm:"type:varchar(128);not null"`
+	Email    string     `json:"email,omitempty" gorm:"type:varchar(255)"`
+	Status   UserStatus `json:"userStatus,omitempty" gorm:"size:8;not null"`
 	gorm.Model
 }
 

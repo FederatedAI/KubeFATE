@@ -25,7 +25,7 @@ func TestJob(t *testing.T) {
 	mysql := new(orm.Mysql)
 	mysql.Setup()
 	db = orm.DBCLIENT
-	db.LogMode(true)
+	//db.LogMode(true)
 
 	// Create Table
 	e := &Job{}

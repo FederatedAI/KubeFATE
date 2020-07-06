@@ -24,14 +24,14 @@ import (
 
 // HelmChart helm chart model
 type HelmChart struct {
-	Uuid           string    `json:"uuid" gorm:"type:varchar(36)"`
-	Name           string    `json:"name" gorm:"type:varchar(100)"`
-	Chart          string    `json:"chart" gorm:"type:text"`
-	Values         string    `json:"values" gorm:"type:text"`
-	ValuesTemplate string    `json:"values_template" gorm:"type:text"`
+	Uuid           string    `json:"uuid" gorm:"type:varchar(36);index:uuid;unique"`
+	Name           string    `json:"name" gorm:"type:varchar(16);not null"`
+	Chart          string    `json:"chart" gorm:"type:text;not null"`
+	Values         string    `json:"values" gorm:"type:text;not null"`
+	ValuesTemplate string    `json:"values_template" gorm:"type:text;not null"`
 	Templates      Templates `json:"templates" gorm:"type:blob"`
-	Version        string    `json:"version" gorm:"type:varchar(100)"`
-	AppVersion     string    `json:"app_version" gorm:"type:varchar(100)"`
+	Version        string    `json:"version" gorm:"type:varchar(32);not null"`
+	AppVersion     string    `json:"app_version" gorm:"type:varchar(32);not null"`
 
 	gorm.Model
 }

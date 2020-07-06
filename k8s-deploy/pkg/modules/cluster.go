@@ -25,20 +25,20 @@ import (
 )
 
 type Cluster struct {
-	Uuid      string `json:"uuid"`
-	Name      string `json:"name"`
-	NameSpace string `json:"namespaces"`
+	Uuid      string `json:"uuid" gorm:"type:varchar(36);index:uuid;unique"`
+	Name      string `json:"name" gorm:"type:varchar(255);not null"`
+	NameSpace string `json:"namespaces" gorm:"type:varchar(255);not null"`
 	// Cluster revision
-	Revision int `json:"revision"`
+	Revision int8 `json:"revision" gorm:"size:8"`
 	// Helm chart version, example: fate v1.2.0
-	ChartVersion string             `json:"chart_version"`
+	ChartVersion string             `json:"chart_version" gorm:"type:varchar(255);not null"`
 	ChartValues  MapStringInterface `json:"chart_values" gorm:"type:blob"`
 	// The value of this cluster for installing helm chart
-	Values    string             `json:"values"`
-	ChartName string             `json:"chart_name"`
+	Values    string             `json:"values" gorm:"type:text"`
+	ChartName string             `json:"chart_name" gorm:"type:varchar(255)"`
 	Type      string             `json:"cluster_type,omitempty"`
 	Metadata  MapStringInterface `json:"metadata" gorm:"type:blob"`
-	Status    ClusterStatus      `json:"status"`
+	Status    ClusterStatus      `json:"status"  gorm:"size:8"`
 	//Backend          ComputingBackend       `json:"backend"`
 	//BootstrapParties Party                  `json:"bootstrap_parties"`
 	Config MapStringInterface `json:"Config,omitempty" gorm:"type:blob"`
@@ -51,7 +51,7 @@ type MapStringInterface map[string]interface{}
 
 type Clusters []Cluster
 
-type ClusterStatus int
+type ClusterStatus int8
 
 const (
 	Creating_c ClusterStatus = iota + 1
