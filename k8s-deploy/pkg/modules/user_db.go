@@ -31,7 +31,7 @@ func (e *User) GetList() ([]User, error) {
 	var users Users
 	table := db.Model(e)
 	if e.Uuid != "" {
-		table = table.Where("user_id = ?", e.Uuid)
+		table = table.Where("uuid = ?", e.Uuid)
 	}
 
 	if e.Username != "" {
@@ -65,7 +65,7 @@ func (e *User) Get() (User, error) {
 	var user User
 	table := db.Model(e)
 	if e.Uuid != "" {
-		table = table.Where("user_id = ?", e.Uuid)
+		table = table.Where("uuid = ?", e.Uuid)
 	}
 
 	if e.Username != "" {

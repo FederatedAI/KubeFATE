@@ -53,7 +53,7 @@ func TestUser(t *testing.T) {
 		t.Errorf("User.Get() error = %v", err)
 		return
 	}
-	if got.Username != want.Username || got.Password != want.Password || got.ID != want.ID || got.Email != want.Email {
+	if got.Username != want.Username || got.Password != want.Password || got.Uuid != want.Uuid || got.Email != want.Email {
 		t.Errorf("User.Get() where Username=admin  got = %v, wat = %v", got, want)
 		return
 	}
@@ -101,7 +101,7 @@ func TestUser(t *testing.T) {
 		t.Errorf("User.Get() error = %v", err, )
 		return
 	}
-	if got.Username != want.Username || got.Password != want.Password || got.ID != want.ID || got.Email != want.Email {
+	if got.Username != want.Username || got.Password != want.Password || got.Uuid != want.Uuid || got.Email != want.Email {
 		t.Errorf("User.Get() got = %v, wat = %v", got, want)
 		return
 	}
