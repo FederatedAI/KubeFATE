@@ -28,6 +28,5 @@ func serviceCommand() *cli.Command {
 }
 
 func serviceRun(c *cli.Context) error {
-	api.Run()
-	return nil
+	return 	api.Run()
 }

@@ -1,6 +1,6 @@
 /*
 * Copyright 2019-2020 VMware, Inc.
-* 
+*
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
@@ -10,8 +10,8 @@
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 * See the License for the specific language governing permissions and
 * limitations under the License.
-* 
-*/
+*
+ */
 package cli
 
 import (
@@ -20,7 +20,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/api"
-	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/db"
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/modules"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
 	"io/ioutil"
@@ -123,7 +123,7 @@ func Send(r *Request) (*Response, error) {
 }
 
 type Result struct {
-	Data []*db.Job
+	Data []*modules.Job
 	Msg  string
 }
 

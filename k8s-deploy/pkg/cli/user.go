@@ -1,6 +1,6 @@
 /*
 * Copyright 2019-2020 VMware, Inc.
-* 
+*
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
@@ -10,14 +10,14 @@
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 * See the License for the specific language governing permissions and
 * limitations under the License.
-* 
-*/
+*
+ */
 package cli
 
 import (
 	"errors"
 	"fmt"
-	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/db"
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/modules"
 	"github.com/gosuri/uitable"
 	"helm.sh/helm/v3/pkg/cli/output"
 	"os"
@@ -35,12 +35,12 @@ func (c *User) addArgs() (Args string) {
 }
 
 type UserResultList struct {
-	Data []*db.User
+	Data []*modules.User
 	Msg  string
 }
 
 type UserResult struct {
-	Data *db.User
+	Data *modules.User
 	Msg  string
 }
 
