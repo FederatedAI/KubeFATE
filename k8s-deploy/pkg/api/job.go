@@ -1,6 +1,6 @@
 /*
 * Copyright 2019-2020 VMware, Inc.
-* 
+*
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
@@ -10,12 +10,12 @@
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 * See the License for the specific language governing permissions and
 * limitations under the License.
-* 
-*/
+*
+ */
 package api
 
 import (
-	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/db"
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/modules"
 	"github.com/gin-gonic/gin"
 )
 
@@ -36,7 +36,7 @@ func (j *Job) Router(r *gin.RouterGroup) {
 
 func (_ *Job) getJobList(c *gin.Context) {
 
-	jobList, err := db.JobFindList("")
+	jobList, err := new(modules.Job).GetList()
 	if err != nil {
 		c.JSON(400, gin.H{"error": err})
 		return
@@ -51,12 +51,13 @@ func (_ *Job) getJob(c *gin.Context) {
 		c.JSON(400, gin.H{"error": "not exit jobId"})
 		return
 	}
-	result, err := db.JobFindByUUID(jobId)
+	j := modules.Job{Uuid: jobId}
+	job, err := j.Get()
 	if err != nil {
 		c.JSON(500, gin.H{"error": err})
 		return
 	}
-	c.JSON(200, gin.H{"data": result})
+	c.JSON(200, gin.H{"data": job})
 }
 
 func (_ *Job) deleteJob(c *gin.Context) {
@@ -66,8 +67,8 @@ func (_ *Job) deleteJob(c *gin.Context) {
 		c.JSON(400, gin.H{"error": "not exit jobId"})
 		return
 	}
-
-	err := db.JobDeleteByUUID(jobId)
+	j := modules.Job{Uuid: jobId}
+	_, err := j.Delete()
 	if err != nil {
 		c.JSON(500, gin.H{"error": err})
 		return

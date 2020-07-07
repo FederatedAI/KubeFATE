@@ -1,6 +1,6 @@
 /*
 * Copyright 2019-2020 VMware, Inc.
-* 
+*
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
@@ -10,12 +10,12 @@
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 * See the License for the specific language governing permissions and
 * limitations under the License.
-* 
-*/
+*
+ */
 package api
 
 import (
-	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/db"
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/modules"
 	"k8s.io/apimachinery/pkg/util/rand"
 	"time"
 
@@ -52,7 +52,7 @@ func initAuthmiddleware() error {
 		IdentityKey: identityKey,
 		// Use username as identity key and set it as jwt token
 		PayloadFunc: func(data interface{}) jwt.MapClaims {
-			if v, ok := data.(*db.User); ok {
+			if v, ok := data.(*modules.User); ok {
 				return jwt.MapClaims{
 					identityKey: v.Username,
 				}
@@ -70,7 +70,7 @@ func initAuthmiddleware() error {
 
 		// Check if user exists
 		Authenticator: func(c *gin.Context) (interface{}, error) {
-			loginVals := new(db.User)
+			loginVals := new(modules.User)
 			if err := c.ShouldBindJSON(loginVals); err != nil {
 				return "", jwt.ErrMissingLoginValues
 			}

@@ -16,6 +16,8 @@ package api
 
 import (
 	"fmt"
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/modules"
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/orm"
 	"os"
 
 	"github.com/gin-contrib/logger"
@@ -32,15 +34,38 @@ func initUser() error {
 	return nil
 }
 
+func initDb()error{
+	mysql := new(orm.Mysql)
+	return mysql.Setup()
+}
+
+func initTables(){
+	new(modules.User).InitTable()
+	new(modules.Cluster).InitTable()
+	new(modules.HelmChart).InitTable()
+	new(modules.Job).InitTable()
+}
+
 // Run starts the API server
-func Run() {
+func Run() error {
 	log.Info().Msgf("logLevel: %v", viper.GetString("log.level"))
 	log.Info().Msgf("api version: %v", ApiVersion)
 	log.Info().Msgf("service version: %v", ServiceVersion)
-	err := initUser()
+
+	err := initDb()
+	if err != nil {
+		log.Error().Err(err).Msg("initDb error, ")
+		return err
+	}
+
+    modules.DB = orm.DBCLIENT
+
+	initTables()
+
+	err = initUser()
 	if err != nil {
 		log.Error().Err(err).Msg("initUser error, ")
-		return
+		return err
 	}
 	//err := service.InitKubeConfig()
 	//if err != nil {
@@ -75,6 +100,7 @@ func Run() {
 	err = r.Run(endpoint)
 	if err != nil {
 		log.Error().Err(err).Msg("gin run error, ")
-		return
+		return err
 	}
+	return nil
 }
