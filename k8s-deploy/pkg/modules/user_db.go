@@ -38,14 +38,6 @@ func (e *User) GetList() ([]User, error) {
 		table = table.Where("username = ?", e.Username)
 	}
 
-	if e.Password != "" {
-		table = table.Where("password = ?", e.Password)
-	}
-
-	if e.Salt != "" {
-		table = table.Where("salt = ?", e.Salt)
-	}
-
 	if e.Email != "" {
 		table = table.Where("email = ?", e.Email)
 	}
@@ -57,6 +49,11 @@ func (e *User) GetList() ([]User, error) {
 	if err := table.Find(&users).Error; err != nil {
 		return nil, err
 	}
+
+	for  _, u := range  users {
+		u.Password = ""
+	}
+
 	return users, nil
 }
 
@@ -72,14 +69,6 @@ func (e *User) Get() (User, error) {
 		table = table.Where("username = ?", e.Username)
 	}
 
-	if e.Password != "" {
-		table = table.Where("password = ?", e.Password)
-	}
-
-	if e.Salt != "" {
-		table = table.Where("salt = ?", e.Salt)
-	}
-
 	if e.Email != "" {
 		table = table.Where("email = ?", e.Email)
 	}
@@ -91,13 +80,14 @@ func (e *User) Get() (User, error) {
 	if err := table.First(&user).Error; err != nil {
 		return User{}, err
 	}
+
+	user.Password = ""
+
 	return user, nil
 }
 
 func (e *User) Insert() (id int, err error) {
-	if err = e.Encrypt(); err != nil {
-		return
-	}
+	e.Encrypt()
 
 	// check username
 	var count int
@@ -120,13 +110,14 @@ func (e *User) Update(id int) (update User, err error) {
 		return
 	}
 
+	e.Encrypt()
+
 	if err = db.Model(&update).Updates(&e).Error; err != nil {
 		return
 	}
 
-	if err != nil {
-		return
-	}
+	update.Password = ""
+
 	return
 }
 

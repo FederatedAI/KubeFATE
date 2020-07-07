@@ -42,14 +42,14 @@ type Users []User
 type UserStatus int8
 
 const (
-	Deprecate_u UserStatus = iota
+	Deprecate_u UserStatus = iota + 1
 	Available_u
 )
 
 func (s UserStatus) String() string {
-	names := []string{
-		"Deprecate",
-		"Available",
+	names := map[UserStatus]string{
+		Deprecate_u: "Deprecate",
+		Available_u: "Available",
 	}
 
 	return names[s]
@@ -74,7 +74,7 @@ func NewUser(username string, password string, email string) *User {
 	u := &User{
 		Uuid:     uuid.NewV4().String(),
 		Username: username,
-		Password: encryption(password, salt),
+		Password: password,
 		Salt:     salt,
 		Email:    email,
 		Status:   Deprecate_u,
@@ -99,17 +99,16 @@ func (e *User) IsValid() bool {
 
 func (e *User) IsExisted() bool {
 
-	gotUsers := make(Users, 0)
-	db.Where("username = ?", e.Username).First(&gotUsers)
-	if db.Error != nil || len(gotUsers) == 0 {
-		return false
+	var count int
+	db.Model(&User{}).Where("username = ?", e.Username).Count(&count)
+	if db.Error == nil || count > 0  {
+		return true
 	}
-	return true
+	return false
 }
 
-func (e *User) Encrypt()  (err error)  {
-	salt := rand.String(saltSize)
-	e.Password = encryption(e.Password,salt)
+func (e *User) Encrypt()  {
+	e.Password = encryption(e.Password,e.Salt)
 	return
 }
 
