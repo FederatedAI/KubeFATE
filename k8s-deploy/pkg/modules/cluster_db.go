@@ -14,23 +14,22 @@
 
 package modules
 
-
 import (
 	"errors"
 )
 
 func (e *Cluster) DropTable() {
-	db.DropTable(&Cluster{})
+	DB.DropTable(&Cluster{})
 }
 
 func (e *Cluster) InitTable() {
-	db.AutoMigrate(&Cluster{})
+	DB.AutoMigrate(&Cluster{})
 }
 
 func (e *Cluster) GetList() ([]Cluster, error) {
 
 	var clusters Clusters
-	table := db.Model(e)
+	table := DB.Model(e)
 	if e.Uuid != "" {
 		table = table.Where("uuid = ?", e.Uuid)
 	}
@@ -55,6 +54,48 @@ func (e *Cluster) GetList() ([]Cluster, error) {
 		table = table.Where("status = ?", e.Status)
 	}
 
+	if e.Status != 0 {
+		table = table.Unscoped()
+	}
+
+	if err := table.Find(&clusters).Error; err != nil {
+		return nil, err
+	}
+	return clusters, nil
+}
+
+func (e *Cluster) GetListAll(all bool) ([]Cluster, error) {
+
+	var clusters Clusters
+	table := DB.Model(e)
+	if e.Uuid != "" {
+		table = table.Where("uuid = ?", e.Uuid)
+	}
+
+	if e.Name != "" {
+		table = table.Where("name = ?", e.Name)
+	}
+
+	if e.NameSpace != "" {
+		table = table.Where("name_space = ?", e.NameSpace)
+	}
+
+	if e.ChartName != "" {
+		table = table.Where("chart_name = ?", e.ChartName)
+	}
+
+	if e.ChartVersion != "" {
+		table = table.Where("chart_version = ?", e.ChartVersion)
+	}
+
+	if e.Status != 0 {
+		table = table.Where("status = ?", e.Status)
+	}
+
+	if all {
+		table = table.Unscoped()
+	}
+
 	if err := table.Find(&clusters).Error; err != nil {
 		return nil, err
 	}
@@ -64,7 +105,7 @@ func (e *Cluster) GetList() ([]Cluster, error) {
 func (e *Cluster) Get() (Cluster, error) {
 
 	var cluster Cluster
-	table := db.Model(e)
+	table := DB.Model(e)
 	if e.Uuid != "" {
 		table = table.Where("uuid = ?", e.Uuid)
 	}
@@ -99,14 +140,14 @@ func (e *Cluster) Insert() (id int, err error) {
 
 	// check name namespace
 	var count int
-	db.Model(&Cluster{}).Where("name = ?", e.Name).Where("name_space = ?", e.NameSpace).Count(&count)
+	DB.Model(&Cluster{}).Where("name = ?", e.Name).Where("name_space = ?", e.NameSpace).Count(&count)
 	if count > 0 {
 		err = errors.New("account already exists")
 		return
 	}
 
 	//Add data
-	if err = db.Model(&Cluster{}).Create(&e).Error; err != nil {
+	if err = DB.Model(&Cluster{}).Create(&e).Error; err != nil {
 		return
 	}
 	id = int(e.ID)
@@ -114,21 +155,49 @@ func (e *Cluster) Insert() (id int, err error) {
 }
 
 func (e *Cluster) Update(id int) (update Cluster, err error) {
-	if err = db.First(&update, id).Error; err != nil {
+	if err = DB.First(&update, id).Error; err != nil {
 		return
 	}
 
-	if err = db.Model(&update).Updates(&e).Error; err != nil {
+	if err = DB.Model(&update).Updates(&e).Error; err != nil {
 		return
 	}
 	return
 }
 
-func (e *Cluster) Delete(id int) (success bool, err error) {
-	if err = db.Where("ID = ?", id).Delete(e).Error; err != nil {
+func (e *Cluster) UpdateByUuid(uuid string) (update Cluster, err error) {
+	if err = DB.Where("uuid = ?", uuid).First(&update).Error; err != nil {
+		return
+	}
+
+	if err = DB.Model(&update).Updates(&e).Error; err != nil {
+		return
+	}
+	return
+}
+
+func (e *Cluster) DeleteById(id uint) (success bool, err error) {
+	if err = DB.Where("ID = ?", id).Delete(e).Error; err != nil {
 		success = false
 		return
 	}
 	success = true
 	return
+}
+
+func (e *Cluster) Delete() (bool, error) {
+	cluster, err := e.Get()
+	if err != nil {
+		return false, err
+	}
+	return e.DeleteById(cluster.ID)
+}
+
+func (e *Cluster) IsExisted(name, namespace string) bool {
+	var count int
+	DB.Model(&Cluster{}).Where("name = ?", e.Name).Where("name_space = ?", e.NameSpace).Count(&count)
+	if DB.Error == nil && count > 0 {
+		return true
+	}
+	return false
 }

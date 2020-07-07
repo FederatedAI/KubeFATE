@@ -23,8 +23,8 @@ func TestCluster(t *testing.T) {
 	InitConfigForTest()
 	mysql := new(orm.Mysql)
 	mysql.Setup()
-	db = orm.DBCLIENT
-	//db.LogMode(true)
+	DB = orm.DBCLIENT
+	//DB.LogMode(true)
 
 	// Create Table
 	e := &Cluster{}
@@ -162,7 +162,7 @@ func TestCluster(t *testing.T) {
 	}
 
 	e = &Cluster{}
-	success, err := e.Delete(1)
+	success, err := e.DeleteById(1)
 	if err != nil {
 		t.Errorf("Cluster.Delete() error = %v", err, )
 		return
