@@ -25,8 +25,8 @@ func TestHelmChart(t *testing.T) {
 	InitConfigForTest()
 	mysql := new(orm.Mysql)
 	mysql.Setup()
-	db = orm.DBCLIENT
-	//db.LogMode(true)
+	DB = orm.DBCLIENT
+	//DB.LogMode(true)
 
 	// Create Table
 	e := &HelmChart{}

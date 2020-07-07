@@ -20,17 +20,17 @@ import (
 )
 
 func (e *HelmChart) DropTable() {
-	db.DropTable(&HelmChart{})
+	DB.DropTable(&HelmChart{})
 }
 
 func (e *HelmChart) InitTable() {
-	db.AutoMigrate(&HelmChart{})
+	DB.AutoMigrate(&HelmChart{})
 }
 
 func (e *HelmChart) GetList() ([]HelmChart, error) {
 
 	var helmCharts HelmCharts
-	table := db.Model(e)
+	table := DB.Model(e)
 	if e.Uuid != "" {
 		table = table.Where("uuid = ?", e.Uuid)
 	}
@@ -60,7 +60,7 @@ func (e *HelmChart) GetList() ([]HelmChart, error) {
 func (e *HelmChart) Get() (HelmChart, error) {
 
 	var cluster HelmChart
-	table := db.Model(e)
+	table := DB.Model(e)
 	if e.Uuid != "" {
 		table = table.Where("uuid = ?", e.Uuid)
 	}
@@ -91,14 +91,14 @@ func (e *HelmChart) Insert() (id int, err error) {
 
 	// check name namespace
 	var count int
-	db.Model(&HelmChart{}).Where("version = ?", e.Version).Count(&count)
+	DB.Model(&HelmChart{}).Where("version = ?", e.Version).Count(&count)
 	if count > 0 {
 		err = errors.New("account already exists")
 		return
 	}
 
 	//Add data
-	if err = db.Model(&HelmChart{}).Create(&e).Error; err != nil {
+	if err = DB.Model(&HelmChart{}).Create(&e).Error; err != nil {
 		return
 	}
 	id = int(e.ID)
@@ -106,18 +106,27 @@ func (e *HelmChart) Insert() (id int, err error) {
 }
 
 func (e *HelmChart) Update(id int) (update HelmChart, err error) {
-	if err = db.First(&update, id).Error; err != nil {
+	if err = DB.First(&update, id).Error; err != nil {
 		return
 	}
 
-	if err = db.Model(&update).Updates(&e).Error; err != nil {
+	if err = DB.Model(&update).Updates(&e).Error; err != nil {
 		return
 	}
 	return
 }
 
 func (e *HelmChart) Delete(id int) (success bool, err error) {
-	if err = db.Where("ID = ?", id).Delete(e).Error; err != nil {
+	if err = DB.Where("ID = ?", id).Delete(e).Error; err != nil {
+		success = false
+		return
+	}
+	success = true
+	return
+}
+
+func (e *HelmChart) DeleteByUuid(Uuid string) (success bool, err error) {
+	if err = DB.Where("uuid = ?", Uuid).Delete(e).Error; err != nil {
 		success = false
 		return
 	}
