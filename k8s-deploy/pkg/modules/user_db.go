@@ -19,17 +19,17 @@ import (
 )
 
 func (e *User) DropTable() {
-	db.DropTable(&User{})
+	DB.DropTable(&User{})
 }
 
 func (e *User) InitTable() {
-	db.AutoMigrate(&User{})
+	DB.AutoMigrate(&User{})
 }
 
 func (e *User) GetList() ([]User, error) {
 
 	var users Users
-	table := db.Model(e)
+	table := DB.Model(e)
 	if e.Uuid != "" {
 		table = table.Where("uuid = ?", e.Uuid)
 	}
@@ -60,7 +60,7 @@ func (e *User) GetList() ([]User, error) {
 func (e *User) Get() (User, error) {
 
 	var user User
-	table := db.Model(e)
+	table := DB.Model(e).Unscoped()
 	if e.Uuid != "" {
 		table = table.Where("uuid = ?", e.Uuid)
 	}
@@ -91,28 +91,28 @@ func (e *User) Insert() (id int, err error) {
 
 	// check username
 	var count int
-	db.Model(&User{}).Where("username = ?", e.Username).Count(&count)
+	DB.Model(&User{}).Where("username = ?", e.Username).Count(&count)
 	if count > 0 {
 		err = errors.New("Account already exists!")
 		return
 	}
 
 	//Add data
-	if err = db.Model(&User{}).Create(&e).Error; err != nil {
+	if err = DB.Model(&User{}).Create(&e).Error; err != nil {
 		return
 	}
 	id = int(e.ID)
 	return
 }
 
-func (e *User) Update(id int) (update User, err error) {
-	if err = db.First(&update, id).Error; err != nil {
+func (e *User) Update(id uint) (update User, err error) {
+	if err = DB.First(&update, id).Error; err != nil {
 		return
 	}
 
 	e.Encrypt()
 
-	if err = db.Model(&update).Updates(&e).Error; err != nil {
+	if err = DB.Model(&update).Updates(&e).Error; err != nil {
 		return
 	}
 
@@ -121,11 +121,20 @@ func (e *User) Update(id int) (update User, err error) {
 	return
 }
 
-func (e *User) Delete(id int) (success bool, err error) {
-	if err = db.Where("ID = ?", id).Delete(e).Error; err != nil {
+func (e *User) DeleteById(id uint) (success bool, err error) {
+	if err = DB.Unscoped().Where("ID = ?", id).Delete(e).Error; err != nil {
 		success = false
 		return
 	}
 	success = true
 	return
+}
+
+
+func (e *User) Delete() (success bool, err error) {
+	user, err := e.Get()
+	if err!=nil{
+		return false, err
+	}
+	return user.DeleteById(user.ID)
 }

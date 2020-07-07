@@ -126,8 +126,8 @@ func TestUser_IsValid(t *testing.T) {
 	InitConfigForTest()
 	mysql := new(orm.Mysql)
 	mysql.Setup()
-	db = orm.DBCLIENT
-	//db.LogMode(true)
+	DB = orm.DBCLIENT
+	//DB.LogMode(true)
 
 	// Create Table
 	e := &User{}
@@ -172,8 +172,8 @@ func TestUser_IsExisted(t *testing.T) {
 	InitConfigForTest()
 	mysql := new(orm.Mysql)
 	mysql.Setup()
-	db = orm.DBCLIENT
-	//db.LogMode(true)
+	DB = orm.DBCLIENT
+	//DB.LogMode(true)
 
 	// Create Table
 	e := &User{}

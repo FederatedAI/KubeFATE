@@ -27,8 +27,8 @@ func TestUser(t *testing.T) {
 	InitConfigForTest()
 	mysql := new(orm.Mysql)
 	mysql.Setup()
-	db = orm.DBCLIENT
-	db.LogMode(true)
+	DB = orm.DBCLIENT
+	DB.LogMode(true)
 
 	// Create Table
 	e := &User{}
@@ -161,7 +161,7 @@ func TestUser(t *testing.T) {
 	}
 
 	e = &User{}
-	success, err := e.Delete(1)
+	success, err := e.DeleteById(1)
 	if err != nil {
 		t.Errorf("User.Delete() error = %v", err)
 		return
@@ -171,7 +171,7 @@ func TestUser(t *testing.T) {
 		return
 	}
 	e = &User{}
-	success, err = e.Delete(-1)
+	success, err = e.DeleteById(-1)
 	if err != nil {
 		t.Errorf("User.Delete() error = %v", err)
 		return
@@ -199,7 +199,7 @@ func TestUser_Delete(t *testing.T) {
 	InitConfigForTest()
 	mysql := new(orm.Mysql)
 	mysql.Setup()
-	db = orm.DBCLIENT
+	DB = orm.DBCLIENT
 	type fields struct {
 		Uuid     string
 		Username string
@@ -243,7 +243,7 @@ func TestUser_Delete(t *testing.T) {
 				Status:   tt.fields.Status,
 				Model:    tt.fields.Model,
 			}
-			gotSuccess, err := e.Delete(tt.args.id)
+			gotSuccess, err := e.DeleteById(tt.args.id)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("User.Delete() error = %v, wantErr %v", err, tt.wantErr)
 				return
