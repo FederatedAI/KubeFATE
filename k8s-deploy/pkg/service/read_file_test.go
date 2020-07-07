@@ -1,6 +1,6 @@
 /*
 * Copyright 2019-2020 VMware, Inc.
-* 
+*
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
@@ -10,12 +10,12 @@
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 * See the License for the specific language governing permissions and
 * limitations under the License.
-* 
-*/
+*
+ */
 package service
 
 import (
-	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/db"
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/modules"
 	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/utils/config"
 	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/utils/logging"
 
@@ -35,7 +35,7 @@ func TestSaveChartFromPath(t *testing.T) {
 	path := "../../fate/"
 	helm, err := SaveChartFromPath(path, "fate")
 	if err == nil {
-		helmUUID, error := db.Save(helm)
+		helmUUID, error := helm.Insert()
 		if error == nil {
 			t.Log("uuid: ", helmUUID)
 		}
@@ -45,9 +45,9 @@ func TestSaveChartFromPath(t *testing.T) {
 
 func TestConvertToChart(t *testing.T) {
 	InitConfigForTest()
-	helm := &db.HelmChart{}
-	result := helm.FindHelmByNameAndVersion("fate", "1.2.0")
-	chart, _ := ConvertToChart(result)
+	helm := &modules.HelmChart{Name: "fate", Version: "1.2.0"}
+	result, _ := helm.Get()
+	chart, _ := ConvertToChart(&result)
 	t.Log(chart.AppVersion())
 
 	// settings := cli.New()

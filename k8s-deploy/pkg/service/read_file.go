@@ -1,6 +1,6 @@
 /*
 * Copyright 2019-2020 VMware, Inc.
-* 
+*
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
@@ -10,15 +10,14 @@
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 * See the License for the specific language governing permissions and
 * limitations under the License.
-* 
-*/
+*
+ */
 package service
 
 import (
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/modules"
 	"io/ioutil"
 	"strings"
-
-	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/db"
 
 	"github.com/pkg/errors"
 
@@ -33,7 +32,7 @@ func ReadFileToString(path string) (string, error) {
 }
 
 // SaveChartFromPath read chart from path
-func SaveChartFromPath(path string, name string) (*db.HelmChart, error) {
+func SaveChartFromPath(path string, name string) (*modules.HelmChart, error) {
 	if !strings.HasSuffix(path, "/") {
 		path += "/"
 	}
@@ -80,13 +79,13 @@ func SaveChartFromPath(path string, name string) (*db.HelmChart, error) {
 		return nil, err
 	}
 
-	helm := db.NewHelmChart(name, string(chartData), valueString, templates, version, appVersion)
+	helm := modules.NewHelmChart(name, string(chartData), valueString, templates, version, appVersion)
 	helm.ValuesTemplate = valueTemplateString
 	return helm, nil
 }
 
 // ConvertToChart convert database object to chart object
-func ConvertToChart(helm *db.HelmChart) (*chart.Chart, error) {
+func ConvertToChart(helm *modules.HelmChart) (*chart.Chart, error) {
 	c := new(chart.Chart)
 
 	templates := helm.Templates
