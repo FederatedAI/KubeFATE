@@ -24,8 +24,8 @@ func TestJob(t *testing.T) {
 	InitConfigForTest()
 	mysql := new(orm.Mysql)
 	mysql.Setup()
-	db = orm.DBCLIENT
-	//db.LogMode(true)
+	DB = orm.DBCLIENT
+	//DB.LogMode(true)
 
 	// Create Table
 	e := &Job{}
@@ -151,7 +151,7 @@ func TestJob(t *testing.T) {
 	}
 
 	e = &Job{}
-	success, err := e.Delete(1)
+	success, err := e.DeleteById(1)
 	if err != nil {
 		t.Errorf("Job.Delete() error = %v", err, )
 		return

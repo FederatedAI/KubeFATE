@@ -30,7 +30,7 @@ type Job struct {
 	StartTime time.Time     `json:"start_time" gorm:"default:Null"`
 	EndTime   time.Time     `json:"end_time" gorm:"default:Null"`
 	Method    string        `json:"method" gorm:"type:varchar(16);not null"`
-	Result    string        `json:"result"  gorm:"type:varchar(255)"`
+	Result    string        `json:"result"  gorm:"type:text"`
 	ClusterId string        `json:"cluster_id" gorm:"type:varchar(36)"`
 	Creator   string        `json:"creator" gorm:"type:varchar(16);not null"`
 	SubJobs   SubJobs       `json:"sub-jobs" gorm:"type:blob"`
@@ -137,4 +137,8 @@ func (s SubJobs) Value() (driver.Value, error) {
 
 func (s *SubJobs) Scan(v interface{}) error {
 	return json.Unmarshal(v.([]byte), s)
+}
+
+func (e *Job) TimeOut() bool {
+	return time.Now().After(e.StartTime.Add(e.TimeLimit))
 }

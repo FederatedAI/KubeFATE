@@ -14,23 +14,22 @@
 
 package modules
 
-
 import (
 	"errors"
 )
 
 func (e *Job) DropTable() {
-	db.DropTable(&Job{})
+	DB.DropTable(&Job{})
 }
 
 func (e *Job) InitTable() {
-	db.AutoMigrate(&Job{})
+	DB.AutoMigrate(&Job{})
 }
 
 func (e *Job) GetList() ([]Job, error) {
 
 	var jobs Jobs
-	table := db.Model(e)
+	table := DB.Model(e)
 	if e.Uuid != "" {
 		table = table.Where("uuid = ?", e.Uuid)
 	}
@@ -60,7 +59,7 @@ func (e *Job) GetList() ([]Job, error) {
 func (e *Job) Get() (Job, error) {
 
 	var job Job
-	table := db.Model(e)
+	table := DB.Model(e)
 	if e.Uuid != "" {
 		table = table.Where("uuid = ?", e.Uuid)
 	}
@@ -91,14 +90,14 @@ func (e *Job) Insert() (id int, err error) {
 
 	// check name namespace
 	var count int
-	db.Model(&Job{}).Where("uuid = ?", e.Uuid).Count(&count)
+	DB.Model(&Job{}).Where("uuid = ?", e.Uuid).Count(&count)
 	if count > 0 {
 		err = errors.New("account already exists")
 		return
 	}
 
 	//Add data
-	if err = db.Model(&Job{}).Create(&e).Error; err != nil {
+	if err = DB.Model(&Job{}).Create(&e).Error; err != nil {
 		return
 	}
 	id = int(e.ID)
@@ -106,21 +105,40 @@ func (e *Job) Insert() (id int, err error) {
 }
 
 func (e *Job) Update(id int) (update Job, err error) {
-	if err = db.First(&update, id).Error; err != nil {
+	if err = DB.First(&update, id).Error; err != nil {
 		return
 	}
 
-	if err = db.Model(&update).Updates(&e).Error; err != nil {
+	if err = DB.Model(&update).Updates(&e).Error; err != nil {
 		return
 	}
 	return
 }
 
-func (e *Job) Delete(id int) (success bool, err error) {
-	if err = db.Where("ID = ?", id).Delete(e).Error; err != nil {
+func (e *Job) UpdateByUuid(uuid string) (update Job, err error) {
+	if err = DB.Where("uuid = ?", uuid).First(&update).Error; err != nil {
+		return
+	}
+
+	if err = DB.Model(&update).Updates(&e).Error; err != nil {
+		return
+	}
+	return
+}
+
+func (e *Job) DeleteById(id uint) (success bool, err error) {
+	if err = DB.Where("ID = ?", id).Delete(e).Error; err != nil {
 		success = false
 		return
 	}
 	success = true
 	return
+}
+
+func (e *Job) Delete() (bool, error) {
+	job, err := e.Get()
+	if err != nil {
+		return false, err
+	}
+	return e.DeleteById(job.ID)
 }
