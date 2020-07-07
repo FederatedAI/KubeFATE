@@ -15,6 +15,7 @@
 package service
 
 import (
+	"context"
 	"fmt"
 	"k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -26,7 +27,7 @@ func GetNamespace(namespace string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	rNamespace, err := clientset.CoreV1().Namespaces().Get(namespace, metav1.GetOptions{})
+	rNamespace, err := clientset.CoreV1().Namespaces().Get(context.Background(),namespace, metav1.GetOptions{})
 
 	if err != nil {
 		return "", err
@@ -42,7 +43,7 @@ func GetNamespaceList() ([]string, error) {
 		return nil, err
 	}
 
-	ncl, err := clientset.CoreV1().Namespaces().List(metav1.ListOptions{})
+	ncl, err := clientset.CoreV1().Namespaces().List(context.Background(),metav1.ListOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +69,7 @@ func CreateNamespace(namespace string) error {
 		Name: namespace,
 	}
 	nc.Spec = v1.NamespaceSpec{}
-	_, err = clientset.CoreV1().Namespaces().Create(nc)
+	_, err = clientset.CoreV1().Namespaces().Create(context.Background(),nc,metav1.CreateOptions{})
 
 	if err != nil {
 		return err
@@ -82,7 +83,7 @@ func CheckNamespace(namespace string) error {
 	if err != nil {
 		return err
 	}
-	namespaces, err := clientset.CoreV1().Namespaces().Get(namespace, metav1.GetOptions{})
+	namespaces, err := clientset.CoreV1().Namespaces().Get(context.Background(),namespace, metav1.GetOptions{})
 	if err == nil {
 		return nil
 	}
@@ -99,7 +100,7 @@ func CheckNamespace(namespace string) error {
 		Name: namespace,
 	}
 	nc.Spec = v1.NamespaceSpec{}
-	_, err = clientset.CoreV1().Namespaces().Create(nc)
+	_, err = clientset.CoreV1().Namespaces().Create(context.Background(),nc,metav1.CreateOptions{})
 
 	return err
 

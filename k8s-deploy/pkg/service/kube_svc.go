@@ -15,6 +15,7 @@
 package service
 
 import (
+	"context"
 	"fmt"
 	"k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -47,6 +48,6 @@ func GetServices(namespace, LabelSelector string) (*v1.ServiceList, error) {
 		return nil, err
 	}
 
-	svcs, err := clientset.CoreV1().Services(namespace).List(metav1.ListOptions{LabelSelector: LabelSelector})
+	svcs, err := clientset.CoreV1().Services(namespace).List(context.Background(),metav1.ListOptions{LabelSelector: LabelSelector})
 	return svcs, err
 }

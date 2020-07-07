@@ -15,6 +15,7 @@
 package service
 
 import (
+	"context"
 	"k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -38,6 +39,6 @@ func GetNodes() (*v1.NodeList, error) {
 		return nil, err
 	}
 
-	nodes, err := clientset.CoreV1().Nodes().List(metav1.ListOptions{})
+	nodes, err := clientset.CoreV1().Nodes().List(context.Background(),metav1.ListOptions{})
 	return nodes, err
 }

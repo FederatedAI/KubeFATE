@@ -15,6 +15,7 @@
 package service
 
 import (
+	"context"
 	"fmt"
 	"k8s.io/api/extensions/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -26,7 +27,7 @@ func GetIngress(name, namespace string) (*v1beta1.IngressList, error) {
 		fmt.Println(err)
 	}
 
-	ingressList, err := clientset.ExtensionsV1beta1().Ingresses(namespace).List(metav1.ListOptions{})
+	ingressList, err := clientset.ExtensionsV1beta1().Ingresses(namespace).List(context.Background(),metav1.ListOptions{})
 
 	return ingressList, err
 }

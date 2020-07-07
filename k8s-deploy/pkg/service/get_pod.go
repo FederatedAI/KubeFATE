@@ -15,6 +15,7 @@
 package service
 
 import (
+	"context"
 	"fmt"
 	"k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -26,7 +27,7 @@ func GetPods(namespace, LabelSelector string) (*v1.PodList, error) {
 		fmt.Println(err)
 	}
 
-	pods, err := clientset.CoreV1().Pods(namespace).List(metav1.ListOptions{LabelSelector: LabelSelector})
+	pods, err := clientset.CoreV1().Pods(namespace).List(context.Background(),metav1.ListOptions{LabelSelector: LabelSelector})
 	return pods, err
 }
 
