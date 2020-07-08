@@ -92,7 +92,7 @@ spec:
             - name: MYSQL_DATABASE
               value: "kube_fate"
             - name: MYSQL_ALLOW_EMPTY_PASSWORD
-              value: 1
+              value: "1"
             - name: MYSQL_USER
               valueFrom:
                 secretKeyRef:
