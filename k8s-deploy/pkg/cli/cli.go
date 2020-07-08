@@ -39,10 +39,7 @@ func initCommandLine() *cli.App {
 	return app
 }
 
-func Run(Args []string) {
+func Run(Args []string) error {
 	app := initCommandLine()
-	err := app.Run(Args)
-	if err != nil {
-		fmt.Println(err)
-	}
+	return app.Run(Args)
 }
