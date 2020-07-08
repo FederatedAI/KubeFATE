@@ -45,7 +45,7 @@ class ClusterManager:
 
     def get_route_table(self):
         # get configmap in dict
-        configmap = self.fe t ch("proxy-config")
+        configmap = self.fetch_config_map("rollsite-config")
 
         # get route table in dict
         route_table = self.fetch_route_table(configmap)
@@ -53,17 +53,17 @@ class ClusterManager:
 
     def set_route_table(self, route_table):
         # get configmap in dict
-        configmap = self.fetch_config_map("proxy-config")
+        configmap = self.fetch_config_map("rollsite-config")
 
         # paste upate to the configmap
         self.update_config_map(configmap, route_table)
 
         # patch config
-        self.patch_config_map(configmap, "proxy-config")
+        self.patch_config_map(configmap, "rollsite-config")
 
     def get_entry_point(self):
         get_address = "kubectl get nodes -o jsonpath=\'{$.items[0].status.addresses[?(@.type==\'InternalIP\')].address}\'"
-        get_port = "kubectl get service proxy -n {0} -o jsonpath=\'{{.spec.ports[0].nodePort}}\'".format(self.namespace)
+        get_port = "kubectl get service rollsite -n {0} -o jsonpath=\'{{.spec.ports[0].nodePort}}\'".format(self.namespace)
 
         ip = ""
         port = ""
@@ -76,4 +76,5 @@ class ClusterManager:
 
         if ip == "" or port == "":
             raise(Exception("Unable to get entrypoint"))
+
         return "{}:{}".format(ip.decode("utf-8").replace("'", ""), port.decode("utf-8").replace("'", ""))

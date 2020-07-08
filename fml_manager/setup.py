@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="fml_manager",
-    version="1.0.0",
+    version="0.4.0",
     author="Layne Peng/Jiahao Chen",
     author_email="jiahaoc@vmware.com",
     description="Python client for FATE cluster",
@@ -15,11 +15,11 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     install_requires=[
         'cachetools==3.0.0',
-        'requests==2.20'
+        'requests>=2.21.0'
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: MIT",
+        "License :: OSI Approved :: Apache Software License",
         "Operating System :: OS Independent",
     ],
     python_requires='>=3.6',

@@ -65,7 +65,7 @@ mysql                              8
 
 ```bash
 PREFIX=federatedai
-TAG=1.3.0-release
+TAG=1.4.1-release
 ```
 我们这里采用从Docker Hub下载镜像。如果在运行机器上已经下载或导入了所需镜像，部署将会变得非常容易。
 
@@ -422,6 +422,9 @@ $ curl -X POST -H 'Content-Type: application/json' -i 'http://192.168.7.1:8059/f
       "x7": 0.347072,
       "x8": -0.287570,
       "x9": -0.733474,
+    },
+    "sendToRemoteFeatureData": {
+      "id": "123"
     }
   }
 }'

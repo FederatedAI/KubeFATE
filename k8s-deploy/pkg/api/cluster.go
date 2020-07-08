@@ -1,22 +1,22 @@
 /*
-* Copyright 2019-2020 VMware, Inc.
-* 
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* http://www.apache.org/licenses/LICENSE-2.0
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-* 
-*/
+ * Copyright 2019-2020 VMware, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package api
 
 import (
-	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/db"
 	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/job"
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/modules"
 	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/service"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
@@ -96,13 +96,8 @@ func (_ *Cluster) getCluster(c *gin.Context) {
 		return
 	}
 
-	//cluster, err := db.ClusterFindByName(clusterId, clusterId)
-	//if err != nil {
-	//	c.JSON(500, gin.H{"error": err})
-	//	return
-	//}
-
-	cluster, err := db.ClusterFindByUUID(clusterId)
+	hc := modules.Cluster{Uuid: clusterId}
+	cluster, err := hc.Get()
 	if err != nil {
 		c.JSON(500, gin.H{"error": err})
 		return
@@ -131,24 +126,13 @@ func (_ *Cluster) getClusterList(c *gin.Context) {
 
 	log.Debug().Bool("all", all).Msg("get args")
 
-	clusterList, err := db.FindClusterList("", all)
-
-	var clusterListreturn = make([]*db.Cluster, 0)
-	if !all {
-		for _, v := range clusterList {
-			if v.Status != db.Deleted_c {
-				clusterListreturn = append(clusterListreturn, v)
-			}
-		}
-	} else {
-		clusterListreturn = clusterList
-	}
+	clusterList, err := new(modules.Cluster).GetListAll(all)
 
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(200, gin.H{"msg": "getClusterList success", "data": clusterListreturn})
+	c.JSON(200, gin.H{"msg": "getClusterList success", "data": clusterList})
 }
 
 func (_ *Cluster) deleteCluster(c *gin.Context) {

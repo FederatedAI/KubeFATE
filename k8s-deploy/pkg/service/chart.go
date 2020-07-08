@@ -1,23 +1,25 @@
 /*
-* Copyright 2019-2020 VMware, Inc.
-* 
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* http://www.apache.org/licenses/LICENSE-2.0
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-* 
-*/
+ * Copyright 2019-2020 VMware, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package service
 
 import (
 	"context"
-	"helm.sh/helm/v3/pkg/chart/loader"
 	"sync"
+
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/modules"
+	"helm.sh/helm/v3/pkg/chart/loader"
 
 	"io/ioutil"
 	"os"
@@ -31,7 +33,6 @@ import (
 	"encoding/json"
 	"encoding/xml"
 
-	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/db"
 	"github.com/spf13/viper"
 	"helm.sh/helm/v3/pkg/getter"
 	"helm.sh/helm/v3/pkg/repo"
@@ -52,32 +53,29 @@ type Chart interface {
 }
 
 type FateChart struct {
-	*db.HelmChart
+	*modules.HelmChart
 }
 
 func (fc *FateChart) save() error {
-	helmUUID, err := db.Save(fc.HelmChart)
+	_, err := fc.HelmChart.Insert()
 	if err != nil {
 		return err
 	}
-	log.Debug().Str("helmUUID", helmUUID).Msg("helm chart save uuid")
+	log.Debug().Str("helmUUID", fc.HelmChart.Uuid).Msg("helm chart save uuid")
 	return nil
 }
 
 func (fc *FateChart) read(chartName, chartVersion string) (*FateChart, error) {
-
-	helmChart, err := db.FindHelmByNameAndVersion(chartName, chartVersion)
+	HelmChart := modules.HelmChart{Name: chartName, Version: chartVersion}
+	helmChart, err := HelmChart.Get()
 	if err != nil {
 		return nil, err
-	}
-	if helmChart == nil {
-		return nil, errors.New("find chart error")
 	}
 
 	log.Debug().Str("ChartName", helmChart.Name).Str("chartVersion", helmChart.Version).Msg("find chart from db success")
 
 	return &FateChart{
-		HelmChart: helmChart,
+		HelmChart: &helmChart,
 	}, nil
 }
 func (fc *FateChart) load(name, version string) (*FateChart, error) {
@@ -116,7 +114,7 @@ func (fc *FateChart) load(name, version string) (*FateChart, error) {
 	}, nil
 }
 
-func ChartRequestedTohelmChart(chartRequested *chart.Chart) (*db.HelmChart, error) {
+func ChartRequestedTohelmChart(chartRequested *chart.Chart) (*modules.HelmChart, error) {
 	if chartRequested == nil || chartRequested.Raw == nil {
 		log.Error().Msg("chartRequested not exist")
 		return nil, errors.New("chartRequested not exist")
@@ -137,7 +135,7 @@ func ChartRequestedTohelmChart(chartRequested *chart.Chart) (*db.HelmChart, erro
 		}
 	}
 
-	helmChart := db.NewHelmChart(chartRequested.Name(),
+	helmChart := modules.NewHelmChart(chartRequested.Name(),
 		chartData, valuesData, chartRequested.Templates, chartRequested.Metadata.Version, chartRequested.AppVersion())
 
 	helmChart.ValuesTemplate = ValuesTemplate
