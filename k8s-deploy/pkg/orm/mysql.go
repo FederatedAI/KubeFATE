@@ -41,7 +41,7 @@ func (e *Mysql) GetConnect() string {
 	conn.WriteString(")")
 	conn.WriteString("/")
 	conn.WriteString(dbConfig.Name)
-	conn.WriteString("?charset=utf8&parseTime=True&loc=Local&timeout=1000ms")
+	conn.WriteString("?charset=utf8&parseTime=True&loc=Local&timeout=10s")
 	return conn.String()
 }
 
@@ -61,7 +61,7 @@ func (e *Mysql) Setup() error {
 	DBCLIENT, err = db.Open("mysql", mysqlConn)
 
 	if err != nil {
-		log.Fatal().Msgf("%s connect error %v", "mysql", err)
+		log.Error().Msgf("%s connect error %v", "mysql", err)
 		return err
 	} else {
 		log.Info().Msgf("%s connect success!", "mysql")
