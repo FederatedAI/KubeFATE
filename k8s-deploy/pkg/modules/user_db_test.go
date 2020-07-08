@@ -171,7 +171,7 @@ func TestUser(t *testing.T) {
 		return
 	}
 	e = &User{}
-	success, err = e.DeleteById(-1)
+	success, err = e.DeleteById(0)
 	if err != nil {
 		t.Errorf("User.Delete() error = %v", err)
 		return
@@ -210,7 +210,7 @@ func TestUser_Delete(t *testing.T) {
 		Model    gorm.Model
 	}
 	type args struct {
-		id int
+		id uint
 	}
 	var (
 		tests = []struct {
@@ -222,9 +222,9 @@ func TestUser_Delete(t *testing.T) {
 		}{
 			// TODO: Add test cases.
 			{
-				name:        "",
-				fields:      fields{},
-				args:        args{
+				name:   "",
+				fields: fields{},
+				args: args{
 					id: 0,
 				},
 				wantSuccess: false,

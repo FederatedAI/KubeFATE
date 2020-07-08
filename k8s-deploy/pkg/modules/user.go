@@ -101,14 +101,13 @@ func (e *User) IsExisted() bool {
 
 	var count int
 	DB.Model(&User{}).Where("username = ?", e.Username).Count(&count)
-	if DB.Error == nil && count > 0  {
+	if DB.Error == nil && count > 0 {
 		return true
 	}
 	return false
 }
 
-func (e *User) Encrypt()  {
-	e.Password = encryption(e.Password,e.Salt)
+func (e *User) Encrypt() {
+	e.Password = encryption(e.Password, e.Salt)
 	return
 }
-

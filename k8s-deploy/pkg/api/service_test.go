@@ -23,11 +23,11 @@ import (
 )
 
 func TestRun(t *testing.T) {
-	os.Setenv("FATECLOUD_SERVER_ADDRESS","0.0.0.0")
-	os.Setenv("FATECLOUD_SERVER_PORT","80")
-	os.Setenv("FATECLOUD_LOG_LEVEL","debug")
-	os.Setenv("FATECLOUD_REPO_URL","https://federatedai.github.io/KubeFATE/")
-	os.Setenv("FATECLOUD_REPO_NAME","kubefate")
+	os.Setenv("FATECLOUD_SERVER_ADDRESS", "0.0.0.0")
+	os.Setenv("FATECLOUD_SERVER_PORT", "80")
+	os.Setenv("FATECLOUD_LOG_LEVEL", "debug")
+	os.Setenv("FATECLOUD_REPO_URL", "https://federatedai.github.io/KubeFATE/")
+	os.Setenv("FATECLOUD_REPO_NAME", "kubefate")
 	_ = config.InitViper()
 	viper.AddConfigPath("../../")
 	_ = viper.ReadInConfig()

@@ -39,7 +39,7 @@ func TestJob(t *testing.T) {
 	e.ClusterId = uuid.NewV4().String()
 	Id, err := e.Insert()
 	if err != nil {
-		t.Errorf("Job.Insert() error = %v", err, )
+		t.Errorf("Job.Insert() error = %v", err)
 		return
 	}
 	if Id != 1 {
@@ -103,7 +103,7 @@ func TestJob(t *testing.T) {
 	e = NewJob("UPGRADE", "test-0")
 	Id, err = e.Insert()
 	if err != nil {
-		t.Errorf("Job.Insert() error = %v", err, )
+		t.Errorf("Job.Insert() error = %v", err)
 		return
 	}
 	if Id != 2 {
@@ -114,7 +114,7 @@ func TestJob(t *testing.T) {
 	e = &Job{}
 	gots, err := e.GetList()
 	if err != nil {
-		t.Errorf("Job.GetList() error = %v", err, )
+		t.Errorf("Job.GetList() error = %v", err)
 		return
 	}
 	if len(gots) != 2 {
@@ -127,7 +127,7 @@ func TestJob(t *testing.T) {
 	want = e
 	got, err = e.Update(2)
 	if err != nil {
-		t.Errorf("Job.Update() error = %v", err, )
+		t.Errorf("Job.Update() error = %v", err)
 		return
 	}
 	if got.Uuid != want.Uuid || got.Status != want.Status ||
@@ -141,7 +141,7 @@ func TestJob(t *testing.T) {
 	want = &got
 	got, err = e.Get()
 	if err != nil {
-		t.Errorf("Job.Get() error = %v", err, )
+		t.Errorf("Job.Get() error = %v", err)
 		return
 	}
 	if got.Uuid != want.Uuid || got.Status != want.Status ||
@@ -153,7 +153,7 @@ func TestJob(t *testing.T) {
 	e = &Job{}
 	success, err := e.DeleteById(1)
 	if err != nil {
-		t.Errorf("Job.Delete() error = %v", err, )
+		t.Errorf("Job.Delete() error = %v", err)
 		return
 	}
 	if !success {
@@ -164,7 +164,7 @@ func TestJob(t *testing.T) {
 	e = &Job{}
 	gots, err = e.GetList()
 	if err != nil {
-		t.Errorf("Job.GetList() error = %v", err, )
+		t.Errorf("Job.GetList() error = %v", err)
 		return
 	}
 	if len(gots) != 1 {

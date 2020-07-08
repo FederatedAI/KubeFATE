@@ -28,7 +28,7 @@ func TestCluster(t *testing.T) {
 
 	// Create Table
 	e := &Cluster{}
-	
+
 	e.InitTable()
 	// Drop Table
 	defer e.DropTable()
@@ -38,7 +38,7 @@ func TestCluster(t *testing.T) {
 	e.ChartValues = map[string]interface{}{"Name": "fate-9999", "NameSpace": "fate-9999"}
 	Id, err := e.Insert()
 	if err != nil {
-		t.Errorf("Cluster.Insert() error = %v", err, )
+		t.Errorf("Cluster.Insert() error = %v", err)
 		return
 	}
 	if Id != 1 {
@@ -114,7 +114,7 @@ func TestCluster(t *testing.T) {
 	e = NewCluster("fate-10000", "fate-10000", "fate", "v1.4.0")
 	Id, err = e.Insert()
 	if err != nil {
-		t.Errorf("Cluster.Insert() error = %v", err, )
+		t.Errorf("Cluster.Insert() error = %v", err)
 		return
 	}
 	if Id != 2 {
@@ -125,7 +125,7 @@ func TestCluster(t *testing.T) {
 	e = &Cluster{}
 	gots, err := e.GetList()
 	if err != nil {
-		t.Errorf("Cluster.GetList() error = %v", err, )
+		t.Errorf("Cluster.GetList() error = %v", err)
 		return
 	}
 	if len(gots) != 2 {
@@ -138,7 +138,7 @@ func TestCluster(t *testing.T) {
 	want = e
 	got, err = e.Update(2)
 	if err != nil {
-		t.Errorf("Cluster.Update() error = %v", err, )
+		t.Errorf("Cluster.Update() error = %v", err)
 		return
 	}
 	if got.Name != want.Name || got.NameSpace != want.NameSpace ||
@@ -152,7 +152,7 @@ func TestCluster(t *testing.T) {
 	want = &got
 	got, err = e.Get()
 	if err != nil {
-		t.Errorf("Cluster.Get() error = %v", err, )
+		t.Errorf("Cluster.Get() error = %v", err)
 		return
 	}
 	if got.Name != want.Name || got.NameSpace != want.NameSpace ||
@@ -164,7 +164,7 @@ func TestCluster(t *testing.T) {
 	e = &Cluster{}
 	success, err := e.DeleteById(1)
 	if err != nil {
-		t.Errorf("Cluster.Delete() error = %v", err, )
+		t.Errorf("Cluster.Delete() error = %v", err)
 		return
 	}
 	if !success {
@@ -175,7 +175,7 @@ func TestCluster(t *testing.T) {
 	e = &Cluster{}
 	gots, err = e.GetList()
 	if err != nil {
-		t.Errorf("Cluster.GetList() error = %v", err, )
+		t.Errorf("Cluster.GetList() error = %v", err)
 		return
 	}
 	if len(gots) != 1 {

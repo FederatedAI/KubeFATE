@@ -50,7 +50,7 @@ func (e *User) GetList() ([]User, error) {
 		return nil, err
 	}
 
-	for  _, u := range  users {
+	for _, u := range users {
 		u.Password = ""
 	}
 
@@ -130,10 +130,9 @@ func (e *User) DeleteById(id uint) (success bool, err error) {
 	return
 }
 
-
 func (e *User) Delete() (success bool, err error) {
 	user, err := e.Get()
-	if err!=nil{
+	if err != nil {
 		return false, err
 	}
 	return user.DeleteById(user.ID)

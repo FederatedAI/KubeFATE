@@ -14,7 +14,6 @@
 
 package modules
 
-
 import (
 	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/orm"
 	"helm.sh/helm/v3/pkg/chart"
@@ -36,7 +35,7 @@ func TestHelmChart(t *testing.T) {
 	defer e.DropTable()
 
 	//Insert
-	templates :=  []*chart.File{
+	templates := []*chart.File{
 		{
 			Name: "a.yaml",
 			Data: []byte(`kind: ConfigMap
@@ -50,10 +49,10 @@ func TestHelmChart(t *testing.T) {
 			metadata: `),
 		},
 	}
-	e = NewHelmChart("fate", "fate-chart", "fate-values", templates,"v1.5.0","v1.5.0")
+	e = NewHelmChart("fate", "fate-chart", "fate-values", templates, "v1.5.0", "v1.5.0")
 	Id, err := e.Insert()
 	if err != nil {
-		t.Errorf("HelmChart.Insert() error = %v", err, )
+		t.Errorf("HelmChart.Insert() error = %v", err)
 		return
 	}
 	if Id != 1 {
@@ -130,10 +129,10 @@ func TestHelmChart(t *testing.T) {
 	}
 
 	// Insert
-	e = NewHelmChart("fate-1", "fate-chart-1", "fate-values-1", templates,"v1.5.1","v1.5.1")
+	e = NewHelmChart("fate-1", "fate-chart-1", "fate-values-1", templates, "v1.5.1", "v1.5.1")
 	Id, err = e.Insert()
 	if err != nil {
-		t.Errorf("HelmChart.Insert() error = %v", err, )
+		t.Errorf("HelmChart.Insert() error = %v", err)
 		return
 	}
 	if Id != 2 {
@@ -144,7 +143,7 @@ func TestHelmChart(t *testing.T) {
 	e = &HelmChart{}
 	gots, err := e.GetList()
 	if err != nil {
-		t.Errorf("HelmChart.GetList() error = %v", err, )
+		t.Errorf("HelmChart.GetList() error = %v", err)
 		return
 	}
 	if len(gots) != 2 {
@@ -153,11 +152,11 @@ func TestHelmChart(t *testing.T) {
 	}
 
 	// Update
-	e = NewHelmChart("fate-2", "fate-chart-2", "fate-values-2", templates,"v1.5.1-a","v1.5.1")
+	e = NewHelmChart("fate-2", "fate-chart-2", "fate-values-2", templates, "v1.5.1-a", "v1.5.1")
 	want = e
 	got, err = e.Update(2)
 	if err != nil {
-		t.Errorf("HelmChart.Update() error = %v", err, )
+		t.Errorf("HelmChart.Update() error = %v", err)
 		return
 	}
 	if got.Name != want.Name || got.Chart != want.Chart ||
@@ -172,7 +171,7 @@ func TestHelmChart(t *testing.T) {
 	want = &got
 	got, err = e.Get()
 	if err != nil {
-		t.Errorf("HelmChart.Get() error = %v", err, )
+		t.Errorf("HelmChart.Get() error = %v", err)
 		return
 	}
 	if got.Name != want.Name || got.Chart != want.Chart ||
@@ -185,7 +184,7 @@ func TestHelmChart(t *testing.T) {
 	e = &HelmChart{}
 	success, err := e.Delete(1)
 	if err != nil {
-		t.Errorf("HelmChart.Delete() error = %v", err, )
+		t.Errorf("HelmChart.Delete() error = %v", err)
 		return
 	}
 	if !success {
@@ -196,7 +195,7 @@ func TestHelmChart(t *testing.T) {
 	e = &HelmChart{}
 	gots, err = e.GetList()
 	if err != nil {
-		t.Errorf("HelmChart.GetList() error = %v", err, )
+		t.Errorf("HelmChart.GetList() error = %v", err)
 		return
 	}
 	if len(gots) != 1 {

@@ -14,7 +14,6 @@
 
 package modules
 
-
 import (
 	"errors"
 )
@@ -133,4 +132,3 @@ func (e *HelmChart) DeleteByUuid(Uuid string) (success bool, err error) {
 	success = true
 	return
 }
-

@@ -139,7 +139,7 @@ func TestUser_IsValid(t *testing.T) {
 	e = NewUser("admin", "admin", "admin@admin.admin")
 	Id, err := e.Insert()
 	if err != nil {
-		t.Errorf("User.Insert() error = %v", err, )
+		t.Errorf("User.Insert() error = %v", err)
 		return
 	}
 	if Id != 1 {
@@ -167,7 +167,6 @@ func TestUser_IsValid(t *testing.T) {
 
 }
 
-
 func TestUser_IsExisted(t *testing.T) {
 	InitConfigForTest()
 	mysql := new(orm.Mysql)
@@ -185,7 +184,7 @@ func TestUser_IsExisted(t *testing.T) {
 	e = NewUser("admin", "admin", "admin@admin.admin")
 	Id, err := e.Insert()
 	if err != nil {
-		t.Errorf("User.Insert() error = %v", err, )
+		t.Errorf("User.Insert() error = %v", err)
 		return
 	}
 	if Id != 1 {

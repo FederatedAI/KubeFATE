@@ -64,12 +64,12 @@ const (
 
 func (s ClusterStatus) String() string {
 	names := map[ClusterStatus]string{
-		Creating_c: "Creating",
-		Deleting_c: "Deleting",
-		Updating_c: "Updating",
-		Running_c: "Running",
+		Creating_c:    "Creating",
+		Deleting_c:    "Deleting",
+		Updating_c:    "Updating",
+		Running_c:     "Running",
 		Unavailable_c: "Unavailable",
-		Deleted_c: "Deleted",
+		Deleted_c:     "Deleted",
 	}
 
 	return names[s]

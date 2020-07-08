@@ -21,4 +21,3 @@ func GetDbConfig() *DbConfig {
 		Password: viper.GetString("db.password"),
 	}
 }
-
