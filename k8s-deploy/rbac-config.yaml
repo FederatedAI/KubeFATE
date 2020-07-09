@@ -33,5 +33,5 @@ type: Opaque
 stringData:
   kubefateUsername: admin
   kubefatePassword: admin
-  mysqlUsername: kubefate
-  mysqlPassword: kubefate
+  mariadbUsername: kubefate
+  mariadbPassword: kubefate

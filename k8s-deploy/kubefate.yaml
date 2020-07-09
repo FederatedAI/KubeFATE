@@ -26,7 +26,7 @@ spec:
             - name: FATECLOUD_DB_TYPE
               value: "mysql"
             - name: FATECLOUD_DB_HOST
-              value: "mysql"
+              value: "mariadb"
             - name: FATECLOUD_DB_PORT
               value: "3306"
             - name: FATECLOUD_DB_NAME
@@ -35,12 +35,12 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: kubefate-secret
-                  key: mysqlUsername
+                  key: mariadbUsername
             - name: FATECLOUD_DB_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: kubefate-secret
-                  key: mysqlPassword
+                  key: mariadbPassword
             - name: FATECLOUD_REPO_NAME
               value: "kubefate"
             - name: FATECLOUD_REPO_URL
@@ -68,26 +68,26 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mysql
+  name: mariadb
   namespace: kube-fate
   labels:
-    fate: mysql
+    fate: mariadb
 spec:
   replicas: 1
   strategy:
     type: Recreate
   selector:
     matchLabels:
-      fate: mysql
+      fate: mariadb
   template:
     metadata:
       labels:
-        fate: mysql
+        fate: mariadb
     spec:
       containers:
-        - image: mysql:8
+        - image: mariadb:10
           imagePullPolicy: IfNotPresent
-          name: mysql
+          name: mariadb
           env:
             - name: MYSQL_DATABASE
               value: "kube_fate"
@@ -97,20 +97,20 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: kubefate-secret
-                  key: mysqlUsername
+                  key: mariadbUsername
             - name: MYSQL_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: kubefate-secret
-                  key: mysqlPassword
+                  key: mariadbPassword
           ports:
             - containerPort: 3306
           volumeMounts:
-            - name: mysql-data
+            - name: mariadb-data
               mountPath: /var/lib/mysql
       restartPolicy: Always
       volumes:
-        - name: mysql-data
+        - name: mariadb-data
           hostPath:
             path: /home/kubefate/mysql/db
             type: DirectoryOrCreate
@@ -118,10 +118,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: mysql
+  name: mariadb
   namespace: kube-fate
   labels:
-    fate: mysql
+    fate: mariadb
 spec:
   ports:
     - name: "3306"
@@ -130,7 +130,7 @@ spec:
       protocol: TCP
   type: ClusterIP
   selector:
-    fate: mysql
+    fate: mariadb
 ---
 apiVersion: v1
 kind: Service
