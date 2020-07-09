@@ -1,25 +1,26 @@
 /*
-* Copyright 2019-2020 VMware, Inc.
-* 
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* http://www.apache.org/licenses/LICENSE-2.0
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-* 
-*/
+ * Copyright 2019-2020 VMware, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package service
 
 import (
-	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/db"
-	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/utils/logging"
 	"os"
 	"reflect"
 	"testing"
+
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/modules"
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/utils/logging"
 
 	"github.com/spf13/viper"
 	"helm.sh/helm/v3/pkg/chart"
@@ -29,7 +30,7 @@ func TestFateChart_save(t *testing.T) {
 	type fields struct {
 		version   string
 		Chart     *chart.Chart
-		HelmChart *db.HelmChart
+		HelmChart *modules.HelmChart
 	}
 	tests := []struct {
 		name    string
@@ -129,7 +130,7 @@ func TestGetFateChart(t *testing.T) {
 func TestFateChart_read(t *testing.T) {
 	InitConfigForTest()
 	type fields struct {
-		HelmChart *db.HelmChart
+		HelmChart *modules.HelmChart
 	}
 	type args struct {
 		name    string
@@ -146,7 +147,7 @@ func TestFateChart_read(t *testing.T) {
 		{
 			name: "test",
 			fields: fields{
-				HelmChart: new(db.HelmChart),
+				HelmChart: new(modules.HelmChart),
 			},
 			args: args{
 				name:    "fate",

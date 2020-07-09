@@ -1,5 +1,5 @@
 NAME = federatedai/kubefate
-VERSION = v1.0.3
+VERSION = v1.1.0
 
 build-linux-binary:
 	go build -a -ldflags '-s' -installsuffix cgo -o kubefate kubefate.go
@@ -12,3 +12,11 @@ release: build-linux-binary
 
 clean:
 	rm kubefate
+
+# Run go fmt against code
+fmt:
+	go fmt ./...
+
+# Run go vet against code
+vet:
+	go vet ./...

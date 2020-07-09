@@ -117,7 +117,7 @@ REVISION        1
 Status          Running
 Values          {"chartName":"fate","chartVersion":"v1.4.0","name":"fate-9999","namespace":"fate-9999","nodemanager":{"count":3,"list":[{"accessMode":"ReadWriteOnce","existingClaim":"","name":"nodemanager","nodeSelector":{},"sessionProcessorsPerNode":2,"size":"1Gi","storageClass":"nodemanager","subPath":"nodemanager"}],"sessionProcessorsPerNode":4},"partyId":9999,"persistence":false, ...... }
 ChartName       fate
-Info            map[dashboard:[9999.fateboard.kubefate.net] ip:10.117.32.181 ...... ]
+Info            map[dashboard:[9999.fateboard.kubefate.net] ip:192.168.9.2 ...... ]
 ```
 
 ### Other Common Use Scenarios
