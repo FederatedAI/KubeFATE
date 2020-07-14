@@ -18,6 +18,8 @@ package modules
 import (
 	"testing"
 
+	"github.com/jinzhu/gorm"
+
 	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/orm"
 )
 
@@ -30,10 +32,10 @@ func TestCluster(t *testing.T) {
 
 	// Create Table
 	e := &Cluster{}
-
+	e.DropTable()
 	e.InitTable()
 	// Drop Table
-	defer e.DropTable()
+	//defer e.DropTable()
 
 	//Insert
 	e = NewCluster("fate-9999", "fate-9999", "fate", "v1.5.0")
@@ -43,8 +45,8 @@ func TestCluster(t *testing.T) {
 		t.Errorf("Cluster.Insert() error = %v", err)
 		return
 	}
-	if Id != 1 {
-		t.Errorf("Cluster.Insert() got = %d, want = %d", Id, 1)
+	if Id < 1 {
+		t.Errorf("Cluster.Insert() got = %d, want Id > 0", Id)
 		return
 	}
 	// repeat insert
@@ -163,8 +165,8 @@ func TestCluster(t *testing.T) {
 		return
 	}
 
-	e = &Cluster{}
-	success, err := e.DeleteById(1)
+	e = &Cluster{Model: gorm.Model{ID: 1}}
+	success, err := e.Delete()
 	if err != nil {
 		t.Errorf("Cluster.Delete() error = %v", err)
 		return
@@ -181,7 +183,24 @@ func TestCluster(t *testing.T) {
 		return
 	}
 	if len(gots) != 1 {
-		t.Errorf("Cluster.GetList() len(got) = %d, want = %d", len(gots), 2)
+		t.Errorf("Cluster.GetList() len(got) = %d, want = %d", len(gots), 1)
+		return
+	}
+
+	e = &Cluster{}
+	got, err = e.Get()
+	if err != nil {
+		t.Errorf("Cluster.Get() error = %v", err)
+		return
+	}
+	err = got.SetStatus(Running_c)
+	if err != nil {
+		t.Errorf("Cluster.SetStatus() error = %v", err)
+		return
+	}
+	got, err = e.Get()
+	if got.Status != Running_c {
+		t.Errorf("Cluster.Get() got.Status = %d, want = %s", got.Status, Running_c)
 		return
 	}
 }

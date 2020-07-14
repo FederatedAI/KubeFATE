@@ -177,7 +177,7 @@ func (e *Cluster) UpdateByUuid(uuid string) (update Cluster, err error) {
 	return
 }
 
-func (e *Cluster) DeleteById(id uint) (success bool, err error) {
+func (e *Cluster) deleteById(id uint) (success bool, err error) {
 	if err = DB.Where("ID = ?", id).Delete(e).Error; err != nil {
 		success = false
 		return
@@ -191,7 +191,11 @@ func (e *Cluster) Delete() (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	return e.DeleteById(cluster.ID)
+	err = e.SetStatus(Deleted_c)
+	if err != nil {
+		return false, err
+	}
+	return e.deleteById(cluster.ID)
 }
 
 func (e *Cluster) IsExisted(name, namespace string) bool {
@@ -201,4 +205,11 @@ func (e *Cluster) IsExisted(name, namespace string) bool {
 		return true
 	}
 	return false
+}
+
+func (e *Cluster) SetStatus(status ClusterStatus) error {
+	if err := DB.Model(e).Update("status", status).Error; err != nil {
+		return err
+	}
+	return nil
 }
