@@ -439,7 +439,7 @@ func install(fc *modules.Cluster, values []byte) error {
 	fc.NameSpace = result.Namespace
 	fc.ChartVersion = result.ChartVersion
 	fc.ChartValues = result.ChartValues
-	fc.Config = result.Config
+	fc.Spec = result.Config
 
 	return nil
 }

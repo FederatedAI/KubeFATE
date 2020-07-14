@@ -166,7 +166,7 @@ func (c *Cluster) outPutInfo(result interface{}) error {
 	//table.AddRow("Type", cluster.Type)
 	table.AddRow("Status", cluster.Status)
 	table.AddRow("Values", cluster.Values)
-	table.AddRow("Config", cluster.Config)
+	table.AddRow("Spec", cluster.Spec)
 	table.AddRow("Info", cluster.Info)
 	table.AddRow("")
 	return output.EncodeTable(os.Stdout, table)
