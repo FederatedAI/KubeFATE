@@ -96,7 +96,7 @@ entries:
     appVersion: v1.2.4
     created: "2020-07-15T11:34:28.500925+08:00"
     description: A Helm chart for fate serving
-    digest: b55f8a675e6f28e758633014b04a7695e92724b45fa82c7d3ec6dc84c3e228ff
+    digest: 1aee80a6bf321950a125dbb21dc377099175e3fcbd089990cd728d32c5cfc100
     name: fate-serving
     urls:
     - package/fate-serving-v1.2.4.tgz
