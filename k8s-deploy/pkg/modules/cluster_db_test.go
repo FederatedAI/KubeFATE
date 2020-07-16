@@ -16,6 +16,7 @@
 package modules
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/jinzhu/gorm"
@@ -38,7 +39,11 @@ func TestCluster(t *testing.T) {
 	//defer e.DropTable()
 
 	//Insert
-	e = NewCluster("fate-9999", "fate-9999", "fate", "v1.5.0")
+	e, err := NewCluster("fate-9999", "fate-9999", "fate", "v1.5.0", "")
+	if err != nil {
+		t.Errorf("Cluster.NewCluster() error = %v", err)
+		return
+	}
 	e.ChartValues = map[string]interface{}{"Name": "fate-9999", "NameSpace": "fate-9999"}
 	Id, err := e.Insert()
 	if err != nil {
@@ -115,7 +120,11 @@ func TestCluster(t *testing.T) {
 	}
 
 	// Insert
-	e = NewCluster("fate-10000", "fate-10000", "fate", "v1.4.0")
+	e, err = NewCluster("fate-10000", "fate-10000", "fate", "v1.4.0", "")
+	if err != nil {
+		t.Errorf("Cluster.NewCluster() error = %v", err)
+		return
+	}
 	Id, err = e.Insert()
 	if err != nil {
 		t.Errorf("Cluster.Insert() error = %v", err)
@@ -138,7 +147,11 @@ func TestCluster(t *testing.T) {
 	}
 
 	// Update
-	e = NewCluster("fate-10001", "fate-10001", "fate-serving", "v1.4.1")
+	e, err = NewCluster("fate-10001", "fate-10001", "fate-serving", "v1.4.1", "")
+	if err != nil {
+		t.Errorf("Cluster.NewCluster() error = %v", err)
+		return
+	}
 	want = e
 	got, err = e.Update(2)
 	if err != nil {
@@ -193,14 +206,15 @@ func TestCluster(t *testing.T) {
 		t.Errorf("Cluster.Get() error = %v", err)
 		return
 	}
-	err = got.SetStatus(Running_c)
+	err = got.SetStatus(ClusterStatusRunning)
 	if err != nil {
 		t.Errorf("Cluster.SetStatus() error = %v", err)
 		return
 	}
+	fmt.Printf("%+v\n", got)
 	got, err = e.Get()
-	if got.Status != Running_c {
-		t.Errorf("Cluster.Get() got.Status = %d, want = %s", got.Status, Running_c)
+	if got.Status != ClusterStatusRunning {
+		t.Errorf("Cluster.Get() got.Status = %d, want = %s", got.Status, ClusterStatusRunning)
 		return
 	}
 }

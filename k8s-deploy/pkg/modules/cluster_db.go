@@ -191,7 +191,7 @@ func (e *Cluster) Delete() (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	err = e.SetStatus(Deleted_c)
+	err = e.SetStatus(ClusterStatusDeleted)
 	if err != nil {
 		return false, err
 	}
@@ -200,7 +200,7 @@ func (e *Cluster) Delete() (bool, error) {
 
 func (e *Cluster) IsExisted(name, namespace string) bool {
 	var count int
-	DB.Model(&Cluster{}).Where("name = ?", e.Name).Where("name_space = ?", e.NameSpace).Count(&count)
+	DB.Model(&Cluster{}).Where("name = ?", name).Where("name_space = ?", namespace).Count(&count)
 	if DB.Error == nil && count > 0 {
 		return true
 	}
@@ -209,6 +209,20 @@ func (e *Cluster) IsExisted(name, namespace string) bool {
 
 func (e *Cluster) SetStatus(status ClusterStatus) error {
 	if err := DB.Model(e).Update("status", status).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func (e *Cluster) SetSpec(spec MapStringInterface) error {
+	if err := DB.Model(e).Update("spec", spec).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func (e *Cluster) SetValues(values string) error {
+	if err := DB.Model(e).Update("values", values).Error; err != nil {
 		return err
 	}
 	return nil

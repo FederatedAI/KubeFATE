@@ -127,6 +127,26 @@ func (e *Cluster) HelmUpgrade() error {
 	return nil
 }
 
+func (e *Cluster) HelmRollback() error {
+
+	settings, err := service.GetSettings(e.NameSpace)
+	if err != nil {
+		return err
+	}
+
+	cfg := new(action.Configuration)
+	if err := cfg.Init(settings.RESTClientGetter(), settings.Namespace(), os.Getenv("HELM_DRIVER"), service.Debug); err != nil {
+		return err
+	}
+	client := action.NewRollback(cfg)
+	client.Version = int(e.HelmRevision - 1)
+	err = client.Run(e.Name)
+	if err != nil {
+		return errors.Wrap(err, "UPGRADE FAILED")
+	}
+	return nil
+}
+
 func (e *Cluster) HelmDelete() error {
 
 	settings, err := service.GetSettings(e.NameSpace)
@@ -148,5 +168,17 @@ func (e *Cluster) HelmDelete() error {
 
 	log.Debug().Interface("resInfo", res.Info).Msg("delete result")
 
+	return nil
+}
+
+func (e *Cluster) HelmUpdate() error {
+	err := e.HelmDelete()
+	if err != nil {
+		return fmt.Errorf("HelmUpdate error: %s", err)
+	}
+	err = e.HelmInstall()
+	if err != nil {
+		return fmt.Errorf("HelmUpdate error: %s", err)
+	}
 	return nil
 }

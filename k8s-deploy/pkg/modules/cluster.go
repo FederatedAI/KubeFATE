@@ -21,6 +21,8 @@ import (
 	"encoding/json"
 	"errors"
 
+	"sigs.k8s.io/yaml"
+
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	uuid "github.com/satori/go.uuid"
@@ -63,22 +65,26 @@ type Clusters []Cluster
 type ClusterStatus int8
 
 const (
-	Creating_c ClusterStatus = iota + 1
-	Deleting_c
-	Updating_c
-	Running_c
-	Unavailable_c
-	Deleted_c
+	ClusterStatusPending ClusterStatus = iota + 1
+	ClusterStatusCreating
+	ClusterStatusDeleting
+	ClusterStatusUpdating
+	ClusterStatusRunning
+	ClusterStatusUnavailable
+	ClusterStatusDeleted
+	ClusterStatusRollback
 )
 
 func (s ClusterStatus) String() string {
 	names := map[ClusterStatus]string{
-		Creating_c:    "Creating",
-		Deleting_c:    "Deleting",
-		Updating_c:    "Updating",
-		Running_c:     "Running",
-		Unavailable_c: "Unavailable",
-		Deleted_c:     "Deleted",
+		ClusterStatusPending:     "Pending",
+		ClusterStatusCreating:    "Creating",
+		ClusterStatusDeleting:    "Deleting",
+		ClusterStatusUpdating:    "Updating",
+		ClusterStatusRunning:     "Running",
+		ClusterStatusUnavailable: "Unavailable",
+		ClusterStatusDeleted:     "Deleted",
+		ClusterStatusRollback:    "Rollback",
 	}
 
 	return names[s]
@@ -99,40 +105,49 @@ func (s *ClusterStatus) UnmarshalJSON(data []byte) error {
 	}
 	var ClusterStatus ClusterStatus
 	switch string(data) {
+	case "\"Pending\"":
+		ClusterStatus = ClusterStatusPending
 	case "\"Creating\"":
-		ClusterStatus = Creating_c
+		ClusterStatus = ClusterStatusCreating
 	case "\"Deleting\"":
-		ClusterStatus = Deleting_c
+		ClusterStatus = ClusterStatusDeleting
 	case "\"Updating\"":
-		ClusterStatus = Updating_c
+		ClusterStatus = ClusterStatusUpdating
 	case "\"Running\"":
-		ClusterStatus = Running_c
+		ClusterStatus = ClusterStatusRunning
 	case "\"Unavailable\"":
-		ClusterStatus = Unavailable_c
+		ClusterStatus = ClusterStatusUnavailable
 	case "\"Deleted\"":
-		ClusterStatus = Deleted_c
+		ClusterStatus = ClusterStatusDeleted
+	case "\"Rollback\"":
+		ClusterStatus = ClusterStatusRollback
 	default:
 		return errors.New("data can't UnmarshalJSON")
 	}
-
-	//log.Debug().Interface("JobStatus", JobStatus).Bytes("datab", data).Str("data", string(data)).Msg("UnmarshalJSON")
 	*s = ClusterStatus
 	return nil
 }
 
 // NewCluster create cluster object with basic argument
-func NewCluster(name string, nameSpaces, chartName, chartVersion string) *Cluster {
+func NewCluster(name string, nameSpaces, chartName, chartVersion, values string) (*Cluster, error) {
+	var spec MapStringInterface
+	err := yaml.Unmarshal([]byte(values), &spec)
+	if err != nil {
+		return nil, err
+	}
 	cluster := &Cluster{
 		Uuid:         uuid.NewV4().String(),
 		Name:         name,
 		NameSpace:    nameSpaces,
 		Revision:     0,
-		Status:       Creating_c,
+		Status:       ClusterStatusPending,
 		ChartName:    chartName,
 		ChartVersion: chartVersion,
+		Values:       values,
+		Spec:         spec,
 	}
 
-	return cluster
+	return cluster, nil
 }
 
 func (s MapStringInterface) Value() (driver.Value, error) {
