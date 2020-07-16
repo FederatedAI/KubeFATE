@@ -133,3 +133,12 @@ func (e *HelmChart) DeleteByUuid(Uuid string) (success bool, err error) {
 	success = true
 	return
 }
+
+func (e *HelmChart) IsExisted() bool {
+	var count int
+	DB.Model(&HelmChart{}).Where("name = ?", e.Name).Where("version = ?", e.Version).Count(&count)
+	if DB.Error == nil && count > 0 {
+		return true
+	}
+	return false
+}
