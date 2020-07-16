@@ -143,3 +143,17 @@ func (e *Job) Delete() (bool, error) {
 	}
 	return e.DeleteById(job.ID)
 }
+
+func (e *Job) SetStatus(status JobStatus) error {
+	if err := DB.Model(e).Update("status", status).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func (e *Job) SetResult(result string) error {
+	if err := DB.Model(e).Update("result", result).Error; err != nil {
+		return err
+	}
+	return nil
+}

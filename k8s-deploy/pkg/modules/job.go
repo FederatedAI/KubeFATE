@@ -39,17 +39,28 @@ type Job struct {
 	Status    JobStatus     `json:"status"  gorm:"size:8"`
 	TimeLimit time.Duration `json:"time_limit"`
 
+	//TODO job 执行 和 回滚
+
 	gorm.Model
+}
+
+type ClusterArgs struct {
+	Name         string `json:"name"`
+	Namespace    string `json:"namespace"`
+	ChartName    string `json:"chart_name"`
+	ChartVersion string `json:"chart_version"`
+	Cover        bool   `json:"cover"`
+	Data         []byte `json:"data"`
 }
 
 type SubJobs []string
 
 type Jobs []Job
 
-type Method uint32
+type Method string
 
 const (
-	INSTALL Method = 1 + iota
+	MethodClusterInstall string = "ClusterInstall"
 	UNINSTALL
 	UPGRADE
 	EXEC
@@ -58,24 +69,24 @@ const (
 type JobStatus int8
 
 const (
-	Pending_j JobStatus = iota + 1
-	Running_j
-	Success_j
-	Failed_j
-	Retry_j
-	Timeout_j
-	Canceled_j
+	JobStatusPending JobStatus = iota + 1
+	JobStatusRunning
+	JobStatusSuccess
+	JobStatusFailed
+	JobStatusRollback
+	JobStatusTimeout
+	JobStatusCanceled
 )
 
 func (s JobStatus) String() string {
 	names := map[JobStatus]string{
-		Pending_j:  "Pending",
-		Running_j:  "Running",
-		Success_j:  "Success",
-		Failed_j:   "Failed",
-		Retry_j:    "Retry",
-		Timeout_j:  "Timeout",
-		Canceled_j: "Canceled",
+		JobStatusPending:  "Pending",
+		JobStatusRunning:  "Running",
+		JobStatusSuccess:  "Success",
+		JobStatusFailed:   "Failed",
+		JobStatusTimeout:  "Timeout",
+		JobStatusCanceled: "Canceled",
+		JobStatusRollback: "Rollback",
 	}
 
 	return names[s]
@@ -96,19 +107,19 @@ func (s *JobStatus) UnmarshalJSON(data []byte) error {
 	var JobStatus JobStatus
 	switch string(data) {
 	case "\"Pending\"":
-		JobStatus = Pending_j
+		JobStatus = JobStatusPending
 	case "\"Running\"":
-		JobStatus = Running_j
+		JobStatus = JobStatusRunning
 	case "\"Success\"":
-		JobStatus = Success_j
+		JobStatus = JobStatusSuccess
 	case "\"Failed\"":
-		JobStatus = Failed_j
-	case "\"Retry\"":
-		JobStatus = Retry_j
+		JobStatus = JobStatusFailed
 	case "\"Timeout\"":
-		JobStatus = Timeout_j
+		JobStatus = JobStatusTimeout
 	case "\"Canceled\"":
-		JobStatus = Canceled_j
+		JobStatus = JobStatusCanceled
+	case "\"Rollback\"":
+		JobStatus = JobStatusRollback
 	default:
 		return errors.New("data can't UnmarshalJSON")
 	}
@@ -118,14 +129,15 @@ func (s *JobStatus) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func NewJob(method string, creator string) *Job {
+func NewJob(method string, creator string, clusterUuid string) *Job {
 
 	job := &Job{
 		Uuid:      uuid.NewV4().String(),
 		Method:    method,
 		Creator:   creator,
+		ClusterId: clusterUuid,
 		StartTime: time.Now(),
-		Status:    Pending_j,
+		Status:    JobStatusPending,
 		TimeLimit: 1 * time.Hour,
 	}
 

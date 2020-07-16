@@ -16,6 +16,7 @@
 package modules
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/orm"
@@ -37,7 +38,7 @@ func TestJob(t *testing.T) {
 	defer e.DropTable()
 
 	//Insert
-	e = NewJob("INSTALL", "admin")
+	e = NewJob("INSTALL", "admin", "")
 	e.ClusterId = uuid.NewV4().String()
 	Id, err := e.Insert()
 	if err != nil {
@@ -102,7 +103,7 @@ func TestJob(t *testing.T) {
 	}
 
 	// Insert
-	e = NewJob("UPGRADE", "test-0")
+	e = NewJob("UPGRADE", "test-0", "")
 	Id, err = e.Insert()
 	if err != nil {
 		t.Errorf("Job.Insert() error = %v", err)
@@ -112,6 +113,7 @@ func TestJob(t *testing.T) {
 		t.Errorf("Job.Insert() got = %d, want = %d", Id, 2)
 		return
 	}
+	fmt.Printf("%+v\n", e)
 
 	e = &Job{}
 	gots, err := e.GetList()
@@ -125,7 +127,7 @@ func TestJob(t *testing.T) {
 	}
 
 	// Update
-	e = NewJob("UNINSTALL", "test-1")
+	e = NewJob("UNINSTALL", "test-1", "")
 	want = e
 	got, err = e.Update(2)
 	if err != nil {
