@@ -39,8 +39,6 @@ type Job struct {
 	Status    JobStatus     `json:"status"  gorm:"size:8"`
 	TimeLimit time.Duration `json:"time_limit"`
 
-	//TODO job 执行 和 回滚
-
 	gorm.Model
 }
 

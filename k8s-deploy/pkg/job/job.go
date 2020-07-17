@@ -467,6 +467,9 @@ func ClusterUpdate(clusterArgs *ClusterArgs, creator string) (*modules.Job, erro
 }
 
 func ClusterDelete(clusterId string, creator string) (*modules.Job, error) {
+	if clusterId == "" {
+		return nil, fmt.Errorf("clusterid cannot be empty")
+	}
 
 	c := modules.Cluster{Uuid: clusterId}
 	cluster, err := c.Get()
