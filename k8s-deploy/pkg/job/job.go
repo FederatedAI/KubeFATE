@@ -131,18 +131,37 @@ func ClusterInstall(clusterArgs *ClusterArgs, creator string) (*modules.Job, err
 				break
 			}
 
-			clusterStatusOk, err := service.CheckClusterStatus(clusterArgs.Name, clusterArgs.Namespace)
+			// update subJobs
+			ClusterStatus, err := service.GetClusterStatus(clusterArgs.Name, clusterArgs.Namespace)
 			if err != nil {
-				dbErr := job.SetResult("CheckClusterStatus error:" + err.Error())
-				if dbErr != nil {
-					log.Error().Err(dbErr).Msg("job.SetResult error")
-				}
-				dbErr = job.SetStatus(modules.JobStatusFailed)
-				if dbErr != nil {
-					log.Error().Err(dbErr).Msg("job.SetStatus error")
-				}
-				break
+				log.Error().Err(err).Msg("GetClusterStatus error")
 			}
+
+			var clusterStatusOk = true
+
+			subJobs := make(modules.SubJobs, 0)
+			for k, v := range ClusterStatus {
+				var subJobStatus string
+				if v == "Running" {
+					subJobStatus = "Success"
+				} else {
+					subJobStatus = "Running"
+					clusterStatusOk = false
+				}
+				subJob := modules.SubJob{
+					ModuleName:       k,
+					Status:           subJobStatus,
+					ModulesName:      k,
+					ModulesPodStatus: v,
+				}
+				subJobs = append(subJobs, subJob)
+			}
+
+			dbErr = job.SetSubJobs(subJobs)
+			if dbErr != nil {
+				log.Error().Err(dbErr).Msg("job.SetSubJobs error")
+			}
+
 			if clusterStatusOk {
 				dbErr := job.SetStatus(modules.JobStatusSuccess)
 				if dbErr != nil {

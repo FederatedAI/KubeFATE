@@ -16,9 +16,15 @@ package service
 
 import (
 	"fmt"
+	"reflect"
 	"testing"
 	"time"
 
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/utils/config"
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/utils/logging"
+	"github.com/spf13/viper"
+
+	v1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/rest"
 )
 
@@ -208,4 +214,47 @@ func TestGetPods(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestGetPodStatus(t *testing.T) {
+	InitConfigForTest()
+	pods, _ := GetPods("fate-9999", "name=fate-9999")
+	type args struct {
+		pods *v1.PodList
+	}
+	tests := []struct {
+		name string
+		args args
+		want map[string]string
+	}{
+		// TODO: Add test cases.
+		{
+			name: "",
+			args: args{
+				pods: pods,
+			},
+			want: map[string]string{
+				"client":         "Running",
+				"clustermanager": "Running",
+				"fateboard":      "Running",
+				"mysql":          "Running",
+				"nodemanager":    "Running",
+				"python":         "Running",
+				"rollsite":       "Running",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := GetPodStatus(tt.args.pods); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("GetPodStatus() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+func InitConfigForTest() {
+	_ = config.InitViper()
+	viper.AddConfigPath("../../")
+	_ = viper.ReadInConfig()
+	logging.InitLog()
 }

@@ -137,15 +137,19 @@ func (c *Job) outPutInfo(result interface{}) error {
 	if result == nil {
 		return errors.New("no out put data")
 	}
-	fmt.Printf("%+v", result)
+	log.Debug().Interface("result", result).Msg("result info")
 	item, ok := result.(*JobResult)
 	if !ok {
 		return errors.New("type jobResult not ok")
 	}
-	fmt.Printf("%+v", item.Data)
-	job := item.Data
 
+	job := item.Data
 	log.Debug().Interface("job", job).Msg("job info")
+
+	var subJobs []string
+	for _, v := range job.SubJobs {
+		subJobs = append(subJobs, fmt.Sprintf("%-20s PodStatus: %s, SubJobStatus: %s", v.ModuleName, v.ModulesPodStatus, v.Status))
+	}
 
 	table := uitable.New()
 
@@ -156,7 +160,13 @@ func (c *Job) outPutInfo(result interface{}) error {
 	table.AddRow("Creator", job.Creator)
 	table.AddRow("ClusterId", job.ClusterId)
 	table.AddRow("Result", job.Result)
-	table.AddRow("SubJobs", job.SubJobs)
+	for i, v := range subJobs {
+		if i == 0 {
+			table.AddRow("SubJobs", v)
+		} else {
+			table.AddRow("", v)
+		}
+	}
 	table.AddRow("")
 	return output.EncodeTable(os.Stdout, table)
 }

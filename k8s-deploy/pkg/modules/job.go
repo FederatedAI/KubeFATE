@@ -35,7 +35,7 @@ type Job struct {
 	Result    string        `json:"result"  gorm:"type:text"`
 	ClusterId string        `json:"cluster_id" gorm:"type:varchar(36)"`
 	Creator   string        `json:"creator" gorm:"type:varchar(16);not null"`
-	SubJobs   SubJobs       `json:"sub-jobs" gorm:"type:blob"`
+	SubJobs   SubJobs       `json:"sub_jobs" gorm:"type:blob"`
 	Status    JobStatus     `json:"status"  gorm:"size:8"`
 	TimeLimit time.Duration `json:"time_limit"`
 
@@ -51,7 +51,14 @@ type ClusterArgs struct {
 	Data         []byte `json:"data"`
 }
 
-type SubJobs []string
+type SubJobs []SubJob
+
+type SubJob struct {
+	ModuleName       string
+	Status           string
+	ModulesName      string
+	ModulesPodStatus string
+}
 
 type Jobs []Job
 

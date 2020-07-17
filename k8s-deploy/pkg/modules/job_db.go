@@ -157,3 +157,10 @@ func (e *Job) SetResult(result string) error {
 	}
 	return nil
 }
+
+func (e *Job) SetSubJobs(subJobs SubJobs) error {
+	if err := DB.Model(e).Update("sub_jobs", subJobs).Error; err != nil {
+		return err
+	}
+	return nil
+}

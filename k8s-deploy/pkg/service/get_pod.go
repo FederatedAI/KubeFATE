@@ -47,6 +47,40 @@ func checkPodStatus(pods *v1.PodList) bool {
 
 }
 
+func GetClusterStatus(name, namespace string) (map[string]string, error) {
+	var labelSelector string
+	labelSelector = fmt.Sprintf("name=%s", name)
+	list, err := GetPods(namespace, labelSelector)
+	if err != nil {
+		return nil, err
+	}
+
+	return GetPodStatus(list), nil
+}
+func GetPodStatus(pods *v1.PodList) map[string]string {
+
+	status := make(map[string]string)
+	for _, v := range pods.Items {
+		for _, vv := range v.Status.ContainerStatuses {
+			if vv.State.Running != nil {
+				status[vv.Name] = "Running"
+				continue
+			}
+			if vv.State.Waiting != nil {
+				status[vv.Name] = "Waiting"
+				continue
+			}
+			if vv.State.Terminated != nil {
+				status[vv.Name] = "Terminated"
+				continue
+			}
+			status[vv.Name] = "Unknown"
+		}
+	}
+	return status
+
+}
+
 // todo get pod by name
 func CheckClusterStatus(name, namespace string) (bool, error) {
 	var labelSelector string
