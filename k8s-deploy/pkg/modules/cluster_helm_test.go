@@ -343,9 +343,16 @@ func TestCluster_Helm(t *testing.T) {
 		Values:       cluster,
 		Spec:         spec,
 	}
-	if err := e.HelmInstall(); (err != nil) != false {
-		t.Errorf("Cluster.Install() error = %v, wantErr %v", err, false)
-	}
+	t.Run("HelmInstall", func(t *testing.T) {
+		t.Log("Normal install")
+		if err := e.HelmInstall(); (err != nil) != false {
+			t.Errorf("Cluster.Install() error = %v, wantErr %v", err, false)
+		}
+		t.Log("Repeat install")
+		if err := e.HelmInstall(); (err != nil) != true {
+			t.Errorf("Cluster.Install() error = %v, wantErr %v", err, true)
+		}
+	})
 
 	var updateSpec MapStringInterface
 	err = yaml.Unmarshal([]byte(updateCluster), &updateSpec)
@@ -361,13 +368,16 @@ func TestCluster_Helm(t *testing.T) {
 		Values:       updateCluster,
 		Spec:         updateSpec,
 	}
-
-	if err := update.HelmUpgrade(); (err != nil) != false {
-		t.Errorf("Cluster.HelmUpgrade() error = %v, wantErr %v", err, false)
-	}
-
-	if err := e.HelmDelete(); (err != nil) != false {
-		t.Errorf("Cluster.HelmDelete() error = %v, wantErr %v", err, false)
-	}
+	t.Run("HelmUpgrade", func(t *testing.T) {
+		t.Log("Repeat install")
+		if err := update.HelmUpgrade(); (err != nil) != false {
+			t.Errorf("Cluster.HelmUpgrade() error = %v, wantErr %v", err, false)
+		}
+	})
+	t.Run("HelmDelete", func(t *testing.T) {
+		if err := e.HelmDelete(); (err != nil) != false {
+			t.Errorf("Cluster.HelmDelete() error = %v, wantErr %v", err, false)
+		}
+	})
 
 }
