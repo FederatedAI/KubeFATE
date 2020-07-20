@@ -22,6 +22,7 @@ import (
 	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/modules"
 	"github.com/gosuri/uitable"
 	"github.com/rs/zerolog/log"
+	"golang.org/x/crypto/ssh/terminal"
 	"helm.sh/helm/v3/pkg/cli/output"
 )
 
@@ -153,6 +154,14 @@ func (c *Job) outPutInfo(result interface{}) error {
 
 	table := uitable.New()
 
+	colWidth, _, _ := terminal.GetSize(int(os.Stdout.Fd()))
+	if colWidth == 0 {
+		table.MaxColWidth = TableMaxColWidthDefault
+	} else {
+		table.MaxColWidth = uint(colWidth - ColWidthOffset)
+	}
+	log.Debug().Int("colWidth", colWidth).Uint("MaxColWidth", table.MaxColWidth).Msg("colWidth ")
+	table.Wrap = true // wrap columns
 	table.AddRow("UUID", job.Uuid)
 	table.AddRow("StartTime", job.StartTime.Format("2006-01-02 15:04:05"))
 	table.AddRow("EndTime", job.EndTime.Format("2006-01-02 15:04:05"))
