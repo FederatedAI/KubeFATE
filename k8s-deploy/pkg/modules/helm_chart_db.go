@@ -93,7 +93,7 @@ func (e *HelmChart) Insert() (id int, err error) {
 	var count int
 	DB.Model(&HelmChart{}).Where("version = ?", e.Version).Count(&count)
 	if count > 0 {
-		err = errors.New("account already exists")
+		err = errors.New("helmChart already exists, version = " + e.Version)
 		return
 	}
 
@@ -102,6 +102,20 @@ func (e *HelmChart) Insert() (id int, err error) {
 		return
 	}
 	id = int(e.ID)
+	return
+}
+
+func (e *HelmChart) Upload() (err error) {
+	var count int
+	if err = DB.Model(&HelmChart{}).Where("version = ?", e.Version).Count(&count).Error; err != nil {
+		return
+	}
+	if count > 0 {
+		DB.Delete(&HelmChart{}, "version = ?", e.Version)
+	}
+	if err = DB.Model(&HelmChart{}).Create(&e).Error; err != nil {
+		return
+	}
 	return
 }
 

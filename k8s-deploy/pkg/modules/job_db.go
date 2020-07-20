@@ -93,7 +93,7 @@ func (e *Job) Insert() (id int, err error) {
 	var count int
 	DB.Model(&Job{}).Where("uuid = ?", e.Uuid).Count(&count)
 	if count > 0 {
-		err = errors.New("account already exists")
+		err = errors.New("job already exists, uuid = " + e.Uuid)
 		return
 	}
 

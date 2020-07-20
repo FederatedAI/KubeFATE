@@ -16,7 +16,7 @@
 package modules
 
 import (
-	"errors"
+	"fmt"
 )
 
 func (e *Cluster) DropTable() {
@@ -143,7 +143,7 @@ func (e *Cluster) Insert() (id int, err error) {
 	var count int
 	DB.Model(&Cluster{}).Where("name = ?", e.Name).Where("name_space = ?", e.NameSpace).Count(&count)
 	if count > 0 {
-		err = errors.New("account already exists")
+		err = fmt.Errorf("cluster already exists in database, name = %s, namespace=%s", e.Name, e.NameSpace)
 		return
 	}
 

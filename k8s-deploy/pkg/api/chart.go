@@ -63,7 +63,7 @@ func (_ *Chart) createChart(c *gin.Context) {
 		return
 	}
 
-	_, err = helmChart.Insert()
+	err = helmChart.Upload()
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
