@@ -113,7 +113,7 @@ func (_ *Cluster) getCluster(c *gin.Context) {
 		cluster.Spec = make(map[string]interface{})
 	}
 
-	c.JSON(200, gin.H{"data": cluster})
+	c.JSON(200, gin.H{"data": &cluster})
 }
 
 func (_ *Cluster) getClusterList(c *gin.Context) {
