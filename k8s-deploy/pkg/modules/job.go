@@ -51,13 +51,14 @@ type ClusterArgs struct {
 	Data         []byte `json:"data"`
 }
 
-type SubJobs []SubJob
+type SubJobs map[string]SubJob
 
 type SubJob struct {
 	ModuleName       string
 	Status           string
-	ModulesName      string
 	ModulesPodStatus string
+	StartTime        time.Time
+	EndTime          time.Time
 }
 
 type Jobs []Job

@@ -164,3 +164,12 @@ func (e *Job) SetSubJobs(subJobs SubJobs) error {
 	}
 	return nil
 }
+
+func (e *Job) IsExisted(uuid string) bool {
+	var count int
+	DB.Model(&Job{}).Where("uuid = ?", uuid).Count(&count)
+	if DB.Error == nil && count > 0 {
+		return true
+	}
+	return false
+}

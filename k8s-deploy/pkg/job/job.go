@@ -118,6 +118,9 @@ func ClusterInstall(clusterArgs *ClusterArgs, creator string) (*modules.Job, err
 
 		//
 		for job.Status == modules.JobStatusRunning {
+			if stopJob(job, cluster) {
+				continue
+			}
 
 			if job.TimeOut() {
 				dbErr := job.SetResult("Checkout cluster status timeOut!")
@@ -136,33 +139,14 @@ func ClusterInstall(clusterArgs *ClusterArgs, creator string) (*modules.Job, err
 			if err != nil {
 				log.Error().Err(err).Msg("GetClusterStatus error")
 			}
-
-			var clusterStatusOk = true
-
-			subJobs := make(modules.SubJobs, 0)
-			for k, v := range ClusterStatus {
-				var subJobStatus string
-				if v == "Running" {
-					subJobStatus = "Success"
-				} else {
-					subJobStatus = "Running"
-					clusterStatusOk = false
-				}
-				subJob := modules.SubJob{
-					ModuleName:       k,
-					Status:           subJobStatus,
-					ModulesName:      k,
-					ModulesPodStatus: v,
-				}
-				subJobs = append(subJobs, subJob)
-			}
-
+			log.Debug().Interface("ClusterStatus", ClusterStatus).Msg("GetClusterStatus()")
+			subJobs := generateSubJobs(job, ClusterStatus)
 			dbErr = job.SetSubJobs(subJobs)
 			if dbErr != nil {
 				log.Error().Err(dbErr).Msg("job.SetSubJobs error")
 			}
 
-			if clusterStatusOk {
+			if service.CheckClusterStatus(ClusterStatus) {
 				dbErr := job.SetStatus(modules.JobStatusSuccess)
 				if dbErr != nil {
 					log.Error().Err(dbErr).Msg("job.SetStatus error")
@@ -216,6 +200,58 @@ func ClusterInstall(clusterArgs *ClusterArgs, creator string) (*modules.Job, err
 	}()
 
 	return job, nil
+}
+
+func stopJob(job *modules.Job, cluster *modules.Cluster) bool {
+	if !cluster.IsExisted(cluster.Name, cluster.NameSpace) {
+		return false
+	}
+
+	if !job.IsExisted(job.Uuid) {
+		return false
+	}
+
+	return true
+}
+
+func generateSubJobs(job *modules.Job, ClusterStatus map[string]string) modules.SubJobs {
+
+	subJobs := make(modules.SubJobs)
+	if job.SubJobs != nil {
+		subJobs = job.SubJobs
+	}
+	log.Debug().Interface("subJobs", subJobs).Msg("subJobs=job.SubJobs")
+	for k, v := range ClusterStatus {
+		var subJobStatus string
+		if v == "Running" {
+			subJobStatus = "Success"
+		} else {
+			subJobStatus = "Running"
+		}
+
+		var subJob modules.SubJob
+		if _, ok := subJobs[k]; !ok {
+			subJob = modules.SubJob{
+				ModuleName:       k,
+				Status:           subJobStatus,
+				ModulesPodStatus: v,
+				StartTime:        job.StartTime,
+			}
+		} else {
+			subJob = subJobs[k]
+			subJob.Status = subJobStatus
+			subJob.ModulesPodStatus = v
+		}
+
+		if subJobStatus == "Success" && subJob.EndTime.IsZero() {
+			subJob.EndTime = time.Now()
+		}
+
+		subJobs[k] = subJob
+	}
+
+	job.SubJobs = subJobs
+	return subJobs
 }
 
 func ClusterUpdate(clusterArgs *ClusterArgs, creator string) (*modules.Job, error) {
@@ -325,6 +361,10 @@ func ClusterUpdate(clusterArgs *ClusterArgs, creator string) (*modules.Job, erro
 
 		//
 		for job.Status == modules.JobStatusRunning {
+			if stopJob(job, &cluster) {
+				continue
+			}
+
 			if job.TimeOut() {
 				dbErr := job.SetResult("Checkout cluster status timeOut!")
 				if dbErr != nil {
@@ -337,19 +377,20 @@ func ClusterUpdate(clusterArgs *ClusterArgs, creator string) (*modules.Job, erro
 				break
 			}
 
-			clusterStatusOk, err := service.CheckClusterStatus(clusterArgs.Name, clusterArgs.Namespace)
+			// update subJobs
+			ClusterStatus, err := service.GetClusterStatus(clusterArgs.Name, clusterArgs.Namespace)
 			if err != nil {
-				dbErr := job.SetResult("CheckClusterStatus error:" + err.Error())
-				if dbErr != nil {
-					log.Error().Err(dbErr).Msg("job.SetResult error")
-				}
-				dbErr = job.SetStatus(modules.JobStatusFailed)
-				if dbErr != nil {
-					log.Error().Err(dbErr).Msg("job.SetStatus error")
-				}
-				break
+				log.Error().Err(err).Msg("GetClusterStatus error")
 			}
-			if clusterStatusOk {
+
+			subJobs := generateSubJobs(job, ClusterStatus)
+
+			dbErr = job.SetSubJobs(subJobs)
+			if dbErr != nil {
+				log.Error().Err(dbErr).Msg("job.SetSubJobs error")
+			}
+
+			if service.CheckClusterStatus(ClusterStatus) {
 				dbErr := job.SetStatus(modules.JobStatusSuccess)
 				if dbErr != nil {
 					log.Error().Err(dbErr).Msg("job.SetStatus error")
@@ -440,19 +481,22 @@ func ClusterUpdate(clusterArgs *ClusterArgs, creator string) (*modules.Job, erro
 					break
 				}
 
-				clusterStatusOk, err := service.CheckClusterStatus(clusterArgs.Name, clusterArgs.Namespace)
+				// update subJobs
+				ClusterStatus, err := service.GetClusterStatus(clusterArgs.Name, clusterArgs.Namespace)
 				if err != nil {
-					dbErr := job.SetResult("CheckClusterStatus error:" + err.Error())
-					if dbErr != nil {
-						log.Error().Err(dbErr).Msg("job.SetResult error")
-					}
-					dbErr = job.SetStatus(modules.JobStatusFailed)
-					if dbErr != nil {
-						log.Error().Err(dbErr).Msg("job.SetStatus error")
-					}
-					break
+					log.Error().Err(err).Msg("GetClusterStatus error")
 				}
-				if clusterStatusOk {
+
+				log.Debug().Interface("ClusterStatus", ClusterStatus).Msg("GetClusterStatus()")
+
+				subJobs := generateSubJobs(job, ClusterStatus)
+
+				dbErr = job.SetSubJobs(subJobs)
+				if dbErr != nil {
+					log.Error().Err(dbErr).Msg("job.SetSubJobs error")
+				}
+
+				if service.CheckClusterStatus(ClusterStatus) {
 					dbErr := job.SetStatus(modules.JobStatusSuccess)
 					if dbErr != nil {
 						log.Error().Err(dbErr).Msg("job.SetStatus error")

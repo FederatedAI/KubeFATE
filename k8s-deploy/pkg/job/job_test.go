@@ -19,6 +19,7 @@ package job
 import (
 	"encoding/json"
 	"fmt"
+	"reflect"
 	"testing"
 	"time"
 
@@ -376,4 +377,43 @@ func TestCluster(t *testing.T) {
 			t.Errorf("ClusterDelete() = %v, want %v", got, modules.JobStatusSuccess)
 		}
 	})
+}
+
+func Test_generateSubJobs(t *testing.T) {
+	var job modules.Job
+	type args struct {
+		job           *modules.Job
+		ClusterStatus map[string]string
+	}
+	tests := []struct {
+		name string
+		args args
+		want modules.SubJobs
+	}{
+		// TODO: Add test cases.
+		{
+			name: "",
+			args: args{
+				job:           &job,
+				ClusterStatus: map[string]string{"client": "Waiting", "clustermanager": "Waiting", "fateboard": "Waiting", "mysql": "Waiting", "nodemanager": "Waiting", "python": "Waiting", "rollsite": "Waiting"},
+			},
+			want: nil,
+		},
+		{
+			name: "",
+			args: args{
+				job:           &job,
+				ClusterStatus: map[string]string{"client": "Running", "clustermanager": "Running", "fateboard": "Running", "mysql": "Running", "nodemanager": "Running", "python": "Running", "rollsite": "Running"},
+			},
+			want: nil,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := generateSubJobs(tt.args.job, tt.args.ClusterStatus); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("generateSubJobs() = %v, want %v", got, tt.want)
+			}
+			time.Sleep(time.Second * 5)
+		})
+	}
 }

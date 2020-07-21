@@ -18,6 +18,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/modules"
 	"github.com/gosuri/uitable"
@@ -149,7 +150,8 @@ func (c *Job) outPutInfo(result interface{}) error {
 
 	var subJobs []string
 	for _, v := range job.SubJobs {
-		subJobs = append(subJobs, fmt.Sprintf("%-20s PodStatus: %s, SubJobStatus: %s", v.ModuleName, v.ModulesPodStatus, v.Status))
+		subJobs = append(subJobs, fmt.Sprintf("%-20s PodStatus: %s, SubJobStatus: %s, Age: %6s, StartTime: %s, EndTime: %s",
+			v.ModuleName, v.ModulesPodStatus, v.Status, GetAge(v.StartTime, v.EndTime), v.StartTime.Format("2006-01-02 15:04:05"), v.EndTime.Format("2006-01-02 15:04:05")))
 	}
 
 	table := uitable.New()
@@ -178,4 +180,11 @@ func (c *Job) outPutInfo(result interface{}) error {
 	}
 	table.AddRow("")
 	return output.EncodeTable(os.Stdout, table)
+}
+
+func GetAge(startTime, endTime time.Time) string {
+	if endTime.IsZero() {
+		return HumanDuration(time.Since(startTime))
+	}
+	return HumanDuration(endTime.Sub(startTime))
 }
