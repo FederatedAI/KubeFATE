@@ -118,6 +118,19 @@ func ClusterInstall(clusterArgs *ClusterArgs, creator string) (*modules.Job, err
 
 		//
 		for job.Status == modules.JobStatusRunning {
+
+			if !cluster.IsExisted(cluster.Name, cluster.NameSpace) {
+				dbErr := job.SetResult("Cluster has been deleted!")
+				if dbErr != nil {
+					log.Error().Err(dbErr).Msg("job.SetResult error")
+				}
+				dbErr = job.SetStatus(modules.JobStatusCanceled)
+				if dbErr != nil {
+					log.Error().Err(dbErr).Msg("job.SetStatus error")
+				}
+				continue
+			}
+
 			if stopJob(job, cluster) {
 				continue
 			}
@@ -153,7 +166,7 @@ func ClusterInstall(clusterArgs *ClusterArgs, creator string) (*modules.Job, err
 				}
 				break
 			}
-			time.Sleep(5 * time.Second)
+			time.Sleep(1 * time.Second)
 		}
 
 		if job.Status == modules.JobStatusCanceled {
@@ -204,14 +217,14 @@ func ClusterInstall(clusterArgs *ClusterArgs, creator string) (*modules.Job, err
 
 func stopJob(job *modules.Job, cluster *modules.Cluster) bool {
 	if !cluster.IsExisted(cluster.Name, cluster.NameSpace) {
-		return false
+		return true
 	}
 
 	if !job.IsExisted(job.Uuid) {
-		return false
+		return true
 	}
 
-	return true
+	return false
 }
 
 func generateSubJobs(job *modules.Job, ClusterStatus map[string]string) modules.SubJobs {
