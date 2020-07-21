@@ -101,7 +101,7 @@ func (c *Job) outPutList(result interface{}) error {
 	table := uitable.New()
 	table.AddRow("UUID", "CREATOR", "METHOD", "STATUS", "STARTTIME", "CLUSTERID", "AGE")
 	for _, r := range joblist {
-		table.AddRow(r.Uuid, r.Creator, r.Method, r.Status.String(), r.StartTime.Format("2006-01-02 15:04:05"), r.ClusterId, GetAge(r.StartTime, r.EndTime))
+		table.AddRow(r.Uuid, r.Creator, r.Method, r.Status.String(), r.StartTime.Format("2006-01-02 15:04:05"), r.ClusterId, GetDuration(r.StartTime, r.EndTime))
 	}
 	table.AddRow("")
 	return output.EncodeTable(os.Stdout, table)
@@ -150,8 +150,8 @@ func (c *Job) outPutInfo(result interface{}) error {
 
 	var subJobs []string
 	for _, v := range job.SubJobs {
-		subJobs = append(subJobs, fmt.Sprintf("%-20s PodStatus: %s, SubJobStatus: %s, Age: %6s, StartTime: %s, EndTime: %s",
-			v.ModuleName, v.ModulesPodStatus, v.Status, GetAge(v.StartTime, v.EndTime), v.StartTime.Format("2006-01-02 15:04:05"), v.EndTime.Format("2006-01-02 15:04:05")))
+		subJobs = append(subJobs, fmt.Sprintf("%-20s PodStatus: %s, SubJobStatus: %s, Duration: %6s, StartTime: %s, EndTime: %s",
+			v.ModuleName, v.ModulesPodStatus, v.Status, GetDuration(v.StartTime, v.EndTime), v.StartTime.Format("2006-01-02 15:04:05"), v.EndTime.Format("2006-01-02 15:04:05")))
 	}
 
 	table := uitable.New()
@@ -167,7 +167,7 @@ func (c *Job) outPutInfo(result interface{}) error {
 	table.AddRow("UUID", job.Uuid)
 	table.AddRow("StartTime", job.StartTime.Format("2006-01-02 15:04:05"))
 	table.AddRow("EndTime", job.EndTime.Format("2006-01-02 15:04:05"))
-	table.AddRow("Age", GetAge(job.StartTime, job.EndTime))
+	table.AddRow("Duration", GetDuration(job.StartTime, job.EndTime))
 	table.AddRow("Status", job.Status.String())
 	table.AddRow("Creator", job.Creator)
 	table.AddRow("ClusterId", job.ClusterId)
@@ -183,7 +183,7 @@ func (c *Job) outPutInfo(result interface{}) error {
 	return output.EncodeTable(os.Stdout, table)
 }
 
-func GetAge(startTime, endTime time.Time) string {
+func GetDuration(startTime, endTime time.Time) string {
 	if endTime.IsZero() {
 		return HumanDuration(time.Since(startTime))
 	}
