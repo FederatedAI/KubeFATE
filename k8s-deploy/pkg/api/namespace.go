@@ -38,7 +38,7 @@ func (_ *Namespace) getNamespaceList(c *gin.Context) {
 	namespace := new(modules.Namespace)
 	namespaceList, err := namespace.GetList()
 	if err != nil {
-		c.JSON(400, gin.H{"error": err})
+		c.JSON(500, gin.H{"error": err})
 		return
 	}
 	c.JSON(200, gin.H{"data": namespaceList, "msg": "getNamespaceList success"})

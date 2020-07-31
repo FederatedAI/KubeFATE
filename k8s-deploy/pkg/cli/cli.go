@@ -37,6 +37,7 @@ func initCommandLine() *cli.App {
 			UserCommand(),
 			ChartCommand(),
 			VersionCommand(),
+			NamespaceCommand(),
 		},
 	}
 
