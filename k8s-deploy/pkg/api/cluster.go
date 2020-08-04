@@ -109,8 +109,8 @@ func (_ *Cluster) getCluster(c *gin.Context) {
 		return
 	}
 
-	if cluster.Config == nil {
-		cluster.Config = make(map[string]interface{})
+	if cluster.Spec == nil {
+		cluster.Spec = make(map[string]interface{})
 	}
 
 	c.JSON(200, gin.H{"data": cluster})

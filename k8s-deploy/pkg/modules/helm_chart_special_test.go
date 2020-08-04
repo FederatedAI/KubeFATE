@@ -12,58 +12,65 @@
  * limitations under the License.
  *
  */
-package service
+
+package modules
 
 import (
-	"reflect"
 	"testing"
 
-	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/utils/config"
-	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/utils/logging"
-	"github.com/spf13/viper"
-
-	"helm.sh/helm/v3/pkg/release"
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/orm"
 )
 
-func TestDelete(t *testing.T) {
+func TestGetFateChart(t *testing.T) {
+	InitConfigForTest()
+	mysql := new(orm.Mysql)
+	mysql.Setup()
+	DB = orm.DBCLIENT
+	//DB.LogMode(true)
+	// Create Table
+	e := &HelmChart{}
 
-	_ = config.InitViper()
-	viper.AddConfigPath("../../")
-	_ = viper.ReadInConfig()
-	logging.InitLog()
+	e.InitTable()
+	// Drop Table
+	defer e.DropTable()
 	type args struct {
-		namespace string
-		name      string
+		chartName    string
+		chartVersion string
 	}
 	tests := []struct {
 		name    string
 		args    args
-		want    *release.UninstallReleaseResponse
+		want    *HelmChart
 		wantErr bool
 	}{
-		// TODO: Add test cases.
 		{
-			name: "delete",
+			name: "not is existed",
 			args: args{
-				namespace: "fate-10000",
-				name:      "fate-10000",
+				chartName:    "fate",
+				chartVersion: "v1.4.0",
 			},
-			want: &release.UninstallReleaseResponse{
-				Release: nil,
-				Info:    "",
+			want:    nil,
+			wantErr: false,
+		},
+		{
+			name: "is existed",
+			args: args{
+				chartName:    "fate",
+				chartVersion: "v1.4.0",
 			},
+			want:    nil,
 			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Delete(tt.args.namespace, tt.args.name)
+			got, err := GetFateChart(tt.args.chartName, tt.args.chartVersion)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Delete() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("GetFateChart() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(got.Info, tt.want.Info) {
-				t.Errorf("Delete() = %+v, want %+v", got, tt.want)
+			if got == nil {
+				t.Errorf("GetFateChart() = %v, want %v", got, tt.want)
 			}
 		})
 	}

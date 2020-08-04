@@ -33,7 +33,7 @@ func Get(namespace, name string) (*release.Release, error) {
 
 	cfg := new(action.Configuration)
 	client := action.NewGet(cfg)
-	if err := cfg.Init(settings.RESTClientGetter(), settings.Namespace(), os.Getenv("HELM_DRIVER"), debug); err != nil {
+	if err := cfg.Init(settings.RESTClientGetter(), settings.Namespace(), os.Getenv("HELM_DRIVER"), Debug); err != nil {
 		return nil, err
 	}
 

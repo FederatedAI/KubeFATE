@@ -22,6 +22,7 @@ import (
 	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/modules"
 	"github.com/gosuri/uitable"
 	"github.com/rs/zerolog/log"
+	"golang.org/x/crypto/ssh/terminal"
 	"helm.sh/helm/v3/pkg/cli/output"
 )
 
@@ -137,18 +138,30 @@ func (c *Job) outPutInfo(result interface{}) error {
 	if result == nil {
 		return errors.New("no out put data")
 	}
-	fmt.Printf("%+v", result)
+	log.Debug().Interface("result", result).Msg("result info")
 	item, ok := result.(*JobResult)
 	if !ok {
 		return errors.New("type jobResult not ok")
 	}
-	fmt.Printf("%+v", item.Data)
-	job := item.Data
 
+	job := item.Data
 	log.Debug().Interface("job", job).Msg("job info")
+
+	var subJobs []string
+	for _, v := range job.SubJobs {
+		subJobs = append(subJobs, fmt.Sprintf("%-20s PodStatus: %s, SubJobStatus: %s", v.ModuleName, v.ModulesPodStatus, v.Status))
+	}
 
 	table := uitable.New()
 
+	colWidth, _, _ := terminal.GetSize(int(os.Stdout.Fd()))
+	if colWidth == 0 {
+		table.MaxColWidth = TableMaxColWidthDefault
+	} else {
+		table.MaxColWidth = uint(colWidth - ColWidthOffset)
+	}
+	log.Debug().Int("colWidth", colWidth).Uint("MaxColWidth", table.MaxColWidth).Msg("colWidth ")
+	table.Wrap = true // wrap columns
 	table.AddRow("UUID", job.Uuid)
 	table.AddRow("StartTime", job.StartTime.Format("2006-01-02 15:04:05"))
 	table.AddRow("EndTime", job.EndTime.Format("2006-01-02 15:04:05"))
@@ -156,7 +169,13 @@ func (c *Job) outPutInfo(result interface{}) error {
 	table.AddRow("Creator", job.Creator)
 	table.AddRow("ClusterId", job.ClusterId)
 	table.AddRow("Result", job.Result)
-	table.AddRow("SubJobs", job.SubJobs)
+	for i, v := range subJobs {
+		if i == 0 {
+			table.AddRow("SubJobs", v)
+		} else {
+			table.AddRow("", v)
+		}
+	}
 	table.AddRow("")
 	return output.EncodeTable(os.Stdout, table)
 }

@@ -19,6 +19,9 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/rs/zerolog/log"
+	"golang.org/x/crypto/ssh/terminal"
+
 	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/modules"
 	"github.com/gosuri/uitable"
 	"helm.sh/helm/v3/pkg/cli/output"
@@ -156,7 +159,14 @@ func (c *Cluster) outPutInfo(result interface{}) error {
 	cluster := item.Data
 
 	table := uitable.New()
-
+	colWidth, _, _ := terminal.GetSize(int(os.Stdout.Fd()))
+	if colWidth == 0 {
+		table.MaxColWidth = TableMaxColWidthDefault
+	} else {
+		table.MaxColWidth = uint(colWidth - ColWidthOffset)
+	}
+	log.Debug().Int("colWidth", colWidth).Uint("MaxColWidth", table.MaxColWidth).Msg("colWidth ")
+	table.Wrap = true // wrap columns
 	table.AddRow("UUID", cluster.Uuid)
 	table.AddRow("Name", cluster.Name)
 	table.AddRow("NameSpace", cluster.NameSpace)
@@ -166,7 +176,7 @@ func (c *Cluster) outPutInfo(result interface{}) error {
 	//table.AddRow("Type", cluster.Type)
 	table.AddRow("Status", cluster.Status)
 	table.AddRow("Values", cluster.Values)
-	table.AddRow("Config", cluster.Config)
+	table.AddRow("Spec", cluster.Spec)
 	table.AddRow("Info", cluster.Info)
 	table.AddRow("")
 	return output.EncodeTable(os.Stdout, table)

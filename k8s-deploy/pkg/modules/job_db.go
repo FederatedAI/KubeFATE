@@ -93,7 +93,7 @@ func (e *Job) Insert() (id int, err error) {
 	var count int
 	DB.Model(&Job{}).Where("uuid = ?", e.Uuid).Count(&count)
 	if count > 0 {
-		err = errors.New("account already exists")
+		err = errors.New("job already exists, uuid = " + e.Uuid)
 		return
 	}
 
@@ -142,4 +142,25 @@ func (e *Job) Delete() (bool, error) {
 		return false, err
 	}
 	return e.DeleteById(job.ID)
+}
+
+func (e *Job) SetStatus(status JobStatus) error {
+	if err := DB.Model(e).Update("status", status).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func (e *Job) SetResult(result string) error {
+	if err := DB.Model(e).Update("result", result).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func (e *Job) SetSubJobs(subJobs SubJobs) error {
+	if err := DB.Model(e).Update("sub_jobs", subJobs).Error; err != nil {
+		return err
+	}
+	return nil
 }

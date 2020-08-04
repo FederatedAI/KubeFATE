@@ -23,6 +23,5 @@ require (
 	k8s.io/apimachinery v0.18.5
 	k8s.io/client-go v0.18.0
 	rsc.io/letsencrypt v0.0.3 // indirect
-	sigs.k8s.io/structured-merge-diff v0.0.0-20190525122527-15d366b2352e // indirect
 	sigs.k8s.io/yaml v1.2.0
 )

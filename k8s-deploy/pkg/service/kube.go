@@ -15,7 +15,11 @@
 package service
 
 import (
+	"os"
 	"sync"
+
+	"helm.sh/helm/v3/pkg/action"
+	"helm.sh/helm/v3/pkg/cli"
 
 	"github.com/spf13/viper"
 
@@ -30,4 +34,32 @@ func getClientset() (*kubernetes.Clientset, error) {
 	config, _ := configFlags.ToRESTConfig()
 	clientset, err := kubernetes.NewForConfig(config)
 	return clientset, err
+}
+
+func GetSettings(namespace string) (*cli.EnvSettings, error) {
+	EnvCs.Lock()
+	err := os.Setenv("HELM_NAMESPACE", namespace)
+	if err != nil {
+		return nil, err
+	}
+	settings := cli.New()
+	err = os.Unsetenv("HELM_NAMESPACE")
+	if err != nil {
+		return nil, err
+	}
+	EnvCs.Unlock()
+
+	return settings, nil
+}
+
+func GetCfg(namespace string) (*action.Configuration, error) {
+	settings, err := GetSettings(namespace)
+	if err != nil {
+		return nil, err
+	}
+	cfg := new(action.Configuration)
+	if err := cfg.Init(settings.RESTClientGetter(), settings.Namespace(), os.Getenv("HELM_DRIVER"), Debug); err != nil {
+		return nil, err
+	}
+	return cfg, nil
 }

@@ -16,7 +16,10 @@
 package modules
 
 import (
+	"fmt"
 	"testing"
+
+	"github.com/jinzhu/gorm"
 
 	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/orm"
 )
@@ -30,21 +33,25 @@ func TestCluster(t *testing.T) {
 
 	// Create Table
 	e := &Cluster{}
-
+	e.DropTable()
 	e.InitTable()
 	// Drop Table
-	defer e.DropTable()
+	//defer e.DropTable()
 
 	//Insert
-	e = NewCluster("fate-9999", "fate-9999", "fate", "v1.5.0")
+	e, err := NewCluster("fate-9999", "fate-9999", "fate", "v1.5.0", "")
+	if err != nil {
+		t.Errorf("Cluster.NewCluster() error = %v", err)
+		return
+	}
 	e.ChartValues = map[string]interface{}{"Name": "fate-9999", "NameSpace": "fate-9999"}
 	Id, err := e.Insert()
 	if err != nil {
 		t.Errorf("Cluster.Insert() error = %v", err)
 		return
 	}
-	if Id != 1 {
-		t.Errorf("Cluster.Insert() got = %d, want = %d", Id, 1)
+	if Id < 1 {
+		t.Errorf("Cluster.Insert() got = %d, want Id > 0", Id)
 		return
 	}
 	// repeat insert
@@ -113,7 +120,11 @@ func TestCluster(t *testing.T) {
 	}
 
 	// Insert
-	e = NewCluster("fate-10000", "fate-10000", "fate", "v1.4.0")
+	e, err = NewCluster("fate-10000", "fate-10000", "fate", "v1.4.0", "")
+	if err != nil {
+		t.Errorf("Cluster.NewCluster() error = %v", err)
+		return
+	}
 	Id, err = e.Insert()
 	if err != nil {
 		t.Errorf("Cluster.Insert() error = %v", err)
@@ -136,7 +147,11 @@ func TestCluster(t *testing.T) {
 	}
 
 	// Update
-	e = NewCluster("fate-10001", "fate-10001", "fate-serving", "v1.4.1")
+	e, err = NewCluster("fate-10001", "fate-10001", "fate-serving", "v1.4.1", "")
+	if err != nil {
+		t.Errorf("Cluster.NewCluster() error = %v", err)
+		return
+	}
 	want = e
 	got, err = e.Update(2)
 	if err != nil {
@@ -163,8 +178,8 @@ func TestCluster(t *testing.T) {
 		return
 	}
 
-	e = &Cluster{}
-	success, err := e.DeleteById(1)
+	e = &Cluster{Model: gorm.Model{ID: 1}}
+	success, err := e.Delete()
 	if err != nil {
 		t.Errorf("Cluster.Delete() error = %v", err)
 		return
@@ -181,7 +196,25 @@ func TestCluster(t *testing.T) {
 		return
 	}
 	if len(gots) != 1 {
-		t.Errorf("Cluster.GetList() len(got) = %d, want = %d", len(gots), 2)
+		t.Errorf("Cluster.GetList() len(got) = %d, want = %d", len(gots), 1)
+		return
+	}
+
+	e = &Cluster{}
+	got, err = e.Get()
+	if err != nil {
+		t.Errorf("Cluster.Get() error = %v", err)
+		return
+	}
+	err = got.SetStatus(ClusterStatusRunning)
+	if err != nil {
+		t.Errorf("Cluster.SetStatus() error = %v", err)
+		return
+	}
+	fmt.Printf("%+v\n", got)
+	got, err = e.Get()
+	if got.Status != ClusterStatusRunning {
+		t.Errorf("Cluster.Get() got.Status = %d, want = %s", got.Status, ClusterStatusRunning)
 		return
 	}
 }

@@ -18,9 +18,6 @@ import (
 	"context"
 	"sync"
 
-	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/modules"
-	"helm.sh/helm/v3/pkg/chart/loader"
-
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -38,168 +35,14 @@ import (
 	"helm.sh/helm/v3/pkg/repo"
 
 	"github.com/rs/zerolog/log"
-	"helm.sh/helm/v3/pkg/action"
-	"helm.sh/helm/v3/pkg/chart"
 	"helm.sh/helm/v3/pkg/cli"
 	"sigs.k8s.io/yaml"
 )
-
-const latestChartVersion string = "v1.2.0"
 
 type Chart interface {
 	save(Chart) error
 	read(version string) (Chart, error)
 	load(version string) (Chart, error)
-}
-
-type FateChart struct {
-	*modules.HelmChart
-}
-
-func (fc *FateChart) save() error {
-	_, err := fc.HelmChart.Insert()
-	if err != nil {
-		return err
-	}
-	log.Debug().Str("helmUUID", fc.HelmChart.Uuid).Msg("helm chart save uuid")
-	return nil
-}
-
-func (fc *FateChart) read(chartName, chartVersion string) (*FateChart, error) {
-	HelmChart := modules.HelmChart{Name: chartName, Version: chartVersion}
-	helmChart, err := HelmChart.Get()
-	if err != nil {
-		return nil, err
-	}
-
-	log.Debug().Str("ChartName", helmChart.Name).Str("chartVersion", helmChart.Version).Msg("find chart from db success")
-
-	return &FateChart{
-		HelmChart: &helmChart,
-	}, nil
-}
-func (fc *FateChart) load(name, version string) (*FateChart, error) {
-	chartPath := GetChartPath(name)
-	settings := cli.New()
-
-	cfg := new(action.Configuration)
-	client := action.NewInstall(cfg)
-
-	client.ChartPathOptions.Version = version
-
-	cp, err := client.ChartPathOptions.LocateChart(chartPath, settings)
-	if err != nil {
-		return nil, err
-	}
-
-	log.Debug().Str("FateChart chartPath:", cp).Msg("chartPath:")
-
-	// Check chart dependencies to make sure all are present in /charts
-	chartRequested, err := loader.Load(cp)
-	if err != nil {
-		return nil, err
-	}
-
-	helmChart, err := ChartRequestedTohelmChart(chartRequested)
-	if err != nil {
-		return nil, err
-	}
-	//helmChart, err := SaveChartFromPath(cp, "fate")
-	//if err != nil {
-	//	return nil, err
-	//}
-
-	return &FateChart{
-		HelmChart: helmChart,
-	}, nil
-}
-
-func ChartRequestedTohelmChart(chartRequested *chart.Chart) (*modules.HelmChart, error) {
-	if chartRequested == nil || chartRequested.Raw == nil {
-		log.Error().Msg("chartRequested not exist")
-		return nil, errors.New("chartRequested not exist")
-	}
-
-	var chartData string
-	var valuesData string
-	var ValuesTemplate string
-	for _, v := range chartRequested.Raw {
-		if v.Name == "Chart.yaml" {
-			chartData = string(v.Data)
-		}
-		if v.Name == "values.yaml" {
-			valuesData = string(v.Data)
-		}
-		if v.Name == "values-template.yaml" {
-			ValuesTemplate = string(v.Data)
-		}
-	}
-
-	helmChart := modules.NewHelmChart(chartRequested.Name(),
-		chartData, valuesData, chartRequested.Templates, chartRequested.Metadata.Version, chartRequested.AppVersion())
-
-	helmChart.ValuesTemplate = ValuesTemplate
-	return helmChart, nil
-}
-
-func (fc *FateChart) GetChartValuesTemplates() (string, error) {
-	if fc.ValuesTemplate == "" {
-		return "", errors.New("FateChart ValuesTemplate not exist")
-	}
-	return fc.ValuesTemplate, nil
-}
-
-func (fc *FateChart) GetChartValues(v map[string]interface{}) (map[string]interface{}, error) {
-	// template to values
-	template, err := fc.GetChartValuesTemplates()
-	if err != nil {
-		log.Err(err).Msg("GetChartValuesTemplates error")
-		return nil, err
-	}
-	values, err := MapToConfig(v, template)
-	if err != nil {
-		log.Err(err).Interface("v", v).Interface("template", template).Msg("MapToConfig error")
-		return nil, err
-	}
-	// values to map
-	vals := make(map[string]interface{})
-	err = yaml.Unmarshal([]byte(values), &vals)
-	if err != nil {
-		log.Err(err).Msg("values yaml Unmarshal error")
-		return nil, err
-	}
-	return vals, nil
-}
-
-// todo  get chart by version from repository
-func GetFateChart(chartName, chaerVersion string) (*FateChart, error) {
-	chartVersion := chaerVersion
-	//if version == "" {
-	//	chartVersion = latestChartVersion
-	//}
-	fc := new(FateChart)
-	fc, err := fc.read(chartName, chartVersion)
-	if err == nil {
-		return fc, nil
-	}
-	log.Warn().Interface("read error", err).Msg("read version FateChart err")
-
-	fc, err = fc.load(chartName, chartVersion)
-	if err != nil {
-		return nil, err
-	}
-	err = fc.save()
-	if err != nil {
-		return nil, err
-	}
-	return fc, nil
-}
-
-func (fc *FateChart) ToHelmChart() (*chart.Chart, error) {
-	if fc == nil || fc.HelmChart == nil {
-		return nil, errors.New("FateChart not exist")
-	}
-	return ConvertToChart(fc.HelmChart)
 }
 
 func GetChartPath(name string) string {

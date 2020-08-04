@@ -37,7 +37,7 @@ func List(namespace string) (*releaseListWriter, error) {
 	cfg := new(action.Configuration)
 	client := action.NewList(cfg)
 
-	if err := cfg.Init(settings.RESTClientGetter(), namespace, os.Getenv("HELM_DRIVER"), debug); err != nil {
+	if err := cfg.Init(settings.RESTClientGetter(), namespace, os.Getenv("HELM_DRIVER"), Debug); err != nil {
 		return nil, err
 	}
 
