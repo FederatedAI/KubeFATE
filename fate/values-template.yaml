@@ -12,8 +12,6 @@ host:
   fateboard: {{ .partyId }}.fateboard.kubefate.net
   client: {{ .partyId }}.notebook.kubefate.net
 
-nodePort: {{ with .rollsite }}{{ .nodePort }}{{ end }}
-
 istio:
   enabled: {{ with .istio }}{{ .enabled | default false }}{{ end }}
 
@@ -42,6 +40,7 @@ modules:
     include: {{ has "rollsite" .modules }}
     ip: rollsite
     type: {{ .rollsite.type | default "ClusterIP" }}
+    nodePort: {{ with .rollsite }}{{ .nodePort }}{{ end }}
     {{- with .rollsite }}
     {{- with .nodeSelector }}
     nodeSelector: 
