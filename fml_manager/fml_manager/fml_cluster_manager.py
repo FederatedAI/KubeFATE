@@ -15,9 +15,21 @@ import subprocess
 import json
 import tempfile
 
+from fml_manager.utils.fate_builders import RouteTable
+
 
 class ClusterManager:
-    def __init__(self, cluster_namespace, cluster_name):
+    """ClusterManager is used to manage FATE cluster"""
+
+    def __init__(self, cluster_namespace, cluster_name=None):
+        """ Init the ClusterManager instance
+
+        :param cluster_namespace: Which namespace the cluster is belonged to
+        :type cluster_namespace: string
+        :param cluster_name: The name of fate cluster, no need to provide in most cases
+        :type cluster_name: string
+
+        """
         self.namespace = cluster_namespace
         self.name = cluster_name
 
@@ -48,28 +60,46 @@ class ClusterManager:
             data, err = subprocess.Popen(
                 args, stdout=subprocess.PIPE).communicate()
             print(data)
-        except Execption as error:
+        except Exception as error:
             print(error)
 
     def get_route_table(self):
+        """ Fetch route table from configmap
+
+        :rtype: RouteTable
+
+        """
         # get configmap in dict
         configmap = self.fetch_config_map("rollsite-config")
 
         # get route table in dict
         route_table = self.fetch_route_table(configmap)
-        return route_table
+
+        route_table_ins = RouteTable().from_dict(route_table)
+        return route_table_ins
 
     def set_route_table(self, route_table):
+        """ Patch configmap with route table
+
+        :param route_table: route table to patch configmap
+        :type route_table: RouteTable
+
+        """
         # get configmap in dict
         configmap = self.fetch_config_map("rollsite-config")
 
-        # paste upate to the configmap
-        self.update_config_map(configmap, route_table)
+        # paste update to the configmap
+        self.update_config_map(configmap, route_table.to_dict())
 
         # patch config
         self.patch_config_map(configmap, "rollsite-config")
 
     def get_entry_point(self):
+        """ Return the entrypoint of FATE cluster
+
+        :rtype: string
+
+        """
         get_address = "kubectl get nodes -o jsonpath=\'{$.items[0].status.addresses[?(@.type==\'InternalIP\')].address}\'"
         get_port = "kubectl get service rollsite -n {0} -o jsonpath=\'{{.spec.ports[0].nodePort}}\'".format(
             self.namespace)

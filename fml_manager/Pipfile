@@ -10,6 +10,7 @@ tar = "*"
 requests = "*"
 setuptools = {index = "https://pypi.tuna.tsinghua.edu.cn/simple",version = "*"}
 wheel = {index = "https://pypi.tuna.tsinghua.edu.cn/simple",version = "*"}
+pep8 = {index = "https://pypi.tuna.tsinghua.edu.cn/simple",version = "*"}
 
 [requires]
 python_version = "3.6"

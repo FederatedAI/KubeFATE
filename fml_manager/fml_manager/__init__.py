@@ -1,5 +1,5 @@
 # Copyright 2019-2020 VMware, Inc.
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # you may obtain a copy of the License at
@@ -12,3 +12,4 @@
 
 from fml_manager.fml_manager import FMLManager
 from fml_manager.fml_cluster_manager import ClusterManager
+from fml_manager.utils.fate_builders import *
