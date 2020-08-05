@@ -20,6 +20,7 @@ import time
 import subprocess
 import tempfile
 
+import pandas as pd
 from contextlib import closing
 from fml_manager.utils import file_utils
 from fml_manager.utils.core import get_lan_ip
@@ -36,8 +37,22 @@ cFateClusterCR = "fatecluster"
 
 
 class FMLManager:
+    """FMLManager is used to communicate with FATE cluster"""
+
     def __init__(self, server_conf=None, log_path="./"):
+        """ Init the FMLManager with config and log path
+
+        :param server_conf: Path to config file, default=None
+        :type server_conf: string
+        :param log_path: Path to log file, default=./
+        :type log_path: string
+
+        """
+
+        #: Url of FATE Flow service
         self.server_url = None
+
+        #: Url of FATE Serving service
         self.serving_url = None
         self.log_path = log_path
 
@@ -90,6 +105,17 @@ class FMLManager:
     # Job management
 
     def submit_job(self, dsl, config):
+        """ Submit job to FATE cluster
+
+        :param dsl: DSL definition
+        :type dsl: Pipline
+        :param config: Config definition
+        :type config: Config
+
+        :returns: response
+        :rtype: dict
+
+        """
         post_data = {'job_dsl': dsl,
                      'job_runtime_conf': config}
         response = requests.post(
@@ -98,6 +124,18 @@ class FMLManager:
         return self.prettify(response)
 
     def submit_job_by_files(self, dsl_path, config_path):
+        """ Submit job with file to FATE cluster
+
+        :param dsl_path: DSL definition path
+        :type dsl_path: string
+        :param config_path: Config definition path
+        :type config_path: string
+
+        :returns: response
+        :rtype: dict
+
+        """
+
         config_data = {}
         if config_path:
             config_path = os.path.abspath(config_path)
@@ -115,9 +153,18 @@ class FMLManager:
 
         return self.submit_job(dsl_data, config_data)
 
-    def query_job_status(self, query_conditions):
+    def query_job_status(self, query_conditions, max_tries=200):
+        """ Fetch status of job
+
+        :param query_conditions: Condition of the job
+        :type query_conditions: dict
+
+        :returns: response
+        :rtype: dict
+
+        """
         job_status = "failed"
-        for i in range(500):
+        for i in range(max_tries):
             time.sleep(1)
             try:
                 guest_status = self.query_job(query_conditions).json()[
@@ -135,16 +182,45 @@ class FMLManager:
         return job_status
 
     def query_job(self, query_conditions):
+        """ Fetch job
+
+        :param query_conditions: Condition of the job
+        :type query_conditions: QueryCondition
+
+        :returns: response
+        :rtype: dict
+
+        """
+
         response = requests.post(
-            "/".join([self.server_url, "job", "query"]), json=query_conditions)
+            "/".join([self.server_url, "job", "query"]), json=query_conditions.to_dict())
         return self.prettify(response)
 
     def query_job_conf(self, query_conditions):
+        """ Fetch config of job
+
+        :param query_conditions: Condition of the job
+        :type query_conditions: dict
+
+        :returns: response
+        :rtype: dict
+
+        """
+
         response = requests.post(
             "/".join([self.server_url, "job", "config"]), json=query_conditions)
         return self.prettify(response)
 
     def stop_job(self, job_id):
+        """ Stop job
+
+        :param job_id: job id of data
+        :type job_id: string
+
+        :returns: response
+        :rtype: dict
+
+        """
         post_data = {
             'job_id': job_id
         }
@@ -164,6 +240,15 @@ class FMLManager:
         return self.prettify(response)
 
     def fetch_job_log(self, job_id):
+        """ Fetch the log of job
+
+        :param job_id: The UUID of job
+        :type job_id: string
+
+        :returns: response
+        :rtype: dict
+
+        """
         data = {
             "job_id": job_id
         }
@@ -185,6 +270,33 @@ class FMLManager:
 
     # Data management
     def load_data(self, url, namespace, table_name, work_mode, head, partition, drop="1", api_version="1.4"):
+        """ Upload data to FATE cluster
+
+        :param url: URL of data to upload
+        :type url: string
+
+        :param namespace: Namespace of the data in FATE cluster
+        :type namespace: string
+
+        :param table_name: Table name of the data in FATE cluster
+        :type table_name: string
+
+        :param work_mode: The work mode of upload
+        :type work_mode: int
+
+        :param head: Head included flag. '1': with head, '0': without head.
+        :type head: int
+
+        :param partition: Partitions of the upload data
+        :type partition: int
+
+        :param drop: Flag to overwrite data with same identifier
+        :type drop: string
+
+        :returns: response
+        :rtype: dict
+
+        """
         if api_version == "1.4":
             temp_file = None
             if url.startswith("http://") or url.startswith("https://"):
@@ -225,6 +337,8 @@ class FMLManager:
         return self.prettify(response)
 
     def query_data(self, job_id, limit):
+        """ Query data of job
+        """
         post_data = {
             "job_id": job_id,
             "limit": limit
@@ -237,6 +351,9 @@ class FMLManager:
 
     # The data is download to fateflow. FATE not ready to download to local.
     def download_data(self, namespace, table_name, filename, work_mode, delimitor, output_folder="./"):
+        """ Download data to local
+        """
+
         DEFAULT_DATA_FOLDER = "/data/projects/fate/python/download_dir"
         output_path = "{}/{}".format(DEFAULT_DATA_FOLDER, filename)
         post_data = {
@@ -315,6 +432,9 @@ class FMLManager:
         return self.prettify(response)
 
     def print_model_version(self, role, party_id, model_id, api_version="1.4"):
+        """ Print model version
+        """
+
         action = "version"
         if api_version == "1.4":
             action = "version_history"
@@ -330,6 +450,9 @@ class FMLManager:
         return self.prettify(response, True)
 
     def model_output(self, role, party_id, model_id, model_version, model_component):
+        """ Output the model
+        """
+
         namespace = "#".join([role, str(party_id), model_id])
         post_data = {
             "name": model_version,
@@ -400,12 +523,18 @@ class FMLManager:
 
     # Task
     def query_task(self, query_conditions):
+        """ Query task
+        """
+
         response = requests.post(
             "/".join([self.server_url, "job", "task", "query"]), json=query_conditions)
         return self.prettify(response)
 
     # Tracking
     def track_job_data(self, job_id, role, party_id):
+        """ Track job data
+        """
+
         post_data = {
             "job_id": job_id,
             "role": role,
@@ -417,6 +546,8 @@ class FMLManager:
         return self.prettify(response, True)
 
     def track_component_all_metric(self, job_id, role, party_id, component_name):
+        """ Track output all metric of component
+        """
         post_data = {
             "job_id": job_id,
             "role": role,
@@ -429,6 +560,8 @@ class FMLManager:
         return self.prettify(response, True)
 
     def track_component_metric_type(self, job_id, role, party_id, component_name):
+        """ Track output metric type of component
+        """
         post_data = {
             "job_id": job_id,
             "role": role,
@@ -442,7 +575,7 @@ class FMLManager:
 
     """
     metric_name and metric_namespace can be found in API track_component_metric_type
-    e.g. response = manager.track_component_metric_type(jobId, "guest", "10000", "homo_lr_0") 
+    e.g. response = manager.track_component_metric_type(jobId, "guest", "10000", "homo_lr_0")
         {
             "data": {
                 "train": [
@@ -457,6 +590,8 @@ class FMLManager:
     """
 
     def track_component_metric_data(self, job_id, role, party_id, component_name, metric_name, metric_namespace):
+        """ Track output metric data of component
+        """
         post_data = {
             "job_id": job_id,
             "role": role,
@@ -471,6 +606,8 @@ class FMLManager:
         return self.prettify(response, True)
 
     def track_component_parameters(self, job_id, role, party_id, component_name):
+        """ Track output parameter of component
+        """
         post_data = {
             "job_id": job_id,
             "role": role,
@@ -483,6 +620,8 @@ class FMLManager:
         return self.prettify(response, True)
 
     def track_component_output_model(self, job_id, role, party_id, component_name):
+        """ Track output model of component
+        """
         post_data = {
             "job_id": job_id,
             "role": role,
@@ -495,6 +634,10 @@ class FMLManager:
         return self.prettify(response, True)
 
     def track_component_output_data(self, job_id, role, party_id, component_name):
+        """ Track output data of component
+
+        :rtype: pandas.DataFrame
+        """
         post_data = {
             "job_id": job_id,
             "role": role,
@@ -504,7 +647,12 @@ class FMLManager:
 
         response = requests.post(
             "/".join([self.server_url, "tracking", "component", "output", "data"]), json=post_data)
-        return self.prettify(response, True)
+
+        result = response.json()
+        data = result['data']
+        header = result['meta']['header']
+
+        return pd.DataFrame(data, columns=header)
 
     # Utils
     def prettify(self, response, verbose=False):
