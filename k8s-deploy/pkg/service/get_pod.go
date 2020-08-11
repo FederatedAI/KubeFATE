@@ -32,21 +32,6 @@ func GetPods(namespace, LabelSelector string) (*v1.PodList, error) {
 	return pods, err
 }
 
-func checkPodStatus(pods *v1.PodList) bool {
-	for _, v := range pods.Items {
-		for _, vv := range v.Status.ContainerStatuses {
-			if vv.State.Running == nil {
-				return false
-			}
-		}
-		if v.Status.Phase != v1.PodRunning {
-			return false
-		}
-	}
-	return true
-
-}
-
 func GetClusterStatus(name, namespace string) (map[string]string, error) {
 	var labelSelector string
 	labelSelector = fmt.Sprintf("name=%s", name)
@@ -81,16 +66,14 @@ func GetPodStatus(pods *v1.PodList) map[string]string {
 
 }
 
-// todo get pod by name
-func CheckClusterStatus(name, namespace string) (bool, error) {
-	var labelSelector string
-	labelSelector = fmt.Sprintf("name=%s", name)
-	list, err := GetPods(namespace, labelSelector)
-	if err != nil {
-		return false, err
+func CheckClusterStatus(ClusterStatus map[string]string) bool {
+	var clusterStatusOk = true
+	for _, v := range ClusterStatus {
+		if v != "Running" {
+			clusterStatusOk = false
+		}
 	}
-
-	return checkPodStatus(list), nil
+	return clusterStatusOk
 }
 
 func GetPodList(name, namespace string) ([]string, error) {

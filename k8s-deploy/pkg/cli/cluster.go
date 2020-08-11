@@ -18,6 +18,10 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"time"
+
+	"github.com/rs/zerolog/log"
+	"golang.org/x/crypto/ssh/terminal"
 
 	"github.com/rs/zerolog/log"
 	"golang.org/x/crypto/ssh/terminal"
@@ -111,9 +115,9 @@ func (c *Cluster) outPutList(result interface{}) error {
 		return errors.New("type ClusterResultList not ok")
 	}
 	table := uitable.New()
-	table.AddRow("UUID", "NAME", "NAMESPACE", "REVISION", "STATUS", "CHART", "ChartVERSION")
+	table.AddRow("UUID", "NAME", "NAMESPACE", "REVISION", "STATUS", "CHART", "ChartVERSION", "AGE")
 	for _, r := range item.Data {
-		table.AddRow(r.Uuid, r.Name, r.NameSpace, r.Revision, r.Status, r.ChartName, r.ChartVersion)
+		table.AddRow(r.Uuid, r.Name, r.NameSpace, r.Revision, r.Status, r.ChartName, r.ChartVersion, HumanDuration(time.Since(r.CreatedAt)))
 	}
 	table.AddRow("")
 	return output.EncodeTable(os.Stdout, table)
@@ -173,7 +177,7 @@ func (c *Cluster) outPutInfo(result interface{}) error {
 	table.AddRow("ChartName", cluster.ChartName)
 	table.AddRow("ChartVersion", cluster.ChartVersion)
 	table.AddRow("Revision", cluster.Revision)
-	//table.AddRow("Type", cluster.Type)
+	table.AddRow("Age", HumanDuration(time.Since(cluster.CreatedAt)))
 	table.AddRow("Status", cluster.Status)
 	table.AddRow("Values", cluster.Values)
 	table.AddRow("Spec", cluster.Spec)
