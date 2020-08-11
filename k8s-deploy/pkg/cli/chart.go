@@ -68,7 +68,7 @@ func (c *Chart) getResult(Type int) (result interface{}, err error) {
 	return
 }
 
-func (c *Chart) outPut(result interface{}, Type int) error {
+func (c *Chart) output(result interface{}, Type int) error {
 	switch Type {
 	case LIST:
 		return c.outPutList(result)
@@ -79,7 +79,7 @@ func (c *Chart) outPut(result interface{}, Type int) error {
 	case ERROR:
 		return c.outPutErr(result)
 	default:
-		return fmt.Errorf("outPut error: no type %d", Type)
+		return fmt.Errorf("output error: no type %d", Type)
 	}
 }
 

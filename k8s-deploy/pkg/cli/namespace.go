@@ -57,7 +57,7 @@ func (c *Namespace) getResult(Type int) (result interface{}, err error) {
 	return
 }
 
-func (c *Namespace) outPut(result interface{}, Type int) error {
+func (c *Namespace) output(result interface{}, Type int) error {
 	switch Type {
 	case LIST:
 		return c.outPutList(result)

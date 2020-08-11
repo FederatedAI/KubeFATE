@@ -32,7 +32,7 @@ type Item interface {
 	getRequestPath() (Path string)
 	addArgs() (Args string)
 	getResult(Type int) (result interface{}, err error)
-	outPut(result interface{}, Type int) error
+	output(result interface{}, Type int) error
 }
 
 func PostItem(i Item, Body []byte) error {
@@ -55,7 +55,7 @@ func PostItem(i Item, Body []byte) error {
 		if err != nil {
 			return err
 		}
-		err = i.outPut(msg, ERROR)
+		err = i.output(msg, ERROR)
 		if err != nil {
 			return err
 		}
@@ -68,7 +68,7 @@ func PostItem(i Item, Body []byte) error {
 		return err
 	}
 
-	err = i.outPut(msg, JOB)
+	err = i.output(msg, JOB)
 	if err != nil {
 		return err
 	}
@@ -94,7 +94,7 @@ func PutItem(i Item, Body []byte) error {
 		if err != nil {
 			return err
 		}
-		err = i.outPut(msg, ERROR)
+		err = i.output(msg, ERROR)
 		if err != nil {
 			return err
 		}
@@ -107,7 +107,7 @@ func PutItem(i Item, Body []byte) error {
 		return err
 	}
 
-	err = i.outPut(msg, JOB)
+	err = i.output(msg, JOB)
 	if err != nil {
 		return err
 	}
@@ -135,7 +135,7 @@ func GetItem(i Item, UUID string) error {
 		if err != nil {
 			return err
 		}
-		err = i.outPut(msg, ERROR)
+		err = i.output(msg, ERROR)
 		if err != nil {
 			return err
 		}
@@ -149,7 +149,7 @@ func GetItem(i Item, UUID string) error {
 		return err
 	}
 
-	err = i.outPut(msg, INFO)
+	err = i.output(msg, INFO)
 	if err != nil {
 		return err
 	}
@@ -177,7 +177,7 @@ func GetItemList(i Item) error {
 		if err != nil {
 			return err
 		}
-		err = i.outPut(msg, ERROR)
+		err = i.output(msg, ERROR)
 		if err != nil {
 			return err
 		}
@@ -193,7 +193,7 @@ func GetItemList(i Item) error {
 		return err
 	}
 
-	err = i.outPut(msg, LIST)
+	err = i.output(msg, LIST)
 	if err != nil {
 		return err
 	}
@@ -221,7 +221,7 @@ func DeleteItem(i Item, UUID string) error {
 		if err != nil {
 			return err
 		}
-		err = i.outPut(msg, ERROR)
+		err = i.output(msg, ERROR)
 		if err != nil {
 			return err
 		}
@@ -237,7 +237,7 @@ func DeleteItem(i Item, UUID string) error {
 		return err
 	}
 
-	err = i.outPut(msg, JOB)
+	err = i.output(msg, JOB)
 	if err != nil {
 		return err
 	}

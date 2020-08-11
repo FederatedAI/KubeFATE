@@ -72,7 +72,7 @@ func (c *Job) getResult(Type int) (result interface{}, err error) {
 	return
 }
 
-func (c *Job) outPut(result interface{}, Type int) error {
+func (c *Job) output(result interface{}, Type int) error {
 	switch Type {
 	case LIST:
 		return c.outPutList(result)
