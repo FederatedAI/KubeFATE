@@ -12,46 +12,34 @@
  * limitations under the License.
  *
  */
+
 package api
 
 import (
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/modules"
 	"github.com/gin-gonic/gin"
 )
 
-const ApiVersion = "v1"
+type Namespace struct {
+}
 
-func Router(r *gin.Engine) {
+func (j *Namespace) Router(r *gin.RouterGroup) {
 
-	r.GET("/", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"msg":             "kubefate run success",
-			"api_version":     ApiVersion,
-			"service_version": ServiceVersion,
-		})
-	})
-
-	v1 := r.Group("/v1")
+	authMiddleware, _ := GetAuthMiddleware()
+	job := r.Group("/namespace")
+	job.Use(authMiddleware.MiddlewareFunc())
 	{
-		v1.GET("/", func(c *gin.Context) {
-			c.JSON(400, gin.H{"error": "error path"})
-		})
-
-		cluster := new(Cluster)
-		cluster.Router(v1)
-
-		user := new(User)
-		user.Router(v1)
-
-		job := new(Job)
-		job.Router(v1)
-
-		chart := new(Chart)
-		chart.Router(v1)
-
-		version := new(Version)
-		version.Router(v1)
-
-		namespace := new(Namespace)
-		namespace.Router(v1)
+		job.GET("/", j.getNamespaceList)
 	}
+}
+
+func (_ *Namespace) getNamespaceList(c *gin.Context) {
+
+	namespace := new(modules.Namespace)
+	namespaceList, err := namespace.GetList()
+	if err != nil {
+		c.JSON(500, gin.H{"error": err})
+		return
+	}
+	c.JSON(200, gin.H{"data": namespaceList, "msg": "getNamespaceList success"})
 }

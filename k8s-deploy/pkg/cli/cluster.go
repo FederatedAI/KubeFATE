@@ -89,7 +89,7 @@ func (c *Cluster) getResult(Type int) (result interface{}, err error) {
 	return
 }
 
-func (c *Cluster) outPut(result interface{}, Type int) error {
+func (c *Cluster) output(result interface{}, Type int) error {
 	switch Type {
 	case LIST:
 		return c.outPutList(result)

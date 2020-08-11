@@ -57,6 +57,21 @@ func GetNamespaceList() ([]string, error) {
 	return namespaces, nil
 }
 
+func GetNamespaces() ([]v1.Namespace, error) {
+	clientset, err := getClientset()
+
+	if err != nil {
+		return nil, err
+	}
+
+	ncl, err := clientset.CoreV1().Namespaces().List(context.Background(), metav1.ListOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	return ncl.Items, nil
+}
+
 func CreateNamespace(namespace string) error {
 	clientset, err := getClientset()
 

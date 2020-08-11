@@ -69,7 +69,7 @@ func (c *User) getResult(Type int) (result interface{}, err error) {
 	return
 }
 
-func (c *User) outPut(result interface{}, Type int) error {
+func (c *User) output(result interface{}, Type int) error {
 	switch Type {
 	case LIST:
 		return c.outPutList(result)
