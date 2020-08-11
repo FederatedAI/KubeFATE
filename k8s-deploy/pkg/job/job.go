@@ -135,6 +135,7 @@ func ClusterInstall(clusterArgs *ClusterArgs, creator string) (*modules.Job, err
 				continue
 			}
 
+
 			if job.TimeOut() {
 				dbErr := job.SetResult("Checkout cluster status timeOut!")
 				if dbErr != nil {
@@ -152,8 +153,10 @@ func ClusterInstall(clusterArgs *ClusterArgs, creator string) (*modules.Job, err
 			if err != nil {
 				log.Error().Err(err).Msg("GetClusterStatus error")
 			}
+
 			log.Debug().Interface("ClusterStatus", ClusterStatus).Msg("GetClusterStatus()")
 			subJobs := generateSubJobs(job, ClusterStatus)
+
 			dbErr = job.SetSubJobs(subJobs)
 			if dbErr != nil {
 				log.Error().Err(dbErr).Msg("job.SetSubJobs error")

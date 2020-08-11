@@ -19,7 +19,6 @@ package job
 import (
 	"encoding/json"
 	"fmt"
-	"reflect"
 	"testing"
 	"time"
 
@@ -100,6 +99,7 @@ func TestClusterInstall(t *testing.T) {
 		},
 		{
 			name: "job install fate-9999 success",
+
 			args: args{
 				clusterArgs: &ClusterArgs{
 					Name:         "fate-9999",
@@ -416,4 +416,100 @@ func Test_generateSubJobs(t *testing.T) {
 			time.Sleep(time.Second * 5)
 		})
 	}
+}
+
+func TestCluster(t *testing.T) {
+	InitConfigForTest()
+	log.Level(zerolog.DebugLevel)
+	mysql := new(orm.Mysql)
+	_ = mysql.Setup()
+	modules.DB = orm.DBCLIENT
+	//DB.LogMode(true)
+	// DropTable Table
+	new(modules.User).DropTable()
+	new(modules.Cluster).DropTable()
+	new(modules.HelmChart).DropTable()
+	new(modules.Job).DropTable()
+	// Create Table
+	new(modules.User).InitTable()
+	new(modules.Cluster).InitTable()
+	new(modules.HelmChart).InitTable()
+	new(modules.Job).InitTable()
+
+	clusterArgs := &ClusterArgs{
+		Name:         "fate-9999",
+		Namespace:    "fate-9999",
+		ChartName:    "fate",
+		ChartVersion: "v1.4.0",
+		Cover:        true,
+		Data:         []byte(`{"chartName":"fate","chartVersion":"v1.4.0","modules":["rollsite","clustermanager","nodemanager","mysql","python","client"],"mysql":{"accessMode":"ReadWriteOnce","database":"eggroll_meta","existingClaim":"","ip":"mysql","nodeSelector":{},"password":"fate_dev","port":3306,"size":"1Gi","storageClass":"mysql","subPath":"","user":"fate"},"name":"fate-9999","namespace":"fate-9999","nodemanager":{"count":0,"list":[{"accessMode":"ReadWriteOnce","existingClaim":"","name":"nodemanager","nodeSelector":{},"sessionProcessorsPerNode":2,"size":"1Gi","storageClass":"nodemanager","subPath":"nodemanager"}],"sessionProcessorsPerNode":4},"partyId":9999,"persistence":false,"pullPolicy":null,"python":{"fateflowNodePort":30109,"fateflowType":"NodePort","nodeSelector":{}},"registry":"","rollsite":{"exchange":{"ip":"192.168.1.1","port":30000},"nodePort":30009,"nodeSelector":{},"partyList":[{"partyId":10000,"partyIp":"10.117.32.179","partyPort":30010}],"type":"NodePort"}}`),
+	}
+
+	var clusterId string
+
+	t.Run("ClusterInstall", func(t *testing.T) {
+		got, err := ClusterInstall(clusterArgs, "test")
+		if (err != nil) != false {
+			t.Errorf("ClusterInstall() error = %v, wantErr %v", err, false)
+			return
+		}
+		if got == nil {
+			t.Errorf("ClusterInstall() = %v, want %s", got, "not nil")
+			return
+		}
+		clusterId = got.ClusterId
+		for got.Status == modules.JobStatusRunning || got.Status == modules.JobStatusPending {
+			time.Sleep(5 * time.Second)
+		}
+		if got.Status != modules.JobStatusSuccess {
+			t.Errorf("ClusterInstall() = %v, want %v", got, modules.JobStatusSuccess)
+		}
+	})
+
+	clusterArgsUpdate := &ClusterArgs{
+		Name:         "fate-9999",
+		Namespace:    "fate-9999",
+		ChartName:    "fate",
+		ChartVersion: "v1.4.1-a",
+		Cover:        false,
+		Data:         []byte(`{"chartName":"fate","chartVersion":"v1.4.1-a","modules":["rollsite","clustermanager","nodemanager","mysql","python","client"],"mysql":{"accessMode":"ReadWriteOnce","database":"eggroll_meta","existingClaim":"","ip":"mysql","nodeSelector":{},"password":"fate_dev","port":3306,"size":"1Gi","storageClass":"mysql","subPath":"","user":"fate"},"name":"fate-9999","namespace":"fate-9999","nodemanager":{"count":2,"list":[{"accessMode":"ReadWriteOnce","existingClaim":"","name":"nodemanager","nodeSelector":{},"sessionProcessorsPerNode":2,"size":"1Gi","storageClass":"nodemanager","subPath":"nodemanager"}],"sessionProcessorsPerNode":4},"partyId":9999,"persistence":false,"pullPolicy":null,"python":{"fateflowNodePort":30109,"fateflowType":"NodePort","nodeSelector":{}},"registry":"","rollsite":{"exchange":{"ip":"192.168.1.1","port":30000},"nodePort":30009,"nodeSelector":{},"partyList":[{"partyId":10000,"partyIp":"192.168.10.1","partyPort":30010}],"type":"NodePort"}}`),
+	}
+
+	t.Run("ClusterUpdate", func(t *testing.T) {
+		got, err := ClusterUpdate(clusterArgsUpdate, "test")
+		if (err != nil) != false {
+			t.Errorf("ClusterUpdate() error = %v, wantErr %v", err, false)
+			return
+		}
+		if got == nil {
+			t.Errorf("ClusterUpdate() = %v, want %s", got, "not nil")
+			return
+		}
+		time.Sleep(5 * time.Second)
+		for got.Status == modules.JobStatusRunning || got.Status == modules.JobStatusPending {
+			time.Sleep(5 * time.Second)
+		}
+		if got.Status != modules.JobStatusSuccess {
+			t.Errorf("ClusterUpdate() = %v, want %v", got, modules.JobStatusSuccess)
+		}
+	})
+
+	t.Run("ClusterDelete", func(t *testing.T) {
+		got, err := ClusterDelete(clusterId, "test")
+		if (err != nil) != false {
+			t.Errorf("ClusterDelete() error = %v, wantErr %v", err, false)
+			return
+		}
+		if got == nil {
+			t.Errorf("ClusterDelete() = %v, want %s", got, "not nil")
+			return
+		}
+		time.Sleep(5 * time.Second)
+		for got.Status == modules.JobStatusRunning || got.Status == modules.JobStatusPending {
+			time.Sleep(5 * time.Second)
+		}
+		if got.Status != modules.JobStatusSuccess {
+			t.Errorf("ClusterDelete() = %v, want %v", got, modules.JobStatusSuccess)
+		}
+	})
 }

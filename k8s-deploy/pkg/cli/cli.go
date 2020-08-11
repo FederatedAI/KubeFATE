@@ -26,6 +26,11 @@ const (
 	TableMaxColWidthDefault uint = 120
 )
 
+const (
+	ColWidthOffset          int  = 20
+	TableMaxColWidthDefault uint = 120
+)
+
 func initCommandLine() *cli.App {
 	app := &cli.App{
 

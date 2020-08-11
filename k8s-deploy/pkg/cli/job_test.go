@@ -33,6 +33,7 @@ func TestJob_outPutInfo(t *testing.T) {
 		wantErr bool
 	}{
 		// TODO: Add test cases.
+
 		{name: "",
 			c: &Job{},
 			args: args{
