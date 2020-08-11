@@ -135,7 +135,6 @@ func ClusterInstall(clusterArgs *ClusterArgs, creator string) (*modules.Job, err
 				continue
 			}
 
-
 			if job.TimeOut() {
 				dbErr := job.SetResult("Checkout cluster status timeOut!")
 				if dbErr != nil {
