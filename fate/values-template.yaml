@@ -2,7 +2,7 @@
 image:
   registry: {{ .registry | default "federatedai" }}
   isThridParty: {{ empty .registry | ternary  "false" "true" }}
-  tag: 1.4.2-release
+  tag: 1.4.3-release
   pullPolicy: {{ .pullPolicy | default "IfNotPresent" }}
 
 partyId: {{ .partyId }}

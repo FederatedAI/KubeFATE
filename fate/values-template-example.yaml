@@ -1,7 +1,7 @@
 name: fate-10000
 namespace: fate-10000
 chartName: fate
-chartVersion: v1.4.2
+chartVersion: v1.4.3
 partyId: 10000
 registry: ""
 pullPolicy: 
@@ -37,7 +37,7 @@ nodemanager:
   list:
   - name: nodemanager
     nodeSelector: {}
-    sessionProcessorsPerNode: 2
+    sessionProcessorsPerNode: 4
     subPath: "nodemanager"
     existingClaim: ""
     storageClass: "nodemanager"

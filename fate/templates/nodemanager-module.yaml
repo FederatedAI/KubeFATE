@@ -44,7 +44,7 @@ data:
     
     
     eggroll.resourcemanager.bootstrap.roll_pair_master.exepath=bin/roll_pair/roll_pair_master_bootstrap.sh
-    eggroll.resourcemanager.bootstrap.roll_pair_master.javahome=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.252.b09-2.el7_8.x86_64/jre
+    eggroll.resourcemanager.bootstrap.roll_pair_master.javahome=/usr/lib/jvm/java-1.8.0-openjdk
     eggroll.resourcemanager.bootstrap.roll_pair_master.classpath=conf/:lib/*
     eggroll.resourcemanager.bootstrap.roll_pair_master.mainclass=com.webank.eggroll.rollpair.RollPairMasterBootstrap
     eggroll.resourcemanager.bootstrap.roll_pair_master.jvm.options=
