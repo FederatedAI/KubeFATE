@@ -312,7 +312,7 @@ func ClusterUpdate(clusterArgs *ClusterArgs, creator string) (*modules.Job, erro
 
 	//do job
 	go func() {
-
+		// update job.status/ cluster.status / cluster
 		dbErr := job.SetStatus(modules.JobStatusRunning)
 		if dbErr != nil {
 			log.Error().Err(dbErr).Msg("job.SetStatus error")
@@ -332,22 +332,18 @@ func ClusterUpdate(clusterArgs *ClusterArgs, creator string) (*modules.Job, erro
 			log.Error().Err(dbErr).Msg("cluster.SetSpec error")
 		}
 
-		if cluster.ChartName == clusterArgs.ChartName &&
-			cluster.ChartVersion == clusterArgs.ChartVersion {
-			//The chart version does not change and update is used
-			//Upgrade corresponding to Helm
-			err = cluster.HelmUpgrade()
-			cluster.HelmRevision += 1
-		} else {
-			cluster.ChartName = clusterArgs.ChartName
-			cluster.ChartVersion = clusterArgs.ChartVersion
-			//The chart version is changed by deleting the installed process first
-			err = cluster.HelmUpdate()
-			cluster.HelmRevision = 1
-		}
-		_, err = cluster.UpdateByUuid(job.ClusterId)
+		// HelmUpgrade
+
+		//The chart version does not change and update is used
+		//Upgrade corresponding to Helm
+		cluster.ChartName = clusterArgs.ChartName
+		cluster.ChartVersion = clusterArgs.ChartVersion
+		err = cluster.HelmUpgrade()
+		cluster.HelmRevision += 1
+
+		_, dbErr = cluster.UpdateByUuid(job.ClusterId)
 		if err != nil {
-			log.Error().Err(err).Interface("cluster", cluster).Msg("update cluster error")
+			log.Error().Err(dbErr).Interface("cluster", cluster).Msg("update cluster error")
 		}
 
 		if err != nil {
@@ -446,17 +442,10 @@ func ClusterUpdate(clusterArgs *ClusterArgs, creator string) (*modules.Job, erro
 				log.Error().Err(dbErr).Msg("cluster.SetStatus error")
 			}
 
-			if cluster.ChartName == clusterArgs.ChartName &&
-				cluster.ChartVersion == clusterArgs.ChartVersion {
-				//The chart version does not change and update is used
-				//Upgrade corresponding to Helm
-				err = cluster.HelmRollback()
-				cluster.HelmRevision -= 1
-			} else {
-				//The chart version is changed by deleting the installed process first
-				err = cluster.HelmUpdate()
-				cluster.HelmRevision = 1
-			}
+			//The chart version does not change and update is used
+			//Upgrade corresponding to Helm
+			err = cluster.HelmRollback()
+			cluster.HelmRevision -= 1
 
 			if err != nil {
 				log.Error().Err(err).Str("ClusterId", cluster.Uuid).Msg("helm upgrade cluster error")

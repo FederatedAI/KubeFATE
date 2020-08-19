@@ -170,15 +170,3 @@ func (e *Cluster) HelmDelete() error {
 
 	return nil
 }
-
-func (e *Cluster) HelmUpdate() error {
-	err := e.HelmDelete()
-	if err != nil {
-		return fmt.Errorf("HelmUpdate error: %s", err)
-	}
-	err = e.HelmInstall()
-	if err != nil {
-		return fmt.Errorf("HelmUpdate error: %s", err)
-	}
-	return nil
-}
