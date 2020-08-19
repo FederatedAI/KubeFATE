@@ -1,6 +1,7 @@
 package modules
 
 import (
+	"os"
 	"testing"
 
 	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/orm"
@@ -675,6 +676,98 @@ func TestCluster_HelmInstall(t *testing.T) {
 		// TODO: Add test cases.
 		{
 			name: "",
+			fields: fields{
+				Name:         "fate-9999",
+				NameSpace:    "fate-9999",
+				ChartName:    "fate",
+				ChartVersion: "v1.4.0",
+				Values:       cluster,
+				Spec:         spec,
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			e := &Cluster{
+				Uuid:         tt.fields.Uuid,
+				Name:         tt.fields.Name,
+				NameSpace:    tt.fields.NameSpace,
+				ChartName:    tt.fields.ChartName,
+				ChartVersion: tt.fields.ChartVersion,
+				Values:       tt.fields.Values,
+				Spec:         tt.fields.Spec,
+				Revision:     tt.fields.Revision,
+				HelmRevision: tt.fields.HelmRevision,
+				ChartValues:  tt.fields.ChartValues,
+				Status:       tt.fields.Status,
+				Info:         tt.fields.Info,
+				Model:        tt.fields.Model,
+			}
+			if err := e.HelmInstall(); (err != nil) != tt.wantErr {
+				t.Errorf("Cluster.HelmInstall() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestCluster_HelmInstall_Chart(t *testing.T) {
+	os.Setenv("FATECLOUD_REPO_URL", "")
+	InitConfigForTest()
+	mysql := new(orm.Mysql)
+	mysql.Setup()
+	DB = orm.DBCLIENT
+	//DB.LogMode(true)
+
+	// Create Table
+	e := &Cluster{}
+	e.InitTable()
+
+	// Drop Table
+	defer e.DropTable()
+	hc := &HelmChart{}
+	hc.InitTable()
+	//defer hc.DropTable()
+	var spec MapStringInterface
+	err := yaml.Unmarshal([]byte(cluster), &spec)
+	if err != nil {
+		t.Errorf("yaml.Unmarshal() error = %v", err)
+	}
+	type fields struct {
+		Uuid         string
+		Name         string
+		NameSpace    string
+		ChartName    string
+		ChartVersion string
+		Values       string
+		Spec         MapStringInterface
+		Revision     int8
+		HelmRevision int8
+		ChartValues  MapStringInterface
+		Status       ClusterStatus
+		Info         MapStringInterface
+		Model        gorm.Model
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+		{
+			name: "chart does not exist",
+			fields: fields{
+				Name:         "fate-9999",
+				NameSpace:    "fate-9999",
+				ChartName:    "fate",
+				ChartVersion: "v1.4.3",
+				Values:       cluster,
+				Spec:         spec,
+			},
+			wantErr: true,
+		},
+		{
+			name: "chart exist",
 			fields: fields{
 				Name:         "fate-9999",
 				NameSpace:    "fate-9999",
