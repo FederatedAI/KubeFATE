@@ -23,7 +23,6 @@ import (
 	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/utils/config"
 	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/utils/logging"
 	"github.com/spf13/viper"
-
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/rest"
 )
@@ -221,4 +220,45 @@ func InitConfigForTest() {
 	viper.AddConfigPath("../../")
 	_ = viper.ReadInConfig()
 	logging.InitLog()
+}
+
+func TestCheckClusterStatus(t *testing.T) {
+	type args struct {
+		ClusterStatus map[string]string
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		// TODO: Add test cases.
+		{
+			name: "false",
+			args: args{
+				ClusterStatus: map[string]string{},
+			},
+			want: false,
+		},
+		{
+			name: "true",
+			args: args{
+				ClusterStatus: map[string]string{"python": "Running", "client": "Running", "fateboard": "Pending"},
+			},
+			want: false,
+		},
+		{
+			name: "true",
+			args: args{
+				ClusterStatus: map[string]string{"python": "Running", "client": "Running", "fateboard": "Running"},
+			},
+			want: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := CheckClusterStatus(tt.args.ClusterStatus); got != tt.want {
+				t.Errorf("CheckClusterStatus() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }
