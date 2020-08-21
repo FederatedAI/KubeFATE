@@ -1,26 +1,29 @@
 /*
-* Copyright 2019-2020 VMware, Inc.
-* 
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* http://www.apache.org/licenses/LICENSE-2.0
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-* 
-*/
+ * Copyright 2019-2020 VMware, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 // job
 package job
 
 import (
 	"fmt"
-	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/db"
+	"reflect"
+	"time"
+
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/modules"
 	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/service"
 	"github.com/rs/zerolog/log"
-	"time"
 )
 
 type ClusterArgs struct {
@@ -32,21 +35,33 @@ type ClusterArgs struct {
 	Data         []byte `json:"data"`
 }
 
-func ClusterInstall(clusterArgs *ClusterArgs, creator string) (*db.Job, error) {
-	cluster := new(db.Cluster)
+func ClusterInstall(clusterArgs *ClusterArgs, creator string) (*modules.Job, error) {
+
+	// Check whether the cluster exists
+	cluster := new(modules.Cluster)
 	if ok := cluster.IsExisted(clusterArgs.Name, clusterArgs.Namespace); ok {
 		return nil, fmt.Errorf("name=%s cluster is exited", clusterArgs.Name)
 	}
 
-	job := db.NewJob("ClusterInstall", creator)
-
-	err := setJobByUuid(job)
+	// create a cluster
+	cluster, err := modules.NewCluster(clusterArgs.Name, clusterArgs.Namespace, clusterArgs.ChartName, clusterArgs.ChartVersion, string(clusterArgs.Data))
 	if err != nil {
-		log.Error().Err(err).Interface("job", job).Msg("setJobByUuid error")
+		log.Error().Err(err).Interface("clusterArgs", clusterArgs).Msg("NewCluster")
 		return nil, err
 	}
+
+	// Save cluster to database
+	_, err = cluster.Insert()
+	if err != nil {
+		log.Error().Err(err).Interface("cluster", cluster).Msg("save cluster error")
+		return nil, err
+	}
+	log.Info().Str("cluster uuid", cluster.Uuid).Msg("save cluster success")
+
+	//create a job
+	job := modules.NewJob("ClusterInstall", creator, cluster.Uuid)
 	//  save job to db
-	_, err = db.Save(job)
+	_, err = job.Insert()
 	if err != nil {
 		log.Error().Err(err).Interface("job", job).Msg("save job error")
 		return nil, err
@@ -56,85 +71,115 @@ func ClusterInstall(clusterArgs *ClusterArgs, creator string) (*db.Job, error) {
 
 	//do job
 	go func() {
-		job.Status = db.Running_j
+		dbErr := job.SetStatus(modules.JobStatusRunning)
+		if dbErr != nil {
+			log.Error().Err(dbErr).Msg("job.SetStatus error")
+		}
 
+		dbErr = cluster.SetStatus(modules.ClusterStatusCreating)
+		if dbErr != nil {
+			log.Error().Err(dbErr).Msg("cluster.SetStatus error")
+		}
+
+		// Override existing installation
 		if clusterArgs.Cover {
-			_ = helmClean(clusterArgs.Name, clusterArgs.Namespace)
-		}
-
-		//create a cluster use parameter
-		cluster := db.NewCluster(clusterArgs.Name, clusterArgs.Namespace, clusterArgs.ChartName, clusterArgs.ChartVersion)
-		job.ClusterId = cluster.Uuid
-
-		err := setJobByClusterId(job)
-
-		if job.Status == db.Running_j {
-			cluster.Status = db.Creating_c
-
-			_, err = db.Save(cluster)
+			log.Info().Msg("Overwrite current installation")
+			err = cluster.HelmDelete()
 			if err != nil {
-				log.Error().Err(err).Interface("cluster", cluster).Msg("save cluster error")
+				log.Error().Err(err).Msg("helmClean error")
 			}
-			log.Debug().Str("cluster uuid", cluster.Uuid).Msg("create cluster success")
+			log.Info().Str("name", cluster.Name).Str("namespace", cluster.NameSpace).Msg("HelmClean success")
 		}
 
-		err = db.UpdateByUUID(job, job.Uuid)
+		err = cluster.HelmInstall()
 		if err != nil {
-			log.Error().Err(err).Str("jobId", job.Uuid).Msg("update job By Uuid error")
-		}
-
-		err = install(cluster, clusterArgs.Data)
-		if err != nil {
-			job.Result = err.Error()
-			job.Status = db.Failed_j
 			log.Error().Err(err).Str("ClusterId", cluster.Uuid).Msg("helm install cluster error")
-		} else {
-			job.Result = "Cluster install success"
-			job.Status = db.Running_j
-			log.Debug().Str("ClusterId", cluster.Uuid).Msg("helm install cluster success")
-		}
 
-		//todo save cluster to db
-		if job.Status == db.Success_j {
-			cluster.Status = db.Creating_c
-			err = db.UpdateByUUID(cluster, job.ClusterId)
-			if err != nil {
-				log.Error().Err(err).Interface("cluster", cluster).Msg("update cluster error")
+			dbErr := job.SetResult(err.Error())
+			if dbErr != nil {
+				log.Error().Err(dbErr).Msg("job.SetResult error")
 			}
-			log.Debug().Str("cluster status", cluster.Status.String()).Str("cluster uuid", cluster.Uuid).Msg("update cluster success")
+			dbErr = job.SetStatus(modules.JobStatusFailed)
+			if dbErr != nil {
+				log.Error().Err(dbErr).Msg("job.SetStatus error")
+			}
+		} else {
+			log.Debug().Str("ClusterId", cluster.Uuid).Msg("helm install cluster success")
+
+			dbErr := job.SetResult("Cluster install success")
+			if dbErr != nil {
+				log.Error().Err(dbErr).Msg("job.SetResult error")
+			}
+			dbErr = job.SetStatus(modules.JobStatusRunning)
+			if dbErr != nil {
+				log.Error().Err(dbErr).Msg("job.SetStatus error")
+			}
 		}
 
-		// todo job start status stop timeout
-		for job.Status == db.Running_j {
+		//
+		for job.Status == modules.JobStatusRunning {
+
+			if !cluster.IsExisted(cluster.Name, cluster.NameSpace) {
+				dbErr := job.SetResult("Cluster has been deleted!")
+				if dbErr != nil {
+					log.Error().Err(dbErr).Msg("job.SetResult error")
+				}
+				dbErr = job.SetStatus(modules.JobStatusCanceled)
+				if dbErr != nil {
+					log.Error().Err(dbErr).Msg("job.SetStatus error")
+				}
+				continue
+			}
+
+			if stopJob(job, cluster) {
+				continue
+			}
 
 			if job.TimeOut() {
-				job.Result = "Checkout cluster status timeOut!"
-				job.Status = db.Failed_j
+				dbErr := job.SetResult("Checkout cluster status timeOut!")
+				if dbErr != nil {
+					log.Error().Err(dbErr).Msg("job.SetResult error")
+				}
+				dbErr = job.SetStatus(modules.JobStatusFailed)
+				if dbErr != nil {
+					log.Error().Err(dbErr).Msg("job.SetStatus error")
+				}
 				break
 			}
 
-			clusterStatusOk, err := service.CheckClusterStatus(clusterArgs.Name, clusterArgs.Namespace)
+			// update subJobs
+			ClusterStatus, err := service.GetClusterStatus(clusterArgs.Name, clusterArgs.Namespace)
 			if err != nil {
-				job.Result = "CheckClusterStatus error:" + err.Error()
-				job.Status = db.Failed_j
+				log.Error().Err(err).Msg("GetClusterStatus error")
+			}
+
+			log.Debug().Interface("ClusterStatus", ClusterStatus).Msg("GetClusterStatus()")
+			subJobs := generateSubJobs(job, ClusterStatus)
+
+			dbErr = job.SetSubJobs(subJobs)
+			if dbErr != nil {
+				log.Error().Err(dbErr).Msg("job.SetSubJobs error")
+			}
+
+			if service.CheckClusterStatus(ClusterStatus) {
+				dbErr := job.SetStatus(modules.JobStatusSuccess)
+				if dbErr != nil {
+					log.Error().Err(dbErr).Msg("job.SetStatus error")
+				}
 				break
 			}
-			if clusterStatusOk {
-				job.Status = db.Success_j
-				break
-			}
-			time.Sleep(5 * time.Second)
+			time.Sleep(1 * time.Second)
 		}
 
-		if job.Status == db.Canceled_j {
+		if job.Status == modules.JobStatusCanceled {
 			job.Result = "Job canceled"
 		}
 
-		//todo save cluster to db
-		if job.Status == db.Success_j {
-			cluster.Status = db.Running_c
+		// save cluster to modules
+		if job.Status == modules.JobStatusSuccess {
+			cluster.Status = modules.ClusterStatusRunning
 			cluster.Revision += 1
-			err = db.UpdateByUUID(cluster, job.ClusterId)
+			_, err = cluster.UpdateByUuid(job.ClusterId)
 			if err != nil {
 				log.Error().Err(err).Interface("cluster", cluster).Msg("update cluster error")
 			}
@@ -142,23 +187,26 @@ func ClusterInstall(clusterArgs *ClusterArgs, creator string) (*db.Job, error) {
 		}
 
 		// rollBACK
-		if job.Status != db.Success_j && job.Status != db.Canceled_j {
-			err = db.ClusterDeleteByUUID(job.ClusterId)
+		if job.Status != modules.JobStatusSuccess && job.Status != modules.JobStatusCanceled {
+			_, err := cluster.Delete()
 			if err != nil {
-				log.Error().Err(err).Interface("cluster", cluster).Msg("delete cluster error")
+				log.Error().Err(err).Interface("cluster", cluster).Msg("DB delete cluster error")
 			}
-			log.Debug().Str("cluster uuid", cluster.Uuid).Msg("delete cluster success")
+			err = cluster.HelmDelete()
+			if err != nil {
+				log.Error().Err(err).Interface("cluster", cluster).Msg("helm delete cluster error")
+			}
+
+			log.Debug().Str("cluster uuid", cluster.Uuid).Msg("install cluster rollBACK success")
 		}
 
 		job.EndTime = time.Now()
-		err = db.UpdateByUUID(job, job.Uuid)
+		_, err = job.UpdateByUuid(job.Uuid)
 		if err != nil {
 			log.Error().Err(err).Str("jobId", job.Uuid).Msg("update job By Uuid error")
 		}
 
-		deleteJob(job)
-
-		if job.Status == db.Success_j {
+		if job.Status == modules.JobStatusSuccess {
 			log.Debug().Interface("job", job).Msg("job run success")
 		} else {
 			log.Warn().Interface("job", job).Msg("job run failed")
@@ -169,35 +217,92 @@ func ClusterInstall(clusterArgs *ClusterArgs, creator string) (*db.Job, error) {
 	return job, nil
 }
 
-func ClusterUpdate(clusterArgs *ClusterArgs, creator string) (*db.Job, error) {
-	//cluster := new(db.Cluster)
-	//if ok := cluster.IsExisted(clusterArgs.Name, clusterArgs.Namespace); ok {
-	//	return nil, fmt.Errorf("name=%s cluster is not exited",clusterArgs.Name)
-	//}
-	job := db.NewJob("ClusterUpdate", creator)
-	//create a cluster use parameter
-	cluster, err := db.ClusterFindByName(clusterArgs.Name, clusterArgs.Namespace)
+func stopJob(job *modules.Job, cluster *modules.Cluster) bool {
+	if !cluster.IsExisted(cluster.Name, cluster.NameSpace) {
+		return true
+	}
+
+	if !job.IsExisted(job.Uuid) {
+		return true
+	}
+
+	return false
+}
+
+func generateSubJobs(job *modules.Job, ClusterStatus map[string]string) modules.SubJobs {
+
+	subJobs := make(modules.SubJobs)
+	if job.SubJobs != nil {
+		subJobs = job.SubJobs
+	}
+	log.Debug().Interface("subJobs", subJobs).Msg("subJobs=job.SubJobs")
+	for k, v := range ClusterStatus {
+		var subJobStatus string
+		if v == "Running" {
+			subJobStatus = "Success"
+		} else {
+			subJobStatus = "Running"
+		}
+
+		var subJob modules.SubJob
+		if _, ok := subJobs[k]; !ok {
+			subJob = modules.SubJob{
+				ModuleName:       k,
+				Status:           subJobStatus,
+				ModulesPodStatus: v,
+				StartTime:        job.StartTime,
+			}
+		} else {
+			subJob = subJobs[k]
+			subJob.Status = subJobStatus
+			subJob.ModulesPodStatus = v
+		}
+
+		if subJobStatus == "Success" && subJob.EndTime.IsZero() {
+			subJob.EndTime = time.Now()
+		}
+
+		subJobs[k] = subJob
+	}
+
+	job.SubJobs = subJobs
+	return subJobs
+}
+
+func ClusterUpdate(clusterArgs *ClusterArgs, creator string) (*modules.Job, error) {
+	// Check whether the cluster exists
+	c := new(modules.Cluster)
+	if ok := c.IsExisted(clusterArgs.Name, clusterArgs.Namespace); !ok {
+		return nil, fmt.Errorf("name=%s cluster is not exited", clusterArgs.Name)
+	}
+
+	c = &modules.Cluster{Name: clusterArgs.Name, NameSpace: clusterArgs.Namespace}
+	cluster, err := c.Get()
 	if err != nil {
-		log.Error().Err(err).Interface("clusterArgs", clusterArgs).Msg("find cluster by clusterArgs error, cluster is not exited")
+		log.Error().Err(err).Interface("clusterArgs", clusterArgs).Msg("find cluster by clusterArgs error")
 		return nil, err
 	}
 
-	cluster_old := cluster
-
-	job.ClusterId = cluster.Uuid
-
-	err = setJobByUuid(job)
+	clusterNew, err := modules.NewCluster(clusterArgs.Name, clusterArgs.Namespace, clusterArgs.ChartName, clusterArgs.ChartVersion, string(clusterArgs.Data))
 	if err != nil {
-		log.Error().Err(err).Interface("job", job).Msg("setJobByUuid error")
+		log.Error().Err(err).Msg("NewCluster")
 		return nil, err
 	}
-	err = setJobByClusterId(job)
-	if err != nil {
-		log.Error().Err(err).Interface("job", job).Msg("setJobByUuid error")
-		return nil, err
+
+	var specOld = cluster.Spec
+	var specNew = clusterNew.Spec
+	var valuesOld = cluster.Values
+	var valuesNew = clusterNew.Values
+
+	if reflect.DeepEqual(specOld, specNew) &&
+		cluster.ChartName == clusterArgs.ChartName &&
+		cluster.ChartVersion == clusterArgs.ChartVersion {
+		return nil, fmt.Errorf("the configuration file did not change")
 	}
-	//  save job to db
-	_, err = db.Save(job)
+
+	job := modules.NewJob("ClusterUpdate", creator, cluster.Uuid)
+	//  save job to modules
+	_, err = job.Insert()
 	if err != nil {
 		log.Error().Err(err).Interface("job", job).Msg("save job error")
 		return nil, err
@@ -207,62 +312,114 @@ func ClusterUpdate(clusterArgs *ClusterArgs, creator string) (*db.Job, error) {
 
 	//do job
 	go func() {
-		job.Status = db.Running_j
-		err = db.UpdateByUUID(job, job.Uuid)
-		if err != nil {
-			log.Error().Err(err).Str("jobId", job.Uuid).Msg("update job By Uuid error")
+		// update job.status/ cluster.status / cluster
+		dbErr := job.SetStatus(modules.JobStatusRunning)
+		if dbErr != nil {
+			log.Error().Err(dbErr).Msg("job.SetStatus error")
 		}
 
-		cluster.Status = db.Updating_c
-
-		err = db.UpdateByUUID(cluster, cluster.Uuid)
-		if err != nil {
-			log.Error().Err(err).Interface("cluster", cluster).Msg("update cluster error")
+		dbErr = cluster.SetStatus(modules.ClusterStatusUpdating)
+		if dbErr != nil {
+			log.Error().Err(dbErr).Msg("cluster.SetStatus error")
 		}
-		log.Debug().Str("cluster uuid", cluster.Uuid).Msg("update cluster success")
 
-		err := upgrade(cluster, clusterArgs)
+		dbErr = cluster.SetValues(valuesNew)
+		if dbErr != nil {
+			log.Error().Err(dbErr).Msg("cluster.SetSpec error")
+		}
+		dbErr = cluster.SetSpec(specNew)
+		if dbErr != nil {
+			log.Error().Err(dbErr).Msg("cluster.SetSpec error")
+		}
+
+		// HelmUpgrade
+
+		//The chart version does not change and update is used
+		//Upgrade corresponding to Helm
+		cluster.ChartName = clusterArgs.ChartName
+		cluster.ChartVersion = clusterArgs.ChartVersion
+		err = cluster.HelmUpgrade()
+		cluster.HelmRevision += 1
+
+		_, dbErr = cluster.UpdateByUuid(job.ClusterId)
 		if err != nil {
-			job.Result = err.Error()
-			job.Status = db.Failed_j
+			log.Error().Err(dbErr).Interface("cluster", cluster).Msg("update cluster error")
+		}
+
+		if err != nil {
 			log.Error().Err(err).Str("ClusterId", cluster.Uuid).Msg("helm upgrade cluster error")
+
+			dbErr := job.SetResult(err.Error())
+			if dbErr != nil {
+				log.Error().Err(dbErr).Msg("job.SetResult error")
+			}
+			dbErr = job.SetStatus(modules.JobStatusFailed)
+			if dbErr != nil {
+				log.Error().Err(dbErr).Msg("job.SetStatus error")
+			}
 		} else {
-			job.Result = "cluster update success"
-			job.Status = db.Running_j
 			log.Debug().Str("ClusterId", cluster.Uuid).Msg("helm upgrade cluster success")
+
+			dbErr := job.SetResult("Cluster update success")
+			if dbErr != nil {
+				log.Error().Err(dbErr).Msg("job.SetResult error")
+			}
+			dbErr = job.SetStatus(modules.JobStatusRunning)
+			if dbErr != nil {
+				log.Error().Err(dbErr).Msg("job.SetStatus error")
+			}
 		}
 
-		// todo job start status stop timeout
-		for job.Status == db.Running_j {
+		//
+		for job.Status == modules.JobStatusRunning {
+			if stopJob(job, &cluster) {
+				continue
+			}
+
 			if job.TimeOut() {
-				job.Result = "checkout cluster status timeOut!"
-				job.Status = db.Timeout_j
+				dbErr := job.SetResult("Checkout cluster status timeOut!")
+				if dbErr != nil {
+					log.Error().Err(dbErr).Msg("job.SetResult error")
+				}
+				dbErr = job.SetStatus(modules.JobStatusFailed)
+				if dbErr != nil {
+					log.Error().Err(dbErr).Msg("job.SetStatus error")
+				}
 				break
 			}
 
-			clusterStatusOk, err := service.CheckClusterStatus(clusterArgs.Name, clusterArgs.Namespace)
+			// update subJobs
+			ClusterStatus, err := service.GetClusterStatus(clusterArgs.Name, clusterArgs.Namespace)
 			if err != nil {
-				job.Result = "CheckClusterStatus error:" + err.Error()
-				job.Status = db.Failed_j
-				break
+				log.Error().Err(err).Msg("GetClusterStatus error")
 			}
-			if clusterStatusOk {
-				job.Status = db.Success_j
+
+			subJobs := generateSubJobs(job, ClusterStatus)
+
+			dbErr = job.SetSubJobs(subJobs)
+			if dbErr != nil {
+				log.Error().Err(dbErr).Msg("job.SetSubJobs error")
+			}
+
+			if service.CheckClusterStatus(ClusterStatus) {
+				dbErr := job.SetStatus(modules.JobStatusSuccess)
+				if dbErr != nil {
+					log.Error().Err(dbErr).Msg("job.SetStatus error")
+				}
 				break
 			}
 			time.Sleep(5 * time.Second)
 		}
 
-		if job.Status == db.Canceled_j {
+		if job.Status == modules.JobStatusCanceled {
 			job.Result = "Job canceled"
 		}
 
-		// save cluster to db
-		if job.Status == db.Success_j {
-			cluster.Status = db.Running_c
-			//cluster.
+		// save cluster to modules
+		if job.Status == modules.JobStatusSuccess {
+			cluster.Status = modules.ClusterStatusRunning
 			cluster.Revision += 1
-			err = db.UpdateByUUID(cluster, job.ClusterId)
+			_, err = cluster.UpdateByUuid(job.ClusterId)
 			if err != nil {
 				log.Error().Err(err).Interface("cluster", cluster).Msg("update cluster error")
 			}
@@ -270,10 +427,90 @@ func ClusterUpdate(clusterArgs *ClusterArgs, creator string) (*db.Job, error) {
 		}
 
 		// rollBACK
-		if job.Status != db.Success_j && job.Status != db.Canceled_j {
+		if job.Status != modules.JobStatusSuccess && job.Status != modules.JobStatusCanceled {
 			//todo helm rollBack
+			dbErr = cluster.SetValues(valuesOld)
+			if dbErr != nil {
+				log.Error().Err(dbErr).Msg("cluster.SetSpec error")
+			}
+			dbErr = cluster.SetSpec(specOld)
+			if dbErr != nil {
+				log.Error().Err(dbErr).Msg("cluster.SetSpec error")
+			}
+			dbErr = cluster.SetStatus(modules.ClusterStatusRollback)
+			if dbErr != nil {
+				log.Error().Err(dbErr).Msg("cluster.SetStatus error")
+			}
 
-			err = db.UpdateByUUID(cluster_old, cluster_old.Uuid)
+			//The chart version does not change and update is used
+			//Upgrade corresponding to Helm
+			err = cluster.HelmRollback()
+			cluster.HelmRevision -= 1
+
+			if err != nil {
+				log.Error().Err(err).Str("ClusterId", cluster.Uuid).Msg("helm upgrade cluster error")
+
+				dbErr := job.SetResult(job.Result + err.Error())
+				if dbErr != nil {
+					log.Error().Err(dbErr).Msg("job.SetResult error")
+				}
+				dbErr = job.SetStatus(modules.JobStatusFailed)
+				if dbErr != nil {
+					log.Error().Err(dbErr).Msg("job.SetStatus error")
+				}
+			} else {
+				log.Debug().Str("ClusterId", cluster.Uuid).Msg("helm upgrade cluster success")
+
+				dbErr := job.SetResult(job.Result + "Cluster run rollback success")
+				if dbErr != nil {
+					log.Error().Err(dbErr).Msg("job.SetResult error")
+				}
+				dbErr = job.SetStatus(modules.JobStatusRollback)
+				if dbErr != nil {
+					log.Error().Err(dbErr).Msg("job.SetStatus error")
+				}
+			}
+
+			//
+			for job.Status == modules.JobStatusRunning {
+				if job.TimeOut() {
+					dbErr := job.SetResult("Checkout cluster status timeOut!")
+					if dbErr != nil {
+						log.Error().Err(dbErr).Msg("job.SetResult error")
+					}
+					dbErr = job.SetStatus(modules.JobStatusFailed)
+					if dbErr != nil {
+						log.Error().Err(dbErr).Msg("job.SetStatus error")
+					}
+					break
+				}
+
+				// update subJobs
+				ClusterStatus, err := service.GetClusterStatus(clusterArgs.Name, clusterArgs.Namespace)
+				if err != nil {
+					log.Error().Err(err).Msg("GetClusterStatus error")
+				}
+
+				log.Debug().Interface("ClusterStatus", ClusterStatus).Msg("GetClusterStatus()")
+
+				subJobs := generateSubJobs(job, ClusterStatus)
+
+				dbErr = job.SetSubJobs(subJobs)
+				if dbErr != nil {
+					log.Error().Err(dbErr).Msg("job.SetSubJobs error")
+				}
+
+				if service.CheckClusterStatus(ClusterStatus) {
+					dbErr := job.SetStatus(modules.JobStatusSuccess)
+					if dbErr != nil {
+						log.Error().Err(dbErr).Msg("job.SetStatus error")
+					}
+					break
+				}
+				time.Sleep(5 * time.Second)
+			}
+
+			_, err = cluster.UpdateByUuid(cluster.Uuid)
 			if err != nil {
 				log.Error().Err(err).Interface("cluster", cluster).Msg("rollBACK cluster error")
 			}
@@ -281,12 +518,12 @@ func ClusterUpdate(clusterArgs *ClusterArgs, creator string) (*db.Job, error) {
 		}
 
 		job.EndTime = time.Now()
-		err = db.UpdateByUUID(job, job.Uuid)
+		_, err = job.UpdateByUuid(job.Uuid)
 		if err != nil {
 			log.Error().Err(err).Str("jobId", job.Uuid).Msg("update job By Uuid error")
 		}
-		deleteJob(job)
-		if job.Status == db.Success_j {
+
+		if job.Status == modules.JobStatusSuccess {
 			log.Debug().Interface("job", job).Msg("job run success")
 		} else {
 			log.Warn().Interface("job", job).Msg("job run failed")
@@ -296,39 +533,21 @@ func ClusterUpdate(clusterArgs *ClusterArgs, creator string) (*db.Job, error) {
 	return job, nil
 }
 
-func ClusterDelete(clusterId string, creator string) (*db.Job, error) {
+func ClusterDelete(clusterId string, creator string) (*modules.Job, error) {
+	if clusterId == "" {
+		return nil, fmt.Errorf("clusterid cannot be empty")
+	}
 
-	job := db.NewJob("ClusterDelete", creator)
-	cluster, err := db.ClusterFindByUUID(clusterId)
+	c := modules.Cluster{Uuid: clusterId}
+	cluster, err := c.Get()
 	if err != nil {
 		log.Error().Err(err).Interface("clusterId", clusterId).Msg("find cluster by clusterId error")
 		return nil, err
 	}
 
-	//cluster_old := cluster
-
-	job.ClusterId = cluster.Uuid
-
-	err = setJobByUuid(job)
-	if err != nil {
-		log.Error().Err(err).Interface("job", job).Msg("setJobByUuid error")
-		return nil, err
-	}
-
-	if ok := IsExistedJobByClusterID(job); ok {
-		jobOther := getJobByClusterID(cluster.Uuid)
-		//Cancel other job
-		jobOther.Status = db.Canceled_j
-	}
-
-	err = setJobByClusterId(job)
-	if err != nil {
-		log.Error().Err(err).Interface("job", job).Msg("setJobByClusterId error")
-		return nil, err
-	}
-
-	// save job to db
-	_, err = db.Save(job)
+	job := modules.NewJob("ClusterDelete", creator, clusterId)
+	// save job to modules
+	_, err = job.Insert()
 	if err != nil {
 		log.Err(err).Interface("job", job).Msg("save job error")
 		return nil, err
@@ -337,199 +556,52 @@ func ClusterDelete(clusterId string, creator string) (*db.Job, error) {
 	log.Info().Str("jobId", job.Uuid).Msg("create a new job of ClusterDelete")
 
 	go func() {
-		job.Status = db.Running_j
-		err = db.UpdateByUUID(job, job.Uuid)
-		if err != nil {
-			log.Error().Err(err).Str("jobId", job.Uuid).Msg("update job By Uuid error")
+		dbErr := job.SetStatus(modules.JobStatusRunning)
+		if dbErr != nil {
+			log.Error().Err(dbErr).Msg("job.SetStatus error")
 		}
-		cluster.Status = db.Deleting_c
-		err = db.UpdateByUUID(cluster, job.ClusterId)
-		if err != nil {
-			log.Error().Err(err).Interface("cluster", cluster).Msg("update cluster error")
+		dbErr = cluster.SetStatus(modules.ClusterStatusDeleting)
+		if dbErr != nil {
+			log.Error().Err(dbErr).Msg("cluster.SetStatus error")
 		}
-		log.Debug().Str("cluster uuid", cluster.Uuid).Msg("update cluster success")
 
-		err = uninstall(cluster)
+		err = cluster.HelmDelete()
 		if err != nil {
 			job.Result = err.Error()
-			job.Status = db.Failed_j
+			job.Status = modules.JobStatusFailed
 			log.Err(err).Str("ClusterId", cluster.Uuid).Msg("helm delete cluster error")
 		} else {
 			job.Result = "uninstall success"
-			job.Status = db.Running_j
+			job.Status = modules.JobStatusRunning
 			log.Debug().Str("ClusterId", cluster.Uuid).Msg("helm delete cluster success")
 		}
 
-		if job.Status == db.Running_j {
-			job.Status = db.Success_j
+		if job.Status == modules.JobStatusRunning {
+			job.Status = modules.JobStatusSuccess
 		}
 
-		if job.Status == db.Canceled_j {
+		if job.Status == modules.JobStatusCanceled {
 			job.Result = "Job canceled"
 		}
 
-		//if job.Status == db.Success_j {
-		err = db.ClusterDeleteByUUID(clusterId)
+		//if job.Status == modules.JobStatusSuccess {
+		c := modules.Cluster{Uuid: clusterId}
+		_, err = c.Delete()
 		if err != nil {
-			log.Err(err).Interface("cluster", cluster).Msg("db delete cluster error")
+			log.Err(err).Interface("cluster", cluster).Msg("modules delete cluster error")
 		}
-		log.Debug().Str("clusterUuid", clusterId).Msg("db delete cluster success")
-		//}
-
-		//// rollBACK
-		//if job.Status == db.Failed_j {
-		//	cluster.Status = db.Running_c
-		//	err = db.UpdateByUUID(cluster_old, job.ClusterId)
-		//	if err != nil {
-		//		log.Error().Err(err).Interface("cluster", cluster).Msg("rollBACK cluster error")
-		//	}
-		//	log.Debug().Str("cluster uuid", cluster.Uuid).Msg("rollBACK cluster success")
-		//}
+		log.Debug().Str("clusterUuid", clusterId).Msg("modules delete cluster success")
 
 		job.EndTime = time.Now()
-		err = db.UpdateByUUID(job, job.Uuid)
+		_, err = job.UpdateByUuid(job.Uuid)
 		if err != nil {
 			log.Err(err).Str("jobId", job.Uuid).Msg("update job By Uuid error")
 		}
-		deleteJob(job)
-		if job.Status == db.Success_j {
+		if job.Status == modules.JobStatusSuccess {
 			log.Debug().Interface("job", job).Msg("job run success")
 		} else {
 			log.Warn().Interface("job", job).Msg("job run failed")
 		}
-	}()
-
-	return job, nil
-}
-
-func install(fc *db.Cluster, values []byte) error {
-
-	err := service.RepoAddAndUpdate()
-	if err != nil {
-		log.Warn().Err(err).Msg("RepoAddAndUpdate error, check kubefate.yaml at env FATECLOUD_REPO_URL values,")
-	}
-	v := new(service.Value)
-	v.Val = values
-	v.T = "json"
-
-	fc.Values = string(values)
-
-	if fc.ChartName == "" {
-		fc.ChartName = "fate"
-	}
-
-	result, err := service.Install(fc.NameSpace, fc.Name, fc.ChartName, fc.ChartVersion, v)
-	if err != nil {
-		return err
-	}
-	log.Debug().Interface("result", result).Msg("service.Install got ")
-
-	fc.ChartName = result.ChartName
-	fc.NameSpace = result.Namespace
-	fc.ChartVersion = result.ChartVersion
-	fc.ChartValues = result.ChartValues
-	fc.Config = result.Config
-
-	return nil
-}
-
-func upgrade(fc *db.Cluster, clusterArgs *ClusterArgs) error {
-
-	err := uninstall(fc)
-	if err != nil {
-		return err
-	}
-
-	fc.ChartName = clusterArgs.ChartName
-	fc.ChartVersion = clusterArgs.ChartVersion
-
-	err = install(fc, clusterArgs.Data)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-func uninstall(fc *db.Cluster) error {
-
-	_, err := service.Delete(fc.NameSpace, fc.Name)
-
-	return err
-}
-
-func helmClean(NameSpace, Name string) error {
-	_, err := service.Delete(NameSpace, Name)
-	return err
-}
-
-type Job interface {
-	save() error
-	doJob() error
-	checkStatus() error
-	update() error
-}
-
-func Run(j Job) (*db.Job, error) {
-	var clusterArgs *ClusterArgs
-	//if ok := service.IsExited(clusterArgs.Name, clusterArgs.Namespace); !ok {
-	//	return nil, errors.New("cluster is exited")
-	//}
-	job := db.NewJob("ClusterInstall", "")
-
-	//  save job to db
-	_, err := db.Save(job)
-	if err != nil {
-		log.Error().Err(err).Interface("job", job).Msg("save job error")
-		return nil, err
-	}
-
-	log.Info().Str("jobId", job.Uuid).Msg("create a new job of ClusterInstall")
-
-	go func() {
-		//create a cluster use parameter
-		cluster := db.NewCluster(clusterArgs.Name, clusterArgs.Namespace, clusterArgs.ChartName, clusterArgs.ChartVersion)
-		job.ClusterId = cluster.Uuid
-
-		err := install(cluster, clusterArgs.Data)
-		if err != nil {
-			job.Result = err.Error()
-			job.Status = db.Failed_j
-			log.Error().Err(err).Str("ClusterId", cluster.Uuid).Msg("install cluster error")
-		} else {
-			job.Result = "install success"
-			job.Status = db.Running_j
-			log.Debug().Str("ClusterId", cluster.Uuid).Msg("install cluster success")
-		}
-
-		// todo job start status stop timeout
-		for job.Status == db.Running_j {
-			clusterStatusOk, err := service.CheckClusterStatus(clusterArgs.Name, clusterArgs.Namespace)
-			if err != nil {
-				job.Status = db.Failed_j
-				break
-			}
-			if clusterStatusOk {
-				job.Status = db.Success_j
-				break
-			}
-			time.Sleep(time.Second)
-		}
-
-		//todo save cluster to db
-		if job.Status == db.Success_j {
-			_, err = db.Save(cluster)
-			if err != nil {
-				log.Error().Err(err).Interface("cluster", cluster).Msg("save cluster error")
-			}
-			log.Debug().Str("cluster uuid", cluster.Uuid).Msg("create cluster success")
-		}
-
-		job.EndTime = time.Now()
-		err = db.UpdateByUUID(job, job.Uuid)
-		if err != nil {
-			log.Error().Err(err).Str("jobId", job.Uuid).Msg("update job By Uuid error")
-		}
-
-		log.Debug().Interface("job", job).Msg("job run success")
 	}()
 
 	return job, nil

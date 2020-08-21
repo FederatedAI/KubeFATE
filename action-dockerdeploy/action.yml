@@ -1,0 +1,11 @@
+name: "Docker Deploy Actions"
+description: "docker deploy using docker compose"
+author: ""
+
+runs:
+  using: "docker"
+  image: "Dockerfile"
+
+branding:
+  icon: "mic"
+  color: "purple"

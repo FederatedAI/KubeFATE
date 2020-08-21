@@ -6,16 +6,18 @@ kubeFATE Service have three parts: deployment, service and ingress.
 Following is the description of the environment variables of KubeFATE deployment.
 ```
 env:
-  - name: FATECLOUD_MONGO_URL
-    value: "mongo:27017"
-  - name: FATECLOUD_MONGO_USERNAME
-    value: "root"
-  - name: FATECLOUD_MONGO_PASSWORD
-    value: "root"
-  - name: FATECLOUD_MONGO_DATABASE
-    value: "KubeFate"
-  - name: FATECLOUD_REPO_NAME
+  - name: FATECLOUD_DB_TYPE
+    value: "mysql"
+  - name: FATECLOUD_DB_HOST
+    value: "mysql"
+  - name: FATECLOUD_DB_PORT
+    value: "3306"
+  - name: FATECLOUD_DB_NAME
+    value: "kube_fate"
+  - name: FATECLOUD_DB_USERNAME
     value: "kubefate"
+  - name: FATECLOUD_DB_PASSWORD
+    value: "kubeFATE!23"
   - name: FATECLOUD_REPO_URL
     value: "https://federatedai.github.io/KubeFATE/"
   - name: FATECLOUD_USER_USERNAME
@@ -29,19 +31,21 @@ env:
   - name: FATECLOUD_LOG_LEVEL
     value: "debug"
 ```
-|Name                     |Description                                |
-|-------------------------|-------------------------------------------|
-|FATECLOUD_MONGO_URL      |MongoDB url, MongoDB configuration depends on MongoDB service. |
-|FATECLOUD_MONGO_USERNAME |MongoDB username.                          |
-|FATECLOUD_MONGO_PASSWORD |MongoDB password.                          |
-|FATECLOUD_MONGO_DATABASE |Database in MongoDB.                       |
-|FATECLOUD_REPO_NAME      |Remote helm [chart repository](https://helm.sh/docs/topics/chart_repository/) name. |
-|FATECLOUD_REPO_URL       |Remote helm chart repository url.          |
-|FATECLOUD_USER_USERNAME  |Username of KubeFATE service default user. |
-|FATECLOUD_USER_PASSWORD  |Password of KubeFATE service default user. |
-|FATECLOUD_SERVER_ADDRESS |KubeFATE service address.                  |
-|FATECLOUD_SERVER_PORT    |KubeFATE service port.                     |
-|FATECLOUD_LOG_LEVEL      |KubeFATE service log level.                |
+| Name                     | Description                                                  |
+| ------------------------ | ------------------------------------------------------------ |
+| FATECLOUD_DB_TYPE        | Database types that support kubefate. At present, there is only "mysql". |
+| FATECLOUD_DB_HOST        | DB host, for example "localhost".                            |
+| FATECLOUD_DB_PORT        | DB port, for example "3306".                                 |
+| FATECLOUD_DB_NAME        | Database name.                                               |
+| FATECLOUD_DB_USERNAME    | Database user.                                               |
+| FATECLOUD_DB_PASSWORD    | Database password.                                           |
+| FATECLOUD_REPO_NAME      | Remote helm [chart repository](https://helm.sh/docs/topics/chart_repository/) name. |
+| FATECLOUD_REPO_URL       | Remote helm chart repository url.                            |
+| FATECLOUD_USER_USERNAME  | Username of KubeFATE service default user.                   |
+| FATECLOUD_USER_PASSWORD  | Password of KubeFATE service default user.                   |
+| FATECLOUD_SERVER_ADDRESS | KubeFATE service address.                                    |
+| FATECLOUD_SERVER_PORT    | KubeFATE service port.                                       |
+| FATECLOUD_LOG_LEVEL      | KubeFATE service log level.                                  |
 
 ### Service
 ```
@@ -70,13 +74,17 @@ rules:
 |host    |Defining the domain name of ingress. |
 |backend |Backend depends on KubeFATE service. |
 
-## MongoDB
+## MySQL
 ### Deployment
 ```
 env:
-  - name: MONGO_INITDB_ROOT_USERNAME
-    value: root
-  - name: MONGO_INITDB_ROOT_PASSWORD
-    value: root
+  - name: MYSQL_DATABASE
+    value: "kube_fate"
+  - name: MYSQL_ALLOW_EMPTY_PASSWORD
+    value: "1"
+  - name: MYSQL_USER
+    value: "kubefate"
+  - name: MYSQL_PASSWORD
+    value: "kubeFATE!23"
 ```
-Define MongoDB initial username and password.
+Define MySQL initial username and password.
