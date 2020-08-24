@@ -15,6 +15,7 @@
 package logging
 
 import (
+	"fmt"
 	"os"
 	"time"
 
@@ -25,36 +26,29 @@ import (
 
 // InitLog initials a log instance with specified config
 func InitLog() {
-	logLevel := viper.GetString("log.level")
-
-	switch logLevel {
-	case "debug":
-		zerolog.SetGlobalLevel(zerolog.DebugLevel)
-	case "info":
-		zerolog.SetGlobalLevel(zerolog.InfoLevel)
-	case "warn":
-		zerolog.SetGlobalLevel(zerolog.WarnLevel)
-	case "error":
-		zerolog.SetGlobalLevel(zerolog.ErrorLevel)
-	case "fatal":
-		zerolog.SetGlobalLevel(zerolog.FatalLevel)
-	case "panic":
-		zerolog.SetGlobalLevel(zerolog.PanicLevel)
-	default:
-		// Info is the default log level
-		zerolog.SetGlobalLevel(zerolog.InfoLevel)
-	}
 
 	log.Logger = log.Output(
 		zerolog.ConsoleWriter{
 			// TODO(JHC):
 			// 1. output device should read from config file
-			Out:        os.Stderr,
-			NoColor:    false,
+			Out:        os.Stdout,
+			NoColor:    viper.GetBool("log.nocolor"),
 			TimeFormat: time.RFC3339,
 		},
-	)
-
-	log.Logger = log.With().Caller().CallerWithSkipFrameCount(2).Logger()
-
+	).With().Caller().Stack().Logger()
+	logLevel, err := zerolog.ParseLevel(viper.GetString("log.level"))
+	if err != nil {
+		log.Error().Err(err).
+			Str("You need to choose one from here", fmt.Sprint(
+				zerolog.TraceLevel,
+				zerolog.InfoLevel,
+				zerolog.DebugLevel,
+				zerolog.WarnLevel,
+				zerolog.ErrorLevel,
+				zerolog.FatalLevel,
+				zerolog.PanicLevel,
+			)).
+			Msg("Get log level configuration error")
+	}
+	log.Logger = log.Logger.Level(logLevel)
 }

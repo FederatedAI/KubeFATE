@@ -15,18 +15,24 @@
 package logging
 
 import (
-	"os"
 	"testing"
+
+	"github.com/spf13/viper"
 
 	"github.com/rs/zerolog/log"
 )
 
 func TestInitLog(t *testing.T) {
-	os.Setenv("FATECLOUD_LOG_LEVEL", "debug")
+	logLevel := "info"
+	viper.Set("log.nocolor", "true")
+	viper.Set("log.level", logLevel)
 	InitLog()
-	log.Info().Str("Logger Level", log.Logger.GetLevel().String())
-
-	log.Debug().Msg("debug")
+	if log.Logger.GetLevel().String() != logLevel {
+		t.Errorf("log level Configuration error")
+	}
+	log.Trace().Msg("Trace")
 	log.Info().Msg("Info")
+	log.Debug().Msg("Debug")
+	log.Warn().Msg("Warn")
 
 }
