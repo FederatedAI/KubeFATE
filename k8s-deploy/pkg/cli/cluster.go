@@ -1,26 +1,31 @@
 /*
-* Copyright 2019-2020 VMware, Inc.
-* 
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* http://www.apache.org/licenses/LICENSE-2.0
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-* 
-*/
+ * Copyright 2019-2020 VMware, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package cli
 
 import (
 	"errors"
 	"fmt"
-	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/db"
+	"os"
+	"time"
+
+	"github.com/rs/zerolog/log"
+	"golang.org/x/crypto/ssh/terminal"
+
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/modules"
 	"github.com/gosuri/uitable"
 	"helm.sh/helm/v3/pkg/cli/output"
-	"os"
 )
 
 type Cluster struct {
@@ -43,15 +48,15 @@ func (c *Cluster) addArgs() (Args string) {
 }
 
 type ClusterResultList struct {
-	Data []*db.Cluster
+	Data []*modules.Cluster
 	Msg  string
 }
 type ClusterJobResult struct {
-	Data *db.Job
+	Data *modules.Job
 	Msg  string
 }
 type ClusterResult struct {
-	Data *db.Cluster
+	Data *modules.Cluster
 	Msg  string
 }
 
@@ -81,7 +86,7 @@ func (c *Cluster) getResult(Type int) (result interface{}, err error) {
 	return
 }
 
-func (c *Cluster) outPut(result interface{}, Type int) error {
+func (c *Cluster) output(result interface{}, Type int) error {
 	switch Type {
 	case LIST:
 		return c.outPutList(result)
@@ -107,9 +112,9 @@ func (c *Cluster) outPutList(result interface{}) error {
 		return errors.New("type ClusterResultList not ok")
 	}
 	table := uitable.New()
-	table.AddRow("UUID", "NAME", "NAMESPACE", "REVISION", "STATUS", "CHART", "ChartVERSION")
+	table.AddRow("UUID", "NAME", "NAMESPACE", "REVISION", "STATUS", "CHART", "ChartVERSION", "AGE")
 	for _, r := range item.Data {
-		table.AddRow(r.Uuid, r.Name, r.NameSpace, r.Revision, r.Status, r.ChartName, r.ChartVersion)
+		table.AddRow(r.Uuid, r.Name, r.NameSpace, r.Revision, r.Status, r.ChartName, r.ChartVersion, HumanDuration(time.Since(r.CreatedAt)))
 	}
 	table.AddRow("")
 	return output.EncodeTable(os.Stdout, table)
@@ -155,17 +160,24 @@ func (c *Cluster) outPutInfo(result interface{}) error {
 	cluster := item.Data
 
 	table := uitable.New()
-
+	colWidth, _, _ := terminal.GetSize(int(os.Stdout.Fd()))
+	if colWidth == 0 {
+		table.MaxColWidth = TableMaxColWidthDefault
+	} else {
+		table.MaxColWidth = uint(colWidth - ColWidthOffset)
+	}
+	log.Debug().Int("colWidth", colWidth).Uint("MaxColWidth", table.MaxColWidth).Msg("colWidth ")
+	table.Wrap = true // wrap columns
 	table.AddRow("UUID", cluster.Uuid)
 	table.AddRow("Name", cluster.Name)
 	table.AddRow("NameSpace", cluster.NameSpace)
 	table.AddRow("ChartName", cluster.ChartName)
 	table.AddRow("ChartVersion", cluster.ChartVersion)
 	table.AddRow("Revision", cluster.Revision)
-	//table.AddRow("Type", cluster.Type)
+	table.AddRow("Age", HumanDuration(time.Since(cluster.CreatedAt)))
 	table.AddRow("Status", cluster.Status)
 	table.AddRow("Values", cluster.Values)
-	table.AddRow("Config", cluster.Config)
+	table.AddRow("Spec", cluster.Spec)
 	table.AddRow("Info", cluster.Info)
 	table.AddRow("")
 	return output.EncodeTable(os.Stdout, table)
