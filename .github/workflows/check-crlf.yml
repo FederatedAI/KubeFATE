@@ -1,0 +1,14 @@
+name: check-crlf
+
+on: pull_request
+
+jobs:
+  check-CRLF:
+    name: Check CRLF action
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: check-crlf
+        uses: erclu/check-crlf@v1
