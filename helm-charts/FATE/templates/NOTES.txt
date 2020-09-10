@@ -1,0 +1,8 @@
+Please wait for several minutes for FATE deployment to complete.
+Then you should be able to visit the FateBoard portal at {{ .Values.host.fateboard }} and NoteBook portal at {{ .Values.host.client }}.
+For more details, please visit https://github.com/FederatedAI/KubeFATE.
+
+# optional
+If you have enabled the istio, please visit:
+- FateBoard at http://${istio-gateway}/fateboard-{{ .Values.partyId }}/
+- NoteBook at http://${istio-gateway}/notebook-{{ .Values.partyId }}/ 

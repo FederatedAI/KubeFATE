@@ -1,0 +1,259 @@
+# Copyright 2019-2020 VMware, Inc.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+{{ if .Values.modules.mysql.include }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-config
+  labels:
+    fateMoudle: mysql
+{{ include "fate.labels" . | indent 4 }}
+data:
+  create-eggroll-meta-tables.sql: |
+    -- create database if not exists
+    CREATE DATABASE IF NOT EXISTS `{{ .Values.modules.mysql.database }}`;
+    
+    -- all operation under this database
+    USE `{{ .Values.modules.mysql.database }}`;
+    
+    -- store_locator
+    CREATE TABLE IF NOT EXISTS `store_locator` (
+      `store_locator_id` SERIAL PRIMARY KEY,
+      `store_type` VARCHAR(255) NOT NULL,
+      `namespace` VARCHAR(2000) NOT NULL DEFAULT 'DEFAULT',
+      `name` VARCHAR(2000) NOT NULL,
+      `path` VARCHAR(2000) NOT NULL DEFAULT '',
+      `total_partitions` INT UNSIGNED NOT NULL,
+      `partitioner` VARCHAR(2000) NOT NULL DEFAULT 'BYTESTRING_HASH',
+      `serdes` VARCHAR(2000) NOT NULL DEFAULT '',
+      `version` INT UNSIGNED NOT NULL DEFAULT 0,
+      `status` VARCHAR(255) NOT NULL,
+      `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+      `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    ) DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
+    
+    CREATE UNIQUE INDEX `idx_u_store_locator_ns_n` ON `store_locator` (`namespace`(120), `name`(640));
+    CREATE INDEX `idx_store_locator_st` ON `store_locator` (`store_type`(255));
+    CREATE INDEX `idx_store_locator_ns` ON `store_locator` (`namespace`(768));
+    CREATE INDEX `idx_store_locator_n` ON `store_locator` (`name`(768));
+    CREATE INDEX `idx_store_locator_s` ON `store_locator` (`status`(255));
+    CREATE INDEX `idx_store_locator_v` ON `store_locator` (`version`);
+    
+    
+    -- store (option)
+    CREATE TABLE IF NOT EXISTS `store_option` (
+      `store_locator_id` VARCHAR(2000),
+      `name` VARCHAR(255) NOT NULL,
+      `data` VARCHAR(2000) NOT NULL DEFAULT '',
+      `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    ) DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
+    
+    CREATE INDEX `idx_store_option_si` ON `store_option` (`store_locator_id`);
+    
+    
+    -- store_partition
+    CREATE TABLE IF NOT EXISTS `store_partition` (
+      `store_partition_id` SERIAL PRIMARY KEY,          -- self-increment sequence
+      `store_locator_id` BIGINT UNSIGNED NOT NULL,
+      `node_id` BIGINT UNSIGNED NOT NULL,
+      `partition_id` INT UNSIGNED NOT NULL,             -- partition id of a store
+      `status` VARCHAR(255) NOT NULL,
+      `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+      `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    ) DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
+    
+    CREATE UNIQUE INDEX `idx_u_store_partition_si_spi_ni` ON `store_partition` (`store_locator_id`, `store_partition_id`, `node_id`);
+    CREATE INDEX `idx_store_partition_sli` ON `store_partition` (`store_locator_id`);
+    CREATE INDEX `idx_store_partition_ni` ON `store_partition` (`node_id`);
+    CREATE INDEX `idx_store_partition_s` ON `store_partition` (`status`(255));
+    
+    
+    -- node
+    CREATE TABLE IF NOT EXISTS `server_node` (
+      `server_node_id` SERIAL PRIMARY KEY,
+      `name` VARCHAR(2000) NOT NULL DEFAULT '',
+      `server_cluster_id` BIGINT UNSIGNED NOT NULL DEFAULT 0,
+      `host` VARCHAR(1000) NOT NULL,
+      `port` INT NOT NULL,
+      `node_type` VARCHAR(255) NOT NULL,
+      `status` VARCHAR(255) NOT NULL,
+      `last_heartbeat_at` DATETIME DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+      `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    ) DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
+    
+    CREATE INDEX `idx_server_node_h_p_nt` ON `server_node` (`host`, `port`, `node_type`);
+    CREATE INDEX `idx_server_node_h` ON `server_node` (`host`(768));
+    CREATE INDEX `idx_server_node_sci` ON `server_node` (`server_cluster_id`);
+    CREATE INDEX `idx_server_node_nt` ON `server_node` (`node_type`(255));
+    CREATE INDEX `idx_server_node_s` ON `server_node` (`status`(255));
+    
+    
+    -- session (main)
+    CREATE TABLE IF NOT EXISTS `session_main` (
+      `session_id` VARCHAR(2000) PRIMARY KEY,
+      `name` VARCHAR(2000) NOT NULL DEFAULT '',
+      `status` VARCHAR(255) NOT NULL,
+      `tag` VARCHAR(255),
+      `total_proc_count` INT,
+      `active_proc_count` INT,
+      `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    ) DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
+    
+    CREATE INDEX `idx_session_main_s` ON `session_main` (`status`);
+    
+    
+    -- session (option)
+    CREATE TABLE IF NOT EXISTS `session_option` (
+      `session_id` VARCHAR(2000),
+      `name` VARCHAR(255) NOT NULL,
+      `data` VARCHAR(2000) NOT NULL DEFAULT '',
+      `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    ) DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
+    
+    CREATE INDEX `idx_session_option_si` ON `session_option` (`session_id`);
+    
+    
+    -- session (processor)
+    CREATE TABLE IF NOT EXISTS `session_processor` (
+      `processor_id` SERIAL PRIMARY KEY,
+      `session_id` VARCHAR(2000),
+      `server_node_id` INT NOT NULL,
+      `processor_type` VARCHAR(255) NOT NULL,
+      `status` VARCHAR(255),
+      `tag` VARCHAR(255),
+      `command_endpoint` VARCHAR(255),
+      `transfer_endpoint` VARCHAR(255),
+      `pid` INT NOT NULL DEFAULT -1,
+      `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    ) DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
+    
+    CREATE INDEX `idx_session_processor_si` ON `session_processor` (`session_id`);
+    
+    INSERT INTO server_node (host, port, node_type, status) values ('clustermanager', '9460', 'CLUSTER_MANAGER', 'HEALTHY');
+    {{- range $nodemanager := .Values.modules.nodemanager.list }}
+    INSERT INTO server_node (host, port, node_type, status) values ('{{ $nodemanager.name }}', '9461', 'NODE_MANAGER', 'HEALTHY');
+    {{- end }}
+    show tables;
+    select * from server_node;
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  labels:
+    fateMoudle: mysql
+{{ include "fate.labels" . | indent 4 }}
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      fateMoudle: mysql
+{{ include "fate.matchLabels" . | indent 6 }}
+  template:
+    metadata:
+      labels:
+        fateMoudle: mysql
+{{ include "fate.labels" . | indent 8 }}
+    spec:
+      containers:
+        {{- if .Values.image.isThridParty }}
+        - image: {{ .Values.image.registry }}/mysql:8
+        {{- else }}
+        - image: mysql:8
+        {{- end }}
+          name: mysql
+          env:
+            - name: MYSQL_ALLOW_EMPTY_PASSWORD 
+              value: "1"
+            - name: MYSQL_DATABASE
+              value: {{ .Values.modules.mysql.database | quote }}
+            - name: MYSQL_USER
+              value: {{ .Values.modules.mysql.user | quote }}
+            - name: MYSQL_PASSWORD
+              value: {{ .Values.modules.mysql.password | quote }}
+            - name: user
+              value: root
+          ports:
+            - containerPort: 3306
+          volumeMounts:
+            - name: mysql-confs
+              mountPath: /docker-entrypoint-initdb.d/
+            - name: data
+              mountPath: /var/lib/mysql
+              subPath: {{ .Values.modules.mysql.subPath }}
+      {{- with .Values.modules.mysql.nodeSelector }}
+      nodeSelector: 
+      {{- range $k, $v := . }}
+        {{ $k }}: {{ $v }}
+      {{- end }}
+      {{- end }}
+      volumes:
+        - name: mysql-confs
+          configMap:
+            name: mysql-config
+        {{- if not .Values.persistence.enabled }}
+        - name: data
+          emptyDir: {}
+        {{- else }}
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ .Values.modules.mysql.existingClaim | default  "mysql-data" }}
+        {{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+  labels:
+    fateMoudle: mysql
+{{ include "fate.labels" . | indent 4 }}
+spec:
+  ports:
+    - name: "3306"
+      port: 3306
+      targetPort: 3306
+      protocol: TCP
+  type: {{ .Values.modules.mysql.type }}
+  selector:
+    fateMoudle: mysql
+{{ include "fate.matchLabels" . | indent 4 }}
+---
+{{- if and .Values.persistence.enabled (not .Values.modules.mysql.existingClaim) }}
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: mysql-data
+  labels:
+    fateMoudle: mysql
+{{ include "fate.labels" . | indent 4 }}
+spec:
+  accessModes: 
+    - {{ .Values.modules.mysql.accessMode }}
+  resources:
+    requests:
+      storage: {{ .Values.modules.mysql.size }}
+  {{- if .Values.modules.mysql.storageClass }}
+    {{- if eq "-" .Values.modules.mysql.storageClass }}
+  storageClassName: ""
+    {{- else }}
+  storageClassName: {{ .Values.modules.mysql.storageClass }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+{{ end }}
