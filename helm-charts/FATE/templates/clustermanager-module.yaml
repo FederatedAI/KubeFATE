@@ -1,0 +1,85 @@
+# Copyright 2019-2020 VMware, Inc.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+{{ if .Values.modules.clustermanager.include }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: clustermanager
+  labels:
+    fateMoudle: clustermanager
+{{ include "fate.labels" . | indent 4 }}
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      fateMoudle: clustermanager
+{{ include "fate.matchLabels" . | indent 6 }}
+  template:
+    metadata:
+      labels:
+        fateMoudle: clustermanager
+{{ include "fate.labels" . | indent 8 }}
+    spec:
+      hostAliases:
+      - ip: "127.0.0.1"
+        hostnames:
+        - "clustermanager"
+      containers:
+        - env:
+          - name: PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION
+            value: python 
+          image: {{ .Values.image.registry }}/eggroll:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          name: clustermanager
+          command:
+          - bash
+          - -c
+          - "java -Dlog4j.configurationFile=$${EGGROLL_HOME}/conf/log4j2.properties -cp $${EGGROLL_HOME}/lib/*: com.webank.eggroll.core.Bootstrap --bootstraps com.webank.eggroll.core.resourcemanager.ClusterManagerBootstrap -c $${EGGROLL_HOME}/conf/eggroll.properties -p 4670 -s 'EGGROLL_DEAMON'"
+          ports:
+            - containerPort: 4670
+          volumeMounts:
+            - mountPath: /data/projects/fate/eggroll/conf/eggroll.properties
+              name: eggroll-confs
+              subPath: eggroll.properties
+      {{- with .Values.modules.mysql.nodeSelector }}
+      nodeSelector: 
+      {{- range $k, $v := . }}
+        {{ $k }}: {{ $v }}
+      {{- end }}
+      {{- end }}
+      restartPolicy: Always
+      volumes:
+        - name: eggroll-confs
+          configMap:
+            name: eggroll-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: clustermanager
+  labels:
+    fateMoudle: clustermanager
+{{ include "fate.labels" . | indent 4 }}
+spec:
+  ports:
+    - name: "4670"
+      port: 4670
+      targetPort: 4670
+      protocol: TCP
+  type: {{ .Values.modules.clustermanager.type }}
+  selector:
+    fateMoudle: clustermanager
+{{ include "fate.matchLabels" . | indent 4 }}
+---
+{{ end }}

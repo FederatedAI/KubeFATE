@@ -1,0 +1,93 @@
+
+image:
+  registry: federatedai
+  isThridParty:
+  tag: 1.4.4-release
+  pullPolicy: IfNotPresent
+  
+partyId: 9999
+partyName: fate-9999
+
+istio:
+  enabled: false
+
+host:
+  fateboard: 9999.fateboard.kubefate.net
+  client: 9999.notebook.kubefate.net
+
+exchange:
+  partyIp: 192.168.1.1
+  partyPort: 30000
+
+partyList:
+- partyId: 8888
+  partyIp: 192.168.8.1
+  partyPort: 30008
+- partyId: 10000
+  partyIp: 192.168.10.1
+  partyPort: 30010
+
+persistence:
+  enabled: false
+
+modules:
+  rollsite: 
+    include: true
+    ip: rollsite
+    type: NodePort
+    nodePort: 30009
+    nodeSelector: {}
+  python: 
+    include: true
+    fateboardIp: fateboard
+    fateboardType: ClusterIP
+    fateflowIp: fateflow
+    fateflowType: ClusterIP
+    nodeSelector: {}
+  clustermanager: 
+    include: true
+    ip: clustermanager
+    type: ClusterIP
+    nodeSelector: {}
+  nodemanager:  
+    include: true
+    list:
+    - name: nodemanager-0
+      nodeSelector: {}
+      sessionProcessorsPerNode: 2
+      subPath: "nodemanager-0"
+      existingClaim: ""
+      storageClass: "nodemanager-0"
+      accessMode: ReadWriteOnce
+      size: 1Gi
+    - name: nodemanager-1
+      nodeSelector: {}
+      sessionProcessorsPerNode: 2
+      subPath: "nodemanager-1"
+      existingClaim: ""
+      storageClass: "nodemanager-1"
+      accessMode: ReadWriteOnce
+      size: 1Gi
+  client: 
+    include: true
+    ip: client
+    type: ClusterIP
+    nodeSelector: {}
+  mysql: 
+    include: true
+    type: ClusterIP
+    nodeSelector: {}
+    ip: mysql
+    port: 3306
+    database: eggroll_meta
+    user: fate
+    password: fate_dev
+    subPath: "mysql"
+    existingClaim: ""
+    claimName: mysql-data
+    storageClass: "mysql"
+    accessMode: ReadWriteOnce
+    size: 1Gi
+  serving:
+    ip: 192.168.9.1
+    port: 30209

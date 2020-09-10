@@ -1,0 +1,148 @@
+# Copyright 2019-2020 VMware, Inc.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+{{ if .Values.servingRedis.include }}
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: serving-redis-config
+  labels:
+    fateMoudle: serving-redis
+    name: {{ .Values.partyName | quote  }}
+    partyId: {{ .Values.partyId  | quote }}
+    owner: kubefate
+    cluster: fate-serving
+data:
+  redis.conf: |
+    bind 0.0.0.0
+    databases 50
+    always-show-logo yes
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: serving-redis
+  labels:
+    fateMoudle: serving-redis
+    name: {{ .Values.partyName | quote  }}
+    partyId: {{ .Values.partyId | quote  }}
+    owner: kubefate
+    cluster: fate-serving
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      fateMoudle: serving-redis
+      name: {{ .Values.partyName | quote  }}
+      partyId: {{ .Values.partyId | quote  }}
+  template:
+    metadata:
+      labels:
+        fateMoudle: serving-redis
+        name: {{ .Values.partyName | quote  }}
+        partyId: {{ .Values.partyId | quote  }}
+        owner: kubefate
+        cluster: fate-serving
+    spec:
+      containers:
+        {{- if .Values.image.isThridParty }}
+        - image: {{ .Values.image.registry }}/redis:5
+        {{- else }}
+        - image: redis:5
+        {{- end }}
+          name: serving-redis
+          ports:
+            - containerPort: 6379
+              name: redis
+          command:
+            - "redis-server"
+          args:
+            - "/usr/local/etc/redis/redis.conf"
+            - "--requirepass"
+            - "{{ .Values.servingRedis.password | default "fate_dev" }}"
+          volumeMounts:
+            - mountPath: /usr/local/etc/redis/redis.conf
+              name: serving-redis-confs
+              subPath: redis.conf
+            - name: data
+              mountPath: /var/lib/redis
+              subPath: {{ .Values.servingRedis.subPath }}
+      {{- with .Values.servingRedis.nodeSelector }}
+      nodeSelector:
+      {{- range $k,$v := . }}
+        {{ $k }}: {{ $v }}
+      {{- end }}
+      {{- end }}
+      restartPolicy: Always
+      volumes:
+        - name: serving-redis-confs
+          configMap:
+            name: serving-redis-config
+        {{- if not .Values.persistence.enabled }}
+        - name: data
+          emptyDir: {}
+        {{- else if .Values.servingRedis.existingClaim }}
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ .Values.servingRedis.existingClaim | default  "serving-redis-data" }}
+        {{- end }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: serving-redis
+  labels:
+    fateMoudle: serving-redis
+    name: {{ .Values.partyName | quote  }}
+    partyId: {{ .Values.partyId | quote  }}
+    owner: kubefate
+    cluster: fate-serving
+spec:
+  ports:
+    - name: "6379"
+      port: 6379
+      targetPort: 6379
+      protocol: TCP
+  type: {{ .Values.servingRedis.type }}
+  selector:
+    fateMoudle: serving-redis
+    name: {{ .Values.partyName | quote  }}
+    partyId: {{ .Values.partyId | quote  }}
+---
+{{- if and .Values.persistence.enabled (not .Values.servingRedis.existingClaim) }}
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: serving-redis-data
+  labels:
+    fateMoudle: serving-redis
+    name: {{ .Values.partyName | quote  }}
+    partyId: {{ .Values.partyId | quote  }}
+    owner: kubefate
+    cluster: fate-serving
+spec:
+  accessModes: 
+    - {{ .Values.servingRedis.accessMode }}
+  resources:
+    requests:
+      storage: {{ .Values.servingRedis.size }}
+  {{- if .Values.servingRedis.storageClass }}
+    {{- if eq "-" .Values.servingRedis.storageClass }}
+  storageClassName: ""
+    {{- else }}
+  storageClassName: {{ .Values.servingRedis.storageClass }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+{{ end }}
