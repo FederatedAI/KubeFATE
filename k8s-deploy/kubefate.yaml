@@ -62,7 +62,7 @@ spec:
             - name: FATECLOUD_LOG_LEVEL
               value: "debug"
             - name: FATECLOUD_LOG_NOCOLOR
-              value: true
+              value: "true"
           ports:
             - containerPort: 8080
       restartPolicy: Always
