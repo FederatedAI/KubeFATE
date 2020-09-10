@@ -9,7 +9,7 @@ networks:
   fate-network:
 services:
   serving-server:
-    image: "${PREFIX}/serving-server:${SERVING_TAG}"
+    image: "federatedai/serving-server:${SERVING_TAG}"
     ports:
       - "8000:8000"
     volumes:
@@ -19,7 +19,7 @@ services:
       - fate-network
 
   serving-proxy:
-    image: "${PREFIX}/serving-proxy:${SERVING_TAG}"
+    image: "federatedai/serving-proxy:${SERVING_TAG}"
     ports:
       - "8059:8059"
       - "8869:8869"

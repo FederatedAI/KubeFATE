@@ -41,7 +41,7 @@ volumes:
 
 services:
   rollsite:
-    image: "${PREFIX}/eggroll:${TAG}"
+    image: "federatedai/eggroll:${TAG}"
     ports:
       - "9370:9370"
     environment:
@@ -53,7 +53,7 @@ services:
     command: ["bash", "-c", "java -Dlog4j.configurationFile=$${EGGROLL_HOME}/conf/log4j2.properties -cp $${EGGROLL_HOME}/lib/*:$${EGGROLL_HOME}/conf/ com.webank.eggroll.rollsite.Proxy -c $${EGGROLL_HOME}/conf/eggroll.properties"]
   
   fateboard:
-    image: "${PREFIX}/fateboard:${TAG}"
+    image: "federatedai/fateboard:${TAG}"
     ports:
       - "8080:8080"
     volumes:
@@ -65,7 +65,7 @@ services:
       - python
   
   clustermanager:
-    image: "${PREFIX}/eggroll:${TAG}"
+    image: "federatedai/eggroll:${TAG}"
     expose:
       - 4670 
     volumes:
@@ -77,7 +77,7 @@ services:
     command: ["bash", "-c", "java -Dlog4j.configurationFile=$${EGGROLL_HOME}/conf/log4j2.properties -cp $${EGGROLL_HOME}/lib/*: com.webank.eggroll.core.Bootstrap --bootstraps com.webank.eggroll.core.resourcemanager.ClusterManagerBootstrap -c $${EGGROLL_HOME}/conf/eggroll.properties -p 4670 -s 'EGGROLL_DEAMON'"]
   
   nodemanager:
-    image: "${PREFIX}/eggroll:${TAG}"
+    image: "federatedai/eggroll:${TAG}"
     expose:
       - 4671
     volumes:
@@ -89,7 +89,7 @@ services:
     command: ["bash", "-c", "java -Dlog4j.configurationFile=$${EGGROLL_HOME}/conf/log4j2.properties -cp $${EGGROLL_HOME}/lib/*: com.webank.eggroll.core.Bootstrap --bootstraps com.webank.eggroll.core.resourcemanager.NodeManagerBootstrap -c $${EGGROLL_HOME}/conf/eggroll.properties -p 4671 -s 'EGGROLL_DEAMON'"]
   
   python:
-    image: "${PREFIX}/python:${TAG}"
+    image: "federatedai/python:${TAG}"
     ports:
       - "9360:9360"
       - "9380:9380"
@@ -112,7 +112,7 @@ services:
       - fate-network
     
   client:
-    image: "${PREFIX}/client:${TAG}"
+    image: "federatedai/client:${TAG}"
     ports:
       - "20000:20000"
     restart: always
