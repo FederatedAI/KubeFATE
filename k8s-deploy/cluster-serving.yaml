@@ -1,7 +1,7 @@
 name: fate-serving-9999
 namespace: fate-serving-9999
 chartName: fate-serving
-chartVersion: v1.2.4
+chartVersion: v2.0.0
 partyId: 9999
 registry: ""
 pullPolicy: 
