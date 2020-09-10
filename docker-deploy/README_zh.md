@@ -34,10 +34,11 @@ $ docker pull redis:5
 $ docker pull mysql:8
 ```
 
-对于中国的用户可以用以下方式下载镜像包：
+对于中国的用户可以用使用国内镜像源：
+具体方法是通过编辑docker-deploy目录下的.env文件,给`RegistryURI`参数填入以下字段
+
 ```bash
-$ wget https://webank-ai-1251170195.cos.ap-guangzhou.myqcloud.com/fate_<version>-images.tar.gz 
-$ docker load --input fate_<version>-images.tar.gz 
+RegistryURI=hub.c.163.com
 ```
 
 检查所有镜像是否下载成功。
