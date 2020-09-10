@@ -6,6 +6,8 @@ partyId: 9999
 registry: ""
 pullPolicy: 
 persistence: false
+istio:
+  enabled: false
 modules:
   - rollsite
   - clustermanager
