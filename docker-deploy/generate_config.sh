@@ -70,22 +70,22 @@ GenerateConfig() {
         cp ${WORKINGDIR}/.env ./confs-$party_id
         if [ "$RegistryURI" != "" ]
         then
-          sed -i "s#PREFIX#${RegistryURI}#g" ./confs-$party_id/docker-compose.yml
-          sed -i 's#image: "mysql:8"#image: "${RegistryURI}/mysql:8"#g' ./confs-$party_id/docker-compose.yml
-          #sed -i 's#image: "redis:5"#image: "${RegistryURI}/redis:5"#g' ./confs-$party_id/docker-compose.yml
+          sed -i 's#federatedai#${RegistryURI}/federatedai#g' ./confs-$party_id/docker-compose.yml
+		  sed -i 's#image: "mysql:8"#image: ${RegistryURI}/library/mysql:8#g' ./confs-$party_id/docker-compose.yml
+		  #sed -i 's#image: "redis:5"#image: "${RegistryURI}/redis:5"#g' ./confs-$party_id/docker-compose.yml
         fi
 
-	# update serving ip
-	sed -i "s/fate-serving/${serving_ip}/g" ./confs-$party_id/docker-compose.yml
+	    # update serving ip
+	    sed -i "s/fate-serving/${serving_ip}/g" ./confs-$party_id/docker-compose.yml
 
         # update the path of shared_dir
         shared_dir="confs-${party_id}/shared_dir"
 
-	# create directories
-	for value in "examples" "federatedml" "data"
-	do
-		mkdir -p ${shared_dir}/${value}
-	done
+	    # create directories
+	    for value in "examples" "federatedml" "data"
+	    do
+			mkdir -p ${shared_dir}/${value}
+	    done
 
         sed -i "s|{/path/to/host/dir}|${dir}/${shared_dir}|g" ./confs-$party_id/docker-compose.yml
         # egg config
@@ -228,15 +228,15 @@ EOF
   		mkdir -p confs-exchange/conf/
   		cp ${WORKINGDIR}/.env confs-exchange/
   		cp training_template/docker-compose-exchange.yml confs-exchange/docker-compose.yml
-                cp -r training_template/docker-example-dir-tree/eggroll/conf/* confs-exchange/conf/
+        cp -r training_template/docker-example-dir-tree/eggroll/conf/* confs-exchange/conf/
   		
   		if [ "$RegistryURI" != "" ]; then
-  		    sed -i "s#PREFIX#RegistryURI#g" ./confs-exchange/docker-compose.yml
+			sed -i 's#federatedai#${RegistryURI}/federatedai#g' ./confs-exchange/docker-compose.yml
   		fi
 
-	        sed -i "s#<rollsite.host>#${proxy_ip}#g" ./confs-exchange/conf/eggroll.properties
-	        sed -i "s#<rollsite.port>#${proxy_port}#g" ./confs-exchange/conf/eggroll.properties
-	        sed -i "s#<party.id>#exchange#g" ./confs-exchange/conf/eggroll.properties
+	    sed -i "s#<rollsite.host>#${proxy_ip}#g" ./confs-exchange/conf/eggroll.properties
+	    sed -i "s#<rollsite.port>#${proxy_port}#g" ./confs-exchange/conf/eggroll.properties
+	    sed -i "s#<party.id>#exchange#g" ./confs-exchange/conf/eggroll.properties
   		sed -i "s/coordinator=.*/coordinator=exchange/g" ./confs-exchange/conf/eggroll.properties
   		sed -i "s/ip=.*/ip=0.0.0.0/g" ./confs-exchange/conf/eggroll.properties
   		
@@ -284,6 +284,11 @@ EOF
     	    cp -r serving_template/docker-serving/* serving-$party_id/confs/
     	    
     	    cp serving_template/docker-compose-serving.yml serving-$party_id/docker-compose.yml
+            if [ "$RegistryURI" != "" ]; then
+               sed -i 's#federatedai#${RegistryURI}/federatedai#g' ./serving-$party_id/docker-compose.yml
+			   # should not use federatedai in here
+               sed -i 's#image: "redis:5"#image: "${RegistryURI}/federatedai/redis:5"#g' ./serving-$party_id/docker-compose.yml
+            fi
     	    # generate conf dir
     	    cp ${WORKINGDIR}/.env ./serving-$party_id
 
@@ -376,7 +381,7 @@ GenerateSplittingProxy() {
     cp docker-compose-exchange.yml confs-${party_id}/docker-compose.yml
     cp -r docker-example-dir-tree/proxy/conf confs-${party_id}/
     if [ "$RegistryURI" != "" ]; then
-        sed -i "s#PREFIX#RegistryURI#g" ./confs-${party_id}/docker-compose.yml
+        sed -i 's#federatedai#${RegistryURI}/federatedai#g' ./confs-${party_id}/docker-compose.yml
     fi
     sed -i "s#9371:9370#9370:9370#g" ./confs-${party_id}/docker-compose.yml
     sed -i "s/port=.*/port=9370/g" ./confs-${party_id}/conf/proxy.properties
