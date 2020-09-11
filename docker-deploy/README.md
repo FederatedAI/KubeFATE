@@ -35,6 +35,9 @@ RegistryURI=192.168.10.1/federatedai
 ...
 ```
 
+**NOTE:** For Chinese user who has difficulty to access docker hub, you can set `RegistryURI` to `hub.c.163.com` to use the mirror of the registry within China.
+
+
 ### Configuring multiple parties of FATE
 There are usually multiple parties participating a federated training. Each party should install FATE using a set of configuration files and scripts. 
 
