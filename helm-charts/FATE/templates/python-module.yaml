@@ -115,7 +115,11 @@ spec:
         hostnames:
         - "fateflow"
       initContainers:
+      {{- if .Values.image.isThridParty }}
+      - image: {{ .Values.image.registry }}/mysql:8
+      {{- else }}
       - image: mysql:8
+      {{- end }}
         name: mysql
         env:
         - name: MYSQL_DATABASE
