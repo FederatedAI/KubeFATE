@@ -85,7 +85,14 @@ serviceurl: kubefate.net
 |user       |mappings|User name and password when logging into KubeFATE service.        |
 |serviceurl |scalars |kubeFATE service's ingress domain name, defined in kubefate.yaml. |
 
-And, according to the FATE deploy plan, create a `cluster.yaml` for cluster configuration. The details of Cluster configuration, please refer to: [FATE Cluster Configuration Guild](../docs/configurations/FATE_cluster_configuration.md). Then intall FATE cluster,
+And, according to the FATE deploy plan, create a `cluster.yaml` for cluster configuration. The details of Cluster configuration, please refer to: [FATE Cluster Configuration Guild](../docs/configurations/FATE_cluster_configuration.md). 
+
+**NOTE:** For Chinese user, to specify mirror registry in `cluster.yaml` can accelerate the download of images. The details is as follow:
+```
+registry: "hub.c.163.com/federatedai"
+```
+
+Then intall FATE cluster,
 
 ```
 $ kubefate cluster install -f ./cluster.yaml

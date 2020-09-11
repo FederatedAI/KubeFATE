@@ -91,6 +91,11 @@ serviceurl: kubefate.net
 
 我们的配置样例里还包含了`cluster.yaml`，是FATE集群的部署计划。更多自定义内容参考：[FATE Cluster Configuration Guild](../docs/configurations/FATE_cluster_configuration.md)
 
+**注意:** 对于中国的用户，可以通过在`cluster.yaml`修改`registry`来加速镜像的下载，具体设置内容如下：
+```
+registry: "hub.c.163.com/federatedai"
+```
+
 准备好后，通过```kubefate cluster install```命令进行部署FATE集群：
 
 ```
