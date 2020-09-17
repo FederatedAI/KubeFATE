@@ -113,6 +113,11 @@ func (_ *Cluster) getCluster(c *gin.Context) {
 		cluster.Spec = make(map[string]interface{})
 	}
 
+	cluster.Info["status"], err = cluster.GetClusterStatus()
+	if err != nil {
+		c.JSON(500, gin.H{"error": err})
+		return
+	}
 	c.JSON(200, gin.H{"data": &cluster})
 }
 

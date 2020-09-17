@@ -148,12 +148,12 @@ func ClusterInstall(clusterArgs *ClusterArgs, creator string) (*modules.Job, err
 			}
 
 			// update subJobs
-			ClusterStatus, err := service.GetClusterStatus(clusterArgs.Name, clusterArgs.Namespace)
+			ClusterStatus, err := service.GetClusterPodStatus(clusterArgs.Name, clusterArgs.Namespace)
 			if err != nil {
-				log.Error().Err(err).Msg("GetClusterStatus error")
+				log.Error().Err(err).Msg("GetClusterPodStatus error")
 			}
 
-			log.Debug().Interface("ClusterStatus", ClusterStatus).Msg("GetClusterStatus()")
+			log.Debug().Interface("ClusterStatus", ClusterStatus).Msg("GetClusterPodStatus()")
 			subJobs := generateSubJobs(job, ClusterStatus)
 
 			dbErr = job.SetSubJobs(subJobs)
@@ -389,9 +389,9 @@ func ClusterUpdate(clusterArgs *ClusterArgs, creator string) (*modules.Job, erro
 			}
 
 			// update subJobs
-			ClusterStatus, err := service.GetClusterStatus(clusterArgs.Name, clusterArgs.Namespace)
+			ClusterStatus, err := service.GetClusterPodStatus(clusterArgs.Name, clusterArgs.Namespace)
 			if err != nil {
-				log.Error().Err(err).Msg("GetClusterStatus error")
+				log.Error().Err(err).Msg("GetClusterPodStatus error")
 			}
 
 			subJobs := generateSubJobs(job, ClusterStatus)
@@ -486,12 +486,12 @@ func ClusterUpdate(clusterArgs *ClusterArgs, creator string) (*modules.Job, erro
 				}
 
 				// update subJobs
-				ClusterStatus, err := service.GetClusterStatus(clusterArgs.Name, clusterArgs.Namespace)
+				ClusterStatus, err := service.GetClusterPodStatus(clusterArgs.Name, clusterArgs.Namespace)
 				if err != nil {
-					log.Error().Err(err).Msg("GetClusterStatus error")
+					log.Error().Err(err).Msg("GetClusterPodStatus error")
 				}
 
-				log.Debug().Interface("ClusterStatus", ClusterStatus).Msg("GetClusterStatus()")
+				log.Debug().Interface("ClusterStatus", ClusterStatus).Msg("GetClusterPodStatus()")
 
 				subJobs := generateSubJobs(job, ClusterStatus)
 

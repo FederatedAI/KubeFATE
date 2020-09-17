@@ -52,3 +52,22 @@ func GetServices(namespace, LabelSelector string) (*v1.ServiceList, error) {
 	svcs, err := clientset.CoreV1().Services(namespace).List(context.Background(), metav1.ListOptions{LabelSelector: LabelSelector})
 	return svcs, err
 }
+
+func GetServiceStatus(Services *v1.ServiceList) map[string]string {
+	status := make(map[string]string)
+	for _, v := range Services.Items {
+		status[v.Name] = v.Status.String()
+	}
+	return status
+}
+
+func GetClusterServiceStatus(name, namespace string) (map[string]string, error) {
+	var labelSelector string
+	labelSelector = fmt.Sprintf("name=%s", name)
+	list, err := GetServices(namespace, labelSelector)
+	if err != nil {
+		return nil, err
+	}
+
+	return GetServiceStatus(list), nil
+}

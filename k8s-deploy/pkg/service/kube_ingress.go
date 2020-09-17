@@ -49,3 +49,22 @@ func GetIngressUrl(name, namespace string) ([]string, error) {
 
 	return urls, nil
 }
+
+func GetIngressStatus(Services *v1beta1.IngressList) map[string]string {
+	status := make(map[string]string)
+	for _, v := range Services.Items {
+		status[v.Name] = v.Status.String()
+	}
+	return status
+}
+
+func GetClusterIngressStatus(name, namespace string) (map[string]string, error) {
+	var labelSelector string
+	labelSelector = fmt.Sprintf("name=%s", name)
+	list, err := GetIngress(namespace, labelSelector)
+	if err != nil {
+		return nil, err
+	}
+
+	return GetIngressStatus(list), nil
+}
