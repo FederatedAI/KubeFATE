@@ -82,6 +82,10 @@ func GetServiceVersion() (string, error) {
 		return "", err
 	}
 
+	if resp.StatusCode != 200 {
+		return "", fmt.Errorf("resp.StatusCode=%d, error: %s", resp.StatusCode, respBody)
+	}
+
 	type VersionResultMsg struct {
 		Msg     string
 		Version string

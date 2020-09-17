@@ -58,6 +58,14 @@ func getToken() (string, error) {
 		return "", err
 	}
 
+	if resp.StatusCode == 503 {
+		return "", fmt.Errorf("%d Service Temporarily Unavailable. Please try again later or check the pod status of kubefate", resp.StatusCode)
+	}
+
+	if resp.StatusCode != 200 {
+		return "", fmt.Errorf("resp.StatusCode=%d, error: %s", resp.StatusCode, rbody)
+	}
+
 	Result := map[string]interface{}{}
 
 	err = json.Unmarshal(rbody, &Result)
