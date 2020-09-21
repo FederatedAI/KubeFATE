@@ -73,6 +73,7 @@ func (_ *Chart) createChart(c *gin.Context) {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
+	log.Debug().Interface("helmChart", helmChart).Msg("createChart success")
 	c.JSON(200, gin.H{"msg": "createChart success", "data": gin.H{"helmUUID": helmChart.Uuid}})
 }
 
@@ -84,6 +85,7 @@ func (_ *Chart) getChartList(c *gin.Context) {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
+	log.Debug().Interface("chartList", chartList).Msg("getChartList success")
 	c.JSON(200, gin.H{"msg": "getChartList success", "data": chartList})
 }
 
@@ -103,6 +105,7 @@ func (_ *Chart) getChart(c *gin.Context) {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
+	log.Debug().Interface("chartList", chartList).Msg("getChart success")
 	c.JSON(200, gin.H{"msg": "getChart success", "data": chartList})
 }
 
@@ -119,5 +122,6 @@ func (_ *Chart) deleteChart(c *gin.Context) {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
+	log.Debug().Interface("result", "deleteChart success").Msg("deleteChart success")
 	c.JSON(200, gin.H{"msg": "deleteChart success"})
 }

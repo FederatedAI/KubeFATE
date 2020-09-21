@@ -45,6 +45,7 @@ func (_ *Job) getJobList(c *gin.Context) {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
+	log.Debug().Interface("data", jobList).Msg("getJobList success")
 	c.JSON(200, gin.H{"data": jobList, "msg": "getJobList success"})
 }
 
@@ -63,7 +64,8 @@ func (_ *Job) getJob(c *gin.Context) {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(200, gin.H{"data": job})
+	log.Debug().Interface("data", job).Msg("getJob success")
+	c.JSON(200, gin.H{"msg": "getJob success", "data": job})
 }
 
 func (_ *Job) deleteJob(c *gin.Context) {
@@ -81,5 +83,6 @@ func (_ *Job) deleteJob(c *gin.Context) {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
+	log.Debug().Interface("msg", "delete Job success").Msg("delete Job success")
 	c.JSON(200, gin.H{"msg": "delete Job success"})
 }

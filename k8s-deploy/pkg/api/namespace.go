@@ -43,5 +43,6 @@ func (_ *Namespace) getNamespaceList(c *gin.Context) {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
+	log.Debug().Interface("data", namespaceList).Msg("getNamespaceList success")
 	c.JSON(200, gin.H{"data": namespaceList, "msg": "getNamespaceList success"})
 }

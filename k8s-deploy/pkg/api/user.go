@@ -93,6 +93,7 @@ func (*User) createUser(c *gin.Context) {
 		c.JSON(500, gin.H{"msg": err.Error()})
 	}
 
+	log.Debug().Interface("data", "user").Msg("result")
 	c.JSON(200, gin.H{"msg": "createCluster success", "data": user})
 }
 
@@ -111,7 +112,7 @@ func (*User) setUser(c *gin.Context) {
 		log.Error().Err(err).Msg("request error")
 		c.JSON(500, gin.H{"error": err.Error()})
 	}
-
+	log.Debug().Interface("result", "setUser success").Msg("result")
 	c.JSON(200, gin.H{"msg": "setUser success"})
 }
 func (*User) getUser(c *gin.Context) {
@@ -126,6 +127,7 @@ func (*User) getUser(c *gin.Context) {
 		log.Error().Err(err).Msg("request error")
 		c.JSON(500, gin.H{"error": err.Error()})
 	}
+	log.Debug().Interface("result", result).Msg("result")
 	c.JSON(200, gin.H{"data": result})
 }
 

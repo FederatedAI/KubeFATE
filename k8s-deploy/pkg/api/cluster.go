@@ -62,6 +62,7 @@ func (_ *Cluster) createCluster(c *gin.Context) {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
+	log.Debug().Interface("data", j).Msg("createCluster success")
 	c.JSON(200, gin.H{"msg": "createCluster success", "data": j})
 }
 
@@ -91,6 +92,7 @@ func (_ *Cluster) setCluster(c *gin.Context) {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
+	log.Debug().Interface("data", j).Msg("setCluster success")
 	c.JSON(200, gin.H{"msg": "setCluster success", "data": j})
 }
 
@@ -128,7 +130,8 @@ func (_ *Cluster) getCluster(c *gin.Context) {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(200, gin.H{"data": &cluster})
+	log.Debug().Interface("data", cluster).Msg("getCluster success")
+	c.JSON(200, gin.H{"msg": "getCluster success", "data": &cluster})
 }
 
 func (_ *Cluster) getClusterList(c *gin.Context) {
@@ -148,6 +151,7 @@ func (_ *Cluster) getClusterList(c *gin.Context) {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
+	log.Debug().Interface("data", clusterList).Msg("getClusterList success")
 	c.JSON(200, gin.H{"msg": "getClusterList success", "data": clusterList})
 }
 
@@ -167,5 +171,6 @@ func (_ *Cluster) deleteCluster(c *gin.Context) {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
+	log.Debug().Interface("data", j).Msg("deleteCluster success")
 	c.JSON(200, gin.H{"msg": "deleteCluster success", "data": j})
 }
