@@ -18,6 +18,7 @@ package api
 import (
 	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/modules"
 	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog/log"
 )
 
 type Namespace struct {
@@ -38,7 +39,8 @@ func (_ *Namespace) getNamespaceList(c *gin.Context) {
 	namespace := new(modules.Namespace)
 	namespaceList, err := namespace.GetList()
 	if err != nil {
-		c.JSON(500, gin.H{"error": err})
+		log.Error().Err(err).Msg("request error")
+		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
 	c.JSON(200, gin.H{"data": namespaceList, "msg": "getNamespaceList success"})

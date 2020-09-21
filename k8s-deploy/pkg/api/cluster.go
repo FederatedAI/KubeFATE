@@ -15,6 +15,8 @@
 package api
 
 import (
+	"errors"
+
 	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/job"
 	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/modules"
 	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/service"
@@ -47,6 +49,7 @@ func (_ *Cluster) createCluster(c *gin.Context) {
 	clusterArgs := new(job.ClusterArgs)
 
 	if err := c.ShouldBindJSON(&clusterArgs); err != nil {
+		log.Error().Err(err).Msg("request error")
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
@@ -55,6 +58,7 @@ func (_ *Cluster) createCluster(c *gin.Context) {
 	// create job and use goroutine do job result save to db
 	j, err := job.ClusterInstall(clusterArgs, user.(*User).Username)
 	if err != nil {
+		log.Error().Err(err).Msg("request error")
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
@@ -74,6 +78,7 @@ func (_ *Cluster) setCluster(c *gin.Context) {
 	clusterArgs := new(job.ClusterArgs)
 
 	if err := c.ShouldBindJSON(&clusterArgs); err != nil {
+		log.Error().Err(err).Msg("request error")
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
@@ -82,6 +87,7 @@ func (_ *Cluster) setCluster(c *gin.Context) {
 	// create job and use goroutine do job result save to db
 	j, err := job.ClusterUpdate(clusterArgs, user.(*User).Username)
 	if err != nil {
+		log.Error().Err(err).Msg("request error")
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
@@ -92,6 +98,7 @@ func (_ *Cluster) getCluster(c *gin.Context) {
 
 	clusterId := c.Param("clusterId")
 	if clusterId == "" {
+		log.Error().Err(errors.New("not exit clusterId")).Msg("request error")
 		c.JSON(400, gin.H{"error": "not exit clusterId"})
 		return
 	}
@@ -99,13 +106,15 @@ func (_ *Cluster) getCluster(c *gin.Context) {
 	hc := modules.Cluster{Uuid: clusterId}
 	cluster, err := hc.Get()
 	if err != nil {
-		c.JSON(500, gin.H{"error": err})
+		log.Error().Err(err).Str("uuid", clusterId).Msg("get cluster error")
+		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
 
 	cluster.Info, err = service.GetClusterInfo(cluster.Name, cluster.NameSpace)
 	if err != nil {
-		c.JSON(500, gin.H{"error": err})
+		log.Error().Err(err).Str("Name", cluster.Name).Str("NameSpace", cluster.NameSpace).Msg("GetClusterInfo error")
+		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -115,7 +124,8 @@ func (_ *Cluster) getCluster(c *gin.Context) {
 
 	cluster.Info["status"], err = cluster.GetClusterStatus()
 	if err != nil {
-		c.JSON(500, gin.H{"error": err})
+		log.Error().Err(err).Str("Name", cluster.Name).Str("NameSpace", cluster.NameSpace).Msg("GetClusterStatus error")
+		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
 	c.JSON(200, gin.H{"data": &cluster})
@@ -134,6 +144,7 @@ func (_ *Cluster) getClusterList(c *gin.Context) {
 	clusterList, err := new(modules.Cluster).GetListAll(all)
 
 	if err != nil {
+		log.Error().Err(err).Msg("request error")
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
@@ -146,11 +157,13 @@ func (_ *Cluster) deleteCluster(c *gin.Context) {
 
 	clusterId := c.Param("clusterId")
 	if clusterId == "" {
+		log.Error().Err(errors.New("not exit clusterId")).Msg("request error")
 		c.JSON(400, gin.H{"error": "not exit clusterId"})
 	}
 
 	j, err := job.ClusterDelete(clusterId, user.(*User).Username)
 	if err != nil {
+		log.Error().Err(err).Msg("request error")
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}

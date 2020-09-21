@@ -15,6 +15,8 @@
 package api
 
 import (
+	"errors"
+
 	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/modules"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
@@ -74,18 +76,21 @@ func (*User) createUser(c *gin.Context) {
 
 	user := new(modules.User)
 	if err := c.ShouldBindJSON(user); err != nil {
+		log.Error().Err(err).Msg("request error")
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
 	// Use db.Newuser method to generate uuid
 	user = modules.NewUser(user.Username, user.Password, user.Email)
 	if user.IsExisted() {
+		log.Error().Err(errors.New(USEREXISTED)).Msg("request error")
 		c.JSON(500, gin.H{"error": USEREXISTED})
 		return
 	}
 	_, err := user.Insert()
 	if err != nil {
-		c.JSON(500, gin.H{"msg": err})
+		log.Error().Err(err).Msg("request error")
+		c.JSON(500, gin.H{"msg": err.Error()})
 	}
 
 	c.JSON(200, gin.H{"msg": "createCluster success", "data": user})
@@ -96,13 +101,15 @@ func (*User) setUser(c *gin.Context) {
 	userId := c.Param("userId")
 	user := new(modules.User)
 	if err := c.ShouldBindJSON(user); err != nil {
+		log.Error().Err(err).Msg("request error")
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
 	user.Uuid = userId
 	_, err := user.Update(user.ID)
 	if err != nil {
-		c.JSON(500, gin.H{"error": err})
+		log.Error().Err(err).Msg("request error")
+		c.JSON(500, gin.H{"error": err.Error()})
 	}
 
 	c.JSON(200, gin.H{"msg": "setUser success"})
@@ -111,11 +118,13 @@ func (*User) getUser(c *gin.Context) {
 
 	userId := c.Param("userId")
 	if userId == "" {
-		c.JSON(400, gin.H{"error": "err"})
+		log.Error().Err(errors.New("not exit userId")).Msg("request error")
+		c.JSON(400, gin.H{"error": "not exit userId"})
 	}
 	result, err := getUserFindByUUID(userId)
 	if err != nil {
-		c.JSON(500, gin.H{"error": err})
+		log.Error().Err(err).Msg("request error")
+		c.JSON(500, gin.H{"error": err.Error()})
 	}
 	c.JSON(200, gin.H{"data": result})
 }
@@ -130,12 +139,14 @@ func (*User) deleteUser(c *gin.Context) {
 
 	userId := c.Param("userId")
 	if userId == "" {
-		c.JSON(400, gin.H{"error": "err"})
+		log.Error().Err(errors.New("not exit userId")).Msg("request error")
+		c.JSON(400, gin.H{"error": "not exit userId"})
 	}
 	u := modules.User{Uuid: userId}
 	_, err := u.Delete()
 	if err != nil {
-		c.JSON(500, gin.H{"error": err})
+		log.Error().Err(err).Msg("request error")
+		c.JSON(500, gin.H{"error": err.Error()})
 	}
 
 	c.JSON(200, gin.H{"msg": "deleteUser success"})
