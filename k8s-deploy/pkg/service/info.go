@@ -41,7 +41,7 @@ func GetClusterInfo(name, namespace string) (map[string]interface{}, error) {
 	if len(port) > 0 {
 		info["port"] = port[0]
 	}
-	info["modules"] = podList
+	info["pod"] = podList
 
 	info["dashboard"] = ingressUrlList
 

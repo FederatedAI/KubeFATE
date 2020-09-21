@@ -41,7 +41,7 @@ func (e *Cluster) GetClusterStatus() (map[string]map[string]string, error) {
 	//}
 
 	return map[string]map[string]string{
-		"pod": ClusterPodStatus,
+		"modules": ClusterPodStatus,
 		//"service": ClusterServiceStatus,
 		//"ingress": ClusterIngressStatus,
 	}, nil
