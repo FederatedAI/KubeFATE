@@ -15,6 +15,8 @@
 package api
 
 import (
+	"errors"
+
 	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/modules"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
@@ -51,6 +53,7 @@ func (_ *Chart) createChart(c *gin.Context) {
 
 	f, err := file.Open()
 	if err != nil {
+		log.Error().Err(err).Msg("request error")
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
@@ -59,15 +62,18 @@ func (_ *Chart) createChart(c *gin.Context) {
 	hc := modules.HelmChart{}
 	helmChart, err := hc.ChartRequestedTohelmChart(chartRequested)
 	if err != nil {
+		log.Error().Err(err).Msg("request error")
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
 
 	err = helmChart.Upload()
 	if err != nil {
+		log.Error().Err(err).Msg("request error")
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
+	log.Debug().Interface("helmChart", helmChart).Msg("createChart success")
 	c.JSON(200, gin.H{"msg": "createChart success", "data": gin.H{"helmUUID": helmChart.Uuid}})
 }
 
@@ -75,9 +81,11 @@ func (_ *Chart) getChartList(c *gin.Context) {
 
 	chartList, err := new(modules.HelmChart).GetList()
 	if err != nil {
+		log.Error().Err(err).Msg("request error")
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
+	log.Debug().Interface("chartList", chartList).Msg("getChartList success")
 	c.JSON(200, gin.H{"msg": "getChartList success", "data": chartList})
 }
 
@@ -85,6 +93,7 @@ func (_ *Chart) getChart(c *gin.Context) {
 
 	chartId := c.Param("chartId")
 	if chartId == "" {
+		log.Error().Err(errors.New("not exit chartId")).Msg("request error")
 		c.JSON(400, gin.H{"error": "not exit chartId"})
 		return
 	}
@@ -92,9 +101,11 @@ func (_ *Chart) getChart(c *gin.Context) {
 	hc := modules.HelmChart{Uuid: chartId}
 	chartList, err := hc.Get()
 	if err != nil {
+		log.Error().Err(err).Msg("request error")
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
+	log.Debug().Interface("chartList", chartList).Msg("getChart success")
 	c.JSON(200, gin.H{"msg": "getChart success", "data": chartList})
 }
 
@@ -107,8 +118,10 @@ func (_ *Chart) deleteChart(c *gin.Context) {
 	chart := new(modules.HelmChart)
 	_, err := chart.DeleteByUuid(chartId)
 	if err != nil {
+		log.Error().Err(err).Msg("request error")
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
+	log.Debug().Interface("result", "deleteChart success").Msg("deleteChart success")
 	c.JSON(200, gin.H{"msg": "deleteChart success"})
 }

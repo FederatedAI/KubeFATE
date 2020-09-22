@@ -15,8 +15,11 @@
 package api
 
 import (
+	"errors"
+
 	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/modules"
 	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog/log"
 )
 
 type Job struct {
@@ -38,9 +41,11 @@ func (_ *Job) getJobList(c *gin.Context) {
 
 	jobList, err := new(modules.Job).GetList()
 	if err != nil {
-		c.JSON(400, gin.H{"error": err})
+		log.Error().Err(err).Msg("request error")
+		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
+	log.Debug().Interface("data", jobList).Msg("getJobList success")
 	c.JSON(200, gin.H{"data": jobList, "msg": "getJobList success"})
 }
 
@@ -48,30 +53,36 @@ func (_ *Job) getJob(c *gin.Context) {
 
 	jobId := c.Param("jobId")
 	if jobId == "" {
+		log.Error().Err(errors.New("not exit jobId")).Msg("request error")
 		c.JSON(400, gin.H{"error": "not exit jobId"})
 		return
 	}
 	j := modules.Job{Uuid: jobId}
 	job, err := j.Get()
 	if err != nil {
-		c.JSON(500, gin.H{"error": err})
+		log.Error().Err(err).Msg("request error")
+		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(200, gin.H{"data": job})
+	log.Debug().Interface("data", job).Msg("getJob success")
+	c.JSON(200, gin.H{"msg": "getJob success", "data": job})
 }
 
 func (_ *Job) deleteJob(c *gin.Context) {
 
 	jobId := c.Param("jobId")
 	if jobId == "" {
+		log.Error().Err(errors.New("not exit jobId")).Msg("request error")
 		c.JSON(400, gin.H{"error": "not exit jobId"})
 		return
 	}
 	j := modules.Job{Uuid: jobId}
 	_, err := j.Delete()
 	if err != nil {
-		c.JSON(500, gin.H{"error": err})
+		log.Error().Err(err).Msg("request error")
+		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
+	log.Debug().Interface("msg", "delete Job success").Msg("delete Job success")
 	c.JSON(200, gin.H{"msg": "delete Job success"})
 }

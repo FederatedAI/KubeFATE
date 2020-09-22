@@ -32,7 +32,7 @@ func GetPods(namespace, LabelSelector string) (*v1.PodList, error) {
 	return pods, err
 }
 
-func GetClusterStatus(name, namespace string) (map[string]string, error) {
+func GetClusterPodStatus(name, namespace string) (map[string]string, error) {
 	var labelSelector string
 	labelSelector = fmt.Sprintf("name=%s", name)
 	list, err := GetPods(namespace, labelSelector)

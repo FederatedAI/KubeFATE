@@ -20,6 +20,8 @@ import (
 	"os"
 	"time"
 
+	yaml "sigs.k8s.io/yaml"
+
 	"github.com/rs/zerolog/log"
 	"golang.org/x/crypto/ssh/terminal"
 
@@ -159,6 +161,14 @@ func (c *Cluster) outPutInfo(result interface{}) error {
 
 	cluster := item.Data
 
+	spec, err := yaml.Marshal(cluster.Spec)
+	if err != nil {
+		return err
+	}
+	info, err := yaml.Marshal(cluster.Info)
+	if err != nil {
+		return err
+	}
 	table := uitable.New()
 	colWidth, _, _ := terminal.GetSize(int(os.Stdout.Fd()))
 	if colWidth == 0 {
@@ -176,9 +186,9 @@ func (c *Cluster) outPutInfo(result interface{}) error {
 	table.AddRow("Revision", cluster.Revision)
 	table.AddRow("Age", HumanDuration(time.Since(cluster.CreatedAt)))
 	table.AddRow("Status", cluster.Status)
-	table.AddRow("Values", cluster.Values)
-	table.AddRow("Spec", cluster.Spec)
-	table.AddRow("Info", cluster.Info)
+	//table.AddRow("Values", cluster.Values)
+	table.AddRow("Spec", string(spec))
+	table.AddRow("Info", string(info))
 	table.AddRow("")
 	return output.EncodeTable(os.Stdout, table)
 }
