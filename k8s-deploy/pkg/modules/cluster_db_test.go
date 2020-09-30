@@ -254,7 +254,7 @@ func TestCluster_Get(t *testing.T) {
 				Uuid: "no-find",
 			},
 			want:    Cluster{},
-			wantErr: false,
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
@@ -284,4 +284,99 @@ func TestCluster_Get(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestClusterDelete(t *testing.T) {
+	InitConfigForTest()
+	mysql := new(orm.Mysql)
+	mysql.Setup()
+	DB = orm.DBCLIENT
+	//DB.LogMode(true)
+
+	// Create Table
+	e := &Cluster{}
+	e.DropTable()
+	e.InitTable()
+	// Drop Table
+	//defer e.DropTable()
+
+	//Insert
+	e, err := NewCluster("fate-9999", "fate-9999", "fate", "v1.5.0", "")
+	if err != nil {
+		t.Errorf("Cluster.NewCluster() error = %v", err)
+		return
+	}
+	e.ChartValues = map[string]interface{}{"Name": "fate-9999", "NameSpace": "fate-9999"}
+	Id, err := e.Insert()
+	if err != nil {
+		t.Errorf("Cluster.Insert() error = %v", err)
+		return
+	}
+	if Id < 1 {
+		t.Errorf("Cluster.Insert() got = %d, want Id > 0", Id)
+		return
+	}
+	// repeat insert
+	Id, err = e.Insert()
+	if err == nil {
+		t.Error("Cluster.Insert() error = repeat insert")
+		return
+	}
+	// Insert
+	e, err = NewCluster("fate-10000", "fate-10000", "fate", "v1.4.0", "")
+	if err != nil {
+		t.Errorf("Cluster.NewCluster() error = %v", err)
+		return
+	}
+	Id, err = e.Insert()
+	if err != nil {
+		t.Errorf("Cluster.Insert() error = %v", err)
+		return
+	}
+	if Id != 2 {
+		t.Errorf("Cluster.Insert() got = %d, want = %d", Id, 2)
+		return
+	}
+
+	e = &Cluster{}
+	gots, err := e.GetList()
+	if err != nil {
+		t.Errorf("Cluster.GetList() error = %v", err)
+		return
+	}
+	if len(gots) != 2 {
+		t.Errorf("Cluster.GetList() len(got) = %d, want = %d", len(gots), 2)
+		return
+	}
+	fmt.Printf("%+v\n", gots)
+	//os.Exit(0)
+	e = &Cluster{}
+	got, err := e.Get()
+	if err != nil {
+		t.Errorf("Cluster.Get() error = %v", err)
+		return
+	}
+	e = &Cluster{Uuid: got.Uuid}
+	success, err := e.Delete()
+	if err != nil {
+		t.Errorf("Cluster.Delete() error = %v", err)
+		return
+	}
+	if !success {
+		t.Errorf("Cluster.Delete() success = %v, wat = %v", success, true)
+		return
+	}
+
+	e = &Cluster{}
+	gots, err = e.GetList()
+	if err != nil {
+		t.Errorf("Cluster.GetList() error = %v", err)
+		return
+	}
+	if len(gots) != 1 {
+		t.Errorf("Cluster.GetList() len(got) = %d, want = %d", len(gots), 1)
+		return
+	}
+
+	fmt.Printf("%+v\n", gots)
 }

@@ -191,7 +191,7 @@ func (e *Cluster) Delete() (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	err = e.SetStatus(ClusterStatusDeleted)
+	err = cluster.SetStatus(ClusterStatusDeleted)
 	if err != nil {
 		return false, err
 	}
