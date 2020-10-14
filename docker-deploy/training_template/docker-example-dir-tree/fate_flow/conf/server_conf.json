@@ -1,29 +1,30 @@
 {
     "servers": {
-        "proxy": {
-            "host": "proxy",
-            "port": 9370
-        },
-        "fateboard": {
-            "host": "fateboard",
-            "port": 8080
-        },
         "roll": {
             "host": "roll",
             "port": 8011
+        },
+        "federation": {
+            "host": "federation",
+            "port": 9394
         },
         "fateflow": {
             "host": "python",
             "grpc.port": 9360,
             "http.port": 9380
         },
-        "federation": {
-            "host": "federation",
-            "port": 9394
+        "fateboard": {
+            "host": "fateboard",
+            "port": 8080
         },
-        "clustercomm": {
-            "host": "federation",
-            "port": 9394
+        "proxy": {
+            "host": "proxy",
+            "port": 9370
+        },
+        "fatemanager": {
+            "host": "localhost",
+            "port": 8001,
+            "federatedId": 0
         },
         "servings": ["serving:8000"]
     }

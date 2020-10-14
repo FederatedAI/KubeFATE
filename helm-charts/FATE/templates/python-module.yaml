@@ -55,18 +55,21 @@ data:
       port: {{ .Values.modules.mysql.port }}
       max_connections: 100
       stale_timeout: 30
-    redis:
-      host: 127.0.0.1
-      port: 6379
-      password: WEBANK_2014_fate_dev
-      max_connections: 500
-      db: 0
-    default_model_store_address:
-      storage: redis
-      host: 127.0.0.1
-      port: 6379
-      password: fate_dev
-      db: 0
+    zookeeper:
+      hosts:
+        - 127.0.0.1:2281
+      use_acl: true
+      user: fate
+      password: fate
+    model_store_address:
+      storage: mysql
+      name: model
+      host: '{{ .Values.modules.mysql.ip }}'
+      port: {{ .Values.modules.mysql.port }}
+      user: '{{ .Values.modules.mysql.user }}'
+      passwd: '{{ .Values.modules.mysql.password }}'
+      max_connections: 10
+      stale_timeout: 10
 ---
 kind: ConfigMap
 apiVersion: v1
@@ -88,6 +91,9 @@ data:
     fateboard.datasource.password={{ .Values.modules.mysql.password }}
     server.tomcat.max-threads=1000
     server.tomcat.max-connections=20000
+    spring.datasource.druid.filter.config.enabled=false
+    spring.datasource.druid.web-stat-filter.enabled=false
+    spring.datasource.druid.stat-view-servlet.enabled=false
 ---
 apiVersion: apps/v1
 kind: Deployment
