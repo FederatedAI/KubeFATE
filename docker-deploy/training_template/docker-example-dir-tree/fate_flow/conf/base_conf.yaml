@@ -1,4 +1,5 @@
 work_mode: 1
+use_registry: false
 fate_flow:
   host: 0.0.0.0
   http_port: 9380
@@ -11,15 +12,18 @@ database:
   port: 3306
   max_connections: 100
   stale_timeout: 30
-redis:
-  host: <redis.ip>
-  port: <redis.port>
-  password: <redis.password>
-  max_connections: 500
-  db: 0
-default_model_store_address:
-  storage: redis
-  host: <redis.ip>
-  port: <redis.port>
-  password: <redis.password>
-  db: 0
+zookeeper:
+  hosts:
+    - 127.0.0.1:2281
+  use_acl: true
+  user: fate
+  password: fate
+model_store_address:
+  storage: mysql
+  name: model
+  host: 192.168.0.1
+  port: 3306
+  user: <jdbc.username>
+  passwd: <jdbc.password>
+  max_connections: 10
+  stale_timeout: 10

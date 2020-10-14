@@ -1,7 +1,7 @@
 name: fate-10000
 namespace: fate-10000
 chartName: fate
-chartVersion: v1.4.4
+chartVersion: v1.4.5
 partyId: 10000
 registry: ""
 pullPolicy: 
