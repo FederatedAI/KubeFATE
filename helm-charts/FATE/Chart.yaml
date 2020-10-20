@@ -2,4 +2,12 @@ apiVersion: v1
 appVersion: v1.4.5
 description: A Helm chart for fate-training
 name: fate
-version: v1.4.5
+version: v1.4.5-a
+home: https://fate.fedai.org
+icon: https://aisp-1251170195.cos.ap-hongkong.myqcloud.com/wp-content/uploads/sites/12/2019/09/logo.png
+sources:
+  - https://github.com/FederatedAI/KubeFATE
+  - https://github.com/FederatedAI/FATE
+
+
+sparkappVersion: 1.5.1

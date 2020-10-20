@@ -1,0 +1,58 @@
+# Copyright 2019-2020 VMware, Inc.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+{{- if .Values.modules.Spark.include }}
+apiVersion: {{ template "deployment.apiVersion" . }}
+kind: Deployment
+metadata:
+  name: {{ template "worker-fullname" . }}
+  labels:
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    component: "{{ .Release.Name }}-{{ .Values.modules.Spark.Worker.Component }}"
+spec:
+{{- if not .Values.modules.Spark.Worker.Autoscaling.Enabled }}
+  replicas: {{ default 1 .Values.modules.Spark.Worker.Replicas }}
+{{- end }}
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      component: "{{ .Release.Name }}-{{ .Values.modules.Spark.Worker.Component }}"
+  template:
+    metadata:
+      labels:
+        heritage: {{ .Release.Service | quote }}
+        release: {{ .Release.Name | quote }}
+        chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+        component: "{{ .Release.Name }}-{{ .Values.modules.Spark.Worker.Component }}"
+    spec:
+      containers:
+        - name: {{ template "worker-fullname" . }}
+          image: "{{ .Values.modules.Spark.Worker.Image }}:{{ .Values.modules.Spark.Worker.ImageTag }}"
+          command: ["{{ .Values.modules.Spark.Path }}/bin/spark-class", "org.apache.spark.deploy.worker.Worker", "spark://{{ template "master-fullname" . }}:{{ .Values.modules.Spark.Master.ServicePort }}"]
+          ports:
+            - containerPort: {{ .Values.modules.Spark.Worker.ContainerPort }}
+          resources:
+            requests:
+              cpu: "{{ .Values.modules.Spark.Worker.Cpu }}"
+              memory: "{{ .Values.modules.Spark.Worker.Memory }}"
+          env:
+          - name: SPARK_DAEMON_MEMORY
+            value: {{ default "1g" .Values.modules.Spark.Worker.DaemonMemory | quote }}
+          - name: SPARK_WORKER_MEMORY
+            value: {{ default "1g" .Values.modules.Spark.Worker.ExecutorMemory | quote }}
+          - name: SPARK_WORKER_WEBUI_PORT
+            value: {{ .Values.modules.Spark.WebUi.ContainerPort | quote }}
+
+{{- end }}

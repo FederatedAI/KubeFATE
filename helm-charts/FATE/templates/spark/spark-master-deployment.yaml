@@ -1,0 +1,138 @@
+# Copyright 2019-2020 VMware, Inc.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+{{- if .Values.modules.Spark.include }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "master-fullname" . }}
+  labels:
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    component: "{{ .Release.Name }}-{{ .Values.modules.Spark.Master.Component }}"
+spec:
+  ports:
+    - port: {{ .Values.modules.Spark.Master.ServicePort }}
+      targetPort: {{ .Values.modules.Spark.Master.ContainerPort }}
+  selector:
+    component: "{{ .Release.Name }}-{{ .Values.modules.Spark.Master.Component }}"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "webui-fullname" . }}
+  labels:
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    component: "{{ .Release.Name }}-{{ .Values.modules.Spark.Master.Component }}"
+spec:
+  ports:
+    - port: {{ .Values.modules.Spark.WebUi.ServicePort }}
+      targetPort: {{ .Values.modules.Spark.WebUi.ContainerPort }}
+  selector:
+    component: "{{ .Release.Name }}-{{ .Values.modules.Spark.Master.Component }}"
+  type: {{ .Values.modules.Spark.Master.ServiceType }}
+---
+apiVersion: {{ template "deployment.apiVersion" . }}
+kind: Deployment
+metadata:
+  name: {{ template "master-fullname" . }}
+  labels:
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    component: "{{ .Release.Name }}-{{ .Values.modules.Spark.Master.Component }}"
+spec:
+  replicas: {{ default .Values.modules.Spark.Master.Replicas }}
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      component: "{{ .Release.Name }}-{{ .Values.modules.Spark.Master.Component }}"
+  template:
+    metadata:
+      labels:
+        heritage: {{ .Release.Service | quote }}
+        release: {{ .Release.Name | quote }}
+        chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+        component: "{{ .Release.Name }}-{{ .Values.modules.Spark.Master.Component }}"
+    spec:
+      containers:
+        - name: {{ template "master-fullname" . }}
+          image: "{{ .Values.modules.Spark.Master.Image }}:{{ .Values.modules.Spark.Master.ImageTag }}"
+          command: ["/bin/sh","-c"]
+          args: ["echo $(hostname -i) {{ template "master-fullname" . }} >> /etc/hosts; {{ .Values.modules.Spark.Path }}/bin/spark-class org.apache.spark.deploy.master.Master"]
+          ports:
+            - containerPort: {{ .Values.modules.Spark.Master.ContainerPort }}
+            - containerPort: {{ .Values.modules.Spark.WebUi.ContainerPort }}
+          resources:
+            requests:
+              cpu: "{{ .Values.modules.Spark.Master.Cpu }}"
+              memory: "{{ .Values.modules.Spark.Master.Memory }}"
+          env:
+          - name: SPARK_DAEMON_MEMORY
+            value: {{ default "1g" .Values.modules.Spark.Master.DaemonMemory | quote }}
+          - name: SPARK_MASTER_HOST
+            value: {{ template "master-fullname" . }}
+          - name: SPARK_MASTER_PORT
+            value: {{ .Values.modules.Spark.Master.ServicePort | quote }}
+          - name: SPARK_MASTER_WEBUI_PORT
+            value: {{ .Values.modules.Spark.WebUi.ContainerPort | quote }}
+---
+{{- $ingress := .Values.modules.Spark.WebUi.Ingress -}}
+{{- $fullName := include "webui-fullname" . -}}
+{{- if $ingress.Enabled }}
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ template "webui-fullname" . }}
+{{- if $ingress.Annotations }}
+  annotations:
+{{ toYaml $ingress.Annotations | indent 4 }}
+{{- end }}
+  labels:
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    component: "{{ .Release.Name }}-{{ .Values.modules.Spark.WebUi.Component }}"
+spec:
+{{- if $ingress.Tls }}
+  tls:
+  {{- range $ingress.Tls }}
+  - hosts:
+    {{- range .Hosts }}
+    - {{ . }}
+    {{- end }}
+    secretName: {{ .SecretName | default (printf "%s-tls" $fullName) }}
+{{- end }}
+{{- end }}
+  {{- if $ingress.Hosts }}
+  rules:
+  {{- range $ingress.Hosts }}
+  - host: {{ . }}
+    http:
+      paths:
+      - path: {{ $ingress.Path }}
+        backend:
+          serviceName: {{ $fullName }}
+          servicePort: 8080
+  {{- end }}
+{{- else }}
+  backend:
+    serviceName: {{ template "webui-fullname" . }}
+    servicePort: 8080
+{{- end }}
+{{- end }}
+
+{{- end }}

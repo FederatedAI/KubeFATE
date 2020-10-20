@@ -91,3 +91,62 @@ modules:
   serving:
     ip: 192.168.9.1
     port: 30209
+  Spark:
+    include: true
+    Path: "/opt/spark"
+    Master:
+      Name: master
+      Image: "k8s.gcr.io/spark"
+      ImageTag: "1.5.1_v3"
+      Replicas: 1
+      Component: "spark-master"
+      Cpu: "100m"
+      Memory: "512Mi"
+      ServicePort: 7077
+      ContainerPort: 7077
+      # Set Master JVM memory. Default 1g
+      # DaemonMemory: 1g
+      ServiceType: ClusterIP
+    WebUi:
+      Name: webui
+      ServicePort: 8080
+      ContainerPort: 8080
+      Component: "spark-webui"
+      Ingress:
+        Enabled: true
+        Path: "/"
+        Hosts:
+        - 9999.sparkui.kubefate.net
+        Tls: []
+      #    - Hosts:
+      #    SecretName: zeppelin
+      # Used to create an Ingress record.
+      # Hosts:
+      # - example.local
+      # Annotations:
+      #   kubernetes.io/ingress.class: nginx
+      #   kubernetes.io/tls-acme: "true"
+      # Tls:
+      #   Enabled: true
+      # Secrets must be manually created in the namespace.
+      #   SecretName: example-tls
+      #   Hosts:
+      #   - example.local
+    Worker:
+      Name: worker
+      Image: "k8s.gcr.io/spark"
+      ImageTag: "1.5.1_v3"
+      Replicas: 3
+      Component: "spark-worker"
+      Cpu: "100m"
+      Memory: "512Mi"
+      ContainerPort: 8081
+      # Set Worker JVM memory. Default 1g
+      # DaemonMemory: 1g
+      # Set how much total memory workers have to give executors
+      # ExecutorMemory: 1g
+      Autoscaling:
+        Enabled: false
+      ReplicasMax: 10
+      CpuTargetPercentage: 50
+

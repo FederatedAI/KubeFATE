@@ -15,6 +15,7 @@ modules:
   - mysql
   - python
   - client
+  - spark
 
 rollsite: 
   type: NodePort
@@ -72,3 +73,21 @@ mysql:
 
 servingIp: 192.168.9.1
 servingPort: 30209
+
+
+spark:
+  master:
+    Image: "k8s.gcr.io/spark"
+    ImageTag: "1.5.1_v3"
+    Replicas: 1
+    Cpu: "100m"
+    Memory: "512Mi"
+  worker:
+    Image: "k8s.gcr.io/spark"
+    ImageTag: "1.5.1_v3"
+    Replicas: 3
+    Cpu: "100m"
+    Memory: "512Mi"
+    Autoscaling: 
+      Enabled: false
+    ReplicasMax: 10
