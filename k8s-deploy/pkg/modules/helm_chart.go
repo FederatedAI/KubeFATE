@@ -31,7 +31,7 @@ type HelmChart struct {
 	Chart          string    `json:"chart" gorm:"type:text;not null"`
 	Values         string    `json:"values" gorm:"type:text;not null"`
 	ValuesTemplate string    `json:"values_template" gorm:"type:text;not null"`
-	Templates      Templates `json:"templates" gorm:"type:blob"`
+	Templates      Templates `json:"templates" gorm:"type:mediumblob"`
 	Version        string    `json:"version" gorm:"type:varchar(32);not null"`
 	AppVersion     string    `json:"app_version" gorm:"type:varchar(32);not null"`
 
