@@ -36,7 +36,7 @@ Deploy() {
 			break
 			;;
 		all)
-			for party in ${partylist[*]}; do
+			for party in ${party_list[*]}; do
 				if [ "$2" != "" ]; then
 					case $2 in
 					--training)
@@ -91,7 +91,7 @@ Delete() {
 	while [ "$1" != "" ]; do
 		case $1 in
 		all)
-			for party in ${partylist[*]}; do
+			for party in ${party_list[*]}; do
 				if [ "$2" != "" ]; then
 					DeleteCluster $party $2
 				else
@@ -131,9 +131,9 @@ DeployPartyInternal() {
 	elif [ "$2" != "" ]; then
 		target_party_ip="$2"
 	else
-		for ((i = 0; i < ${#partylist[*]}; i++)); do
-			if [ "${partylist[$i]}" = "$target_party_id" ]; then
-				target_party_ip=${partyiplist[$i]}
+		for ((i = 0; i < ${#party_list[*]}; i++)); do
+			if [ "${party_list[$i]}" = "$target_party_id" ]; then
+				target_party_ip=${party_ip_list[$i]}
 			fi
 		done
 	fi
@@ -183,9 +183,9 @@ DeployPartyServing() {
 		exit 1
 	fi
 	# extract the ip address of the target party
-	for ((i = 0; i < ${#partylist[*]}; i++)); do
-		if [ "${partylist[$i]}" = "$target_party_id" ]; then
-			target_party_serving_ip=${servingiplist[$i]}
+	for ((i = 0; i < ${#party_list[*]}; i++)); do
+		if [ "${party_list[$i]}" = "$target_party_id" ]; then
+			target_party_serving_ip=${serving_ip_list[$i]}
 		fi
 	done
 	# verify the target_party_ip
@@ -222,16 +222,16 @@ DeleteCluster() {
 	if [ "$target_party_id" == "exchange" ]; then
 		target_party_ip=${exchangeip}
 	else
-		for ((i = 0; i < ${#partylist[*]}; i++)); do
-			if [ "${partylist[$i]}" = "$target_party_id" ]; then
-				target_party_ip=${partyiplist[$i]}
+		for ((i = 0; i < ${#party_list[*]}; i++)); do
+			if [ "${party_list[$i]}" = "$target_party_id" ]; then
+				target_party_ip=${party_ip_list[$i]}
 			fi
 		done
 	fi
 
-	for ((i = 0; i < ${#partylist[*]}; i++)); do
-		if [ "${partylist[$i]}" = "$target_party_id" ]; then
-			target_party_serving_ip=${servingiplist[$i]}
+	for ((i = 0; i < ${#party_list[*]}; i++)); do
+		if [ "${party_list[$i]}" = "$target_party_id" ]; then
+			target_party_serving_ip=${serving_ip_list[$i]}
 		fi
 	done
 

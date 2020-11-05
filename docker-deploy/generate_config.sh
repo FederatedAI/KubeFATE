@@ -146,38 +146,20 @@ GenerateConfig() {
 		echo mysql module of $party_id done!
 
 		# fate_flow
-		sed -i "s/WORK_MODE =.*/WORK_MODE = 1/g" ./confs-$party_id/confs/fate_flow/conf/settings.py
-		sed -i "s/user:.*/user: '${db_user}'/g" ./confs-$party_id/confs/fate_flow/conf/base_conf.yaml
-		sed -i "s/passwd:.*/passwd: '${db_password}'/g" ./confs-$party_id/confs/fate_flow/conf/base_conf.yaml
-		sed -i "s/host: 192.168.0.1*/host: '${db_ip}'/g" ./confs-$party_id/confs/fate_flow/conf/base_conf.yaml
-		sed -i "s/name:.*/name: '${db_name}'/g" ./confs-$party_id/confs/fate_flow/conf/base_conf.yaml
+		sed -i "12 s/name:.*/name: '${db_name}'/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
+		sed -i "13 s/user:.*/user: '${db_user}'/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
+		sed -i "14 s/passwd:.*/passwd: '${db_password}'/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
+		sed -i "15 s/host: 192.168.0.1*/host: '${db_ip}'/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
+		sed -i "43 s/name:.*/name: '${db_name}'/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
+		sed -i "44 s/host: 192.168.0.1*/host: '${db_ip}'/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
+		sed -i "46 s/user:.*/user: '${db_user}'/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
+		sed -i "47 s/passwd:.*/passwd: '${db_password}'/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
+		sed -i "s/127.0.0.1:8000/${serving_ip}:8000/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
 
-		cat >./confs-$party_id/confs/fate_flow/conf/server_conf.json <<EOF
-{
-    "servers": {
-        "proxy": {
-            "host": "${proxy_ip}",
-            "port": ${proxy_port}
-        },
-        "fateboard": {
-            "host": "${fateboard_ip}",
-            "port": ${fateboard_port}
-        },
-        "fateflow": {
-            "host": "${fate_flow_ip}",
-            "grpc.port": ${fate_flow_grpc_port},
-            "http.port": ${fate_flow_http_port}
-        },
-        "fml_agent":  {
-            "host": "${fate_flow_ip}",
-            "port": ${fml_agent_port}
-        },
-        "servings": [
-          "${serving_ip_list[${i}]}:8000"
-        ]
-    }
-}
-EOF
+		if [ $computing_backend = "spark" ]; then
+			sed -i "s/proxy: eggroll/proxy: nginx/g"./confs-$party_id/confs/fate_flow/conf/server_conf.yaml
+		fi
+
 		echo fate_flow module of $party_id done!
 		# now we handles the route table
 		if [ $computing_backend = "spark" ]; then
@@ -204,6 +186,21 @@ ${party_id}:
     - host: ${fate_flow_ip}
       port: ${fate_flow_grpc_port}
 EOF
+			cat >./confs-$party_id/confs/fate_flow/conf/rabbitmq_route_table.yaml <<EOF
+$(for ((j = 0; j < ${#party_list[*]}; j++)); do
+				if [ "${party_id}" == "${party_list[${j}]}" ]; then
+					continue
+				fi
+				echo "${party_list[${j}]}:
+    - host: ${party_ip_list[${j}]} 
+      port: 5672
+"
+			done)
+${party_id}:
+    - host: rabbitmq
+      port: 5672 
+EOF
+
 		else
 			cat >./confs-$party_id/confs/eggroll/conf/route_table.json <<EOF
 {
@@ -218,8 +215,8 @@ $(if [ "$exchange_ip" != "" ]; then
 	"
 			else
 				echo " 
-				\"ip\": \"proxy\",
-				\"port\": 9370
+				\"ip\": \"${proxy_ip}\",
+				\"port\": \"${proxy_port}\"
 	"
 			fi)
 				}
@@ -239,9 +236,13 @@ $(for ((j = 0; j < ${#party_list[*]}; j++)); do
 	"
 			done)
 		"${party_id}": {
+			"default": [{
+				"ip": "${proxy_ip}",
+				"port": ${proxy_port}
+			}],
 			"fateflow": [{
-			"ip": "${fate_flow_ip}",
-			"port": ${fate_flow_grpc_port}
+				"ip": "${fate_flow_ip}",
+				"port": ${fate_flow_grpc_port}
 			}]
 		}
 	},
