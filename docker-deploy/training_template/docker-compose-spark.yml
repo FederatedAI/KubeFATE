@@ -121,6 +121,8 @@ services:
       - "8081:8081"
     environment:
       SPARK_MASTER: "spark://spark-master:7077"
+    volumes:
+      - ./confs/fate_flow/conf:/data/projects/fate/conf
     networks:
       - fate-network
 
