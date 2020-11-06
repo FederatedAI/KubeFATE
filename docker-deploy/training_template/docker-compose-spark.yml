@@ -80,7 +80,7 @@ services:
       - 9870:9870
       - 50070:50070
     volumes:
-      - ./shard_dir/data/namenode:/hadoop/dfs/name
+      - ./shared_dir/data/namenode:/hadoop/dfs/name
       - ./confs/hadoop/core-site.xml:/etc/hadoop/core-site.xml
     env_file:
       - ./confs/hadoop/hadoop.env
@@ -166,3 +166,5 @@ services:
     restart: always
     networks:
       - fate-network
+    depends_on:
+      - python
