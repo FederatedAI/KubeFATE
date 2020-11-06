@@ -157,7 +157,7 @@ GenerateConfig() {
 		sed -i "s/127.0.0.1:8000/${serving_ip}:8000/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
 
 		if [ $computing_backend = "spark" ]; then
-			sed -i "s/proxy: eggroll/proxy: nginx/g"./confs-$party_id/confs/fate_flow/conf/server_conf.yaml
+			sed -i "s/proxy: rollsite/proxy: nginx/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
 		fi
 
 		echo fate_flow module of $party_id done!
@@ -192,13 +192,13 @@ $(for ((j = 0; j < ${#party_list[*]}; j++)); do
 					continue
 				fi
 				echo "${party_list[${j}]}:
-    - host: ${party_ip_list[${j}]} 
-      port: 5672
+    host: ${party_ip_list[${j}]}
+    port: 5672
 "
 			done)
 ${party_id}:
-    - host: rabbitmq
-      port: 5672 
+    host: rabbitmq
+    port: 5672
 EOF
 
 		else

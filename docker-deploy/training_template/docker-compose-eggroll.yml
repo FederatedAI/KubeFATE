@@ -58,7 +58,7 @@ services:
       - "8080:8080"
     volumes:
       - ./confs/fateboard/conf:/data/projects/fate/fateboard/conf
-      - fate_flow_logs:/data/projects/fate/python/logs
+      - fate_flow_logs:/data/projects/fate/logs
     networks:
       - fate-network
     depends_on:
@@ -96,7 +96,7 @@ services:
     restart: always
     volumes:
       - shared_dir_federatedml:/data/projects/fate/python/federatedml
-      - shared_dir_examples:/data/projects/fate/python/examples
+      - shared_dir_examples:/data/projects/fate/examples
       - download_dir:/data/projects/fate/python/download_dir
       - ./confs/fate_flow/conf:/data/projects/fate/conf
       - ./confs/eggroll/conf:/data/projects/fate/eggroll/conf
