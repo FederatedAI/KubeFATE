@@ -67,7 +67,7 @@ services:
       - shared_dir_federatedml:/data/projects/fate/python/federatedml
       - shared_dir_examples:/data/projects/fate/examples
       - download_dir:/data/projects/fate/python/download_dir
-      - fate_flow_logs:/data/projects/fate/python/logs
+      - fate_flow_logs:/data/projects/fate/logs
     networks:
       fate-network:
         ipv4_address: 192.167.0.100

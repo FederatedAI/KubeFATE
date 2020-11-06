@@ -100,7 +100,7 @@ services:
       - download_dir:/data/projects/fate/python/download_dir
       - ./confs/fate_flow/conf:/data/projects/fate/conf
       - ./confs/eggroll/conf:/data/projects/fate/eggroll/conf
-      - fate_flow_logs:/data/projects/fate/python/logs
+      - fate_flow_logs:/data/projects/fate/logs
     depends_on:
       - mysql
       - rollsite
