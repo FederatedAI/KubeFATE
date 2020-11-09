@@ -120,6 +120,9 @@ services:
       FATE_SERVING_HOST: "fate-serving:8059"
     volumes:
       - download_dir:/fml_manager/Examples/download_dir
+      - shared_dir_examples:/data/projects/fate/examples
+      - ./confs/fate_flow/conf:/data/projects/fate/conf
+      - ./confs/client/pipeline_conf.yaml:/data/projects/fate/conf/pipeline_conf.yaml
     depends_on:
       - python
     networks:
