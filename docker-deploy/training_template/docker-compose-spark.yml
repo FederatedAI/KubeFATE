@@ -73,7 +73,7 @@ services:
         ipv4_address: 192.167.0.100
 
   namenode:
-    image: bde2020/hadoop-namenode:2.0.0-hadoop2.7.4-java8
+    image: federatedai/hadoop-namenode:2.0.0-hadoop2.7.4-java8
     restart: always
     ports:
       - 9000:9000
@@ -90,7 +90,7 @@ services:
       - fate-network
 
   datanode:
-    image: bde2020/hadoop-datanode:2.0.0-hadoop2.7.4-java8
+    image: federatedai/hadoop-datanode:2.0.0-hadoop2.7.4-java8
     restart: always
     volumes:
       - ./shared_dir/data/datanode:/hadoop/dfs/data
