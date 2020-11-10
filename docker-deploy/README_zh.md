@@ -215,7 +215,7 @@ $ python run_toy_example.py 10000 9999 1        #验证
 `$ vi examples/upload_host.json`
 ```
 {
-  "file": "examples/data/breast_a.csv",
+  "file": "examples/data/breast_hetero_host.csv",
   "head": 1,
   "partition": 10,
   "work_mode": 1,
@@ -238,7 +238,7 @@ $ python run_toy_example.py 10000 9999 1        #验证
 `$ vi examples/upload_guest.json`
 ```
 {
-  "file": "examples/data/breast_b.csv",
+  "file": "examples/data/breast_hetero_host.csv",
   "head": 1,
   "partition": 10,
   "work_mode": 1,
