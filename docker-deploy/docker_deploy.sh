@@ -147,6 +147,10 @@ DeployPartyInternal() {
 		user=$3
 	fi
 
+	if [ "$(handleLocally confs)" == "local" ]; then
+		return 0
+	fi
+
 	scp ${WORKINGDIR}/outputs/confs-$target_party_id.tar $user@$target_party_ip:~/
 	#rm -f ${WORKINGDIR}/outputs/confs-$target_party_id.tar
 	echo "$target_party_ip training cluster copy is ok!"
@@ -192,6 +196,10 @@ DeployPartyServing() {
 	if [ "$target_party_serving_ip" = "127.0.0.1" ]; then
 		echo "Unable to find Party : $target_party_id serving address, please check you input."
 		exit 1
+	fi
+
+	if [ $(handleLocally serving) == "local" ]; then
+		return
 	fi
 
 	scp ${WORKINGDIR}/outputs/serving-$target_party_id.tar $user@$target_party_serving_ip:~/
@@ -280,6 +288,22 @@ eeooff
 ShowUsage() {
 	echo "Usage: "
 	echo "Deploy all parties or specified partie(s): bash docker_deploy.sh partyid1[partyid2...] | all"
+}
+
+handleLocally() {
+	type=$1
+	for ip in $(hostname -I); do
+		if [ "$target_party_ip" == "$ip" ]; then
+			mkdir -p $dir
+			tar -xf ${WORKINGDIR}/outputs/${type}-${target_party_id}.tar -C $dir
+			cd ${dir}/${type}-${target_party_id}
+			docker-compose down
+			docker-compose up -d
+			echo "local"
+			return 0
+		fi
+	done
+	echo "non-local"
 }
 
 main() {
