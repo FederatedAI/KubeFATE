@@ -176,6 +176,9 @@ $(for ((j = 0; j < ${#party_list[*]}; j++)); do
   proxy:
     - host: ${party_ip_list[${j}]} 
       port: 9390
+  fateflow:
+    - host: ${party_ip_list[${j}]}
+      port: ${fate_flow_grpc_port}
 "
 			done)
 ${party_id}:
