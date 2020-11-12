@@ -2,28 +2,52 @@
 `cluster.yaml` declares information about the FATE cluster to be deployed, which KubeFATE CLI uses to deploy the FATE cluster.
 
 ## cluster.yaml
-| Name                  | Type      | Description                                                  |
-| --------------------- | --------- | ------------------------------------------------------------ |
-| name                  | scalars   | FATE cluster name.                                           |
-| namespace             | scalars   | Kubernetes namespace for FATE cluster.                       |
-| chartName             | scalars   | FATE chart name. (fate/fate-serving)                         |
-| chartVersion          | scalars   | FATE chart corresponding version.                            |
-| partyId               | scalars   | FATE cluster party id.                                       |
-| registry              | scalars   | Other fate images sources.                                   |
-| pullPolicy            | scalars   | kubernetes images pull policy                                |
-| persistence           | bool      | mysql and nodemanager data persistence.                      |
-| modules               | sequences | Modules to be deployed in the FATE cluster.                  |
-| rollsite              | mappings  | Configuration of FATE cluster `rollsite` module.             |
-| nodemanager           | mappings  | Configuration of FATE cluster `nodemanager` module.          |
-| python                | mappings  | Configuration of FATE cluster `python` module.               |
-| mysql                 | mappings  | Configuration of FATE cluster `mysql` module.<br />If you use your own redis, please delete this item. |
-| externalMysqlIp       | scalars   | Access your own MySQL.                                       |
-| externalMysqlPort     | scalars   | Access your own MySQL.                                       |
-| externalMysqlDatabase | scalars   | Access your own MySQL.                                       |
-| externalMysqlUser     | scalars   | Access your own MySQL.                                       |
-| externalMysqlPassword | scalars   | Access your own MySQL.                                       |
-| servingIp             | scalars   | Serving cluster connected to fate.                           |
-| servingPort           | scalars   | Serving cluster connected to fate.                           |
+| Name                  | Type               | Description                                                  |
+| --------------------- | ------------------ | ------------------------------------------------------------ |
+| * name                | scalars            | FATE cluster name.                                           |
+| * namespace           | scalars            | Kubernetes namespace for FATE cluster.                       |
+| * chartName           | scalars            | FATE chart name. (fate/fate-serving)                         |
+| * chartVersion        | scalars            | FATE chart corresponding version.                            |
+| * partyId             | scalars            | FATE cluster party id.                                       |
+| registry              | scalars            | Other fate images sources.                                   |
+| pullPolicy            | scalars            | kubernetes images pull policy                                |
+| * persistence         | bool               | mysql and nodemanager data persistence.                      |
+| * modules             | sequences          | Modules to be deployed in the FATE cluster.                  |
+| backend               | set(eggroll,spark) | Configure cluster computing engine( eggroll or spark)        |
+| rollsite              | mappings           | Configuration of FATE cluster `rollsite` module.             |
+| nodemanager           | mappings           | Configuration of FATE cluster `nodemanager` module.          |
+| python                | mappings           | Configuration of FATE cluster `python` module.               |
+| mysql                 | mappings           | Configuration of FATE cluster `mysql` module.<br />If you use your own redis, please delete this item. |
+| externalMysqlIp       | scalars            | Access your own MySQL.                                       |
+| externalMysqlPort     | scalars            | Access your own MySQL.                                       |
+| externalMysqlDatabase | scalars            | Access your own MySQL.                                       |
+| externalMysqlUser     | scalars            | Access your own MySQL.                                       |
+| externalMysqlPassword | scalars            | Access your own MySQL.                                       |
+| servingIp             | scalars            | Serving cluster connected to fate.                           |
+| servingPort           | scalars            | Serving cluster connected to fate.                           |
+| spark                 | mappings           | Configuration of FATE cluster `spark` module.                |
+| hdfs                  | mappings           | Configuration of FATE cluster `hdfs` module.                 |
+| nginx                 | mappings           | Configuration of FATE cluster `nginx` module.                |
+| rabbitmq              | mappings           | Configuration of FATE cluster `rabbitmq` module.             |
+
+
+
+### list of modules
+
+- rollsite
+
+- clustermanager
+- nodemanager
+- mysql
+- python
+- fateboard
+- client
+- spark
+- hdfs
+- nginx
+- rabbitmq
+
+
 
 ### rollsite mappings
 It is used to declare the `rollsite ` module in the FATE cluster to be deployed.
@@ -70,11 +94,21 @@ The parties are directly connected.
 
 ### python mappings
 
-| Name             | Type     | Description                                                  |
-| ---------------- | -------- | ------------------------------------------------------------ |
-| fateflowType     | scalars  | Kubernetes ServiceTypes, default is NodePort.<br />Other modules can connect to the fateflow |
-| fateflowNodePort | scalars  | The port used by `proxy` module's kubernetes service, default range: 30000-32767. |
-| nodeSelector     | mappings | kubernetes nodeSelector.                                     |
+| Name                 | Type     | Description                                                  |
+| -------------------- | -------- | ------------------------------------------------------------ |
+| type                 | scalars  | Kubernetes ServiceTypes, default is NodePort.<br />Other modules can connect to the fateflow |
+| nodePort             | scalars  | The port used by `proxy` module's kubernetes service, default range: 30000-32767. |
+| nodeSelector         | mappings | kubernetes nodeSelector.                                     |
+| spark                | mappings | If you use your own spark, modify the configuration          |
+| spark.master         | scalars  | If you do not need to use the spark configuration, you can use the spark configuration |
+| spark.home           | scalars  | configuration of FATE fateflow module                        |
+| spark.cores_per_node | scalars  | configuration of FATE fateflow module                        |
+| spark.nodes          | scalars  | configuration of FATE fateflow module                        |
+| hdfs                 | mappings | If you do not need to use the spark configuration, you can use the spark configuration |
+| rabbitmq             | mappings | If you do not need to use the spark configuration, you can use the spark configuration |
+| nginx                | mappings | If you do not need to use the spark configuration, you can use the spark configuration |
+
+
 
 ### Mysql mappings
 
@@ -93,4 +127,99 @@ Configuration of kubernetes deployment mysql.
 | storageClass  | scalars  | Specify the "storageClass" used to provision the volume. Or the default. StorageClass will be used(the default). Set it to "-" to disable dynamic provisioning. |
 | accessMode    | scalars  | Kubernetes Persistent Volume Access Modes: <br />ReadWriteOnce<br />ReadOnlyMany <br />ReadWriteMany. |
 | size          | scalars  | Match the volume size of PVC.                                |
+
+
+
+### spark mappings
+
+Configuration of kubernetes deployment spark.
+
+| Name              | SubItem      | Type     | Description                  |
+| ----------------- | ------------ | -------- | ---------------------------- |
+| master/<br>worker | Image        | scalars  | Image of spark components    |
+|                   | ImageTag     | scalars  | ImageTag of spark components |
+|                   | replicas     |          | Number of copies of pod      |
+|                   | cpu          | scalars  | Requested CPU resources      |
+|                   | memory       | scalars  | Requested memory resources   |
+|                   | nodeSelector | mappings | kubernetes nodeSelector.     |
+|                   | type         | scalars  | Kubernetes ServiceTypes.     |
+
+### hdfs mappings
+
+Configuration of kubernetes deployment hdfs.
+
+| Name                  | SubItem      | Type     | Description                                      |
+| --------------------- | ------------ | -------- | ------------------------------------------------ |
+| namenode/<br>datanode | nodeSelector | mappings | kubernetes nodeSelector.                         |
+|                       | type         | scalars  | Kubernetes ServiceTypes, default is `ClusterIp`. |
+
+
+
+### nginx mappings
+
+Configuration of kubernetes deployment hdfs.
+
+| Name         | Type     | Description                  |
+| ------------ | -------- | ---------------------------- |
+| nodeSelector | mappings | kubernetes nodeSelector.     |
+| type         | scalars  | Kubernetes ServiceTypes.     |
+| nodePort     | scalars  | Kubernetes Service NodePort. |
+| route_table  | mappings | route table of FATE          |
+
+*example of route_table*:
+
+```bash
+10000: 
+  proxy: 
+  - host: 192.168.0.1 
+    port: 30103
+  fateflow: 
+  - host: 192.168.0.1
+    port: 30102
+9999: 
+  proxy: 
+  - host: 192.168.0.2 
+    port: 30093
+  fateflow: 
+  - host: 192.168.0.2
+    port: 30092
+8888: 
+  proxy: 
+  - host: 192.168.0.3 
+    port: 30083
+  fateflow: 
+  - host: 192.168.0.3
+    port: 30082 
+```
+
+
+
+### rabbitmq mappings
+
+Configuration of kubernetes deployment rabbitmq .
+
+| Name         | Type     | Description                                      |
+| ------------ | -------- | ------------------------------------------------ |
+| nodeSelector | mappings | kubernetes nodeSelector.                         |
+| type         | scalars  | Kubernetes ServiceTypes, default is `ClusterIp`. |
+| nodePort     | scalars  | Kubernetes Service NodePort.                     |
+| default_user | scalars  | configuration of rabbitmq.                       |
+| default_pass | scalars  | configuration of rabbitmq.                       |
+| user         | scalars  | configuration of rabbitmq.                       |
+| password     | scalars  | configuration of rabbitmq.                       |
+| route_table  | mappings | route table of rabbitmq.                         |
+
+*example of route_table*:
+
+```bash
+10000:
+  host: 192.168.0.1
+  port: 30104
+9999:
+  host: 192.168.0.2
+  port: 30094
+8888:
+  host: 192.168.0.3
+  port: 30084
+```
 
