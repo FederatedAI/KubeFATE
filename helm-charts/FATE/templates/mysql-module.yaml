@@ -18,6 +18,8 @@ metadata:
     fateMoudle: mysql
 {{ include "fate.labels" . | indent 4 }}
 data:
+  {{- if eq .Values.modules.python.backend  "spark" }}
+  {{- else }}
   create-eggroll-meta-tables.sql: |
     -- create database if not exists
     CREATE DATABASE IF NOT EXISTS `{{ .Values.modules.mysql.database }}`;
@@ -43,15 +45,15 @@ data:
     
     CREATE UNIQUE INDEX `idx_u_store_locator_ns_n` ON `store_locator` (`namespace`(120), `name`(640));
     CREATE INDEX `idx_store_locator_st` ON `store_locator` (`store_type`(255));
-    CREATE INDEX `idx_store_locator_ns` ON `store_locator` (`namespace`(768));
-    CREATE INDEX `idx_store_locator_n` ON `store_locator` (`name`(768));
+    CREATE INDEX `idx_store_locator_ns` ON `store_locator` (`namespace`(760));
+    CREATE INDEX `idx_store_locator_n` ON `store_locator` (`name`(760));
     CREATE INDEX `idx_store_locator_s` ON `store_locator` (`status`(255));
     CREATE INDEX `idx_store_locator_v` ON `store_locator` (`version`);
-    
-    
+        
+        
     -- store (option)
     CREATE TABLE IF NOT EXISTS `store_option` (
-      `store_locator_id` VARCHAR(2000),
+      `store_locator_id` BIGINT UNSIGNED NOT NULL,
       `name` VARCHAR(255) NOT NULL,
       `data` VARCHAR(2000) NOT NULL DEFAULT '',
       `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -92,8 +94,8 @@ data:
       `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     ) DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
     
-    CREATE INDEX `idx_server_node_h_p_nt` ON `server_node` (`host`, `port`, `node_type`);
-    CREATE INDEX `idx_server_node_h` ON `server_node` (`host`(768));
+    CREATE INDEX `idx_server_node_h_p_nt` ON `server_node` (`host`(600), `port`, `node_type`(100));
+    CREATE INDEX `idx_server_node_h` ON `server_node` (`host`(760));
     CREATE INDEX `idx_server_node_sci` ON `server_node` (`server_cluster_id`);
     CREATE INDEX `idx_server_node_nt` ON `server_node` (`node_type`(255));
     CREATE INDEX `idx_server_node_s` ON `server_node` (`status`(255));
@@ -123,7 +125,7 @@ data:
       `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     ) DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
     
-    CREATE INDEX `idx_session_option_si` ON `session_option` (`session_id`);
+    CREATE INDEX `idx_session_option_si` ON `session_option` (`session_id`(760));
     
     
     -- session (processor)
@@ -141,7 +143,7 @@ data:
       `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     ) DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
     
-    CREATE INDEX `idx_session_processor_si` ON `session_processor` (`session_id`);
+    CREATE INDEX `idx_session_processor_si` ON `session_processor` (`session_id`(760));
     
     INSERT INTO server_node (host, port, node_type, status) values ('clustermanager', '9460', 'CLUSTER_MANAGER', 'HEALTHY');
     {{- range $nodemanager := .Values.modules.nodemanager.list }}
@@ -149,6 +151,7 @@ data:
     {{- end }}
     show tables;
     select * from server_node;
+    {{- end }}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -199,9 +202,7 @@ spec:
               subPath: {{ .Values.modules.mysql.subPath }}
       {{- with .Values.modules.mysql.nodeSelector }}
       nodeSelector: 
-      {{- range $k, $v := . }}
-        {{ $k }}: {{ $v }}
-      {{- end }}
+{{ toYaml . | indent 8 }}
       {{- end }}
       volumes:
         - name: mysql-confs

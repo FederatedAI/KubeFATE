@@ -49,13 +49,27 @@ data:
     eggroll.resourcemanager.bootstrap.roll_pair_master.mainclass=com.webank.eggroll.rollpair.RollPairMasterBootstrap
     eggroll.resourcemanager.bootstrap.roll_pair_master.jvm.options=
     
-    # roll site
+    
+    # roll_frame
+    arrow.enable_unsafe_memory_access=true
+    
+    # hadoop
+    hadoop.fs.defaultFS=file:///
+    
+    # hadoop HA mode
+    hadoop.dfs.nameservices=
+    hadoop.dfs.namenode.rpc-address.nn1=
+    hadoop.dfs.namenode.rpc-address.nn2=
+    
+    # for roll site. rename in the next round
     eggroll.rollsite.coordinator={{ $root.Values.partyName }}
     eggroll.rollsite.host=rollsite
     eggroll.rollsite.port=9370
     eggroll.rollsite.party.id={{ $root.Values.partyId }}
-    eggroll.rollsite.route.table.path=conf/route_table.json
-    
+    eggroll.rollsite.route.table.path=conf/route_table/route_table.json
+    eggroll.rollsite.route.table.key=
+    eggroll.rollsite.route.table.whitelist=127.0.0.1
+    eggroll.rollsite.jvm.options=-XX:+UseG1GC -XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:logs/eggroll/rollsite.gc.log
     
     eggroll.session.processors.per.node={{ $nodemanager.sessionProcessorsPerNode }}
     eggroll.session.start.timeout.ms=180000
@@ -83,10 +97,6 @@ spec:
         fateMoudle: {{ $nodemanager.name }}
 {{ include "fate.labels" $root | indent 8 }}
     spec:
-      hostAliases:
-      - ip: "127.0.0.1"
-        hostnames:
-        - "{{ $nodemanager.name }}"
       containers:
         - image: {{ $root.Values.image.registry }}/eggroll:{{ $root.Values.image.tag }}
           imagePullPolicy: {{ $root.Values.image.pullPolicy }}
@@ -101,17 +111,14 @@ spec:
             - mountPath: /data/projects/fate/eggroll/conf/eggroll.properties
               name: nodemanager-confs
               subPath: eggroll.properties
-            - mountPath: /data/projects/fate/python/arch/conf/server_conf.json
+            - mountPath: /data/projects/fate/conf/
               name: python-confs
-              subPath: server_conf.json
             - name: data-dir
               mountPath: /data/projects/fate/eggroll/data
               subPath: {{ $nodemanager.subPath }}
       {{- with $nodemanager.nodeSelector }}
       nodeSelector: 
-      {{- range $k, $v := . }}
-        {{ $k }}: {{ $v }}
-      {{- end }}
+{{ toYaml . | indent 8 }}
       {{- end }}
       restartPolicy: Always
       volumes:

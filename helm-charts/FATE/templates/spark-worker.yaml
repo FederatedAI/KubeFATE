@@ -9,72 +9,68 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-{{ if .Values.modules.clustermanager.include }}
+{{ if .Values.modules.spark.include }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: clustermanager
+  name: spark-worker
   labels:
-    fateMoudle: clustermanager
+    fateMoudle: spark-worker
 {{ include "fate.labels" . | indent 4 }}
 spec:
-  replicas: 1
+  replicas: {{ default 1 .Values.modules.spark.worker.replicas }}
   strategy:
     type: Recreate
   selector:
     matchLabels:
-      fateMoudle: clustermanager
+      fateMoudle: spark-worker
 {{ include "fate.matchLabels" . | indent 6 }}
   template:
     metadata:
       labels:
-        fateMoudle: clustermanager
+        fateMoudle: spark-worker
 {{ include "fate.labels" . | indent 8 }}
     spec:
       containers:
-        - env:
-          - name: PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION
-            value: python 
-          image: {{ .Values.image.registry }}/eggroll:{{ .Values.image.tag }}
+        - name: spark-worker
+          image: {{ .Values.modules.spark.worker.Image }}:{{ .Values.modules.spark.worker.ImageTag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          name: clustermanager
-          command:
-          - bash
-          - -c
-          - "java -Dlog4j.configurationFile=$${EGGROLL_HOME}/conf/log4j2.properties -cp $${EGGROLL_HOME}/lib/*: com.webank.eggroll.core.Bootstrap --bootstraps com.webank.eggroll.core.resourcemanager.ClusterManagerBootstrap -c $${EGGROLL_HOME}/conf/eggroll.properties -p 4670 -s 'EGGROLL_DEAMON'"
-          ports:
-            - containerPort: 4670
+          resources:
+            requests:
+              cpu: "{{ .Values.modules.spark.worker.cpu }}"
+              memory: "{{ .Values.modules.spark.worker.memory }}"
           volumeMounts:
-            - mountPath: /data/projects/fate/eggroll/conf/eggroll.properties
-              name: eggroll-confs
-              subPath: eggroll.properties
-      {{- with .Values.modules.mysql.nodeSelector }}
+            - mountPath: /data/projects/fate/conf/
+              name: python-confs
+          ports:
+            - containerPort: 8081
+      {{- with .Values.modules.spark.worker.nodeSelector }}
       nodeSelector: 
 {{ toYaml . | indent 8 }}
       {{- end }}
       restartPolicy: Always
       volumes:
-        - name: eggroll-confs
+        - name: python-confs
           configMap:
-            name: eggroll-config
+            name: python-config
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: clustermanager
+  name: spark-worker-1
   labels:
-    fateMoudle: clustermanager
+    fateMoudle: spark-worker
 {{ include "fate.labels" . | indent 4 }}
 spec:
   ports:
-    - name: "4670"
-      port: 4670
-      targetPort: 4670
+    - name: "8081"
+      port: 8081
+      targetPort: 8081
       protocol: TCP
-  type: {{ .Values.modules.clustermanager.type }}
+  type: {{ .Values.modules.spark.worker.type }}
   clusterIP: None
   selector:
-    fateMoudle: clustermanager
+    fateMoudle: spark-worker
 {{ include "fate.matchLabels" . | indent 4 }}
 ---
 {{ end }}

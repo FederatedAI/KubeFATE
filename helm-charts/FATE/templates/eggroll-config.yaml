@@ -40,7 +40,7 @@ data:
     eggroll.resourcemanager.bootstrap.egg_pair.venv=/data/projects/python/venv
     eggroll.resourcemanager.bootstrap.egg_pair.pythonpath=/data/projects/fate/python:/data/projects/fate/eggroll/python
     eggroll.resourcemanager.bootstrap.egg_pair.filepath=python/eggroll/roll_pair/egg_pair.py
-    
+    eggroll.resourcemanager.bootstrap.egg_pair.ld_library_path=
     
     eggroll.resourcemanager.bootstrap.roll_pair_master.exepath=bin/roll_pair/roll_pair_master_bootstrap.sh
     eggroll.resourcemanager.bootstrap.roll_pair_master.javahome=/usr/lib/jvm/java-1.8.0-openjdk
@@ -48,13 +48,27 @@ data:
     eggroll.resourcemanager.bootstrap.roll_pair_master.mainclass=com.webank.eggroll.rollpair.RollPairMasterBootstrap
     eggroll.resourcemanager.bootstrap.roll_pair_master.jvm.options=
     
-    # roll site
+    
+    # roll_frame
+    arrow.enable_unsafe_memory_access=true
+    
+    # hadoop
+    hadoop.fs.defaultFS=file:///
+    
+    # hadoop HA mode
+    hadoop.dfs.nameservices=
+    hadoop.dfs.namenode.rpc-address.nn1=
+    hadoop.dfs.namenode.rpc-address.nn2=
+    
+    # for roll site. rename in the next round
     eggroll.rollsite.coordinator={{ .Values.partyName }}
     eggroll.rollsite.host=rollsite
     eggroll.rollsite.port=9370
     eggroll.rollsite.party.id={{ .Values.partyId }}
     eggroll.rollsite.route.table.path=conf/route_table/route_table.json
-    
+    eggroll.rollsite.route.table.key=
+    eggroll.rollsite.route.table.whitelist=127.0.0.1
+    eggroll.rollsite.jvm.options=-XX:+UseG1GC -XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:logs/eggroll/rollsite.gc.log
     
     eggroll.session.processors.per.node=2
     eggroll.session.start.timeout.ms=180000

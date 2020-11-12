@@ -1,7 +1,7 @@
 name: fate-9999
 namespace: fate-9999
 chartName: fate
-chartVersion: v1.4.5
+chartVersion: v1.5.0
 partyId: 9999
 registry: ""
 pullPolicy: 
@@ -14,58 +14,135 @@ modules:
   - nodemanager
   - mysql
   - python
-# - client
+  - fateboard
+  # - client
+  # - spark
+  # - hdfs
+  # - nginx
+  # - rabbitmq
 
-rollsite: 
-  type: NodePort
-  nodePort: 30009
-  exchange:
-    ip: 192.168.1.1
-    port: 30000
-  partyList:
-  - partyId: 10000
-    partyIp: 192.168.10.1
-    partyPort: 30010
-  nodeSelector: {}
+backend: eggroll
 
-nodemanager:
-  count: 3
-  sessionProcessorsPerNode: 4
-  list:
-  - name: nodemanager
-    nodeSelector: {}
-    sessionProcessorsPerNode: 2
-    subPath: "nodemanager"
-    existingClaim: ""
-    storageClass: "nodemanager"
-    accessMode: ReadWriteOnce
-    size: 1Gi
+# rollsite: 
+  # type: NodePort
+  # nodePort: 30091
+  # exchange:
+    # ip: 192.168.0.1
+    # port: 30000
+  # partyList:
+  # - partyId: 10000
+    # partyIp: 192.168.0.1
+    # partyPort: 30101
+  # nodeSelector: 
 
-python:
-  fateflowType: NodePort
-  fateflowNodePort: 30109
-  nodeSelector: {}
+# nodemanager:
+  # count: 3
+  # sessionProcessorsPerNode: 4
+  # storageClass: "nodemanagers"
+  # accessMode: ReadWriteOnce
+  # size: 2Gi
+  # list:
+  # - name: nodemanager
+    # nodeSelector: 
+    # sessionProcessorsPerNode: 4
+    # subPath: "nodemanager"
+    # existingClaim: ""
+    # storageClass: "nodemanager"
+    # accessMode: ReadWriteOnce
+    # size: 1Gi
 
-mysql: 
-  nodeSelector: {}
-  ip: mysql
-  port: 3306
-  database: eggroll_meta
-  user: fate
-  password: fate_dev
-  subPath: ""
-  existingClaim: ""
-  storageClass: "mysql"
-  accessMode: ReadWriteOnce
-  size: 1Gi
+# python:
+  # type: NodePort
+  # nodePort: 30102
+  # nodeSelector: 
+  # spark: 
+    # master: spark://spark-master:7077
+    # home: 
+    # cores_per_node: 20
+    # nodes: 2
+  # hdfs:
+    # name_node: hdfs://namenode:9000
+    # path_prefix:
+  # rabbitmq:
+    # host: rabbitmq
+    # mng_port: 15672
+    # port: 5672
+    # user: fate
+    # password: fate
+    # # default conf/rabbitmq_route_table.yaml
+    # route_table: 
+  # nginx:
+    # host: nginx
+    # port: 9390
+# mysql: 
+  # nodeSelector: 
+  # ip: mysql
+  # port: 3306
+  # database: eggroll_meta
+  # user: fate
+  # password: fate_dev
+  # subPath: ""
+  # existingClaim: ""
+  # storageClass: "mysql"
+  # accessMode: ReadWriteOnce
+  # size: 1Gi
 
-# If use external MySQL, uncomment and change this section
-# externalMysqlIp: mysql
-# externalMysqlPort: 3306
-# externalMysqlDatabase: eggroll_meta
-# externalMysqlUser: fate
-# externalMysqlPassword: fate_dev
+# #
+# #externalMysqlIp: mysql
+# #externalMysqlPort: 3306
+# #externalMysqlDatabase: eggroll_meta
+# #externalMysqlUser: fate
+# #externalMysqlPassword: fate_dev
 
-# If FATE-Serving deployed, uncomment and change
-# servingIp: 192.168.9.1
-# servingPort: 30209
+
+# servingIp: 192.168.0.1
+# servingPort: 30095
+
+# spark:
+  # master:
+    # Image: "federatedai/spark-master"
+    # ImageTag: "1.5.0-release"
+    # replicas: 1
+    # cpu: "100m"
+    # memory: "512Mi"
+    # nodeSelector: 
+    # type: ClusterIP
+  # worker:
+    # Image: "federatedai/spark-worker"
+    # ImageTag: "1.5.0-release"
+    # replicas: 2
+    # cpu: "1000m"
+    # memory: "512Mi"
+    # nodeSelector: 
+    # type: ClusterIP
+# hdfs:
+  # namenode:
+    # nodeSelector: 
+    # type: ClusterIP
+  # datanode:
+    # nodeSelector: 
+    # type: ClusterIP
+# nginx:
+  # nodeSelector: 
+  # type: ClusterIP
+  # nodePort: 30093
+  # route_table: 
+    # 10000: 
+      # proxy: 
+        # - host: 192.168.0.1 
+          # port: 30103
+      # fateflow: 
+        # - host: 192.168.0.1
+          # port: 30102
+# rabbitmq:
+  # nodeSelector: 
+  # type: ClusterIP
+  # nodePort: 30094
+  # default_user: fate
+  # default_pass: fate
+  # user: fate
+  # password: fate
+  # route_table:
+    # 10000:
+      # host: 192.168.0.1
+      # port: 30104

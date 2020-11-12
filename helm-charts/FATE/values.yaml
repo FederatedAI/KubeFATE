@@ -2,7 +2,7 @@
 image:
   registry: federatedai
   isThridParty:
-  tag: 1.4.5-release
+  tag: 1.5.0-release
   pullPolicy: IfNotPresent
   
 partyId: 9999
@@ -14,7 +14,8 @@ istio:
 host:
   fateboard: 9999.fateboard.kubefate.net
   client: 9999.notebook.kubefate.net
-
+  sparkUI: 9999.spark.kubefate.net
+  rabbitmqUI: 9999.rabbitmq.kubefate.net
 exchange:
   partyIp: 192.168.1.1
   partyPort: 30000
@@ -22,10 +23,10 @@ exchange:
 partyList:
 - partyId: 8888
   partyIp: 192.168.8.1
-  partyPort: 30008
+  partyPort: 30081
 - partyId: 10000
   partyIp: 192.168.10.1
-  partyPort: 30010
+  partyPort: 30101
 
 persistence:
   enabled: false
@@ -34,26 +35,44 @@ modules:
   rollsite: 
     include: true
     ip: rollsite
-    type: NodePort
-    nodePort: 30009
-    nodeSelector: {}
+    type: ClusterIP
+    nodePort: 30091
+    nodeSelector: 
   python: 
     include: true
-    fateboardIp: fateboard
-    fateboardType: ClusterIP
-    fateflowIp: fateflow
-    fateflowType: ClusterIP
-    nodeSelector: {}
+    type: ClusterIP
+    nodePort: 30092
+    nodeSelector: 
+    backend: eggroll
+    spark: 
+      master: spark://spark-master:7077
+      home: 
+      cores_per_node: 20
+      nodes: 2
+    hdfs:
+      name_node: hdfs://namenode:9000
+      path_prefix:
+    rabbitmq:
+      host: rabbitmq
+      mng_port: 15672
+      port: 5672
+      user: fate
+      password: fate
+      # default conf/rabbitmq_route_table.yaml
+      route_table: 
+    nginx:
+      host: nginx
+      port: 9390
   clustermanager: 
     include: true
     ip: clustermanager
     type: ClusterIP
-    nodeSelector: {}
+    nodeSelector: 
   nodemanager:  
     include: true
     list:
     - name: nodemanager-0
-      nodeSelector: {}
+      nodeSelector: 
       sessionProcessorsPerNode: 2
       subPath: "nodemanager-0"
       existingClaim: ""
@@ -61,7 +80,7 @@ modules:
       accessMode: ReadWriteOnce
       size: 1Gi
     - name: nodemanager-1
-      nodeSelector: {}
+      nodeSelector: 
       sessionProcessorsPerNode: 2
       subPath: "nodemanager-1"
       existingClaim: ""
@@ -72,11 +91,11 @@ modules:
     include: true
     ip: client
     type: ClusterIP
-    nodeSelector: {}
+    nodeSelector: 
   mysql: 
     include: true
     type: ClusterIP
-    nodeSelector: {}
+    nodeSelector: 
     ip: mysql
     port: 3306
     database: eggroll_meta
@@ -90,4 +109,60 @@ modules:
     size: 1Gi
   serving:
     ip: 192.168.9.1
-    port: 30209
+    port: 30095
+  fateboard:
+    include: true
+    type: ClusterIP
+  spark:
+    include: true
+    master:
+      Image: "federatedai/spark-master"
+      ImageTag: "1.5.0-release"
+      replicas: 1
+      cpu: "100m"
+      memory: "512Mi"
+      nodeSelector: 
+      type: ClusterIP
+    worker:
+      Image: "federatedai/spark-worker"
+      ImageTag: "1.5.0-release"
+      replicas: 2
+      cpu: "1000m"
+      memory: "512Mi"
+      nodeSelector: 
+      type: ClusterIP
+  hdfs:
+    include: true
+    namenode:
+      nodeSelector: 
+      type: ClusterIP
+    datanode:
+      nodeSelector: 
+      type: ClusterIP
+  nginx:
+    include: true
+    nodeSelector: 
+    type: ClusterIP
+    nodePort: 30093
+    route_table: 
+#      10000: 
+#        proxy: 
+#        - host: 192.168.10.1 
+#          port: 30103
+#        fateflow:
+#        - host: 192.168.10.1  
+#          port: 30102
+  rabbitmq:
+    include: true
+    nodeSelector: 
+    type: ClusterIP
+    nodePort: 30094
+    default_user: fate
+    default_pass: fate
+    user: fate
+    password: fate
+    route_table: 
+#      10000:
+#        host: 192.168.10.1 
+#        port: 30104
+    

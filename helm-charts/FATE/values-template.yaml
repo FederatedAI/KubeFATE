@@ -2,7 +2,7 @@
 image:
   registry: {{ .registry | default "federatedai" }}
   isThridParty: {{ empty .registry | ternary  "false" "true" }}
-  tag: 1.4.5-release
+  tag: 1.5.0-release
   pullPolicy: {{ .pullPolicy | default "IfNotPresent" }}
 
 partyId: {{ .partyId }}
@@ -11,7 +11,8 @@ partyName: {{ .name }}
 host:
   fateboard: {{ .partyId }}.fateboard.kubefate.net
   client: {{ .partyId }}.notebook.kubefate.net
-
+  sparkUI: {{ .partyId }}.spark.kubefate.net
+  rabbitmqUI: {{ .partyId }}.rabbitmq.kubefate.net
 istio:
   enabled: {{ with .istio }}{{ .enabled | default false }}{{ end }}
 
@@ -38,48 +39,73 @@ persistence:
 modules:
   rollsite: 
     include: {{ has "rollsite" .modules }}
-    ip: rollsite
-    type: {{ .rollsite.type | default "ClusterIP" }}
-    nodePort: {{ with .rollsite }}{{ .nodePort }}{{ end }}
     {{- with .rollsite }}
+    ip: rollsite
+    type: {{ .type | default "ClusterIP" }}
+    nodePort: {{ .nodePort }}
     {{- with .nodeSelector }}
     nodeSelector: 
-    {{- range $k, $v := . }}
-      {{ $k }}: {{ $v }}
+{{ toYaml . | indent 6 }}
     {{- end }}
     {{- end }}
-    {{- end }}
+
+
   python: 
     include: {{ has "python" .modules }}
-    fateboardIp: fateboard
-    fateboardType: ClusterIP
-    fateflowIp: fateflow
+    backend: {{ .backend }}
     {{- with .python }}
-    fateflowType: {{ .fateflowType | default "ClusterIP" }}
-    fateflowNodePort: {{ .fateflowNodePort }}
+    type: {{ .type }}
+    nodePort: {{ .nodePort }}
     {{- with .nodeSelector }}
     nodeSelector: 
-    {{- range $k, $v := . }}
-      {{ $k }}: {{ $v }}
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    {{- with .spark }}
+    spark: 
+      master: {{ .master }}
+      home: {{ .home }}
+      cores_per_node: {{ .cores_per_node }}
+      nodes: {{ .nodes }}
+    {{- end }}
+    {{- with .hdfs }}
+    hdfs:
+      name_node: {{ .name_node }}
+      path_prefix: {{ .path_prefix }}
+    {{- end }}
+    {{- with .rabbitmq }}
+    rabbitmq:
+      host: {{ .host }}
+      mng_port: {{ .mng_port }}
+      port: {{ .port }}
+      user: {{ .user }}
+      password: {{ .password }}
+      # default conf/rabbitmq_route_table.yaml
+      route_table: {{ .route_table }}
+    {{- end }}
+    {{- with .nginx }}
+    nginx:
+      host: {{ .host }}
+      port: {{ .port }}
     {{- end }}
     {{- end }}
-    {{- end }}
+
+
   clustermanager: 
     include: {{ has "clustermanager" .modules }}
+    {{- with .clustermanager }}
     ip: clustermanager
     type: ClusterIP
-    {{- with .clustermanager }}
     {{- with .nodeSelector }}
     nodeSelector: 
-    {{- range $k, $v := . }}
-      {{ $k }}: {{ $v }}
+{{ toYaml . | indent 6 }}
     {{- end }}
     {{- end }}
-    {{- end }}
+
+
   nodemanager:  
     include: {{ has "nodemanager" .modules }}
-    list:
     {{- with .nodemanager }}
+    list:
     {{- $nodemanager := . }}
     {{- range .count | int | until }}
     - name: nodemanager-{{ . }}
@@ -96,9 +122,7 @@ modules:
     - name: {{ .name }}
       {{- with .nodeSelector }}
       nodeSelector: 
-      {{- range $k, $v := . }}
-        {{ $k }}: {{ $v }}
-      {{- end }}
+{{ toYaml . | indent 8 }}
       {{- end }}
       sessionProcessorsPerNode: {{ .sessionProcessorsPerNode }}
       subPath: {{ .subPath }}
@@ -108,30 +132,24 @@ modules:
       size: {{ .size }}
     {{- end }}
     {{- end }}
+
+
   client: 
     include: {{ has "client" .modules }}
-    ip: client
-    type: ClusterIP
     {{- with .client }}
-    {{- with .nodeSelector }}
+    ip: {{ .ip }}
+    type: {{ .type }}
     nodeSelector: 
-    {{- range $k, $v := . }}
-      {{ $k }}: {{ $v }}
+{{ toYaml .nodeSelector | indent 6 }}
     {{- end }}
-    {{- end }}
-    {{- end }}
+
+
   mysql: 
-    {{- if .mysql }}
     include: {{ has "mysql" .modules }}
-    type: ClusterIP
     {{- with .mysql }}
-    {{- with .nodeSelector }}
+    type: {{ .type }}
     nodeSelector: 
-    {{- range $k, $v := . }}
-      {{ $k }}: {{ $v }}
-    {{- end }}
-    {{- end }}
-    {{- end }}
+{{ toYaml .mysql.nodeSelector | indent 6 }}
     ip: {{ .mysql.ip | default "mysql" }}
     port: {{ .mysql.port | default "3306" }}
     database: {{ .mysql.database | default "eggroll_meta" }}
@@ -142,22 +160,92 @@ modules:
     storageClass: {{ .mysql.storageClass }}
     accessMode: {{ .mysql.accessMode | default "ReadWriteOnce" }}
     size: {{ .mysql.size | default "1Gi" }}
-    {{- else }}
-    include: {{ has "mysql" .modules }}
-    type: ClusterIP
-    nodeSelector: {}
-    ip: {{ .externalMysqlIp | default "mysql" }}
-    port: {{ .externalMysqlPort | default "3306" }}
-    database: {{ .externalMysqlDatabase | default "eggroll_meta" }}
-    user: {{ .externalMysqlUser | default "fate" }}
-    password: {{ .externalMysqlPassword | default "fate_dev" }}
-    subPath: ""
-    existingClaim: ""
-    storageClass: "mysql"
-    accessMode: ReadWriteOnce
-    size: 1Gi
     {{- end }}
+
+
   serving:
     ip: {{ .servingIp }}
     port: {{ .servingPort }}
-    
+
+
+  fateboard:
+    include: {{ has "fateboard" .modules }}
+    {{- with .spark }}
+    type: {{ .type }}
+    {{- end }}
+
+
+  spark:
+    include: {{ has "spark" .modules }}
+    {{- with .spark }}
+    master:
+      Image: "{{ .master.Image }}"
+      ImageTag: "{{ .master.ImageTag }}"
+      replicas: {{ .master.replicas }}
+      cpu: "{{ .master.cpu }}"
+      memory: "{{ .master.memory }}"
+      nodeSelector: 
+{{ toYaml .master.nodeSelector | indent 8 }}
+      type: {{ .type }}
+    worker:
+      Image: "{{ .worker.Image }}"
+      ImageTag: "{{ .worker.ImageTag }}"
+      replicas: {{ .worker.replicas }}
+      cpu: "{{ .worker.cpu }}"
+      memory: "{{ .worker.memory }}"
+      nodeSelector: 
+{{ toYaml .worker.nodeSelector | indent 8 }}
+      type: {{ .type }}
+    {{- end }}
+
+
+  hdfs:
+    include: {{ has "hdfs" .modules }}
+    {{- with .hdfs }}
+    namenode:
+      nodeSelector: 
+{{ toYaml .namenode.nodeSelector | indent 8 }}
+      type: ClusterIP
+    datanode:
+      nodeSelector: 
+{{ toYaml .datanode.nodeSelector | indent 8 }}
+      type: ClusterIP
+    {{- end }}
+
+
+  nginx:
+    include: {{ has "nginx" .modules }}
+    {{- with .nginx }}
+    {{- with .nodeSelector }}
+    nodeSelector: 
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    type: {{ .type }}
+    nodePort: {{ .nodePort }}
+    route_table: 
+      {{- range $key, $val := .route_table }}
+      {{ $key }}: 
+{{ toYaml $val | indent 8 }}
+      {{- end }}
+    {{- end }}
+
+
+  rabbitmq:
+    include: {{ has "rabbitmq" .modules }}
+    {{- with .rabbitmq }}
+    {{- with .nodeSelector }}
+    nodeSelector: 
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    type: {{ .type }}
+    nodePort: {{ .nodePort }}
+    default_user: {{ .default_user }}
+    default_pass: {{ .default_pass }}
+    user: {{ .user }}
+    password: {{ .password }}
+    route_table:
+      {{- range $key, $val := .route_table }}
+      {{ $key }}: 
+{{ toYaml $val | indent 8 }}
+      {{- end }}
+    {{- end }}
