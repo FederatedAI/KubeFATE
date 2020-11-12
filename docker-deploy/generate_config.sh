@@ -104,7 +104,7 @@ GenerateConfig() {
 		cp ${WORKINGDIR}/.env ./confs-$party_id
 		if [ "$RegistryURI" != "" ]; then
 			sed -i 's#federatedai#${RegistryURI}/federatedai#g' ./confs-$party_id/docker-compose.yml
-			sed -i 's#image: "mysql:8"#image: ${RegistryURI}/library/mysql:8#g' ./confs-$party_id/docker-compose.yml
+			sed -i 's#image: "mysql:8"#image: ${RegistryURI}/federatedai/mysql:8#g' ./confs-$party_id/docker-compose.yml
 			#sed -i 's#image: "redis:5"#image: "${RegistryURI}/redis:5"#g' ./confs-$party_id/docker-compose.yml
 		fi
 
