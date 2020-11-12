@@ -27,8 +27,8 @@ In current implementation, the `fate_flow` service uses the `spark-submit` binar
     "party_id": 10000
   },
   "job_parameters": {
-    "work_mode": 0,
-    "backend": 0,
+    "work_mode": 1,
+    "backend": 1,
     "spark_run": {
       "executor-memory": "4G",
       "total-executor-cores": 4
