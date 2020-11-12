@@ -1,0 +1,188 @@
+# Copyright 2019-2020 VMware, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# you may obtain a copy of the License at
+# http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+version: "3"
+
+networks:
+  fate-network:
+    ipam:
+      config:
+        - subnet: 192.167.0.0/16
+volumes:
+  fate_flow_logs:
+  download_dir:
+  shared_dir_examples:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: {/path/to/host/dir}/examples
+  shared_dir_federatedml:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: {/path/to/host/dir}/federatedml
+  shared_dir_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: {/path/to/host/dir}/data
+
+services:
+  fateboard:
+    image: "federatedai/fateboard:${TAG}"
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./confs/fateboard/conf:/data/projects/fate/fateboard/conf
+      - fate_flow_logs:/data/projects/fate/logs
+    networks:
+      - fate-network
+    depends_on:
+      - python
+
+  python:
+    image: "federatedai/python-spark:${TAG}"
+    environment:
+      PYSPARK_PYTHON: /data/projects/python/venv/bin/python
+      PYSPARK_DRIVER_PYTHON: /data/projects/python/venv/bin/python
+    restart: always
+    ports:
+      - 9380:9380
+      - 9360:9360
+    volumes:
+      - ./confs/spark/spark-defaults.conf:/data/projects/spark-2.4.1-bin-hadoop2.7/conf/spark-defaults.conf
+      - ./confs/fate_flow/conf:/data/projects/fate/conf
+      - shared_dir_federatedml:/data/projects/fate/python/federatedml
+      - shared_dir_examples:/data/projects/fate/examples
+      - download_dir:/data/projects/fate/python/download_dir
+      - fate_flow_logs:/data/projects/fate/logs
+    networks:
+      fate-network:
+        ipv4_address: 192.167.0.100
+
+  namenode:
+    image: federatedai/hadoop-namenode:2.0.0-hadoop2.7.4-java8
+    restart: always
+    ports:
+      - 9000:9000
+      - 9870:9870
+      - 50070:50070
+    volumes:
+      - ./shared_dir/data/namenode:/hadoop/dfs/name
+      - ./confs/hadoop/core-site.xml:/etc/hadoop/core-site.xml
+    env_file:
+      - ./confs/hadoop/hadoop.env
+    environment:
+      - CLUSTER_NAME=fate
+    networks:
+      - fate-network
+
+  datanode:
+    image: federatedai/hadoop-datanode:2.0.0-hadoop2.7.4-java8
+    restart: always
+    volumes:
+      - ./shared_dir/data/datanode:/hadoop/dfs/data
+    environment:
+      SERVICE_PRECONDITION: "namenode:9000"
+    env_file:
+      - ./confs/hadoop/hadoop.env
+    networks:
+      - fate-network
+
+  spark-master:
+    image: federatedai/spark-master:${TAG}
+    restart: always
+    ports:
+      - "8888:8080"
+      - "7077:7077"
+    environment:
+      INIT_DAEMON_STEP: setup_spark
+    networks:
+      - fate-network
+
+  spark-worker:
+    image: federatedai/spark-worker:${TAG}
+    restart: always
+    depends_on:
+      - spark-master
+    ports:
+      - "8081:8081"
+    environment:
+      SPARK_MASTER: "spark://spark-master:7077"
+    volumes:
+      - ./confs/fate_flow/conf:/data/projects/fate/conf
+    networks:
+      - fate-network
+
+  rabbitmq:
+    image: rabbitmq:3.8.3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: fate
+      RABBITMQ_DEFAULT_PASS: fate
+      RABBITMQ_USER: fate
+      RABBITMQ_PASSWORD: fate
+      RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: "-rabbit max_message_size 536870912"
+    volumes:
+      - ./confs/rabbitmq/enabled_plugins:/etc/rabbitmq/enabled_plugins
+      - ./shared_dir/data/rabbitmq:/var/lib/rabbitmq
+    networks:
+      - fate-network
+
+  mysql:
+    image: "mysql:8"
+    expose:
+      - 3306
+    volumes:
+      - ./confs/mysql/init:/docker-entrypoint-initdb.d/
+      - ./shared_dir/data/mysql:/var/lib/mysql
+    restart: always
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    networks:
+      - fate-network
+
+  nginx:
+    image: federatedai/nginx:1.17
+    ports:
+      - 9390:9390
+    volumes:
+      - ./confs/nginx/route_table.yaml:/data/projects/fate/proxy/nginx/conf/route_table.yaml
+      - ./confs/nginx/nginx.conf:/data/projects/fate/proxy/nginx/conf/nginx.conf
+    restart: always
+    networks:
+      - fate-network
+    depends_on:
+      - python
+  
+  client:
+    image: "federatedai/client:${TAG}"
+    ports:
+      - "20000:20000"
+    restart: always
+    environment:
+      FATE_FLOW_HOST: "python:9380"
+      FATE_SERVING_HOST: "fate-serving:8059"
+    volumes:
+      - download_dir:/fml_manager/Examples/download_dir
+      - shared_dir_examples:/data/projects/fate/examples
+      - ./confs/fate_flow/conf:/data/projects/fate/conf
+      - ./confs/client/pipeline_conf.yaml:/data/projects/fate/conf/pipeline_conf.yaml
+    depends_on:
+      - python
+    networks:
+      - fate-network
