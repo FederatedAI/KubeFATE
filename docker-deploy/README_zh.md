@@ -22,6 +22,25 @@ Compose是用于定义和运行多容器Docker应用程序的工具。通过Comp
 4. 部署机可以联网，所以主机相互之间可以网络互通；
 5. 运行机已经下载FATE 的各组件镜像（离线构建镜像参考文档[构建镜像](https://github.com/FederatedAI/FATE/tree/master/docker-build)）。
 
+### 下载部署脚本
+
+在任意机器上下载合适的KubeFATE版本，可参考 [releases pages](https://github.com/FederatedAI/KubeFATE/releases)，然后解压。
+
+### 修改镜像配置文件（可选）
+
+在默认情况下，脚本在部署期间会从 [Docker Hub](https://hub.docker.com/search?q=federatedai&type=image)中下载镜像。
+
+对于中国的用户可以用使用国内镜像源：
+具体方法是通过编辑docker-deploy目录下的.env文件,给`RegistryURI`参数填入以下字段
+
+```bash
+RegistryURI=hub.c.163.com
+```
+
+如果在运行机器上已经下载或导入了所需镜像，部署将会变得非常容易。
+
+### 手动下载镜像（可选）
+
 如果运行机没有FATE组件的镜像，可以通过以下命令从Docker Hub获取镜像。FATE镜像的版本`<version>`可在[release页面](https://github.com/FederatedAI/FATE/releases)上查看，其中serving镜像的版本信息在[这个页面](https://github.com/FederatedAI/FATE-Serving/releases)：
 
 ```bash
@@ -34,14 +53,8 @@ $ docker pull redis:5
 $ docker pull mysql:8
 ```
 
-对于中国的用户可以用使用国内镜像源：
-具体方法是通过编辑docker-deploy目录下的.env文件,给`RegistryURI`参数填入以下字段
-
-```bash
-RegistryURI=hub.c.163.com
-```
-
 检查所有镜像是否下载成功。
+
 ```bash
 $ docker images
 REPOSITORY                         TAG 
@@ -55,24 +68,10 @@ redis                              5
 mysql                              8
 ```
 
-### 下载部署脚本
-
-在任意机器上下载合适的KubeFATE版本，可参考 [releases pages](https://github.com/FederatedAI/KubeFATE/releases)，然后解压。
-
-
-### (可选)修改镜像配置文件
-
-默认情况下，脚本在部署期间会从 [Docker Hub](https://hub.docker.com/search?q=federatedai&type=image)中下载镜像。
-
-```bash
-PREFIX=federatedai
-TAG=1.4.1-release
-```
-我们这里采用从Docker Hub下载镜像。如果在运行机器上已经下载或导入了所需镜像，部署将会变得非常容易。
-
-### (可选)离线部署
+### 离线部署（可选）
 
 当我们的运行机器处于无法连接外部网络的时候，就无法从Docker Hub下载镜像，建议使用[Harbor](https://goharbor.io/)作为本地镜像仓库。安装Harbor请参考[文档](https://github.com/FederatedAI/KubeFATE/blob/master/registry/install_harbor.md)。在`.env`文件中，将`RegistryURI`变量更改为Harbor的IP。如下面 192.168.10.1是Harbor IP的示例。
+
 ```bash
 $ cd KubeFATE/
 $ vi .env
@@ -84,7 +83,7 @@ RegistryURI=192.168.10.1/federatedai
 
 ### 用Docker Compose部署FATE
 
-####  配置需要部署的实例数目
+#### 配置需要部署的实例数目
 
 部署脚本提供了部署多个FATE实例的功能，下面的例子我们部署在两个机器上，每个机器运行一个FATE实例，这里两台机器的IP分别为*192.168.7.1*和*192.168.7.2*
 
@@ -98,8 +97,11 @@ dir=/data/projects/fate                     # docker-compose部署目录
 partylist=(10000 9999)                      # 组织id
 partyiplist=(192.168.7.1 192.168.7.2)       # id对应训练集群ip
 servingiplist=(192.168.7.1 192.168.7.2)     # id对应在线预测集群ip
-exchangeip=                                 # 通信组件标识
+# computing_backend could be eggroll or spark.
+computing_backend=eggroll
 ```
+
+FATE 1.5 支持使用Spark作为底层的分布式计算引擎，Spark集群默认会通过容器的方式部署。相关的简介可以参考这个[链接](../docs/FATE_On_Spark.md).
 
 **注意**: 默认情况下不会部署exchange组件。如需部署，用户可以把服务器IP填入上述配置文件的`exchangeip`中，该组件的默认监听端口为9371
 
