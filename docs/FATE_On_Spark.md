@@ -12,7 +12,7 @@ As the above figure show, the EggRoll provide both computing and storage resourc
 In FATE v1.5.0 a user can select Spark as the underlying computing engine, however, spark
 it self is a in-memory computing engine without the ability to persist data. Thus to use FATE on Spark a HDFS is also needed to be included to provide persistence capability. For example, a user need to upload their data to HDFS through FATE before further processing; the output data of every component will be also stored to the HDFS.
 
-** Currently the verifed Spark version is [2.4.1](https://archive.apache.org/dist/spark/spark-2.4.1/spark-2.4.1-bin-hadoop2.7.tgz) and the Hadoop is [2.7.4](https://archive.apache.org/dist/hadoop/common/hadoop-2.7.4/hadoop-2.7.4.tar.gz)**
+**Currently the verifed Spark version is [2.4.1](https://archive.apache.org/dist/spark/spark-2.4.1/spark-2.4.1-bin-hadoop2.7.tgz) and the Hadoop is [2.7.4](https://archive.apache.org/dist/hadoop/common/hadoop-2.7.4/hadoop-2.7.4.tar.gz)**
 
 The following picture shows the architecture of FATE on Spark:
 <div align="center">
