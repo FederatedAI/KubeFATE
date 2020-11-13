@@ -322,11 +322,18 @@ metadata:
 {{ include "fate.labels" . | indent 4 }}
 spec:
   ports:
-    - name: "9360"
+    - name: "grpc"
       port: 9360
       targetPort: 9360
       {{- if eq .Values.modules.python.type "NodePort" "LoadBalancer" }}
-      nodePort: {{ .Values.modules.python.nodePort }}
+      nodePort: {{ .Values.modules.python.grpcNodePort }}
+      {{- end }}
+      protocol: TCP
+    - name: "http"
+      port: 9380
+      targetPort: 9380
+      {{- if eq .Values.modules.python.type "NodePort" "LoadBalancer" }}
+      nodePort: {{ .Values.modules.python.httpNodePort }}
       {{- end }}
       protocol: TCP
   type: {{ .Values.modules.python.type }}

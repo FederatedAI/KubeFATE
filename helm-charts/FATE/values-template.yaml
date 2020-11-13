@@ -55,7 +55,8 @@ modules:
     backend: {{ .backend }}
     {{- with .python }}
     type: {{ .type }}
-    nodePort: {{ .nodePort }}
+    httpNodePort: {{ .httpNodePort }}
+    grpcNodePort: {{ .grpcNodePort }}
     {{- with .nodeSelector }}
     nodeSelector: 
 {{ toYaml . | indent 6 }}

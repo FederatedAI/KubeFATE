@@ -41,7 +41,8 @@ modules:
   python: 
     include: true
     type: ClusterIP
-    nodePort: 30092
+    httpNodePort: 30097
+    grpcNodePort: 30092
     nodeSelector: 
     backend: eggroll
     spark: 
