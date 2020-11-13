@@ -40,7 +40,7 @@ func ClusterInstall(clusterArgs *ClusterArgs, creator string) (*modules.Job, err
 	// Check whether the cluster exists
 	cluster := new(modules.Cluster)
 	if ok := cluster.IsExisted(clusterArgs.Name, clusterArgs.Namespace); ok {
-		return nil, fmt.Errorf("name=%s cluster is exited", clusterArgs.Name)
+		return nil, fmt.Errorf("name=%s cluster is existed", clusterArgs.Name)
 	}
 
 	// create a cluster
@@ -273,7 +273,7 @@ func ClusterUpdate(clusterArgs *ClusterArgs, creator string) (*modules.Job, erro
 	// Check whether the cluster exists
 	c := new(modules.Cluster)
 	if ok := c.IsExisted(clusterArgs.Name, clusterArgs.Namespace); !ok {
-		return nil, fmt.Errorf("name=%s cluster is not exited", clusterArgs.Name)
+		return nil, fmt.Errorf("name=%s cluster is not existed", clusterArgs.Name)
 	}
 
 	c = &modules.Cluster{Name: clusterArgs.Name, NameSpace: clusterArgs.Namespace}
