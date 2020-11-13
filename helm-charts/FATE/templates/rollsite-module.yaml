@@ -28,7 +28,7 @@ data:
                         "ip": "{{ .partyIp }}",
                         "port": {{ .partyPort }}
                       {{- else }}
-                        "ip": "proxy",
+                        "ip": "rollsite",
                         "port": 9370
                       {{- end }}
                     }
@@ -39,7 +39,7 @@ data:
                 "default": [
                     {
                         "ip": "{{ .partyIp }}",
-                        "port": "{{ .partyPort }}"
+                        "port": {{ .partyPort }}
                     }
                 ]
             },
@@ -47,8 +47,14 @@ data:
             "{{ .Values.partyId }}": {
                 "fateflow": [
                     {
-                        "ip": "{{ .Values.modules.python.fateflowIp }}",
+                        "ip": "fateflow",
                         "port": 9360
+                    }
+                ],
+                "default": [
+                    {
+                        "ip": "rollsite",
+                        "port": 9370
                     }
                 ]
             }
@@ -82,18 +88,18 @@ spec:
       hostAliases:
       - ip: "127.0.0.1"
         hostnames:
-        - rollsite
+        - "rollsite"
       containers:
-        - env:
+        - name: rollsite
+          env:
           - name: PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION
             value: python
           image: {{ .Values.image.registry }}/eggroll:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          name: rollsite
           command:
-          - bash
-          - -c
-          - "java -Dlog4j.configurationFile=$${EGGROLL_HOME}/conf/log4j2.properties -cp $${EGGROLL_HOME}/lib/*:$${EGGROLL_HOME}/conf/ com.webank.eggroll.rollsite.Proxy -c $${EGGROLL_HOME}/conf/eggroll.properties"
+          - "bash"
+          - "-c"
+          - "java -Dlog4j.configurationFile=$${EGGROLL_HOME}/conf/log4j2.properties -cp $${EGGROLL_HOME}/lib/*:$${EGGROLL_HOME}/conf/ com.webank.eggroll.rollsite.EggSiteBootstrap -c $${EGGROLL_HOME}/conf/eggroll.properties"
           ports:
             - containerPort: 9370
           volumeMounts:
@@ -104,9 +110,7 @@ spec:
               subPath: eggroll.properties
       {{- with .Values.modules.rollsite.nodeSelector }}
       nodeSelector: 
-      {{- range $k, $v := . }}
-        {{ $k }}: {{ $v }}
-      {{- end }}
+{{ toYaml . | indent 8 }}
       {{- end }}
       restartPolicy: Always
       volumes:
@@ -129,8 +133,8 @@ spec:
     - name: "9370"
       port: 9370
       targetPort: 9370
-      {{- with .Values.modules.rollsite.nodePort }}
-      nodePort: {{ . }}
+      {{- if eq .Values.modules.rollsite.type "NodePort" "LoadBalancer" }}
+      nodePort: {{ .Values.modules.rollsite.nodePort }}
       {{- end }}
       protocol: TCP
   type: {{ .Values.modules.rollsite.type }}

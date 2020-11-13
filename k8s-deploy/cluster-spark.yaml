@@ -9,19 +9,19 @@ persistence: false
 istio:
   enabled: false
 modules:
-  - rollsite
-  - clustermanager
-  - nodemanager
+  # - rollsite
+  # - clustermanager
+  # - nodemanager
   - mysql
   - python
   - fateboard
   # - client
-  # - spark
-  # - hdfs
-  # - nginx
-  # - rabbitmq
+  - spark
+  - hdfs
+  - nginx
+  - rabbitmq
 
-backend: eggroll
+backend: spark
 
 # rollsite: 
   # type: NodePort
@@ -53,8 +53,7 @@ backend: eggroll
 
 # python:
   # type: NodePort
-  # httpNodePort: 30097
-  # grpcNodePort: 30092
+  # nodePort: 30102
   # nodeSelector: 
   # spark: 
     # master: spark://spark-master:7077
@@ -98,6 +97,8 @@ backend: eggroll
 
 # servingIp: 192.168.0.1
 # servingPort: 30095
+
+## cluster of FATE on spark configuration
 
 # spark:
   # master:

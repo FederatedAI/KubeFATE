@@ -8,7 +8,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-{{ if .Values.modules.python.include }}
+{{ if .Values.modules.fateboard.include }}
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
@@ -45,5 +45,45 @@ spec:
         backend:
           serviceName: notebook
           servicePort: 20000
+---
+{{ end }}
+
+{{ if .Values.modules.spark.include }}
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: spark
+  labels:
+    fateMoudle: spark
+{{ include "fate.labels" . | indent 4 }}
+spec:
+  rules:
+  - host: {{ .Values.host.sparkUI }}
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: spark-master
+          servicePort: 8080
+---
+{{ end }}
+
+{{ if .Values.modules.rabbitmq.include }}
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: rabbitmq
+  labels:
+    fateMoudle: rabbitmq
+{{ include "fate.labels" . | indent 4 }}
+spec:
+  rules:
+  - host: {{ .Values.host.rabbitmqUI }}
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: rabbitmq
+          servicePort: 15672
 ---
 {{ end }}

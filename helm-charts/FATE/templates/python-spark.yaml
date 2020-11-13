@@ -18,35 +18,38 @@ metadata:
     fateMoudle: python
 {{ include "fate.labels" . | indent 4 }}
 data:
-  server_conf.json: |
-    {
-        "servers": {
-            "proxy": {
-                "host": "{{ .Values.modules.rollsite.ip }}", 
-                "port": 9370
-            }, 
-            "fateboard": {
-                "host": "{{ .Values.modules.python.fateboardIp }}", 
-                "port": 8080
-            }, 
-            {{- if .Values.modules.serving }}
-            "servings": [
-                "{{ .Values.modules.serving.ip }}:{{ .Values.modules.serving.port }}"
-            ],
-            {{- end }}
-            "fateflow": {
-                "host": "{{ .Values.modules.python.fateflowIp }}", 
-                "grpc.port": 9360,
-                "http.port": 9380
-            }
-        }
-    }
-  base_conf.yaml: |
+  rabbitmq_route_table.yaml: |
+    {{ .Values.partyId }}:
+      host: rabbitmq
+      port: 5672
+{{- range $key, $val := .Values.modules.rabbitmq.route_table }}
+    {{ $key }}: 
+{{ toYaml . | indent 6 }}
+{{- end }}
+  spark-defaults.conf: |
+    spark.master                      {{  .Values.modules.python.spark.master | default "local[4]"}}
+    #spark.eventLog.enabled           true
+    #spark.eventLog.dir               hdfs://namenode:9000/spark/logs
+    spark.driver.host                 fateflow
+  service_conf.yaml: |
     work_mode: 1
-    fate_flow:
-      host: 0.0.0.0
+    use_registry: false
+    fateflow:
+      # you must set real ip address or 127.0.0.1, 0.0.0.0 is not supported
+      host: fateflow
       http_port: 9380
       grpc_port: 9360
+      # support rollsite or nginx as a coordinate proxy, rollsite recommended in the fate on eggroll, nginx is recommended in the fate on spark
+      # format(proxy: rollsite) means rollsite use the rollsite configuration of fate_one_eggroll and nginx use the nginx configuration of fate_one_spark
+      # you can customize the config by format(proxy:\n name: rollsite \n host: xx \n port: xx)
+      {{- if eq .Values.modules.python.backend  "spark" }}
+      proxy: nginx
+      {{- else }}
+      proxy: rollsite
+      {{- end }}
+    fateboard:
+      host: fateboard
+      port: 8080
     database:
       name: '{{ .Values.modules.mysql.database }}'
       user: '{{ .Values.modules.mysql.user }}'
@@ -55,12 +58,34 @@ data:
       port: {{ .Values.modules.mysql.port }}
       max_connections: 100
       stale_timeout: 30
-    zookeeper:
-      hosts:
-        - 127.0.0.1:2281
-      use_acl: true
-      user: fate
-      password: fate
+    fate_on_eggroll:
+      clustermanager:
+        cores_per_node: 20
+        nodes: 1
+      rollsite:
+        host: {{ .Values.modules.rollsite.ip }}
+        port: 9370
+    fate_on_spark:
+      spark:
+        # default use SPARK_HOME environment variable
+        home: 
+        cores_per_node: {{ .Values.modules.python.spark.cores_per_node }}
+        nodes: {{ .Values.modules.python.spark.nodes }}
+      hdfs:
+        name_node: {{ .Values.modules.python.hdfs.name_node }}
+        # default /
+        path_prefix: {{ .Values.modules.python.hdfs.path_prefix }}
+      rabbitmq:
+        host: {{ .Values.modules.python.rabbitmq.host }}
+        mng_port: {{ .Values.modules.python.rabbitmq.mng_port }}
+        port: {{ .Values.modules.python.rabbitmq.port }}
+        user: {{ .Values.modules.python.rabbitmq.user }}
+        password: {{ .Values.modules.python.rabbitmq.password }}
+        # default conf/rabbitmq_route_table.yaml
+        route_table: {{ .Values.modules.python.rabbitmq.route_table }}
+      nginx:
+        host: {{ .Values.modules.python.nginx.host }}
+        port: {{ .Values.modules.python.nginx.port }}
     model_store_address:
       storage: mysql
       name: model
@@ -70,6 +95,14 @@ data:
       passwd: '{{ .Values.modules.mysql.password }}'
       max_connections: 10
       stale_timeout: 10
+    servings:
+      hosts:
+      {{- if .Values.modules.serving }}
+        - {{ .Values.modules.serving.ip }}:{{ .Values.modules.serving.port }}
+      {{- end }}
+  transfer_conf.yaml: |
+    paths: # dir or path
+      - "python/federatedml/transfer_variable/auth_conf"
 ---
 kind: ConfigMap
 apiVersion: v1
@@ -81,7 +114,7 @@ metadata:
 data:
   application.properties: |
     server.port=8080
-    fateflow.url=http://{{ .Values.modules.python.fateflowIp }}:9380
+    fateflow.url=http://fateflow:9380
     spring.datasource.driver-Class-Name=com.mysql.cj.jdbc.Driver
     spring.http.encoding.charset=UTF-8
     spring.http.encoding.enabled=true
@@ -91,9 +124,13 @@ data:
     fateboard.datasource.password={{ .Values.modules.mysql.password }}
     server.tomcat.max-threads=1000
     server.tomcat.max-connections=20000
+    spring.servlet.multipart.max-file-size=10MB
+    spring.servlet.multipart.max-request-size=100MB
     spring.datasource.druid.filter.config.enabled=false
     spring.datasource.druid.web-stat-filter.enabled=false
     spring.datasource.druid.stat-view-servlet.enabled=false
+    server.compression.enabled=true
+    server.compression.mime-types=application/json,application/xml,text/html,text/xml,text/plain
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -116,10 +153,6 @@ spec:
         fateMoudle: python
 {{ include "fate.labels" . | indent 8 }}
     spec:
-      hostAliases:
-      - ip: "127.0.0.1"
-        hostnames:
-        - "fateflow"
       initContainers:
       {{- if .Values.image.isThridParty }}
       - image: {{ .Values.image.registry }}/mysql:8
@@ -160,31 +193,53 @@ spec:
           echo "Waiting for mysql started..."
           checkMySQL
       containers:
-        - image: {{ .Values.image.registry }}/python:{{ .Values.image.tag }}
+        - name: python
+          {{- if eq .Values.modules.python.backend  "spark" }}
+          image: {{ .Values.image.registry }}/python-spark:{{ .Values.image.tag }}
+          {{- else }}
+          image: {{ .Values.image.registry }}/python:{{ .Values.image.tag }}
+          {{- end }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          name: python
+          env:
+          - name: PYSPARK_PYTHON
+            value: /data/projects/python/venv/bin/python
+          - name: PYSPARK_DRIVER_PYTHON
+            value: /data/projects/python/venv/bin/python
+          - name: POD_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
           ports:
             - containerPort: 9360
             - containerPort: 9380
-            - containerPort: 8484
+          command:
+            - /bin/bash
+            - -c
+            - |
+                set -x
+                mkdir -p /data/projects/fate/conf/
+                cp /data/projects/fate/conf1/transfer_conf.yaml /data/projects/fate/conf/transfer_conf.yaml
+                cp /data/projects/fate/conf1/service_conf.yaml /data/projects/fate/conf/service_conf.yaml
+                sed -i "s/host: fateflow/host: ${POD_IP}/g" /data/projects/fate/conf/service_conf.yaml
+                sleep 5;
+                source /data/projects/python/venv/bin/activate 
+                python ./fate_flow/fate_flow_server.py
           volumeMounts:
-            - mountPath: /data/projects/fate/python/eggroll/conf/server_conf.json
-              name: python-confs
-              subPath: server_conf.json
             - mountPath: /data/projects/fate/eggroll/conf/eggroll.properties
               name: eggroll-confs
               subPath: eggroll.properties
-            - mountPath: /data/projects/fate/python/arch/conf/server_conf.json
-              name: python-confs
-              subPath: server_conf.json
-              name: python-confs
-            - mountPath: /data/projects/fate/python/arch/conf/base_conf.yaml
-              subPath: base_conf.yaml
-              name: python-confs
             - name: logs
-              mountPath: /data/projects/fate/python/logs
+              mountPath: /data/projects/fate/logs
+            - mountPath: /data/projects/fate/conf1/
+              name: python-confs
             - name: download-dir
               mountPath: /data/projects/fate/python/download_dir
+            - mountPath: /data/projects/spark-2.4.1-bin-hadoop2.7/conf/spark-defaults.conf
+              name: python-confs
+              subPath: spark-defaults.conf
+            - mountPath: /data/projects/fate/conf/rabbitmq_route_table.yaml
+              name: python-confs
+              subPath: rabbitmq_route_table.yaml
         {{- if .Values.modules.client.include }}
         - image: {{ .Values.image.registry }}/client:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -202,6 +257,7 @@ spec:
             - name: download-dir
               mountPath: /fml_manager/Examples/download_dir
         {{- end }}
+        {{- if .Values.modules.fateboard.include }}
         - image: {{ .Values.image.registry }}/fateboard:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           name: fateboard
@@ -212,21 +268,20 @@ spec:
               name: fateboard-confs
               subPath: application.properties
             - name: logs
-              mountPath: /data/projects/fate/python/logs
+              mountPath: /data/projects/fate/logs
+        {{- end }}
       {{- with .Values.modules.python.nodeSelector }}
       nodeSelector:
-      {{- range $k, $v := . }}
-        {{ $k }}: {{ $v }}
-      {{- end }}
+{{ toYaml . | indent 8 }}
       {{- end }}
       restartPolicy: Always
       volumes:
-        - name: python-confs
-          configMap:
-            name: python-config
         - name: eggroll-confs
           configMap:
             name: eggroll-config
+        - name: python-confs
+          configMap:
+            name: python-config
         - name: fateboard-confs
           configMap:
             name: fateboard-config
@@ -240,7 +295,7 @@ kind: Service
 metadata:
   name: fateflow
   labels:
-    fateMoudle: python
+    fateMoudle: fateflow
 {{ include "fate.labels" . | indent 4 }}
 spec:
   ports:
@@ -250,16 +305,43 @@ spec:
       protocol: TCP
     - name: "9380"
       port: 9380
-      {{- with .Values.modules.python.fateflowNodePort }}
-      nodePort: {{ . }}
-      {{- end }}
       targetPort: 9380
       protocol: TCP
-  type: {{ .Values.modules.python.fateflowType }}
+  type: ClusterIP
+  clusterIP: None
   selector:
     fateMoudle: python
 {{ include "fate.matchLabels" . | indent 4 }}
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fateflow-client
+  labels:
+    fateMoudle: fateflow
+{{ include "fate.labels" . | indent 4 }}
+spec:
+  ports:
+    - name: "grpc"
+      port: 9360
+      targetPort: 9360
+      {{- if eq .Values.modules.python.type "NodePort" "LoadBalancer" }}
+      nodePort: {{ .Values.modules.python.grpcNodePort }}
+      {{- end }}
+      protocol: TCP
+    - name: "http"
+      port: 9380
+      targetPort: 9380
+      {{- if eq .Values.modules.python.type "NodePort" "LoadBalancer" }}
+      nodePort: {{ .Values.modules.python.httpNodePort }}
+      {{- end }}
+      protocol: TCP
+  type: {{ .Values.modules.python.type }}
+  selector:
+    fateMoudle: python
+{{ include "fate.matchLabels" . | indent 4 }}
+---
+{{- if .Values.modules.fateboard.include }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -273,11 +355,12 @@ spec:
       port: 8080
       targetPort: 8080
       protocol: TCP
-  type: {{ .Values.modules.python.fateboardType }}
+  type: {{ .Values.modules.fateboard.type }}
   selector:
     fateMoudle: python
 {{ include "fate.matchLabels" . | indent 4 }}
 ---
+{{- end }}
 {{- if .Values.modules.client.include }}
 apiVersion: v1
 kind: Service

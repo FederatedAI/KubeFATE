@@ -1,5 +1,5 @@
 NAME = federatedai/kubefate
-VERSION = v1.1.1
+VERSION = v1.2.0
 
 build-linux-binary:
 	go build -a -ldflags '-s' -installsuffix cgo -o kubefate kubefate.go
