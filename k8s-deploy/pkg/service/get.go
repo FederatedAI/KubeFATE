@@ -43,11 +43,3 @@ func Get(namespace, name string) (*release.Release, error) {
 	}
 	return res, nil
 }
-
-func IsExited(name, namespace string) bool {
-	res, _ := Get(namespace, name)
-	if res != nil {
-		return true
-	}
-	return false
-}
