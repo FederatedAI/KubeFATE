@@ -12,6 +12,7 @@
 
 #!/bin/bash
 
+set -e
 BASEDIR=$(dirname "$0")
 cd $BASEDIR
 WORKINGDIR=$(pwd)
@@ -24,10 +25,10 @@ source ${WORKINGDIR}/parties.conf
 cd ${WORKINGDIR}
 
 GenerateConfig() {
-	for ((i = 0; i < ${#partylist[*]}; i++)); do
-		eval party_id=\${partylist[${i}]}
-		eval party_ip=\${partyiplist[${i}]}
-		eval serving_ip=\${servingiplist[${i}]}
+	for ((i = 0; i < ${#party_list[*]}; i++)); do
+		eval party_id=\${party_list[${i}]}
+		eval party_ip=\${party_ip_list[${i}]}
+		eval serving_ip=\${serving_ip_list[${i}]}
 
 		eval processor_count=2
 		eval venv_dir=/data/projects/python/venv
@@ -62,14 +63,48 @@ GenerateConfig() {
 
 		rm -rf confs-$party_id/
 		mkdir -p confs-$party_id/confs
-		cp -r training_template/docker-example-dir-tree/* confs-$party_id/confs/
+		cp -r training_template/public/* confs-$party_id/confs/
+		# handle spark backend here
+		if [ "$computing_backend" == "spark" ]; then
+			cp -r training_template/backends/spark/* confs-$party_id/confs/
+			cp training_template/docker-compose-spark.yml confs-$party_id/docker-compose.yml
+		else
+			# if the computing backend is not spark, use eggroll anyway
+			cp -r training_template/backends/eggroll confs-$party_id/confs/
+			cp training_template/docker-compose-eggroll.yml confs-$party_id/docker-compose.yml
 
-		cp training_template/docker-compose.yml confs-$party_id/
+			# eggroll config
+			#db connect inf
+			# use the fixed db name here
+			sed -i "s#<jdbc.url>#jdbc:mysql://${db_ip}:3306/eggroll_meta?useSSL=false\&serverTimezone=UTC\&characterEncoding=utf8\&allowPublicKeyRetrieval=true#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
+			sed -i "s#<jdbc.username>#${db_user}#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
+			sed -i "s#<jdbc.password>#${db_password}#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
+
+			#clustermanager & nodemanager
+			sed -i "s#<clustermanager.host>#${clustermanager_ip}#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
+			sed -i "s#<clustermanager.port>#${clustermanager_port}#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
+			sed -i "s#<nodemanager.port>#${nodemanager_port}#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
+			sed -i "s#<party.id>#${party_id}#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
+
+			#python env
+			sed -i "s#<venv>#${venv_dir}#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
+			#pythonpath, very import, do not modify."
+			sed -i "s#<python.path>#/data/projects/fate/python:/data/projects/fate/eggroll/python#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
+
+			#javahome
+			sed -i "s#<java.home>#/usr/lib/jvm/java-1.8.0-openjdk#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
+			sed -i "s#<java.classpath>#conf/:lib/*#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
+
+			sed -i "s#<rollsite.host>#${proxy_ip}#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
+			sed -i "s#<rollsite.port>#${proxy_port}#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
+
+		fi
+
 		# generate conf dir
 		cp ${WORKINGDIR}/.env ./confs-$party_id
 		if [ "$RegistryURI" != "" ]; then
 			sed -i 's#federatedai#${RegistryURI}/federatedai#g' ./confs-$party_id/docker-compose.yml
-			sed -i 's#image: "mysql:8"#image: ${RegistryURI}/library/mysql:8#g' ./confs-$party_id/docker-compose.yml
+			sed -i 's#image: "mysql:8"#image: ${RegistryURI}/federatedai/mysql:8#g' ./confs-$party_id/docker-compose.yml
 			#sed -i 's#image: "redis:5"#image: "${RegistryURI}/redis:5"#g' ./confs-$party_id/docker-compose.yml
 		fi
 
@@ -85,32 +120,8 @@ GenerateConfig() {
 		done
 
 		sed -i "s|{/path/to/host/dir}|${dir}/${shared_dir}|g" ./confs-$party_id/docker-compose.yml
-		# egg config
-		module_name=eggroll
-		#db connect inf
-		# use the fixed db name here
-		sed -i "s#<jdbc.url>#jdbc:mysql://${db_ip}:3306/eggroll_meta?useSSL=false\&serverTimezone=UTC\&characterEncoding=utf8\&allowPublicKeyRetrieval=true#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
-		sed -i "s#<jdbc.username>#${db_user}#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
-		sed -i "s#<jdbc.password>#${db_password}#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
 
-		#clustermanager & nodemanager
-		sed -i "s#<clustermanager.host>#${clustermanager_ip}#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
-		sed -i "s#<clustermanager.port>#${clustermanager_port}#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
-		sed -i "s#<nodemanager.port>#${nodemanager_port}#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
-		sed -i "s#<party.id>#${party_id}#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
-
-		#python env
-		sed -i "s#<venv>#${venv_dir}#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
-		#pythonpath, very import, do not modify."
-		sed -i "s#<python.path>#/data/projects/fate/python:/data/projects/fate/eggroll/python#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
-
-		#javahome
-		sed -i "s#<java.home>#/usr/lib/jvm/java-1.8.0-openjdk#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
-		sed -i "s#<java.classpath>#conf/:lib/*#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
-
-		sed -i "s#<rollsite.host>#${proxy_ip}#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
-		sed -i "s#<rollsite.port>#${proxy_port}#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
-
+		# Start the general config rendering
 		# fateboard
 		sed -i "s#^server.port=.*#server.port=${fateboard_port}#g" ./confs-$party_id/confs/fateboard/conf/application.properties
 		sed -i "s#^fateflow.url=.*#fateflow.url=http://${fate_flow_ip}:${fate_flow_http_port}#g" ./confs-$party_id/confs/fateboard/conf/application.properties
@@ -135,82 +146,115 @@ GenerateConfig() {
 		echo mysql module of $party_id done!
 
 		# fate_flow
-		sed -i "s/WORK_MODE =.*/WORK_MODE = 1/g" ./confs-$party_id/confs/fate_flow/conf/settings.py
-		sed -i "s/user:.*/user: '${db_user}'/g" ./confs-$party_id/confs/fate_flow/conf/base_conf.yaml
-		sed -i "s/passwd:.*/passwd: '${db_password}'/g" ./confs-$party_id/confs/fate_flow/conf/base_conf.yaml
-		sed -i "s/host: 192.168.0.1*/host: '${db_ip}'/g" ./confs-$party_id/confs/fate_flow/conf/base_conf.yaml
-		sed -i "s/name:.*/name: '${db_name}'/g" ./confs-$party_id/confs/fate_flow/conf/base_conf.yaml
+		sed -i "12 s/name:.*/name: '${db_name}'/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
+		sed -i "13 s/user:.*/user: '${db_user}'/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
+		sed -i "14 s/passwd:.*/passwd: '${db_password}'/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
+		sed -i "15 s/host: 192.168.0.1*/host: '${db_ip}'/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
+		sed -i "43 s/name:.*/name: '${db_name}'/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
+		sed -i "44 s/host: 192.168.0.1*/host: '${db_ip}'/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
+		sed -i "46 s/user:.*/user: '${db_user}'/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
+		sed -i "47 s/passwd:.*/passwd: '${db_password}'/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
+		sed -i "s/127.0.0.1:8000/${serving_ip}:8000/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
 
-		cat >./confs-$party_id/confs/fate_flow/conf/server_conf.json <<EOF
-{
-    "servers": {
-        "proxy": {
-            "host": "${proxy_ip}",
-            "port": ${proxy_port}
-        },
-        "fateboard": {
-            "host": "${fateboard_ip}",
-            "port": ${fateboard_port}
-        },
-        "fateflow": {
-            "host": "${fate_flow_ip}",
-            "grpc.port": ${fate_flow_grpc_port},
-            "http.port": ${fate_flow_http_port}
-        },
-        "fml_agent":  {
-            "host": "${fate_flow_ip}",
-            "port": ${fml_agent_port}
-        },
-        "servings": [
-          "${servingiplist[${i}]}:8000"
-        ]
-    }
-}
-EOF
+		if [ $computing_backend = "spark" ]; then
+			sed -i "s/proxy: rollsite/proxy: nginx/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
+		fi
+
 		echo fate_flow module of $party_id done!
-		# rollsite
-		cat >./confs-$party_id/confs/eggroll/conf/route_table.json <<EOF
-{
-    "route_table": {
-        "default": {
-            "default": [
-                {
-$(if [ "$exchange_ip" != "" ]; then
-			echo "                    \"ip\": \"${exchange_ip}\",
-                    \"port\": 9371 "
+		# now we handles the route table
+		if [ $computing_backend = "spark" ]; then
+			cat >./confs-$party_id/confs/nginx/route_table.yaml <<EOF
+default:
+  proxy:
+    - host: nginx
+      port: 9390
+$(for ((j = 0; j < ${#party_list[*]}; j++)); do
+				if [ "${party_id}" == "${party_list[${j}]}" ]; then
+					continue
+				fi
+				echo "${party_list[${j}]}:
+  proxy:
+    - host: ${party_ip_list[${j}]} 
+      port: 9390
+  fateflow:
+    - host: ${party_ip_list[${j}]}
+      port: ${fate_flow_grpc_port}
+"
+			done)
+${party_id}:
+  proxy:
+    - host: nginx
+      port: 9390
+  fateflow:
+    - host: ${fate_flow_ip}
+      port: ${fate_flow_grpc_port}
+EOF
+			cat >./confs-$party_id/confs/fate_flow/conf/rabbitmq_route_table.yaml <<EOF
+$(for ((j = 0; j < ${#party_list[*]}; j++)); do
+				if [ "${party_id}" == "${party_list[${j}]}" ]; then
+					continue
+				fi
+				echo "${party_list[${j}]}:
+    host: ${party_ip_list[${j}]}
+    port: 5672
+"
+			done)
+${party_id}:
+    host: rabbitmq
+    port: 5672
+EOF
+
 		else
-			echo "                    \"ip\": \"proxy\",
-                    \"port\": 9370 "
-		fi)
-                }
-            ]
-        },
-$(for ((j = 0; j < ${#partylist[*]}; j++)); do
-			if [ "${party_id}" == "${partylist[${j}]}" ]; then
-				continue
-			fi
-			echo "        \"${partylist[${j}]}\": {
-            \"default\": [
-                {
-                    \"ip\": \"${partyiplist[${j}]}\",
-                    \"port\": 9370
-                }
-            ]
-        },"
-		done)
-        "${party_id}": {
-            "fateflow": [
-            {
-                "ip": "${fate_flow_ip}",
-                "port": ${fate_flow_grpc_port}
-            }]
-        }
-    },
-    "permission": {
-        "default_allow": true
-    }
+			cat >./confs-$party_id/confs/eggroll/conf/route_table.json <<EOF
+{
+	"route_table": {
+		"default": {
+			"default": [
+				{
+$(if [ "$exchange_ip" != "" ]; then
+				echo "
+				\"ip\": \"${exchange_ip}\",
+				\"port\": 9371
+	"
+			else
+				echo " 
+				\"ip\": \"${proxy_ip}\",
+				\"port\": \"${proxy_port}\"
+	"
+			fi)
+				}
+			]
+		},
+$(for ((j = 0; j < ${#party_list[*]}; j++)); do
+				if [ "${party_id}" == "${party_list[${j}]}" ]; then
+					continue
+				fi
+				echo "
+		\"${party_list[${j}]}\": {
+			\"default\": [{
+		 		\"ip\": \"${party_ip_list[${j}]}\",
+				\"port\": 9370
+			    }]
+		},
+	"
+			done)
+		"${party_id}": {
+			"default": [{
+				"ip": "${proxy_ip}",
+				"port": ${proxy_port}
+			}],
+			"fateflow": [{
+				"ip": "${fate_flow_ip}",
+				"port": ${fate_flow_grpc_port}
+			}]
+		}
+	},
+	"permission": {
+		"default_allow": true
+	}
 }
 EOF
+		fi
 		tar -czf ./outputs/confs-$party_id.tar ./confs-$party_id
 		rm -rf ./confs-$party_id
 		echo proxy module of $party_id done!
@@ -239,11 +283,11 @@ EOF
 			cat >./confs-exchange/conf/route_table.json <<EOF
 {
     "route_table": {
-$(for ((j = 0; j < ${#partylist[*]}; j++)); do
-				echo "        \"${partylist[${j}]}\": {
+$(for ((j = 0; j < ${#party_list[*]}; j++)); do
+				echo "        \"${party_list[${j}]}\": {
             \"default\": [
                 {
-                    \"ip\": \"${partyiplist[${j}]}\",
+                    \"ip\": \"${party_ip_list[${j}]}\",
                     \"port\": 9370
                 }
             ]
@@ -269,10 +313,10 @@ EOF
 
 	# handle serving
 	echo "handle serving"
-	for ((i = 0; i < ${#servingiplist[*]}; i++)); do
-		eval party_id=\${partylist[${i}]}
-		eval party_ip=\${partyiplist[${i}]}
-		eval serving_ip=\${servingiplist[${i}]}
+	for ((i = 0; i < ${#serving_ip_list[*]}; i++)); do
+		eval party_id=\${party_list[${i}]}
+		eval party_ip=\${party_ip_list[${i}]}
+		eval serving_ip=\${serving_ip_list[${i}]}
 
 		rm -rf serving-$party_id/
 		mkdir -p serving-$party_id/confs
@@ -299,9 +343,9 @@ EOF
 		cat >./serving-$party_id/confs/serving-proxy/conf/route_table.json <<EOF
 {
     "route_table": {
-$(for ((j = 0; j < ${#partylist[*]}; j++)); do
-			if [ "${party_id}" == "${partylist[${j}]}" ]; then
-				echo "        \"${partylist[${j}]}\": {
+$(for ((j = 0; j < ${#party_list[*]}; j++)); do
+			if [ "${party_id}" == "${party_list[${j}]}" ]; then
+				echo "        \"${party_list[${j}]}\": {
             \"default\": [
                 {
                     \"ip\": \"serving-proxy\",
@@ -316,10 +360,10 @@ $(for ((j = 0; j < ${#partylist[*]}; j++)); do
             ]
         },"
 			else
-				echo "        \"${partylist[${j}]}\": {
+				echo "        \"${party_list[${j}]}\": {
             \"default\": [
                 {
-                    \"ip\": \"${servingiplist[${j}]}\",
+                    \"ip\": \"${serving_ip_list[${j}]}\",
                     \"port\": 8869
                 }
             ]

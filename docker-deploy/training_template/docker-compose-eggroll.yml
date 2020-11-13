@@ -50,7 +50,7 @@ services:
       - ./confs/eggroll/conf:/data/projects/fate/eggroll/conf
     networks:
       - fate-network
-    command: ["bash", "-c", "java -Dlog4j.configurationFile=$${EGGROLL_HOME}/conf/log4j2.properties -cp $${EGGROLL_HOME}/lib/*:$${EGGROLL_HOME}/conf/ com.webank.eggroll.rollsite.Proxy -c $${EGGROLL_HOME}/conf/eggroll.properties"]
+    command: ["bash", "-c", "java -Dlog4j.configurationFile=$${EGGROLL_HOME}/conf/log4j2.properties -cp $${EGGROLL_HOME}/lib/*:$${EGGROLL_HOME}/conf/ com.webank.eggroll.rollsite.EggSiteBootstrap -c $${EGGROLL_HOME}/conf/eggroll.properties"]
   
   fateboard:
     image: "federatedai/fateboard:${TAG}"
@@ -58,7 +58,7 @@ services:
       - "8080:8080"
     volumes:
       - ./confs/fateboard/conf:/data/projects/fate/fateboard/conf
-      - fate_flow_logs:/data/projects/fate/python/logs
+      - fate_flow_logs:/data/projects/fate/logs
     networks:
       - fate-network
     depends_on:
@@ -81,9 +81,9 @@ services:
     expose:
       - 4671
     volumes:
-        - ./confs/eggroll/conf:/data/projects/fate/eggroll/conf
-        - ./confs/fate_flow/conf/server_conf.json:/data/projects/fate/python/arch/conf/server_conf.json
-        - shared_dir_data:/data/projects/fate/eggroll/data
+      - ./confs/eggroll/conf:/data/projects/fate/eggroll/conf
+      - ./confs/fate_flow/conf/service_conf.yaml:/data/projects/fate/conf/service_conf.yaml
+      - ./shared_dir/data/nodemanager:/data/projects/fate/eggroll/data
     networks:
       - fate-network
     command: ["bash", "-c", "java -Dlog4j.configurationFile=$${EGGROLL_HOME}/conf/log4j2.properties -cp $${EGGROLL_HOME}/lib/*: com.webank.eggroll.core.Bootstrap --bootstraps com.webank.eggroll.core.resourcemanager.NodeManagerBootstrap -c $${EGGROLL_HOME}/conf/eggroll.properties -p 4671 -s 'EGGROLL_DEAMON'"]
@@ -96,20 +96,19 @@ services:
     restart: always
     volumes:
       - shared_dir_federatedml:/data/projects/fate/python/federatedml
-      - shared_dir_examples:/data/projects/fate/python/examples
+      - shared_dir_examples:/data/projects/fate/examples
       - download_dir:/data/projects/fate/python/download_dir
-      - ./confs/fate_flow/conf/settings.py:/data/projects/fate/python/fate_flow/settings.py
-      - ./confs/fate_flow/conf/base_conf.yaml:/data/projects/fate/python/arch/conf/base_conf.yaml
-      - ./confs/fate_flow/conf/server_conf.json:/data/projects/fate/python/arch/conf/server_conf.json
+      - ./confs/fate_flow/conf:/data/projects/fate/conf
       - ./confs/eggroll/conf:/data/projects/fate/eggroll/conf
-      - fate_flow_logs:/data/projects/fate/python/logs
+      - fate_flow_logs:/data/projects/fate/logs
     depends_on:
       - mysql
       - rollsite
       - clustermanager
       - nodemanager
     networks:
-      - fate-network
+      fate-network:
+        ipv4_address: 192.167.0.100
     
   client:
     image: "federatedai/client:${TAG}"
@@ -121,6 +120,9 @@ services:
       FATE_SERVING_HOST: "fate-serving:8059"
     volumes:
       - download_dir:/fml_manager/Examples/download_dir
+      - shared_dir_examples:/data/projects/fate/examples
+      - ./confs/fate_flow/conf:/data/projects/fate/conf
+      - ./confs/client/pipeline_conf.yaml:/data/projects/fate/conf/pipeline_conf.yaml
     depends_on:
       - python
     networks:
@@ -132,7 +134,7 @@ services:
       - 3306
     volumes:
       - ./confs/mysql/init:/docker-entrypoint-initdb.d/
-      - ./confs/mysql/data:/var/lib/mysql
+      - ./shared_dir/data/mysql:/var/lib/mysql
     restart: always
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"

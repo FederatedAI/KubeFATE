@@ -1,0 +1,3 @@
+ip: python
+port: 9380
+log_directory: /fml_manager/Examples/Pipeline/logs

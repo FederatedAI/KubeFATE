@@ -1,0 +1,52 @@
+work_mode: 1
+use_registry: false
+fateflow:
+  host: 192.167.0.100
+  http_port: 9380
+  grpc_port: 9360
+  proxy: rollsite 
+fateboard:
+  host: fateboard
+  port: 8080
+database:
+  name: fate
+  user: fate_dev
+  passwd: fate_dev
+  host: mysql 
+  port: 3306
+  max_connections: 100
+  stale_timeout: 30
+fate_on_eggroll:
+  clustermanager:
+    cores_per_node: 20
+    nodes: 1
+  rollsite:
+    host: rollsite 
+    port: 9370
+fate_on_spark:
+  spark:
+    cores_per_node: 20
+    nodes: 2
+  hdfs:
+    name_node: hdfs://namenode:9000
+  rabbitmq:
+    host: rabbitmq 
+    mng_port: 15672 
+    port: 5672
+    user: fate
+    password: fate
+  nginx:
+    host: nginx 
+    port: 9390
+model_store_address:
+  storage: mysql
+  name: model 
+  host: mysql 
+  port: 3306
+  user: fate_dev
+  passwd: fate_dev
+  max_connections: 10
+  stale_timeout: 10
+servings:
+  hosts:
+    - 127.0.0.1:8000

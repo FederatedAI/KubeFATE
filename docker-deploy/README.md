@@ -54,7 +54,12 @@ partylist=(10000 9999)
 partyiplist=(192.168.7.1 192.168.7.2)
 servingiplist=(192.168.7.1 192.168.7.2)
 exchangeip=
+# computing_backend could be eggroll or spark.
+computing_backend=eggroll
 ```
+
+Spark was introduced in FATE v1.5 as the underlying computing backend, for more details
+about FATE on Spark please refer to this [document](../docs/FATE_On_Spark.md).
 
 On the host running FATE, the user is non root and needs`/data/projects/fate` folder permission and docker permission. No other action is required if the user is root.
 
@@ -184,7 +189,7 @@ For more details about the testing result, please refer to `python/examples/toy_
 `$ vi examples/upload_host.json`
 ```
 {
-  "file": "examples/data/breast_a.csv",
+  "file": "examples/data/breast_hetero_host.csv",
   "head": 1,
   "partition": 10,
   "work_mode": 1,
@@ -207,7 +212,7 @@ For more details about the testing result, please refer to `python/examples/toy_
 `$ vi examples/upload_guest.json`
 ```
 {
-  "file": "examples/data/breast_b.csv",
+  "file": "examples/data/breast_hetero_host.csv",
   "head": 1,
   "partition": 10,
   "work_mode": 1,

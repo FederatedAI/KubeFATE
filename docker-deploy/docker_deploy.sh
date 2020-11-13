@@ -12,6 +12,7 @@
 
 #!/bin/bash
 
+set -e
 BASEDIR=$(dirname "$0")
 cd $BASEDIR
 WORKINGDIR=$(pwd)
@@ -36,7 +37,7 @@ Deploy() {
 			break
 			;;
 		all)
-			for party in ${partylist[*]}; do
+			for party in ${party_list[*]}; do
 				if [ "$2" != "" ]; then
 					case $2 in
 					--training)
@@ -91,7 +92,7 @@ Delete() {
 	while [ "$1" != "" ]; do
 		case $1 in
 		all)
-			for party in ${partylist[*]}; do
+			for party in ${party_list[*]}; do
 				if [ "$2" != "" ]; then
 					DeleteCluster $party $2
 				else
@@ -131,9 +132,9 @@ DeployPartyInternal() {
 	elif [ "$2" != "" ]; then
 		target_party_ip="$2"
 	else
-		for ((i = 0; i < ${#partylist[*]}; i++)); do
-			if [ "${partylist[$i]}" = "$target_party_id" ]; then
-				target_party_ip=${partyiplist[$i]}
+		for ((i = 0; i < ${#party_list[*]}; i++)); do
+			if [ "${party_list[$i]}" = "$target_party_id" ]; then
+				target_party_ip=${party_ip_list[$i]}
 			fi
 		done
 	fi
@@ -145,6 +146,11 @@ DeployPartyInternal() {
 
 	if [ "$3" != "" ]; then
 		user=$3
+	fi
+
+	handleLocally confs
+	if [ "$local_flag" == "true" ]; then
+		return 0
 	fi
 
 	scp ${WORKINGDIR}/outputs/confs-$target_party_id.tar $user@$target_party_ip:~/
@@ -183,15 +189,20 @@ DeployPartyServing() {
 		exit 1
 	fi
 	# extract the ip address of the target party
-	for ((i = 0; i < ${#partylist[*]}; i++)); do
-		if [ "${partylist[$i]}" = "$target_party_id" ]; then
-			target_party_serving_ip=${servingiplist[$i]}
+	for ((i = 0; i < ${#party_list[*]}; i++)); do
+		if [ "${party_list[$i]}" = "$target_party_id" ]; then
+			target_party_serving_ip=${serving_ip_list[$i]}
 		fi
 	done
 	# verify the target_party_ip
 	if [ "$target_party_serving_ip" = "127.0.0.1" ]; then
 		echo "Unable to find Party : $target_party_id serving address, please check you input."
 		exit 1
+	fi
+
+	handleLocally serving
+	if [ $local_flag == "true" ]; then
+		return
 	fi
 
 	scp ${WORKINGDIR}/outputs/serving-$target_party_id.tar $user@$target_party_serving_ip:~/
@@ -222,16 +233,16 @@ DeleteCluster() {
 	if [ "$target_party_id" == "exchange" ]; then
 		target_party_ip=${exchangeip}
 	else
-		for ((i = 0; i < ${#partylist[*]}; i++)); do
-			if [ "${partylist[$i]}" = "$target_party_id" ]; then
-				target_party_ip=${partyiplist[$i]}
+		for ((i = 0; i < ${#party_list[*]}; i++)); do
+			if [ "${party_list[$i]}" = "$target_party_id" ]; then
+				target_party_ip=${party_ip_list[$i]}
 			fi
 		done
 	fi
 
-	for ((i = 0; i < ${#partylist[*]}; i++)); do
-		if [ "${partylist[$i]}" = "$target_party_id" ]; then
-			target_party_serving_ip=${servingiplist[$i]}
+	for ((i = 0; i < ${#party_list[*]}; i++)); do
+		if [ "${party_list[$i]}" = "$target_party_id" ]; then
+			target_party_serving_ip=${serving_ip_list[$i]}
 		fi
 	done
 
@@ -282,6 +293,22 @@ ShowUsage() {
 	echo "Deploy all parties or specified partie(s): bash docker_deploy.sh partyid1[partyid2...] | all"
 }
 
+handleLocally() {
+	type=$1
+	for ip in $(hostname -I); do
+		if [ "$target_party_ip" == "$ip" ]; then
+			mkdir -p $dir
+			tar -xf ${WORKINGDIR}/outputs/${type}-${target_party_id}.tar -C $dir
+			cd ${dir}/${type}-${target_party_id}
+			docker-compose down
+			docker-compose up -d
+			local_flag="true"
+			return 0
+		fi
+	done
+	local_flag="false"
+}
+
 main() {
 	if [ "$1" = "" ] || [ "$" = "--help" ]; then
 		ShowUsage
@@ -292,6 +319,12 @@ main() {
 	else
 		Deploy "$@"
 	fi
+
+	for ((i = 0; i < ${#party_list[*]}; i++)); do
+   echo "
+   Use  ${party_ip_list[$i]}:8080 to access fateboard of party: ${party_list[$i]}
+   Use  ${party_ip_list[$i]}:20000 to access notebook of party: ${party_list[$i]}"
+	done
 
 	exit 0
 }

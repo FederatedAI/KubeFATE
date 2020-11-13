@@ -1,0 +1,18 @@
+default:
+  proxy:
+    - host: nginx 
+      port: 9390
+9999:
+  proxy:
+    - host: nginx 
+      port: 9390
+  fateflow:
+    - host: fate-flow 
+      port: 9360
+10000:
+  proxy:
+    - host: nginx
+      port: 9390 
+  fateflow:
+    - host: fate-flow 
+      port: 9360
