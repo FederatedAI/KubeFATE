@@ -424,7 +424,7 @@ $ curl -X POST -H 'Content-Type: application/json' -i 'http://192.168.7.1:8059/f
       "x6": -0.485934,
       "x7": 0.347072,
       "x8": -0.287570,
-      "x9": -0.733474,
+      "x9": -0.733474
     },
     "sendToRemoteFeatureData": {
       "id": "123"
