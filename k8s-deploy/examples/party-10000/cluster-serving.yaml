@@ -1,0 +1,45 @@
+name: fate-serving-10000
+namespace: fate-serving-10000
+chartName: fate-serving
+chartVersion: v2.0.0
+partyId: 10000
+registry: ""
+pullPolicy: 
+persistence: false
+istio:
+  enabled: false
+modules:
+  - servingProxy
+  - servingRedis
+  - servingServer
+
+servingProxy: 
+  nodePort: 30106
+  ingerssHost: 10000.serving-proxy.kubefate.net
+  partyList:
+  - partyId: 9999
+    partyIp: 192.168.9.1
+    partyPort: 30096
+  nodeSelector: {}
+
+servingServer:
+  type: NodePort
+  nodePort: 30105
+  fateflow:
+    ip: 192.168.10.1
+    port: 30107
+  subPath: ""
+  existingClaim: ""
+  storageClass: "serving-server"
+  accessMode: ReadWriteOnce
+  size: 1Gi
+  nodeSelector: {}
+
+servingRedis:
+  password: fate_dev
+  nodeSelector: {}
+  subPath: ""
+  existingClaim: ""
+  storageClass: "serving-redis"
+  accessMode: ReadWriteOnce
+  size: 1Gi

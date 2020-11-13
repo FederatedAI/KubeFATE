@@ -1,0 +1,45 @@
+name: fate-serving-9999
+namespace: fate-serving-9999
+chartName: fate-serving
+chartVersion: v2.0.0
+partyId: 9999
+registry: ""
+pullPolicy: 
+persistence: false
+istio:
+  enabled: false
+modules:
+  - servingProxy
+  - servingRedis
+  - servingServer
+
+servingProxy: 
+  nodePort: 30096
+  ingerssHost: 9999.serving-proxy.kubefate.net
+  partyList:
+  - partyId: 10000
+    partyIp: 192.168.10.1
+    partyPort: 30106
+  nodeSelector: {}
+
+servingServer:
+  type: NodePort
+  nodePort: 30095
+  fateflow:
+    ip: 192.168.9.1
+    port: 30097
+  subPath: ""
+  existingClaim: ""
+  storageClass: "serving-server"
+  accessMode: ReadWriteOnce
+  size: 1Gi
+  nodeSelector: {}
+
+servingRedis:
+  password: fate_dev
+  nodeSelector: {}
+  subPath: ""
+  existingClaim: ""
+  storageClass: "serving-redis"
+  accessMode: ReadWriteOnce
+  size: 1Gi

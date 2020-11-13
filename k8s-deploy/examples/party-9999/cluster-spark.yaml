@@ -1,0 +1,48 @@
+name: fate-9999
+namespace: fate-9999
+chartName: fate
+chartVersion: v1.5.0
+partyId: 9999
+registry: ""
+pullPolicy: 
+persistence: false
+istio:
+  enabled: false
+modules:
+  - python
+  - mysql
+  - fateboard
+  - client
+  - spark
+  - hdfs
+  - nginx
+  - rabbitmq
+
+backend: spark
+
+python:
+  type: NodePort
+  httpNodePort: 30097
+  grpcNodePort: 30092
+
+servingIp: 192.168.9.1
+servingPort: 30095
+
+nginx:
+  type: NodePort
+  nodePort: 30093
+  route_table: 
+    10000: 
+      proxy: 
+        - host: 192.168.10.1
+          port: 30103
+      fateflow: 
+        - host: 192.168.10.1
+          port: 30102
+rabbitmq:
+  type: NodePort
+  nodePort: 30094
+  route_table:
+    10000:
+      host: 192.168.10.1
+      port: 30104

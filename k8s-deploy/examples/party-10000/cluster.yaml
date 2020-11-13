@@ -1,0 +1,36 @@
+name: fate-10000
+namespace: fate-10000
+chartName: fate
+chartVersion: v1.5.0
+partyId: 10000
+registry: ""
+pullPolicy: 
+persistence: false
+istio:
+  enabled: false
+modules:
+  - rollsite
+  - clustermanager
+  - nodemanager
+  - mysql
+  - python
+  - fateboard
+  - client
+
+backend: eggroll
+
+rollsite: 
+  type: NodePort
+  nodePort: 30101
+  partyList:
+  - partyId: 9999
+    partyIp: 192.168.9.1
+    partyPort: 30091
+
+python:
+  type: NodePort
+  httpNodePort: 30107
+  grpcNodePort: 30102
+
+servingIp: 192.168.10.1
+servingPort: 30105

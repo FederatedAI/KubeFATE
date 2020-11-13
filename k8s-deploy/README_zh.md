@@ -136,6 +136,7 @@ Info            map[dashboard:[9999.fateboard.kubefate.net] ip:10.117.32.181 ...
 ### 其他常用用户场景
 #### [Manage FATE and FATE-Serving Version](../docs/Manage_FATE_and_FATE-Serving_Version.md)
 #### [Update and Delete a FATE Cluster](../docs/Update_and_Delete_a_FATE_Cluster.md)
+#### [KubeFATE Examples](examples)
 
 ## KubeFATE服务的API参考
 [API Reference](https://app.swaggerhub.com/apis-docs/vmware-octo/kubefate2/1.0.0-oas3#/cluster/createcluster)

@@ -130,6 +130,7 @@ Info            map[dashboard:[9999.fateboard.kubefate.net] ip:192.168.9.2 .....
 ### Other Common Use Scenarios
 #### [Manage FATE and FATE-Serving Version](../docs/Manage_FATE_and_FATE-Serving_Version.md)
 #### [Update and Delete a FATE Cluster](../docs/Update_and_Delete_a_FATE_Cluster.md)
+#### [KubeFATE Examples](examples)
 
 ## KubeFATE Service RESTful APIs Reference
 [API Reference](https://app.swaggerhub.com/apis-docs/vmware-octo/kubefate2/1.0.0-oas3#/cluster/createcluster)
