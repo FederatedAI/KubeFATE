@@ -148,7 +148,8 @@ DeployPartyInternal() {
 		user=$3
 	fi
 
-	if [ "$(handleLocally confs)" == "local" ]; then
+	handleLocally confs
+	if [ "$local_flag" == "true" ]; then
 		return 0
 	fi
 
@@ -199,7 +200,8 @@ DeployPartyServing() {
 		exit 1
 	fi
 
-	if [ $(handleLocally serving) == "local" ]; then
+	handleLocally serving
+	if [ $local_flag == "true" ]; then
 		return
 	fi
 
@@ -300,11 +302,11 @@ handleLocally() {
 			cd ${dir}/${type}-${target_party_id}
 			docker-compose down
 			docker-compose up -d
-			echo "local"
+			local_flag="true"
 			return 0
 		fi
 	done
-	echo "non-local"
+	local_flag="false"
 }
 
 main() {
