@@ -379,10 +379,10 @@ output:
 ```
 
 ##### Test the online serving
-Send the following message to {SERVING_SERVICE_IP}:8059/federation/v1/inference
+Send the following message to serving interface "{SERVING_SERVICE_IP}:8059/federation/v1/inference" of the "GUEST" party.
 
 ```
-$ curl -X POST -H 'Content-Type: application/json' -i 'http://192.168.7.1:8059/federation/v1/inference' --data '{
+$ curl -X POST -H 'Content-Type: application/json' -i 'http://192.168.7.2:8059/federation/v1/inference' --data '{
   "head": {
     "serviceId": "test"
   },

@@ -406,10 +406,10 @@ output:
 ```
 
 ###### 在线测试
-发送以下信息到{SERVING_SERVICE_IP}:8059/federation/v1/inference
+发送以下信息到"GUEST"方的推理服务"{SERVING_SERVICE_IP}:8059/federation/v1/inference"
 
 ```
-$ curl -X POST -H 'Content-Type: application/json' -i 'http://192.168.7.1:8059/federation/v1/inference' --data '{
+$ curl -X POST -H 'Content-Type: application/json' -i 'http://192.168.7.2:8059/federation/v1/inference' --data '{
   "head": {
     "serviceId": "test"
   },
