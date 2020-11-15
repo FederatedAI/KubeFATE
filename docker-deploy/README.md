@@ -212,7 +212,7 @@ For more details about the testing result, please refer to `python/examples/toy_
 `$ vi examples/upload_guest.json`
 ```
 {
-  "file": "examples/data/breast_hetero_host.csv",
+  "file": "examples/data/breast_hetero_guest.csv",
   "head": 1,
   "partition": 10,
   "work_mode": 1,
