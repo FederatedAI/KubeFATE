@@ -254,6 +254,7 @@ $ python run_toy_example.py 10000 9999 1        #验证
 ###### 修改examples/test_hetero_lr_job_conf.json
 
 **目前FATE Serving还不支持DSL 2.0，因此如果要使用在线推理的话请不要在任务中的配置文件中使用`"dsl_version": "2"`字段**
+
 `$ vi examples/test_hetero_lr_job_conf.json`
 
 ```json
@@ -307,7 +308,7 @@ $ python run_toy_example.py 10000 9999 1        #验证
             "batch_size": 320,
             "learning_rate": 0.15,
             "init_param": {
-                it_method": "random_uniform"
+                "init_method": "random_uniform"
             }
         }
     }
@@ -315,6 +316,7 @@ $ python run_toy_example.py 10000 9999 1        #验证
 ```
 
 ##### 修改examples/test_hetero_lr_job_dsl.json
+
 `$ vi examples/test_hetero_lr_job_dsl.json`
 
 ```json

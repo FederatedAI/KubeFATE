@@ -282,7 +282,7 @@ For more details about the testing result, please refer to `python/examples/toy_
             "batch_size": 320,
             "learning_rate": 0.15,
             "init_param": {
-                it_method": "random_uniform"
+                "init_method": "random_uniform"
             }
         }
     }
