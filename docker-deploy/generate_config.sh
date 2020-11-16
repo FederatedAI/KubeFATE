@@ -268,7 +268,7 @@ EOF
 			mkdir -p confs-exchange/conf/
 			cp ${WORKINGDIR}/.env confs-exchange/
 			cp training_template/docker-compose-exchange.yml confs-exchange/docker-compose.yml
-			cp -r training_template/docker-example-dir-tree/eggroll/conf/* confs-exchange/conf/
+			cp -r training_template/backends/eggroll/conf/* confs-exchange/conf/
 
 			if [ "$RegistryURI" != "" ]; then
 				sed -i 's#federatedai#${RegistryURI}/federatedai#g' ./confs-exchange/docker-compose.yml

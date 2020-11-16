@@ -321,9 +321,11 @@ main() {
 	fi
 
 	for ((i = 0; i < ${#party_list[*]}; i++)); do
+	if [ $party_list[$i] != "exchange" ]; then
    echo "
    Use  ${party_ip_list[$i]}:8080 to access fateboard of party: ${party_list[$i]}
    Use  ${party_ip_list[$i]}:20000 to access notebook of party: ${party_list[$i]}"
+        fi
 	done
 
 	exit 0

@@ -2,9 +2,9 @@ version: '3'
 
 services:
   exchange:
-    image: "${PREFIX}/eggroll:${TAG}"
+    image: "federatedai/eggroll:${TAG}"
     ports:
       - "9371:9370"
     volumes:
       - ./conf:/data/projects/fate/eggroll/conf
-    command: ["bash", "-c", "java -Dlog4j.configurationFile=$${EGGROLL_HOME}/conf/log4j2.properties -cp $${EGGROLL_HOME}/lib/*:$${EGGROLL_HOME}/conf/ com.webank.eggroll.rollsite.Proxy -c $${EGGROLL_HOME}/conf/eggroll.properties"]
+    command: ["bash", "-c", "java -Dlog4j.configurationFile=$${EGGROLL_HOME}/conf/log4j2.properties -cp $${EGGROLL_HOME}/lib/*:$${EGGROLL_HOME}/conf/ com.webank.eggroll.rollsite.EggSiteBootstrap -c $${EGGROLL_HOME}/conf/eggroll.properties"]
