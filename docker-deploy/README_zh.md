@@ -252,8 +252,11 @@ $ python run_toy_example.py 10000 9999 1        #验证
 `$ python fate_flow_client.py -f upload -c examples/upload_guest.json `
 
 ###### 修改examples/test_hetero_lr_job_conf.json
+
+**目前FATE Serving还不支持DSL 2.0，因此如果要使用在线推理的话请不要在任务中的配置文件中使用`"dsl_version": "2"`字段**
 `$ vi examples/test_hetero_lr_job_conf.json`
-```
+
+```json
 {
     "initiator": {
         "role": "guest",
@@ -293,7 +296,100 @@ $ python run_toy_example.py 10000 9999 1        #验证
             }
         }
     },
-    ....
+    "algorithm_parameters": {
+        "hetero_lr_0": {
+            "penalty": "L2",
+            "optimizer": "rmsprop",
+            "eps": 1e-5,
+            "alpha": 0.01,
+            "max_iter": 3,
+            "converge_func": "diff",
+            "batch_size": 320,
+            "learning_rate": 0.15,
+            "init_param": {
+                it_method": "random_uniform"
+            }
+        }
+    }
+}
+```
+
+##### 修改examples/test_hetero_lr_job_dsl.json
+`$ vi examples/test_hetero_lr_job_dsl.json`
+
+```json
+{
+    "components" : {
+        "dataio_0": {
+            "module": "DataIO",
+            "input": {
+                "data": {
+                    "data": [
+                        "args.train_data"
+                    ]
+                }
+            },
+            "output": {
+                "data": ["train"],
+                "model": ["dataio"]
+            },
+            "need_deploy": true
+         },
+        "hetero_feature_binning_0": {
+            "module": "HeteroFeatureBinning",
+            "input": {
+                "data": {
+                    "data": [
+                        "dataio_0.train"
+                    ]
+                }
+            },
+            "output": {
+                "data": ["train"],
+                "model": ["hetero_feature_binning"]
+            }
+        },
+        "hetero_feature_selection_0": {
+            "module": "HeteroFeatureSelection",
+            "input": {
+                "data": {
+                    "data": [
+                        "hetero_feature_binning_0.train"
+                    ]
+                },
+                "isometric_model": [
+                    "hetero_feature_binning_0.hetero_feature_binning"
+                ]
+            },
+            "output": {
+                "data": ["train"],
+                "model": ["selected"]
+            }
+        },
+        "hetero_lr_0": {
+            "module": "HeteroLR",
+            "input": {
+                "data": {
+                    "train_data": ["hetero_feature_selection_0.train"]
+                }
+            },
+            "output": {
+                "data": ["train"],
+                "model": ["hetero_lr"]
+            }
+        },
+        "evaluation_0": {
+            "module": "Evaluation",
+            "input": {
+                "data": {
+                    "data": ["hetero_lr_0.train"]
+                }
+            },
+            "output": {
+                "data": ["evaluate"]
+            }
+        }
+    }
 }
 ```
 
