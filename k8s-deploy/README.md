@@ -92,26 +92,36 @@ And, according to the FATE deploy plan, create a `cluster.yaml` for cluster conf
 registry: "hub.c.163.com/federatedai"
 ```
 
-Then intall FATE cluster,
+Then install FATE cluster,
 
 ```
 $ kubefate cluster install -f ./cluster.yaml
 create job success, job id=fe846176-0787-4879-9d27-622692ce181c
 ```
+*If you want to deploy **FATE on Spark** cluster, you can use `cluster- spark.yaml`.*
+
 #### Check the status of "Install Cluster" job
 A job will be created for installing FATE cluster. Use `kubefate job describe` to check the status of job, util we see the result turns to `install success`
 
 ```
 $ kubefate job describe fe846176-0787-4879-9d27-622692ce181c
-StartTime       2020-05-15 06:34:25
-EndTime         2020-05-15 06:35:14
+StartTime       2020-11-13 07:22:53
+EndTime         2020-11-13 07:23:35
+Duration        42s
 Status          Success
 Creator         admin
 ClusterId       27e37a60-fffb-4031-a76f-990b2ff43cf2
 Result          install success
-SubJobs         []
+SubJobs         clustermanager       PodStatus: Running, SubJobStatus: Success, Duration:     6s, StartTime: 2020-11-13 07:22:53, EndTime: 2020-11-13 07:22:59
+                fateboard            PodStatus: Running, SubJobStatus: Success, Duration:     1s, StartTime: 2020-11-13 07:22:53, EndTime: 2020-11-13 07:22:55
+                mysql                PodStatus: Running, SubJobStatus: Success, Duration:     8s, StartTime: 2020-11-13 07:22:53, EndTime: 2020-11-13 07:23:01
+                nodemanager-0        PodStatus: Running, SubJobStatus: Success, Duration:     8s, StartTime: 2020-11-13 07:22:53, EndTime: 2020-11-13 07:23:01
+                nodemanager-1        PodStatus: Running, SubJobStatus: Success, Duration:     8s, StartTime: 2020-11-13 07:22:53, EndTime: 2020-11-13 07:23:01
+                python               PodStatus: Running, SubJobStatus: Success, Duration:     1s, StartTime: 2020-11-13 07:22:53, EndTime: 2020-11-13 07:22:55
+                rollsite             PodStatus: Running, SubJobStatus: Success, Duration:     8s, StartTime: 2020-11-13 07:22:53, EndTime: 2020-11-13 07:23:01
+                client               PodStatus: Running, SubJobStatus: Success, Duration:    42s, StartTime: 2020-11-13 07:22:53, EndTime: 2020-11-13 07:23:35
 ```
-#### Decribe the cluster and find FATE access infos
+#### Describe the cluster and find FATE access infos
 When we see the `install cluster` job success, use `kubefate cluster describe` to check the FATE access infos
 ```
 $ kubefate cluster describe 27e37a60-fffb-4031-a76f-990b2ff43cf2
@@ -119,12 +129,34 @@ UUID            27e37a60-fffb-4031-a76f-990b2ff43cf2
 Name            fate-9999
 NameSpace       fate-9999
 ChartName       fate
-ChartVersion    v1.4.0
+ChartVersion    v1.5.0
 REVISION        1
+Age             92s
 Status          Running
-Values          {"chartName":"fate","chartVersion":"v1.4.0","name":"fate-9999","namespace":"fate-9999","nodemanager":{"count":3,"list":[{"accessMode":"ReadWriteOnce","existingClaim":"","name":"nodemanager","nodeSelector":{},"sessionProcessorsPerNode":2,"size":"1Gi","storageClass":"nodemanager","subPath":"nodemanager"}],"sessionProcessorsPerNode":4},"partyId":9999,"persistence":false, ...... }
-ChartName       fate
-Info            map[dashboard:[9999.fateboard.kubefate.net] ip:192.168.9.2 ...... ]
+Spec            name: fate-9999
+                namespace: fate-9999
+                chartName: fate
+                chartVersion: v1.5.0
+                partyId: 9999
+                ......
+                
+Info            dashboard:
+                - 9999.notebook.kubefate.net
+                - 9999.fateboard.kubefate.net
+                ip: 192.168.0.1
+                pod:
+                - clustermanager-78f98b85bf-ph2hv
+                ......
+                status:
+                  modules:
+                    client: Running
+                    clustermanager: Running
+                    fateboard: Running
+                    mysql: Running
+                    nodemanager-0: Running
+                    nodemanager-1: Running
+                    python: Running
+                    rollsite: Running
 ```
 
 ### Other Common Use Scenarios
