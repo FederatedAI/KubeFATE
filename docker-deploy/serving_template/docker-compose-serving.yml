@@ -14,7 +14,7 @@ services:
       - "8000:8000"
     volumes:
       - ./confs/serving-server/conf/serving-server.properties:/data/projects/fate/serving-server/conf/serving-server.properties
-      - ./confs/serving-server/.fate:/root/.fate
+      - ./confs/serving-server/cache:/data/projects/fate/serving-server/.fate
     networks:
       - fate-network
 
