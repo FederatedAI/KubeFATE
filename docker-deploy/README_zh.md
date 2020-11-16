@@ -301,10 +301,8 @@ $ python run_toy_example.py 10000 9999 1        #验证
         "hetero_lr_0": {
             "penalty": "L2",
             "optimizer": "rmsprop",
-            "eps": 1e-5,
             "alpha": 0.01,
             "max_iter": 3,
-            "converge_func": "diff",
             "batch_size": 320,
             "learning_rate": 0.15,
             "init_param": {
