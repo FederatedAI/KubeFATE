@@ -24,7 +24,7 @@ rollsite:
   nodePort: 30091
   partyList:
   - partyId: 10000
-    partyIp: 10.184.101.42
+    partyIp: 192.168.10.1
     partyPort: 30101
 
 python:
@@ -32,5 +32,5 @@ python:
   httpNodePort: 30097
   grpcNodePort: 30092
 
-servingIp: 10.184.101.42
+servingIp: 192.168.9.1
 servingPort: 30095
