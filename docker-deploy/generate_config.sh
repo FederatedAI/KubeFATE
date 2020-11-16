@@ -390,78 +390,6 @@ EOF
 	done
 }
 
-# only used in the k8s deployment
-# TODO modularize the components
-
-GenerateSplittingProxy() {
-	# The default proxy/${party_id} port is 9370
-	# "$#" return the number of args with $0 exclude
-	if [ "$#" -ne 6 ]; then
-		echo ""
-		echo "[ERROR] Illegal number of parameters: want 8 you input $#"
-		echo "The params are party_id federation_ip federation_port fate_flow_ip fate_flow_port exchange_ip"
-		exit 1
-	fi
-	# params:
-	party_id=$1
-	federation_ip=$2
-	federation_port=$3
-	fate_flow_ip=$4
-	fate_flow_port=$5
-	exchange_ip=$6
-
-	echo "Handle Splitting Proxy"
-	module_name=proxy
-	cd ${WORKINGDIR}
-	rm -rf confs-${party_id}/
-	mkdir -p confs-${party_id}/conf
-	cp ${WORKINGDIR}/.env confs-${party_id}
-	cp docker-compose-exchange.yml confs-${party_id}/docker-compose.yml
-	cp -r docker-example-dir-tree/proxy/conf confs-${party_id}/
-	if [ "$RegistryURI" != "" ]; then
-		sed -i 's#federatedai#${RegistryURI}/federatedai#g' ./confs-${party_id}/docker-compose.yml
-	fi
-	sed -i "s#9371:9370#9370:9370#g" ./confs-${party_id}/docker-compose.yml
-	sed -i "s/port=.*/port=9370/g" ./confs-${party_id}/conf/proxy.properties
-	sed -i "s#route.table=.*#route.table=${deploy_dir}/proxy/conf/route_table.json#g" ./confs-${party_id}/conf/proxy.properties
-	sed -i "s/coordinator=.*/coordinator=${party_id}/g" ./confs-${party_id}/conf/proxy.properties
-	sed -i "s/ip=.*/ip=0.0.0.0/g" ./confs-${party_id}/conf/proxy.properties
-	cat >./confs-${party_id}/conf/route_table.json <<EOF
-{
-    "route_table": {
-        "default": {
-            "default": [
-                {
-                    "ip": "${exchange_ip}",
-                    "port": 9370
-                }
-            ]
-        },
-        "${party_id}": {
-            "fateflow": [
-                {
-                    "ip": "${fate_flow_ip}",
-                    "port": ${fate_flow_port}
-                }
-            ],
-            "fate": [
-                {
-                    "ip": "${federation_ip}",
-                    "port": ${federation_port}
-                }
-            ]
-        }
-    },
-    "permission": {
-        "default_allow": true
-    }
-}
-EOF
-	tar -czf ./outputs/confs-${party_id}.tar ./confs-${party_id}
-	rm -rf ./confs-${party_id}
-	echo Splitting proxy of ${party_id} done!
-}
-
 ShowUsage() {
 	echo "Usage: "
 	echo "Generate configuration: bash generate_config.sh"
@@ -475,11 +403,7 @@ CleanOutputDir() {
 }
 
 main() {
-	if [ "$1" = "splitting_proxy" ]; then
-		CleanOutputDir
-		shift
-		GenerateSplittingProxy $@
-	elif [ "$1" != "" ]; then
+	if [ "$1" != "" ]; then
 		ShowUsage
 		exit 1
 	else
