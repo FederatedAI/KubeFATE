@@ -366,7 +366,7 @@ For more details about the testing result, please refer to `python/examples/toy_
 }
 ```
 
-##### Sbumit job
+##### Submit job
 `$ python fate_flow_client.py -f submit_job -d examples/test_hetero_lr_job_dsl.json -c examples/test_hetero_lr_job_conf.json`
 
 output：
