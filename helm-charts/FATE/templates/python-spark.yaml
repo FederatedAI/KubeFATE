@@ -103,6 +103,10 @@ data:
   transfer_conf.yaml: |
     paths: # dir or path
       - "python/federatedml/transfer_variable/auth_conf"
+  pipeline_conf.yaml: |
+    ip: fateflow
+    port: 9380
+    log_directory: /fml_manager/Examples/Pipeline/logs
 ---
 kind: ConfigMap
 apiVersion: v1
@@ -254,6 +258,8 @@ spec:
           ports:
             - containerPort: 20000
           volumeMounts:
+            - mountPath: /data/projects/fate/conf/
+              name: python-confs
             - name: download-dir
               mountPath: /fml_manager/Examples/download_dir
         {{- end }}
