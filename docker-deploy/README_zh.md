@@ -186,7 +186,7 @@ docker-compose上的FATE启动成功之后需要验证各个服务是否都正�
 ```bash
 #在192.168.7.1上执行下列命令
 $ docker exec -it confs-10000_python_1 bash     #进入python组件容器内部
-$ cd /data/projects/fate/python/examples/toy_example               #toy_example目录
+$ cd /data/projects/fate/examples/toy_example   #toy_example目录
 $ python run_toy_example.py 10000 9999 1        #验证
 ```
 
