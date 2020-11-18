@@ -13,8 +13,11 @@ host:
   client: {{ .partyId }}.notebook.kubefate.net
   sparkUI: {{ .partyId }}.spark.kubefate.net
   rabbitmqUI: {{ .partyId }}.rabbitmq.kubefate.net
+
+{{- with .istio }}
 istio:
-  enabled: {{ with .istio }}{{ .enabled | default false }}{{ end }}
+  enabled: {{ .enabled | default false }}
+{{- end }}
 
 exchange:
 {{- with .rollsite }}
@@ -52,7 +55,7 @@ modules:
 
   python: 
     include: {{ has "python" .modules }}
-    backend: {{ .backend }}
+    backend: {{ default "eggroll" .backend }}
     {{- with .python }}
     type: {{ .type }}
     httpNodePort: {{ .httpNodePort }}
