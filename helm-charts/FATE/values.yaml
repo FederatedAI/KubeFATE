@@ -117,16 +117,16 @@ modules:
   spark:
     include: true
     master:
-      Image: "federatedai/spark-master"
-      ImageTag: "1.5.0-release"
+      Image: ""
+      ImageTag: ""
       replicas: 1
       cpu: "100m"
       memory: "512Mi"
       nodeSelector: 
       type: ClusterIP
     worker:
-      Image: "federatedai/spark-worker"
-      ImageTag: "1.5.0-release"
+      Image: ""
+      ImageTag: ""
       replicas: 2
       cpu: "1000m"
       memory: "512Mi"
