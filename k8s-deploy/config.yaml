@@ -1,6 +1,8 @@
 # TODO
 # persistent layer
 
+log:
+  level: info
 user:
   username: admin
   password: admin
