@@ -98,7 +98,7 @@ Then install FATE cluster,
 $ kubefate cluster install -f ./cluster.yaml
 create job success, job id=fe846176-0787-4879-9d27-622692ce181c
 ```
-*If you want to deploy **FATE on Spark** cluster, you can use `cluster- spark.yaml`.*
+*If you want to deploy **FATE on Spark** cluster, you can use `cluster-spark.yaml`.*
 
 #### Check the status of "Install Cluster" job
 A job will be created for installing FATE cluster. Use `kubefate job describe` to check the status of job, util we see the result turns to `install success`

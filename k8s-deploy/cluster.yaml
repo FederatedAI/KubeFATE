@@ -15,7 +15,7 @@ modules:
   - mysql
   - python
   - fateboard
-  # - client
+  - client
   # - spark
   # - hdfs
   # - nginx
