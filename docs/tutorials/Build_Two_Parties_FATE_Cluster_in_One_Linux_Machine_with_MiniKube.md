@@ -14,7 +14,7 @@ After the tutorial, the deployment architecture looks like the following diagram
 4. Network connectivity to dockerhub or 163 Docker Image Registry, and google storage
 5. Setup the global KubeFATE version using in the tutorial and create a folder for the whole tutorial. We use KubeFATE v1.5.0 in this tutorial, other versions should be similar.
 ```
-export version=v1.5.0 && kubefate_version=v1.2.0 && cd ~ && mkdir demo && cd demo
+export version=v1.5.0 && export kubefate_version=v1.2.0 && cd ~ && mkdir demo && cd demo
 ```
 
 **<font color="red">!!!Note: in this tutorial, the IP of the machine we used is 192.168.100.123. Please change it to your machine's IP in all the following commands and config files.</font></div>**
@@ -50,8 +50,29 @@ minikube version: v1.7.3
 commit: 436667c819c324e35d7e839f8116b968a2d0a3ff
 ```
 
+### Install Kubernetes with MiniKube
+In a Linux machine, we suggest using Docker as the hypervisor, which is easy. The details related to [Install MiniKube - Install a Hypervisor](https://kubernetes.io/docs/tasks/tools/install-minikube/#install-a-hypervisor). It is only one command,
+```
+sudo minikube start --vm-driver=none
+```
+Wait a few seconds for the command finish. Verify it, 
+```
+layne@machine:~/demo$ sudo minikube status
+host: Running
+kubelet: Running
+apiserver: Running
+kubeconfig: Configured
+```
+It means Kubernetes has been installed on your machine!
+
+However, by default MiniKube will not enable the Ingress addon, which KubeFATE required, we need to enable it manually,
+```
+sudo minikube addons enable ingress
+```
+Till now, Kubernetes have been ready. 
+
 ### Download KubeFATE Release Pack, KubeFATE Server Image v1.2.0 and Install KubeFATE Command Lines
-Go to [KubeFATE Release](https://github.com/FederatedAI/KubeFATE/releases), and find the latest kubefate-k8s release pack. 
+Go to [KubeFATE Release](https://github.com/FederatedAI/KubeFATE/releases), and find the latest kubefate-k8s release pack, which is `v1.5.0` as set to ENVs before. 
 ```
 curl -LO https://github.com/FederatedAI/KubeFATE/releases/download/${version}/kubefate-k8s-${version}.tar.gz && tar -xzf ./kubefate-k8s-${version}.tar.gz
 ```
@@ -72,7 +93,7 @@ layne@machine:~/demo$ kubefate version
 ```
 It is fine only the command line version shows and get an error on KubeFATE service's version because we have not deployed KubeFATE service yet.
 
-Then, we download the KubeFATE Server Image v1.2.0,
+Then, we download the KubeFATE Server Image v1.2.0 as set to ENVs before,
 ```
 curl -LO https://github.com/FederatedAI/KubeFATE/releases/download/${version}/kubefate-${kubefate_version}.docker
 ```
@@ -84,27 +105,6 @@ layne@machine:~/demo$ docker load < ./kubefate-v1.2.0.docker
 b7ffb386319e: Loading layer [==================================================>]  2.048kB/2.048kB
 Loaded image: federatedai/kubefate:v1.2.0
 ```
-
-## Install Kubernetes with MiniKube
-In a Linux machine, we suggest using Docker as the hypervisor, which is easy. The details related to [Install MiniKube - Install a Hypervisor](https://kubernetes.io/docs/tasks/tools/install-minikube/#install-a-hypervisor). It is only one command,
-```
-sudo minikube start --vm-driver=none
-```
-Wait a few seconds for the command finish. Verify it, 
-```
-layne@machine:~/demo$ sudo minikube status
-host: Running
-kubelet: Running
-apiserver: Running
-kubeconfig: Configured
-```
-It means Kubernetes has been installed on your machine!
-
-However, by default MiniKube will not enable the Ingress addon, which KubeFATE required, we need to enable it manually,
-```
-sudo minikube addons enable ingress
-```
-Till now, Kubernetes have been ready. 
 
 ## Deploy KubeFATE service
 ### Create kube-fate namespace and account for KubeFATE service
@@ -357,7 +357,7 @@ Info            dashboard:
                     python: Running
                     rollsite: Running
 ```
-In `Spec->dashboard` field, we can find there are two dashboards in current deployment: 
+In `Info->dashboard` field, we can find there are two dashboards in current deployment: 
 * Notebook in `9999.notebook.kubefate.net`, which is Jupyter Notebook integrated, where data scientists can write python or access shell in. We have pre-install FATE-clients to the Notebook.
 * FATEBoard in `9999.fateboard.kubefate.net`, which we can inspect the status, job flows in FATE.
 
