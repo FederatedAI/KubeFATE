@@ -224,7 +224,13 @@ spec:
                 mkdir -p /data/projects/fate/conf/
                 cp /data/projects/fate/conf1/transfer_conf.yaml /data/projects/fate/conf/transfer_conf.yaml
                 cp /data/projects/fate/conf1/service_conf.yaml /data/projects/fate/conf/service_conf.yaml
+                cp /data/projects/fate/conf1/pipeline_conf.yaml /data/projects/fate/conf/pipeline_conf.yaml
+                # fix fateflow conf must use IP
                 sed -i "s/host: fateflow/host: ${POD_IP}/g" /data/projects/fate/conf/service_conf.yaml
+                # fix pipeline conf must use IP
+                sed -i "s/ip: fateflow/ip: ${POD_IP}/g" /data/projects/fate/conf/pipeline_conf.yaml
+                # shared examples 
+                cp -r /data/projects/fate/examples /data/projects/fate/examples-shared-for-client
                 sleep 5;
                 source /data/projects/python/venv/bin/activate 
                 python ./fate_flow/fate_flow_server.py
@@ -244,6 +250,10 @@ spec:
             - mountPath: /data/projects/fate/conf/rabbitmq_route_table.yaml
               name: python-confs
               subPath: rabbitmq_route_table.yaml
+            - mountPath: /data/projects/fate/conf/
+              name: shared-dir-conf
+            - mountPath: /data/projects/fate/examples-shared-for-client
+              name: shared-dir-examples
         {{- if .Values.modules.client.include }}
         - image: {{ .Values.image.registry }}/client:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -259,7 +269,10 @@ spec:
             - containerPort: 20000
           volumeMounts:
             - mountPath: /data/projects/fate/conf/
-              name: python-confs
+              name: shared-dir-conf
+            - mountPath: /data/projects/fate/examples
+              name: shared-dir-examples
+              subPath: examples
             - name: download-dir
               mountPath: /fml_manager/Examples/download_dir
         {{- end }}
@@ -294,6 +307,10 @@ spec:
         - name: logs
           emptyDir: {}
         - name: download-dir
+          emptyDir: {}
+        - name: shared-dir-conf
+          emptyDir: {}
+        - name: shared-dir-examples
           emptyDir: {}
 ---
 apiVersion: v1
