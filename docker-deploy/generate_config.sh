@@ -339,7 +339,7 @@ EOF
 		sed -i "s/<redis.password>/${redis_password}/g" ./serving-$party_id/docker-compose.yml
 
 		# serving proxy
-		sed -i "s/coordinator=partyid/coordinator=${party_id}/g" ./serving-$party_id/confs/serving-proxy/conf/application.properties
+		sed -i "s/coordinator=9999/coordinator=${party_id}/g" ./serving-$party_id/confs/serving-proxy/conf/application.properties
 		cat >./serving-$party_id/confs/serving-proxy/conf/route_table.json <<EOF
 {
     "route_table": {
