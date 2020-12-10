@@ -87,7 +87,7 @@ GenerateConfig() {
 			sed -i "s#<party.id>#${party_id}#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
 
 			#python env
-			#sed -i "s#<venv>#${venv_dir}#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
+			sed -i "s#<venv>##g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
 			#pythonpath, very import, do not modify."
 			sed -i "s#<python.path>#/data/projects/fate/python:/data/projects/fate/eggroll/python#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
 
@@ -111,6 +111,11 @@ GenerateConfig() {
         # check if use python-nn
         if [ $enabled_nn = "true" ]; then
 			sed -i 's#image: "federatedai/python:${TAG}"#image: "federatedai/python-nn:${TAG}"#g' ./confs-$party_id/docker-compose.yml
+        fi
+
+        # replace namenode in training_template/public/fate_flow/conf/service_conf.yaml
+        if [ $name_node != "" ]; then
+            sed -i "s#name_node: hdfs://namenode:9000#name_node: ${name_node}#g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
         fi
 
 		# update serving ip
