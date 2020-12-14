@@ -110,7 +110,7 @@ GenerateConfig() {
 
         # check if use python-nn
         if [ $enabled_nn = "true" ]; then
-			sed -i 's#image: "federatedai/python:${TAG}"#image: "federatedai/python-nn:${TAG}"#g' ./confs-$party_id/docker-compose.yml
+            sed -i 's#image: "federatedai/python:${TAG}"#image: "federatedai/python-nn:${TAG}"#g' ./confs-$party_id/docker-compose.yml
         fi
 
         # replace namenode in training_template/public/fate_flow/conf/service_conf.yaml
