@@ -12,28 +12,7 @@
  * limitations under the License.
  *
  */
-package api
 
-import (
-	"github.com/gin-gonic/gin"
-)
+package kube
 
-const ServiceVersion = "v1.3.0"
-
-type Version struct {
-}
-
-// Router is cluster router definition method
-func (c *Version) Router(r *gin.RouterGroup) {
-
-	authMiddleware, _ := GetAuthMiddleware()
-	cluster := r.Group("/version")
-	cluster.Use(authMiddleware.MiddlewareFunc())
-	{
-		cluster.GET("/", c.getVersion)
-	}
-}
-
-func (_ *Version) getVersion(c *gin.Context) {
-	c.JSON(200, gin.H{"msg": "getVersion success", "version": ServiceVersion})
-}
+// Kube is mainly responsible for the change of k8s API version

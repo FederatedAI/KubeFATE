@@ -12,36 +12,18 @@
  * limitations under the License.
  *
  */
-package service
+
+package kube
 
 import (
-	"reflect"
-	"testing"
+	"context"
+
+	v1 "k8s.io/api/apps/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func TestGetNodeIp(t *testing.T) {
-	tests := []struct {
-		name    string
-		want    []int32
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-		{
-			name:    "",
-			want:    nil,
-			wantErr: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := GetNodeIp()
-			if (err != nil) != tt.wantErr {
-				t.Errorf("GetNodeIp() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("GetNodeIp() = %v, want %v", got, tt.want)
-			}
-		})
-	}
+// GetDeployment is get a Deployment
+func (e *Kube) GetDeployment(deploymentName, namespace string) (*v1.Deployment, error) {
+	deployment, err := e.client.AppsV1().Deployments(namespace).Get(context.Background(), deploymentName, metav1.GetOptions{})
+	return deployment, err
 }

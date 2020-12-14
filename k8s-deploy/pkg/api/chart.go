@@ -73,7 +73,7 @@ func (_ *Chart) createChart(c *gin.Context) {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
-	log.Debug().Interface("helmChart", helmChart).Msg("createChart success")
+	log.Debug().Interface("helmChart.Chart", helmChart.Chart).Msg("createChart success")
 	c.JSON(200, gin.H{"msg": "createChart success", "data": gin.H{"helmUUID": helmChart.Uuid}})
 }
 
