@@ -109,7 +109,7 @@ services:
     networks:
       fate-network:
         ipv4_address: 192.167.0.100
-    command: ["/bin/bash", "-c", "python ./fate_flow/fate_flow_server.py"]
+    command: ["/bin/bash", "-c", "sleep 5 && python ./fate_flow/fate_flow_server.py"]
     
   client:
     image: "federatedai/client:${TAG}"
