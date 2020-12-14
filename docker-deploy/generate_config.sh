@@ -86,8 +86,6 @@ GenerateConfig() {
 			sed -i "s#<nodemanager.port>#${nodemanager_port}#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
 			sed -i "s#<party.id>#${party_id}#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
 
-			#python env
-			sed -i "s#<venv>##g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
 			#pythonpath, very import, do not modify."
 			sed -i "s#<python.path>#/data/projects/fate/python:/data/projects/fate/eggroll/python#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
 
