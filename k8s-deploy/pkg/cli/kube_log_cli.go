@@ -48,7 +48,7 @@ func LogCommand() *cli.Command {
 				Value: false,
 				Usage: "If true, print the logs for the previous instance of the container in a pod if it exists.",
 			},
-			&cli.Int64Flag{
+			&cli.DurationFlag{
 				Name:  "since",
 				Usage: "Only return logs newer than a relative duration like 5s, 2m, or 3h. Defaults to all logs. Only one of since-time since may be used.",
 			},
@@ -87,9 +87,8 @@ func LogCommand() *cli.Command {
 			if c.Bool("previous") {
 				args.Set("previous", "true")
 			}
-			if c.Int64("since") != 0 {
-				//TODO: 2s => 2 1m => 60 1h => 3600
-				args.Set("since", fmt.Sprint(c.Int64("since")))
+			if c.Duration("since") != 0 {
+				args.Set("since", fmt.Sprint(c.Duration("since").Seconds()))
 			}
 
 			if c.Timestamp("since-time") != nil {
