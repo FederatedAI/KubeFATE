@@ -112,6 +112,10 @@ spec:
       nodeSelector: 
 {{ toYaml . | indent 8 }}
       {{- end }}
+      {{- with .Values.image.imagePullSecrets }}
+      imagePullSecrets:
+{{ toYaml . | indent 6 }}
+      {{- end }}
       restartPolicy: Always
       volumes:
         - name: rollsite-confs

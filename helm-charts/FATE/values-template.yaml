@@ -4,7 +4,11 @@ image:
   isThridParty: {{ empty .registry | ternary  "false" "true" }}
   tag: 1.5.0-release
   pullPolicy: {{ .pullPolicy | default "IfNotPresent" }}
-
+  {{- with .imagePullSecrets }}
+  imagePullSecrets:
+{{ toYaml . | indent 2 }}
+  {{- end }}
+  
 partyId: {{ .partyId }}
 partyName: {{ .name }}
 
