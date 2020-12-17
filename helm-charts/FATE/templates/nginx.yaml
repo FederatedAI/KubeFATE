@@ -135,6 +135,10 @@ spec:
               subPath: nginx.conf
       {{- with .Values.modules.nginx.nodeSelector }}
       nodeSelector: 
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.image.imagePullSecrets }}
+      imagePullSecrets:
 {{ toYaml . | indent 6 }}
       {{- end }}
       restartPolicy: Always

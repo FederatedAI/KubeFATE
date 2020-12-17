@@ -5,6 +5,8 @@ chartVersion: v1.5.0
 partyId: 9999
 registry: ""
 pullPolicy: 
+imagePullSecrets: 
+- name: myregistrykey
 persistence: false
 istio:
   enabled: false

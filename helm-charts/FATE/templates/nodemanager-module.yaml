@@ -120,6 +120,10 @@ spec:
       nodeSelector: 
 {{ toYaml . | indent 8 }}
       {{- end }}
+      {{- with $root.Values.image.imagePullSecrets }}
+      imagePullSecrets:
+{{ toYaml . | indent 6 }}
+      {{- end }}
       restartPolicy: Always
       volumes:
         - name: nodemanager-confs
