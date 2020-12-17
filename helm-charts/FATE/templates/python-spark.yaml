@@ -165,7 +165,7 @@ spec:
       {{- else }}
       - image: mysql:8
       {{- end }}
-        name: mysql
+        name: ping-mysql
         env:
         - name: MYSQL_DATABASE
           value: {{ .Values.modules.mysql.database }}
