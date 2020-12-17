@@ -67,7 +67,7 @@ metadata:
 {{ include "fate.labels" . | indent 4 }}
 spec:
   ports:
-    - name: "4670"
+    - name: "tcp-clustermanager"
       port: 4670
       targetPort: 4670
       protocol: TCP

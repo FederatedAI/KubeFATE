@@ -46,7 +46,7 @@ spec:
       uri: /
     route:
     - destination:
-        host: fateboard.{{ .Values.partyName }}.svc.cluster.local
+        host: fateboard
         port:
           number: 8080
   - match:
@@ -57,7 +57,7 @@ spec:
         prefix: /queryLogSize
     route:
     - destination:
-        host: fateboard.{{ .Values.partyName }}.svc.cluster.local
+        host: fateboard
         port:
           number: 8080
   - match:
@@ -68,7 +68,7 @@ spec:
         prefix: /v1
     route:
     - destination:
-        host: fateboard.{{ .Values.partyName }}.svc.cluster.local
+        host: fateboard
         port:
           number: 8080
   - match:
@@ -79,7 +79,7 @@ spec:
         prefix: /ssh
     route:
     - destination:
-        host: fateboard.{{ .Values.partyName }}.svc.cluster.local
+        host: fateboard
         port:
           number: 8080
   - match:
@@ -90,7 +90,7 @@ spec:
         prefix: /log
     route:
     - destination:
-        host: fateboard.{{ .Values.partyName }}.svc.cluster.local
+        host: fateboard
         port:
           number: 8080
   - match:
@@ -101,7 +101,7 @@ spec:
         prefix: /job
     route:
     - destination:
-        host: fateboard.{{ .Values.partyName }}.svc.cluster.local
+        host: fateboard
         port:
           number: 8080
 {{ end }}
@@ -113,7 +113,7 @@ spec:
       uri: /
     route:
     - destination:
-        host: notebook.{{ .Values.partyName }}.svc.cluster.local
+        host: notebook
         port:
             number: 20000
 {{ end }}

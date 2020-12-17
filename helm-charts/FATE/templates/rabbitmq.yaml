@@ -87,14 +87,14 @@ metadata:
 {{ include "fate.labels" . | indent 4 }}
 spec:
   ports:
-    - name: "5672"
+    - name: "tcp-rabbitmq"
       port: 5672
       targetPort: 5672
       {{- if eq .Values.modules.rabbitmq.type "NodePort" "LoadBalancer" }}
       nodePort: {{ .Values.modules.rabbitmq.nodePort }}
       {{- end }}
       protocol: TCP
-    - name: "15672"
+    - name: "tcp-rabbitmq1"
       port: 15672
       targetPort: 15672
       protocol: TCP

@@ -146,7 +146,7 @@ metadata:
   name: {{ $nodemanager.name }}
 spec:
   ports:
-    - name: "4671"
+    - name: "tcp-nodemanager"
       port: 4671
       targetPort: 4671
       protocol: TCP

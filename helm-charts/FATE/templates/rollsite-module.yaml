@@ -130,7 +130,7 @@ metadata:
 {{ include "fate.labels" . | indent 4 }}
 spec:
   ports:
-    - name: "9370"
+    - name: "tcp-rollsite"
       port: 9370
       targetPort: 9370
       {{- if eq .Values.modules.rollsite.type "NodePort" "LoadBalancer" }}
