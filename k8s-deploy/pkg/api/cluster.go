@@ -124,11 +124,28 @@ func (_ *Cluster) getCluster(c *gin.Context) {
 		cluster.Spec = make(map[string]interface{})
 	}
 
-	cluster.Info["status"], err = cluster.GetClusterStatus()
+	clusterStatus, err := cluster.GetClusterStatus()
 	if err != nil {
 		log.Error().Err(err).Str("Name", cluster.Name).Str("NameSpace", cluster.NameSpace).Msg("GetClusterStatus error")
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
+	}
+	cluster.Info["status"] = clusterStatus
+
+	podsStatus, exists := clusterStatus["modules"]
+	if exists && podsStatus != nil {
+		for _, v := range podsStatus {
+			if v == "Pending" {
+				cluster.Status = modules.ClusterStatusPending
+				continue
+			} else if v == "Unknown" {
+				cluster.Status = modules.ClusterStatusUnknown
+				continue
+			} else if v == "Failed" {
+				cluster.Status = modules.ClusterStatusFailed
+				break
+			}
+		}
 	}
 	log.Debug().Interface("data", cluster).Msg("getCluster success")
 	c.JSON(200, gin.H{"msg": "getCluster success", "data": &cluster})

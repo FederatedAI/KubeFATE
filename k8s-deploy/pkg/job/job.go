@@ -240,6 +240,8 @@ func generateSubJobs(job *modules.Job, ClusterStatus map[string]string) modules.
 		var subJobStatus string
 		if v == "Running" {
 			subJobStatus = "Success"
+		} else if v == "Failed" || v == "Unknown" || v == "Pending" {
+			subJobStatus = v
 		} else {
 			subJobStatus = "Running"
 		}
