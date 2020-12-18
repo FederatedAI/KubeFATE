@@ -42,28 +42,36 @@ func GetClusterPodStatus(name, namespace string) (map[string]string, error) {
 
 	return GetPodStatus(list), nil
 }
-func GetPodStatus(pods *v1.PodList) map[string]string {
 
+func GetPodStatus(pods *v1.PodList) map[string]string {
 	status := make(map[string]string)
 	for _, v := range pods.Items {
-		for _, vv := range v.Status.ContainerStatuses {
-			if vv.State.Running != nil {
-				status[vv.Name] = "Running"
-				continue
+		/*
+			for _, vv := range v.Status.ContainerStatuses {
+				if vv.State.Running != nil {
+					status[vv.Name] = "Running"
+					continue
+				}
+				if vv.State.Waiting != nil {
+					status[vv.Name] = "Waiting"
+					continue
+				}
+				if vv.State.Terminated != nil {
+					status[vv.Name] = "Terminated"
+					continue
+				}
+				status[vv.Name] = "Unknown"
 			}
-			if vv.State.Waiting != nil {
-				status[vv.Name] = "Waiting"
-				continue
-			}
-			if vv.State.Terminated != nil {
-				status[vv.Name] = "Terminated"
-				continue
-			}
-			status[vv.Name] = "Unknown"
+		*/
+		switch string(v.Status.Phase) {
+		case "Running", "Succeeded", "Pending", "Failed":
+			status[v.Name] = string(v.Status.Phase)
+			continue
+		default:
+			status[v.Name] = "Unknown"
 		}
 	}
 	return status
-
 }
 
 func CheckClusterStatus(ClusterStatus map[string]string) bool {
