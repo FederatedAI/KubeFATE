@@ -3,21 +3,16 @@ Then you should be able to visit the FateBoard portal at {{ .Values.host.fateboa
 For more details, please visit https://github.com/FederatedAI/KubeFATE.
 
 # optional
-{{- if .Values.istio.enabled }}
-If you have enabled the istio, please visit:
-- FateBoard at http://${istio-gateway}/fateboard-{{ .Values.partyId }}/
-- NoteBook at http://${istio-gateway}/notebook-{{ .Values.partyId }}/ 
-{{- else }}
-{{- if .Values.host.fateboard }}
+If you have configured ingress or isto, you may need to add "<host_ip/istio_ip> [ <FateBoard>, <NoteBook>...]"to the hosts.
+{{- if .Values.modules.fateboard.include }}
 - FateBoard at http://{{ .Values.host.fateboard }}
 {{- end }}
-{{- if .Values.host.client }}
+{{- if .Values.modules.client.include  }}
 - NoteBook at http://{{ .Values.host.client }}
 {{- end }}
-{{- if .Values.host.sparkUI }}
+{{- if .Values.modules.spark.include  }}
 - SparkUI at http://{{ .Values.host.sparkUI }}
 {{- end }}
-{{- if .Values.host.rabbitmqUI }}
+{{- if .Values.modules.rabbitmq.include  }}
 - RabbitmqUI at http://{{ .Values.host.rabbitmqUI }}
-{{- end }}
 {{- end }}
