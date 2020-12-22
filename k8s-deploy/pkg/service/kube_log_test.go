@@ -45,7 +45,7 @@ func TestGetLogs(t *testing.T) {
 					Container:  "python",
 					TailLines:  func() *int64 { a := int64(10); return &a }(),
 					Timestamps: true,
-					SinceTime:  time.Now().Add(-10*time.Hour),
+					SinceTime:  time.Now().Add(-10 * time.Hour),
 				},
 			},
 			want:    nil,

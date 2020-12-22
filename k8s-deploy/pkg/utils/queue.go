@@ -267,7 +267,6 @@ func (q *EsQueue) Gets(values []interface{}) (gets, quantity uint32) {
 	return getCnt, posCnt - getCnt
 }
 
-// round 到最近的2的倍数
 func minQuantity(v uint32) uint32 {
 	v--
 	v |= v >> 1
