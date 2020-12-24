@@ -18,18 +18,34 @@ package orm
 import (
 	"bytes"
 
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/mysql"
-	"github.com/rs/zerolog/log"
+	"github.com/spf13/viper"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 )
-
-var DBCLIENT *gorm.DB
 
 type Mysql struct {
 }
 
-func (e *Mysql) GetConnect() string {
-	dbConfig := GetDbConfig()
+type DbConfig struct {
+	Host     string
+	Port     string
+	Name     string
+	Username string
+	Password string
+}
+
+func getDbConfig() *DbConfig {
+	return &DbConfig{
+		Host:     viper.GetString("db.host"),
+		Port:     viper.GetString("db.port"),
+		Name:     viper.GetString("db.name"),
+		Username: viper.GetString("db.username"),
+		Password: viper.GetString("db.password"),
+	}
+}
+
+func (e *Mysql) Open() (db *gorm.DB, err error) {
+	dbConfig := getDbConfig()
 	var conn bytes.Buffer
 	conn.WriteString(dbConfig.Username)
 	conn.WriteString(":")
@@ -42,29 +58,6 @@ func (e *Mysql) GetConnect() string {
 	conn.WriteString("/")
 	conn.WriteString(dbConfig.Name)
 	conn.WriteString("?charset=utf8&parseTime=True&loc=Local&timeout=10s")
-	return conn.String()
-}
-
-func (e *Mysql) Open(dbType string, conn string) (db *gorm.DB, err error) {
-	return gorm.Open(dbType, conn)
-}
-
-func (e *Mysql) Setup() error {
-
-	var err error
-	var db Database
-
-	db = new(Mysql)
-	mysqlConn := db.GetConnect()
-	log.Info().Msg(mysqlConn)
-
-	DBCLIENT, err = db.Open("mysql", mysqlConn)
-
-	if err != nil {
-		log.Error().Msgf("%s connect error %v", "mysql", err)
-		return err
-	} else {
-		log.Info().Msgf("%s connect success!", "mysql")
-	}
-	return nil
+	dsn := conn.String()
+	return gorm.Open(mysql.Open(dsn), &gorm.Config{})
 }

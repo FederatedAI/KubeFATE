@@ -15,9 +15,50 @@
 
 package orm
 
-import "github.com/jinzhu/gorm"
+import (
+	"fmt"
+
+	"github.com/rs/zerolog/log"
+	"github.com/spf13/viper"
+	"gorm.io/gorm"
+)
 
 type Database interface {
-	Open(dbType string, conn string) (db *gorm.DB, err error)
-	GetConnect() string
+	Open() (db *gorm.DB, err error)
+}
+
+func getDbType(Type string) (Database, error) {
+	var database Database
+	switch Type {
+	case "mysql":
+		database = new(Mysql)
+	case "sqlite":
+		database = new(Sqlite)
+	default:
+		err := fmt.Errorf("unknown database type: %s, please use 'mysql' or 'sqlite'", Type)
+		log.Error().Str("Type", Type).Err(err).Msg("unknown db type")
+		return nil, err
+	}
+	return database, nil
+}
+
+func Setup() (*gorm.DB, error) {
+	a := viper.AllSettings()
+	fmt.Println(a)
+	database, err := getDbType(viper.GetString("db.type"))
+	if err != nil {
+		return nil, err
+	}
+	return database.Open()
+}
+
+var DB *gorm.DB
+
+func InitDB() error {
+	db, err := Setup()
+	if err != nil {
+		return err
+	}
+	DB = db
+	return nil
 }

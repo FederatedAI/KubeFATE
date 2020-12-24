@@ -5,13 +5,11 @@ go 1.15
 require (
 	github.com/Masterminds/sprig/v3 v3.1.0
 	github.com/appleboy/gin-jwt/v2 v2.6.3
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-contrib/logger v0.0.2
 	github.com/gin-gonic/gin v1.6.3
 	github.com/gofrs/flock v0.7.1
 	github.com/gosuri/uitable v0.0.4
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
-	github.com/jinzhu/gorm v1.9.14
 	github.com/json-iterator/go v1.1.10
 	github.com/kylelemons/godebug v1.1.0 // indirect
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible // indirect
@@ -30,6 +28,9 @@ require (
 	golang.org/x/net v0.0.0-20200324143707-d3edc9973b7e
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 	gopkg.in/yaml.v2 v2.2.8
+	gorm.io/driver/mysql v1.0.3
+	gorm.io/driver/sqlite v1.1.4
+	gorm.io/gorm v1.20.8
 	helm.sh/helm/v3 v3.2.4
 	k8s.io/api v0.18.5
 	k8s.io/apimachinery v0.18.5
