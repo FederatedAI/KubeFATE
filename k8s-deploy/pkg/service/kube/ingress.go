@@ -18,23 +18,23 @@ package kube
 import (
 	"context"
 
-	extensionsv1beta1 "k8s.io/api/extensions/v1beta1"
+	networkingv1beta1 "k8s.io/api/networking/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // Ingress interface
 type Ingress interface {
-	GetIngress(ingressName, namespace string) (*extensionsv1beta1.Ingress, error)
-	GetIngresses(namespace, labelSelector string) (*extensionsv1beta1.IngressList, error)
+	GetIngress(ingressName, namespace string) (*networkingv1beta1.Ingress, error)
+	GetIngresses(namespace, labelSelector string) (*networkingv1beta1.IngressList, error)
 }
 
 // GetIngress is get a Ingress
-func (e *Kube) GetIngress(ingressName, namespace string) (*extensionsv1beta1.Ingress, error) {
-	ingress, err := e.client.ExtensionsV1beta1().Ingresses(namespace).Get(context.Background(), ingressName, metav1.GetOptions{})
+func (e *Kube) GetIngress(ingressName, namespace string) (*networkingv1beta1.Ingress, error) {
+	ingress, err := e.client.NetworkingV1beta1().Ingresses(namespace).Get(context.Background(), ingressName, metav1.GetOptions{})
 	return ingress, err
 }
 
 // GetIngresses is get list of Ingress
-func (e *Kube) GetIngresses(namespace, labelSelector string) (*extensionsv1beta1.IngressList, error) {
-	return e.client.ExtensionsV1beta1().Ingresses(namespace).List(e.ctx, metav1.ListOptions{LabelSelector: labelSelector})
+func (e *Kube) GetIngresses(namespace, labelSelector string) (*networkingv1beta1.IngressList, error) {
+	return e.client.NetworkingV1beta1().Ingresses(namespace).List(e.ctx, metav1.ListOptions{LabelSelector: labelSelector})
 }
