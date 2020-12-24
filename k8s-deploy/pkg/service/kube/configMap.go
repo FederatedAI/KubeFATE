@@ -12,42 +12,16 @@
  * limitations under the License.
  *
  */
-package service
+
+package kube
 
 import (
-	"os"
-	"sync"
-
-	"helm.sh/helm/v3/pkg/cli"
-
-	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/service/kube"
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-var EnvCs sync.Mutex
-
-type kubeClient interface {
-	kube.Pod
-	kube.Namespace
-	kube.Ingress
-	kube.Node
-	kube.Services
-	kube.Log
-}
-
-var KubeClient kubeClient = &kube.KUBE
-
-func GetSettings(namespace string) (*cli.EnvSettings, error) {
-	EnvCs.Lock()
-	err := os.Setenv("HELM_NAMESPACE", namespace)
-	if err != nil {
-		return nil, err
-	}
-	settings := cli.New()
-	err = os.Unsetenv("HELM_NAMESPACE")
-	if err != nil {
-		return nil, err
-	}
-	EnvCs.Unlock()
-
-	return settings, nil
+// GetConfigMap is get a ConfigMap
+func (e *Kube) GetConfigMap(configMapName, namespace string) (*corev1.ConfigMap, error) {
+	configMap, err := e.client.CoreV1().ConfigMaps(namespace).Get(e.ctx, configMapName, metav1.GetOptions{})
+	return configMap, err
 }

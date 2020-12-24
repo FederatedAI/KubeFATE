@@ -32,8 +32,11 @@ func TestGetClusterInfo(t *testing.T) {
 	}{
 		// TODO: Add test cases.
 		{
-			name:    "",
-			args:    args{},
+			name: "",
+			args: args{
+				name:      "fate-9999",
+				namespace: "fate-9999",
+			},
 			want:    nil,
 			wantErr: false,
 		},

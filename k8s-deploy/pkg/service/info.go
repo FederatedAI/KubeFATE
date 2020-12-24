@@ -12,23 +12,25 @@
  * limitations under the License.
  *
  */
+
 package service
 
+// GetClusterInfo GetClusterInfo
 func GetClusterInfo(name, namespace string) (map[string]interface{}, error) {
-	ip, err := GetNodeIp()
+	ip, err := GetNodeIP()
 	if err != nil {
 		return nil, err
 	}
-	port, err := GetProxySvcNodePorts(name, namespace)
+	port, err := GetProxySvcNodePorts(name, getDefaultNamespace(namespace))
 	if err != nil {
 		return nil, err
 	}
-	podList, err := GetPodList(name, namespace)
+	podList, err := GetPodList(name, getDefaultNamespace(namespace))
 	if err != nil {
 		return nil, err
 	}
 
-	ingressUrlList, err := GetIngressUrl(name, namespace)
+	ingressURLList, err := GetIngressURLList(name, getDefaultNamespace(namespace))
 	if err != nil {
 		return nil, err
 	}
@@ -38,12 +40,12 @@ func GetClusterInfo(name, namespace string) (map[string]interface{}, error) {
 	if len(ip) > 0 {
 		info["ip"] = ip[len(ip)-1]
 	}
-	if len(port) > 0 {
-		info["port"] = port[0]
+	if port != 0 {
+		info["port"] = port
 	}
 	info["pod"] = podList
 
-	info["dashboard"] = ingressUrlList
+	info["dashboard"] = ingressURLList
 
 	return info, nil
 }

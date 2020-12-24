@@ -1,5 +1,6 @@
 *.cfg
 *.idea/
+*.vscode/
 *bin/
 *.todo
 *.exe

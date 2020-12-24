@@ -12,47 +12,38 @@
  * limitations under the License.
  *
  */
+
 package service
 
 import (
-	"context"
 	"fmt"
 
 	v1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func GetProxySvcNodePorts(name, namespace string) ([]int32, error) {
+// GetProxySvcNodePorts return rollsite svc NodePort
+func GetProxySvcNodePorts(name, namespace string) (int32, error) {
 	var labelSelector string
 	labelSelector = fmt.Sprintf("name=%s", name)
-	svcs, err := GetServices(namespace, labelSelector)
+	svcs, err := KubeClient.GetServices(namespace, labelSelector)
 	if err != nil {
-		return nil, err
+		return 0, err
 	}
-
-	var nodePorts []int32
 
 	//svcs.Items[0].GetName()
 	for _, v := range svcs.Items {
-		if v.GetName() == "proxy" {
+		if v.GetName() == "rollsite" {
 			for _, vv := range v.Spec.Ports {
-				nodePorts = append(nodePorts, vv.NodePort)
+				if vv.Port == 9370 {
+					return vv.NodePort, nil
+				}
 			}
 		}
 	}
-	return nodePorts, nil
+	return 0, nil
 }
 
-func GetServices(namespace, LabelSelector string) (*v1.ServiceList, error) {
-	clientset, err := getClientset()
-	if err != nil {
-		return nil, err
-	}
-
-	svcs, err := clientset.CoreV1().Services(namespace).List(context.Background(), metav1.ListOptions{LabelSelector: LabelSelector})
-	return svcs, err
-}
-
+// GetServiceStatus func
 func GetServiceStatus(Services *v1.ServiceList) map[string]string {
 	status := make(map[string]string)
 	for _, v := range Services.Items {
@@ -61,10 +52,11 @@ func GetServiceStatus(Services *v1.ServiceList) map[string]string {
 	return status
 }
 
+// GetClusterServiceStatus func
 func GetClusterServiceStatus(name, namespace string) (map[string]string, error) {
 	var labelSelector string
 	labelSelector = fmt.Sprintf("name=%s", name)
-	list, err := GetServices(namespace, labelSelector)
+	list, err := KubeClient.GetServices(namespace, labelSelector)
 	if err != nil {
 		return nil, err
 	}
