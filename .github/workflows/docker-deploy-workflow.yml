@@ -14,14 +14,14 @@ jobs:
     - name: generate config
       if: success()
       run: |
-        bash ci/docker-deploy/generate_config.sh
+        bash build/ci/docker-deploy/generate_config.sh
 
     - name: docker deploy
       if: success()
       run: |
-        bash ci/docker-deploy/docker_deploy.sh
+        bash build/ci/docker-deploy/docker_deploy.sh
 
     - name: toy example test
       if: success()
       run: |
-        bash ci/docker-deploy/test_cluster.sh
+        bash build/ci/docker-deploy/test_cluster.sh

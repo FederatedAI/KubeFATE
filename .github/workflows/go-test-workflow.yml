@@ -17,7 +17,7 @@ jobs:
         uses: actions/checkout@v1
       - name: Fmt
         run: |
-          bash ci/k8s-deploy/format_check.sh
+          bash build/ci/k8s-deploy/format_check.sh
           #  test:
           #    needs: Lint
           #    name: Test
