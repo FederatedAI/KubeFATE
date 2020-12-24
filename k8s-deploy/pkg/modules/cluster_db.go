@@ -20,7 +20,8 @@ import (
 )
 
 func (e *Cluster) DropTable() {
-	DB.DropTable(&Cluster{})
+	DB.Migrator().DropTable(&Cluster{})
+
 }
 
 func (e *Cluster) InitTable() {
@@ -140,7 +141,7 @@ func (e *Cluster) Get() (Cluster, error) {
 func (e *Cluster) Insert() (id int, err error) {
 
 	// check name namespace
-	var count int
+	var count int64
 	DB.Model(&Cluster{}).Where("name = ?", e.Name).Where("name_space = ?", e.NameSpace).Count(&count)
 	if count > 0 {
 		err = fmt.Errorf("cluster already exists in database, name = %s, namespace=%s", e.Name, e.NameSpace)
@@ -199,7 +200,7 @@ func (e *Cluster) Delete() (bool, error) {
 }
 
 func (e *Cluster) IsExisted(name, namespace string) bool {
-	var count int
+	var count int64
 	DB.Model(&Cluster{}).Where("name = ?", name).Where("name_space = ?", namespace).Count(&count)
 	if DB.Error == nil && count > 0 {
 		return true

@@ -15,6 +15,8 @@
 
 package modules
 
-import "github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/orm"
+import (
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/orm"
+)
 
-var DB = orm.DBCLIENT
+var DB = orm.DB

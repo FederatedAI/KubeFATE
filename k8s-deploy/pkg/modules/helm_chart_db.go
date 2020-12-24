@@ -20,7 +20,7 @@ import (
 )
 
 func (e *HelmChart) DropTable() {
-	DB.DropTable(&HelmChart{})
+	DB.Migrator().DropTable(&HelmChart{})
 }
 
 func (e *HelmChart) InitTable() {
@@ -90,7 +90,7 @@ func (e *HelmChart) Get() (HelmChart, error) {
 func (e *HelmChart) Insert() (id int, err error) {
 
 	// check name namespace
-	var count int
+	var count int64
 	DB.Model(&HelmChart{}).Where("version = ?", e.Version).Count(&count)
 	if count > 0 {
 		err = errors.New("helmChart already exists, version = " + e.Version)
@@ -106,7 +106,7 @@ func (e *HelmChart) Insert() (id int, err error) {
 }
 
 func (e *HelmChart) Upload() (err error) {
-	var count int
+	var count int64
 	if err = DB.Model(&HelmChart{}).Where("version = ?", e.Version).Count(&count).Error; err != nil {
 		return
 	}
@@ -149,7 +149,7 @@ func (e *HelmChart) DeleteByUuid(Uuid string) (success bool, err error) {
 }
 
 func (e *HelmChart) IsExisted() bool {
-	var count int
+	var count int64
 	DB.Model(&HelmChart{}).Where("name = ?", e.Name).Where("version = ?", e.Version).Count(&count)
 	if DB.Error == nil && count > 0 {
 		return true

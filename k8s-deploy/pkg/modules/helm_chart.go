@@ -19,8 +19,8 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 
-	"github.com/jinzhu/gorm"
 	uuid "github.com/satori/go.uuid"
+	"gorm.io/gorm"
 	"helm.sh/helm/v3/pkg/chart"
 )
 

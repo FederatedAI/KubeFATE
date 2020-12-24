@@ -20,7 +20,7 @@ import (
 )
 
 func (e *Job) DropTable() {
-	DB.DropTable(&Job{})
+	DB.Migrator().DropTable(&Job{})
 }
 
 func (e *Job) InitTable() {
@@ -90,7 +90,7 @@ func (e *Job) Get() (Job, error) {
 func (e *Job) Insert() (id int, err error) {
 
 	// check name namespace
-	var count int
+	var count int64
 	DB.Model(&Job{}).Where("uuid = ?", e.Uuid).Count(&count)
 	if count > 0 {
 		err = errors.New("job already exists, uuid = " + e.Uuid)
@@ -166,7 +166,7 @@ func (e *Job) SetSubJobs(subJobs SubJobs) error {
 }
 
 func (e *Job) IsExisted(uuid string) bool {
-	var count int
+	var count int64
 	DB.Model(&Job{}).Where("uuid = ?", uuid).Count(&count)
 	if DB.Error == nil && count > 0 {
 		return true
