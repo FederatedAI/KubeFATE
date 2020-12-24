@@ -4,6 +4,8 @@ image:
   isThridParty:
   tag: 1.5.0-release
   pullPolicy: IfNotPresent
+  imagePullSecrets: 
+#  - name: 
   
 partyId: 9999
 partyName: fate-9999

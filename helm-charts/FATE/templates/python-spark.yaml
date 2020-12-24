@@ -165,6 +165,7 @@ spec:
       {{- else }}
       - image: mysql:8
       {{- end }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
         name: ping-mysql
         env:
         - name: MYSQL_DATABASE
@@ -295,6 +296,10 @@ spec:
       {{- with .Values.modules.python.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.image.imagePullSecrets }}
+      imagePullSecrets:
+{{ toYaml . | indent 6 }}
       {{- end }}
       restartPolicy: Always
       volumes:

@@ -12,34 +12,20 @@
  * limitations under the License.
  *
  */
+
 package service
 
-import (
-	"os"
+// GetNodeIP get a node ip
+func GetNodeIP() ([]string, error) {
 
-	"helm.sh/helm/v3/pkg/action"
-	"helm.sh/helm/v3/pkg/cli"
-	"helm.sh/helm/v3/pkg/release"
-)
-
-func Get(namespace, name string) (*release.Release, error) {
-	EnvCs.Lock()
-	err := os.Setenv("HELM_NAMESPACE", namespace)
-	if err != nil {
-		panic(err)
-	}
-	settings := cli.New()
-	EnvCs.Unlock()
-
-	cfg := new(action.Configuration)
-	client := action.NewGet(cfg)
-	if err := cfg.Init(settings.RESTClientGetter(), settings.Namespace(), os.Getenv("HELM_DRIVER"), Debug); err != nil {
-		return nil, err
-	}
-
-	res, err := client.Run(name)
+	svcs, err := KubeClient.GetNodes("")
 	if err != nil {
 		return nil, err
 	}
-	return res, nil
+
+	var nodeIP []string
+	for _, v := range svcs.Items {
+		nodeIP = append(nodeIP, v.Status.Addresses[0].Address)
+	}
+	return nodeIP, nil
 }

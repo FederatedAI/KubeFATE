@@ -12,42 +12,22 @@
  * limitations under the License.
  *
  */
-package service
+
+package kube
 
 import (
-	"os"
-	"sync"
+	"context"
 
-	"helm.sh/helm/v3/pkg/cli"
-
-	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/service/kube"
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-var EnvCs sync.Mutex
-
-type kubeClient interface {
-	kube.Pod
-	kube.Namespace
-	kube.Ingress
-	kube.Node
-	kube.Services
-	kube.Log
+// Node interface
+type Node interface {
+	GetNodes(labelSelector string) (*corev1.NodeList, error)
 }
 
-var KubeClient kubeClient = &kube.KUBE
-
-func GetSettings(namespace string) (*cli.EnvSettings, error) {
-	EnvCs.Lock()
-	err := os.Setenv("HELM_NAMESPACE", namespace)
-	if err != nil {
-		return nil, err
-	}
-	settings := cli.New()
-	err = os.Unsetenv("HELM_NAMESPACE")
-	if err != nil {
-		return nil, err
-	}
-	EnvCs.Unlock()
-
-	return settings, nil
+// GetNodes is get a node list
+func (e *Kube) GetNodes(labelSelector string) (*corev1.NodeList, error) {
+	return e.client.CoreV1().Nodes().List(context.Background(), metav1.ListOptions{LabelSelector: labelSelector})
 }

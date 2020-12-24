@@ -180,6 +180,7 @@ spec:
         {{- else }}
         - image: mysql:8
         {{- end }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           name: mysql
           env:
             - name: MYSQL_ALLOW_EMPTY_PASSWORD 
@@ -203,6 +204,10 @@ spec:
       {{- with .Values.modules.mysql.nodeSelector }}
       nodeSelector: 
 {{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.image.imagePullSecrets }}
+      imagePullSecrets:
+{{ toYaml . | indent 6 }}
       {{- end }}
       volumes:
         - name: mysql-confs

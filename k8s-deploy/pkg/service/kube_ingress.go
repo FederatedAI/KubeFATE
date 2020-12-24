@@ -12,31 +12,18 @@
  * limitations under the License.
  *
  */
+
 package service
 
 import (
-	"context"
 	"fmt"
-
-	"k8s.io/api/extensions/v1beta1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func GetIngress(name, namespace string) (*v1beta1.IngressList, error) {
-	clientset, err := getClientset()
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	ingressList, err := clientset.ExtensionsV1beta1().Ingresses(namespace).List(context.Background(), metav1.ListOptions{})
-
-	return ingressList, err
-}
-
-func GetIngressUrl(name, namespace string) ([]string, error) {
+// GetIngressURLList is Get Ingress Url list
+func GetIngressURLList(name, namespace string) ([]string, error) {
 	var urls []string
-
-	ingressList, err := GetIngress(name, namespace)
+	labelSelector := getLabelSelector(namespace, name)
+	ingressList, err := KubeClient.GetIngresses(namespace, labelSelector)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
@@ -48,23 +35,4 @@ func GetIngressUrl(name, namespace string) ([]string, error) {
 	}
 
 	return urls, nil
-}
-
-func GetIngressStatus(Services *v1beta1.IngressList) map[string]string {
-	status := make(map[string]string)
-	for _, v := range Services.Items {
-		status[v.Name] = v.Status.String()
-	}
-	return status
-}
-
-func GetClusterIngressStatus(name, namespace string) (map[string]string, error) {
-	var labelSelector string
-	labelSelector = fmt.Sprintf("name=%s", name)
-	list, err := GetIngress(namespace, labelSelector)
-	if err != nil {
-		return nil, err
-	}
-
-	return GetIngressStatus(list), nil
 }
