@@ -51,13 +51,13 @@ vet:
 
 package: kubefate
 	mkdir -p package;
-	cp -r ./{bin/kubefate,cluster.yaml,cluster-serving.yaml,cluster-spark.yaml,config.yaml,kubefate.yaml,rbac-config.yaml,examples} package/;
+	cp -r bin/kubefate cluster.yaml cluster-serving.yaml cluster-spark.yaml config.yaml kubefate.yaml rbac-config.yaml examples package/;
 	tar -czvf kubefate-k8s-${RELEASE_VERSION}.tar.gz -C package/ .;
 	rm -r package;
 
 release: package docker-save
 	mkdir -p release;
-	mv ./{kubefate-k8s-${RELEASE_VERSION}.tar.gz,kubefate-${VERSION}.docker} release/;
+	mv kubefate-k8s-${RELEASE_VERSION}.tar.gz kubefate-${VERSION}.docker release/;
 
 clean:
 	rm -r release
