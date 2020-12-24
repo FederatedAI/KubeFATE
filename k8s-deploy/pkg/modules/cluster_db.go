@@ -31,7 +31,7 @@ func (e *Cluster) InitTable() {
 func (e *Cluster) GetList() ([]Cluster, error) {
 
 	var clusters Clusters
-	table := DB.Model(e)
+	table := DB.Debug().Model(e)
 	if e.Uuid != "" {
 		table = table.Where("uuid = ?", e.Uuid)
 	}
@@ -69,7 +69,7 @@ func (e *Cluster) GetList() ([]Cluster, error) {
 func (e *Cluster) GetListAll(all bool) ([]Cluster, error) {
 
 	var clusters Clusters
-	table := DB.Model(e)
+	table := DB.Debug().Model(e)
 	if e.Uuid != "" {
 		table = table.Where("uuid = ?", e.Uuid)
 	}
@@ -107,7 +107,7 @@ func (e *Cluster) GetListAll(all bool) ([]Cluster, error) {
 func (e *Cluster) Get() (Cluster, error) {
 
 	var cluster Cluster
-	table := DB.Model(e)
+	table := DB.Debug().Model(e)
 	if e.Uuid != "" {
 		table = table.Where("uuid = ?", e.Uuid)
 	}
@@ -142,7 +142,7 @@ func (e *Cluster) Insert() (id int, err error) {
 
 	// check name namespace
 	var count int64
-	DB.Model(&Cluster{}).Where("name = ?", e.Name).Where("name_space = ?", e.NameSpace).Count(&count)
+	DB.Debug().Model(&Cluster{}).Where("name = ?", e.Name).Where("name_space = ?", e.NameSpace).Count(&count)
 	if count > 0 {
 		err = fmt.Errorf("cluster already exists in database, name = %s, namespace=%s", e.Name, e.NameSpace)
 		return
@@ -168,18 +168,18 @@ func (e *Cluster) Update(id int) (update Cluster, err error) {
 }
 
 func (e *Cluster) UpdateByUuid(uuid string) (update Cluster, err error) {
-	if err = DB.Where("uuid = ?", uuid).First(&update).Error; err != nil {
+	if err = DB.Debug().Where("uuid = ?", uuid).First(&update).Error; err != nil {
 		return
 	}
 
-	if err = DB.Model(&update).Updates(&e).Error; err != nil {
+	if err = DB.Debug().Model(&update).Updates(&e).Error; err != nil {
 		return
 	}
 	return
 }
 
 func (e *Cluster) deleteById(id uint) (success bool, err error) {
-	if err = DB.Where("ID = ?", id).Delete(e).Error; err != nil {
+	if err = DB.Debug().Where("ID = ?", id).Delete(e).Error; err != nil {
 		success = false
 		return
 	}
@@ -201,7 +201,7 @@ func (e *Cluster) Delete() (bool, error) {
 
 func (e *Cluster) IsExisted(name, namespace string) bool {
 	var count int64
-	DB.Model(&Cluster{}).Where("name = ?", name).Where("name_space = ?", namespace).Count(&count)
+	DB.Debug().Model(&Cluster{}).Where("name = ?", name).Where("name_space = ?", namespace).Count(&count)
 	if DB.Error == nil && count > 0 {
 		return true
 	}
@@ -209,21 +209,21 @@ func (e *Cluster) IsExisted(name, namespace string) bool {
 }
 
 func (e *Cluster) SetStatus(status ClusterStatus) error {
-	if err := DB.Model(e).Update("status", status).Error; err != nil {
+	if err := DB.Debug().Model(e).Update("status", status).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
 func (e *Cluster) SetSpec(spec MapStringInterface) error {
-	if err := DB.Model(e).Update("spec", spec).Error; err != nil {
+	if err := DB.Debug().Model(e).Update("spec", spec).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
 func (e *Cluster) SetValues(values string) error {
-	if err := DB.Model(e).Update("values", values).Error; err != nil {
+	if err := DB.Debug().Model(e).Update("values", values).Error; err != nil {
 		return err
 	}
 	return nil

@@ -17,10 +17,14 @@ package orm
 
 import (
 	"bytes"
+	"log"
+	"os"
+	"time"
 
 	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 type Mysql struct {
@@ -59,5 +63,14 @@ func (e *Mysql) Open() (db *gorm.DB, err error) {
 	conn.WriteString(dbConfig.Name)
 	conn.WriteString("?charset=utf8&parseTime=True&loc=Local&timeout=10s")
 	dsn := conn.String()
-	return gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	newLogger := logger.New(
+		log.New(os.Stdout, "\r\n", log.LstdFlags),
+		logger.Config{
+			SlowThreshold: time.Second,
+			LogLevel:      logger.Silent,
+			Colorful:      false,
+		},
+	)
+
+	return gorm.Open(mysql.Open(dsn), &gorm.Config{Logger: newLogger})
 }
