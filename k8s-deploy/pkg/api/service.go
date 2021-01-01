@@ -36,8 +36,7 @@ func initUser() error {
 }
 
 func initDb() error {
-	mysql := new(orm.Mysql)
-	return mysql.Setup()
+	return orm.InitDB()
 }
 
 func initTables() {
@@ -59,7 +58,7 @@ func Run() error {
 		return err
 	}
 
-	modules.DB = orm.DBCLIENT
+	modules.DB = orm.DB
 
 	initTables()
 

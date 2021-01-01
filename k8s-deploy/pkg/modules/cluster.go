@@ -21,11 +21,9 @@ import (
 	"encoding/json"
 	"errors"
 
-	"sigs.k8s.io/yaml"
-
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/mysql"
 	uuid "github.com/satori/go.uuid"
+	"gorm.io/gorm"
+	"sigs.k8s.io/yaml"
 )
 
 type Cluster struct {

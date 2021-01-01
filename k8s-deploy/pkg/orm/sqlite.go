@@ -13,10 +13,18 @@
  *
  */
 
-package modules
+package orm
 
 import (
-	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/orm"
+	"github.com/spf13/viper"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 )
 
-var DB = orm.DB
+type Sqlite struct {
+}
+
+func (e *Sqlite) Open() (db *gorm.DB, err error) {
+	dsn := viper.GetString("db.file")
+	return gorm.Open(sqlite.Open(dsn), &gorm.Config{})
+}
