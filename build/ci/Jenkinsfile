@@ -3,21 +3,20 @@ pipeline{
     stages{
         stage("Build"){
             steps{
-                git "https://github.com/FederatedAI/KubeFATE"
-                sh 'cd k8s-deploy && make kubefate'
+                git "https://github.com/jiahaoc1993/jenkins-ci"
             }
         }
         
-        stage("Deploy") {
+        stage("Ping") {
             steps{
-                ansiblePlaybook colorized: false, 
-                credentialsId: 'ssh-jenkins',
-                installation: 'ansible',
-                inventoryContent:
-                    contents: '192.168.0.1'
-                playbook: 'test/playbook.yml', 
-                sudo: true,
-                sudoUser: 'jenkins'
+                    withCredentials([file(credentialsId: 'ansible-inventory', variable: 'FILE')]){
+                    ansiblePlaybook colorized: false, 
+                    credentialsId: 'ssh-ansible',
+                    installation: 'ansible',
+                    inventory: '$FILE',
+                    playbook: 'playbooks/ping.yaml',
+                    disableHostKeyChecking: true
+                }
             }
         }
     }
