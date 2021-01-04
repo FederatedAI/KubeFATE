@@ -4,8 +4,8 @@ on:
     paths:
     - "k8s-deploy/**.go"
 jobs:
-  lint:
-    name: Lint
+  Unit-test:
+    name: Unit Test
     runs-on: ubuntu-latest
     steps:
       - name: Setup
