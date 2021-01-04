@@ -1,0 +1,24 @@
+pipeline{
+    agent any
+    stages{
+        stage("Build"){
+            steps{
+                git "https://github.com/FederatedAI/KubeFATE"
+                sh 'cd k8s-deploy && make kubefate'
+            }
+        }
+        
+        stage("Deploy") {
+            steps{
+                ansiblePlaybook colorized: false, 
+                credentialsId: 'ssh-jenkins',
+                installation: 'ansible',
+                inventoryContent:
+                    contents: '192.168.0.1'
+                playbook: 'test/playbook.yml', 
+                sudo: true,
+                sudoUser: 'jenkins'
+            }
+        }
+    }
+}
