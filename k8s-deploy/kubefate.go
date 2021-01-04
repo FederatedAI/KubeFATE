@@ -21,17 +21,19 @@ import (
 	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/cli"
 	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/utils/config"
 	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/utils/logging"
+	"github.com/rs/zerolog/log"
+	"github.com/spf13/viper"
 )
 
 func main() {
-	if err := config.InitConfig(); err != nil {
-		fmt.Printf("Unable to read in configuration: %s\n", err)
-		os.Exit(1)
+	config.InitViper()
+	logging.InitLog()
+	err := viper.ReadInConfig()
+	if err != nil {
+		log.Debug().Err(err).Msg("load config.yaml error")
 	}
 
-	logging.InitLog()
-
-	err := cli.Run(os.Args)
+	err = cli.Run(os.Args)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
