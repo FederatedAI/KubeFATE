@@ -8,27 +8,14 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     steps:
-      - name: Setup go
+      - name: Setup
         uses: actions/setup-go@v1
         with:
           go-version: 1.14
           id: go
       - name: Code
         uses: actions/checkout@v1
-      - name: Fmt
+      - name: Unit Test
         run: |
-          bash build/ci/k8s-deploy/format_check.sh
-          #  test:
-          #    needs: Lint
-          #    name: Test
-          #    runs-on: ubuntu-latest
-          #    steps:
-          #      - name: Setup go
-          #        uses: actions/setup-go@v1
-          #        with:
-          #            go-version: 1.14
-          #      - name: Code
-          #        uses: actions/checkout@v1
-          #      - name: Test
-          #        run: |
-          #          bash ci/k8s-deploy/go_test.sh
+          cd k8s-deploy
+          make test
