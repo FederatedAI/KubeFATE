@@ -20,7 +20,7 @@ import (
 
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
-	"helm.sh/helm/v3/pkg/kube"
+	"k8s.io/cli-runtime/pkg/genericclioptions"
 	"k8s.io/client-go/kubernetes"
 )
 
@@ -34,10 +34,21 @@ type Kube struct {
 var KUBE Kube
 
 func getClientset() (*kubernetes.Clientset, error) {
-	configFlags := kube.GetConfig(viper.GetString("kube.config"), viper.GetString("kube.context"), viper.GetString("kube.namespace"))
-	config, _ := configFlags.ToRESTConfig()
+
+	config, err := getConfig(viper.GetString("kube.namespace"), viper.GetString("kube.context"), viper.GetString("kube.config")).ToRESTConfig()
+	if err != nil {
+		return nil, err
+	}
 	clientset, err := kubernetes.NewForConfig(config)
 	return clientset, err
+}
+
+func getConfig(namespace, context, kubeConfig string) *genericclioptions.ConfigFlags {
+	cf := genericclioptions.NewConfigFlags(true)
+	cf.Namespace = &namespace
+	cf.Context = &context
+	cf.KubeConfig = &kubeConfig
+	return cf
 }
 
 func init() {
