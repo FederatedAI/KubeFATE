@@ -231,7 +231,7 @@ metadata:
 {{ include "fate.labels" . | indent 4 }}
 spec:
   ports:
-    - name: "3306"
+    - name: "tcp-mysql"
       port: 3306
       targetPort: 3306
       protocol: TCP

@@ -141,15 +141,15 @@ metadata:
 {{ include "fate.labels" . | indent 4 }}
 spec:
   ports:
-    - name: "9000"
+    - name: "tcp-9000"
       port: 9000
       targetPort: 9000
       protocol: TCP
-    - name: "9870"
+    - name: "tcp-9870"
       port: 9870
       targetPort: 9870
       protocol: TCP
-    - name: "50070"
+    - name: "tcp-50070"
       port: 50070
       targetPort: 50070
       protocol: TCP

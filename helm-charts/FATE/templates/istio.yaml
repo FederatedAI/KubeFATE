@@ -12,8 +12,9 @@
 apiVersion: networking.istio.io/v1alpha3
 kind: Gateway
 metadata:
-    name: {{ .Values.partyName }}-gateway
-    # namespace: {{.Namespace}}
+  name: {{ .Values.partyName }}-gateway
+  labels:
+{{ include "fate.labels" . | indent 4 }}
 spec:
   selector:
     istio: ingressgateway # use istio default controller
@@ -24,97 +25,44 @@ spec:
       protocol: HTTP
     hosts:
     - "*"
+{{ if .Values.modules.fateboard.include }}
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
-  name: fate-ingress 
+  name: fateboard
   labels:
 {{ include "fate.labels" . | indent 4 }}
-  # namespace: {{.Namespace}}
 spec:
   hosts:
-  - "*"
+  - {{ .Values.host.fateboard }}
+  gateways:
+    - fate-9999-gateway
+  http:
+    - route:
+        - destination:
+            host: fateboard
+            port:
+              number: 8080
+{{ end }}
+{{ if .Values.modules.client.include }}
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: notebook
+  labels:
+{{ include "fate.labels" . | indent 4 }}
+spec:
+  hosts:
+  - {{ .Values.host.client }}
   gateways:
   - {{ .Values.partyName }}-gateway
   http:
-{{ if .Values.modules.python.include }} 
-  - match:
-    - uri:
-        prefix: /fateboard-{{ .Values.partyId }}
-    rewrite:
-      uri: /
-    route:
+  - route:
     - destination:
-        host: fateboard.{{ .Values.partyName }}.svc.cluster.local
+        host: notebook
         port:
-          number: 8080
-  - match:
-    - headers:
-        referer:
-          regex: .*\/fateboard-{{ .Values.partyId }}\/$
-      uri:
-        prefix: /queryLogSize
-    route:
-    - destination:
-        host: fateboard.{{ .Values.partyName }}.svc.cluster.local
-        port:
-          number: 8080
-  - match:
-    - headers:
-        referer:
-          regex: .*\/fateboard-{{ .Values.partyId }}\/$
-      uri:
-        prefix: /v1
-    route:
-    - destination:
-        host: fateboard.{{ .Values.partyName }}.svc.cluster.local
-        port:
-          number: 8080
-  - match:
-    - headers:
-        referer:
-          regex: .*\/fateboard-{{ .Values.partyId }}\/$
-      uri:
-        prefix: /ssh
-    route:
-    - destination:
-        host: fateboard.{{ .Values.partyName }}.svc.cluster.local
-        port:
-          number: 8080
-  - match:
-    - headers:
-        referer:
-          regex: .*\/fateboard-{{ .Values.partyId }}\/$
-      uri:
-        prefix: /log
-    route:
-    - destination:
-        host: fateboard.{{ .Values.partyName }}.svc.cluster.local
-        port:
-          number: 8080
-  - match:
-    - headers:
-        referer:
-          regex: .*\/fateboard-{{ .Values.partyId }}\/$
-      uri:
-        prefix: /job
-    route:
-    - destination:
-        host: fateboard.{{ .Values.partyName }}.svc.cluster.local
-        port:
-          number: 8080
-{{ end }}
-{{ if .Values.modules.client.include }}  
-  - match:
-    - uri:
-        prefix: /notebook-{{ .Values.partyId }}
-    rewrite:
-      uri: /
-    route:
-    - destination:
-        host: notebook.{{ .Values.partyName }}.svc.cluster.local
-        port:
-            number: 20000
+          number: 20000
 {{ end }}
 {{ end }}
