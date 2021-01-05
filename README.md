@@ -1,3 +1,5 @@
+**Note**: The `master` branch may be in an *unstable* or *even broken* state during development. Please use [releases](https://github.com/FederatedAI/KubeFATE/releases) instead of the `master` branch in order to get a stable set of binaries.
+
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 # Overview
 Federated learning involves multiple parties to collaborately train a machine learning model, therefore it is usually based on a distributed system. KubeteFATE manages federated learning workloads using cloud native technologies such as containers. KubeFATE enables federated learning jobs to run across public, private and hybrid cloud environments.
