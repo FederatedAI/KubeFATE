@@ -36,7 +36,7 @@ data:
     use_registry: false
     fateflow:
       # you must set real ip address or 127.0.0.1, 0.0.0.0 is not supported
-      host: fateflow
+      host: {{ if .Values.istio.enabled }}127.0.0.1{{ else }}fateflow{{ end }}
       http_port: 9380
       grpc_port: 9360
       # support rollsite or nginx as a coordinate proxy, rollsite recommended in the fate on eggroll, nginx is recommended in the fate on spark
@@ -104,7 +104,7 @@ data:
     paths: # dir or path
       - "python/federatedml/transfer_variable/auth_conf"
   pipeline_conf.yaml: |
-    ip: fateflow
+    ip: {{ if .Values.istio.enabled }}127.0.0.1{{ else }}fateflow{{ end }}
     port: 9380
     log_directory: /fml_manager/Examples/Pipeline/logs
 ---
@@ -118,7 +118,7 @@ metadata:
 data:
   application.properties: |
     server.port=8080
-    fateflow.url=http://fateflow:9380
+    fateflow.url=http://{{ if .Values.istio.enabled }}127.0.0.1{{ else }}fateflow{{ end }}:9380
     spring.datasource.driver-Class-Name=com.mysql.cj.jdbc.Driver
     spring.http.encoding.charset=UTF-8
     spring.http.encoding.enabled=true
@@ -157,13 +157,16 @@ spec:
         fateMoudle: python
 {{ include "fate.labels" . | indent 8 }}
     spec:
+      {{- if .Values.istio.enabled }}
+      {{- else }}
       initContainers:
       {{- if .Values.image.isThridParty }}
       - image: {{ .Values.image.registry }}/mysql:8
       {{- else }}
       - image: mysql:8
       {{- end }}
-        name: mysql
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        name: ping-mysql
         env:
         - name: MYSQL_DATABASE
           value: {{ .Values.modules.mysql.database }}
@@ -196,6 +199,7 @@ spec:
           }
           echo "Waiting for mysql started..."
           checkMySQL
+      {{- end }}
       containers:
         - name: python
           {{- if eq .Values.modules.python.backend  "spark" }}
@@ -262,7 +266,7 @@ spec:
             - name: partyId
               value: {{ .Values.partyId | quote  }}
             - name: FATE_FLOW_HOST
-              value: "fateflow:9380"
+              value: "{{ if .Values.istio.enabled }}127.0.0.1{{ else }}fateflow{{ end }}:9380"
             - name: FATE_SERVING_HOST
               value: "{{.Values.modules.serving.ip}}:{{.Values.modules.serving.port}}"
           ports:
@@ -293,6 +297,10 @@ spec:
       nodeSelector:
 {{ toYaml . | indent 8 }}
       {{- end }}
+      {{- with .Values.image.imagePullSecrets }}
+      imagePullSecrets:
+{{ toYaml . | indent 6 }}
+      {{- end }}
       restartPolicy: Always
       volumes:
         - name: eggroll-confs
@@ -322,11 +330,11 @@ metadata:
 {{ include "fate.labels" . | indent 4 }}
 spec:
   ports:
-    - name: "9360"
+    - name: "tcp-grpc"
       port: 9360
       targetPort: 9360
       protocol: TCP
-    - name: "9380"
+    - name: "tcp-http"
       port: 9380
       targetPort: 9380
       protocol: TCP
@@ -345,14 +353,14 @@ metadata:
 {{ include "fate.labels" . | indent 4 }}
 spec:
   ports:
-    - name: "grpc"
+    - name: "tcp-grpc"
       port: 9360
       targetPort: 9360
       {{- if eq .Values.modules.python.type "NodePort" "LoadBalancer" }}
       nodePort: {{ .Values.modules.python.grpcNodePort }}
       {{- end }}
       protocol: TCP
-    - name: "http"
+    - name: "tcp-http"
       port: 9380
       targetPort: 9380
       {{- if eq .Values.modules.python.type "NodePort" "LoadBalancer" }}
@@ -374,7 +382,7 @@ metadata:
 {{ include "fate.labels" . | indent 4 }}
 spec:
   ports:
-    - name: "8080"
+    - name: "tcp-fateboard"
       port: 8080
       targetPort: 8080
       protocol: TCP
@@ -394,7 +402,7 @@ metadata:
 {{ include "fate.labels" . | indent 4 }}
 spec:
   ports:
-    - name: "20000"
+    - name: "tcp-notebook"
       port: 20000
       targetPort: 20000
       protocol: TCP

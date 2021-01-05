@@ -1,23 +1,30 @@
 BUILD-PATH = ${shell pwd}
-K8S-DEPLOY="./k8s-deploy"
+K8S-DEPLOY = ./k8s-deploy
+CHART = ./helm-charts
+FML = ./fml_manager
+RELEASE_VERSION ?= v1.5.0
 
 define sub_make
  cd $1 && make $2 && cd ${BUILD-PATH}
 endef
 
-all: build-linux-binary zip build-docker-image
+all: release
 
-build-linux-binary:
-	$(call sub_make, ${K8S-DEPLOY}, build-linux-binary)
-
-build-docker-image:
-	$(call sub_make, ${K8S-DEPLOY}, build-docker-image)
-
-zip:
-	tar -czvf kubefate-docker-compose-${RELEASE_VERSION}.tar.gz ./docker-deploy/* ./docker-deploy/.env
-
-release: zip
-	${call sub_make, ${K8S-DEPLOY}, release RELEASE_VERSION=${RELEASE_VERSION}} && mv ${K8S-DEPLOY}/kubefate-k8s-${RELEASE_VERSION}.tar.gz ./ && curl -LJO https://federatedai.github.io/KubeFATE/package/fate-${RELEASE_VERSION}.tgz 
+release: k8s-release docker-compose-release helm-chart-release
+	mkdir -p ${BUILD-PATH}/release
+	mv ${K8S-DEPLOY}/release/* release/
+	mv ${BUILD-PATH}/kubefate-docker-compose-${RELEASE_VERSION}.tar.gz release/
+	mv ${CHART}/fate-*.tgz release/
 
 clean:
-	rm kubefate-docker-compose-*.tar.gz kubefate-k8s-*.tar.gz fate-*.tgz && $(call sub_make, ${K8S-DEPLOY}, clean)
+	rm -r release
+
+k8s-release:
+	${call sub_make, ${K8S-DEPLOY}, release RELEASE_VERSION=${RELEASE_VERSION}}
+docker-compose-release:
+	tar -czvf kubefate-docker-compose-${RELEASE_VERSION}.tar.gz ./docker-deploy/* ./docker-deploy/.env
+helm-chart-release:
+	${call sub_make, ${CHART}, release  RELEASE_VERSION=${RELEASE_VERSION}}
+
+fml-release:
+	${call sub_make, ${FML}, docker-save VERSION=${RELEASE_VERSION}}

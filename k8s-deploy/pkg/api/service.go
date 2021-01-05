@@ -36,8 +36,7 @@ func initUser() error {
 }
 
 func initDb() error {
-	mysql := new(orm.Mysql)
-	return mysql.Setup()
+	return orm.InitDB()
 }
 
 func initTables() {
@@ -52,6 +51,9 @@ func Run() error {
 	log.Info().Msgf("logLevel: %v", viper.GetString("log.level"))
 	log.Info().Msgf("api version: %v", ApiVersion)
 	log.Info().Msgf("service version: %v", ServiceVersion)
+	log.Info().Msgf("DbType: %v", viper.GetString("db.type"))
+	log.Info().Msgf("LogNocolor: %v", viper.GetString("log.nocolor"))
+	log.Info().Msgf("server: [%s:%s]", viper.GetString("server.address"), viper.GetString("server.port"))
 
 	err := initDb()
 	if err != nil {
@@ -59,7 +61,7 @@ func Run() error {
 		return err
 	}
 
-	modules.DB = orm.DBCLIENT
+	modules.DB = orm.DB
 
 	initTables()
 
@@ -68,10 +70,6 @@ func Run() error {
 		log.Error().Err(err).Msg("initUser error, ")
 		return err
 	}
-	//err := service.InitKubeConfig()
-	//if err != nil {
-	//	panic(err)
-	//}
 
 	// use gin.New() instead
 	r := gin.New()

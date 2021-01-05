@@ -1,4 +1,4 @@
-release: lint
+release:
 	helm package ./FATE
 	helm package ./FATE-Serving
 lint:

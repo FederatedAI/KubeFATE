@@ -18,23 +18,23 @@ import (
 	"os"
 	"sync"
 
-	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/cli"
 
-	"github.com/spf13/viper"
-
-	"helm.sh/helm/v3/pkg/kube"
-	"k8s.io/client-go/kubernetes"
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/service/kube"
 )
 
 var EnvCs sync.Mutex
 
-func getClientset() (*kubernetes.Clientset, error) {
-	configFlags := kube.GetConfig(viper.GetString("kube.config"), viper.GetString("kube.context"), viper.GetString("kube.namespace"))
-	config, _ := configFlags.ToRESTConfig()
-	clientset, err := kubernetes.NewForConfig(config)
-	return clientset, err
+type kubeClient interface {
+	kube.Pod
+	kube.Namespace
+	kube.Ingress
+	kube.Node
+	kube.Services
+	kube.Log
 }
+
+var KubeClient kubeClient = &kube.KUBE
 
 func GetSettings(namespace string) (*cli.EnvSettings, error) {
 	EnvCs.Lock()
@@ -50,16 +50,4 @@ func GetSettings(namespace string) (*cli.EnvSettings, error) {
 	EnvCs.Unlock()
 
 	return settings, nil
-}
-
-func GetCfg(namespace string) (*action.Configuration, error) {
-	settings, err := GetSettings(namespace)
-	if err != nil {
-		return nil, err
-	}
-	cfg := new(action.Configuration)
-	if err := cfg.Init(settings.RESTClientGetter(), settings.Namespace(), os.Getenv("HELM_DRIVER"), Debug); err != nil {
-		return nil, err
-	}
-	return cfg, nil
 }

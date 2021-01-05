@@ -24,9 +24,7 @@ func Router(r *gin.Engine) {
 
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(200, gin.H{
-			"msg":             "kubefate run success",
-			"api_version":     ApiVersion,
-			"service_version": ServiceVersion,
+			"msg": "kubefate run success",
 		})
 	})
 
@@ -53,5 +51,8 @@ func Router(r *gin.Engine) {
 
 		namespace := new(Namespace)
 		namespace.Router(v1)
+
+		kubeLog := new(kubeLog)
+		kubeLog.Router(v1)
 	}
 }

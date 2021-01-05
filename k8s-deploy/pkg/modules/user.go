@@ -20,10 +20,9 @@ import (
 	"crypto/sha256"
 	"fmt"
 
-	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/orm"
-	"github.com/jinzhu/gorm"
 	uuid "github.com/satori/go.uuid"
 	"golang.org/x/crypto/pbkdf2"
+	"gorm.io/gorm"
 	"k8s.io/apimachinery/pkg/util/rand"
 )
 
@@ -86,10 +85,10 @@ func NewUser(username string, password string, email string) *User {
 }
 
 func (e *User) IsValid() bool {
-	db := orm.DBCLIENT
+
 	gotUser := new(User)
-	db.Where("username = ?", e.Username).First(&gotUser)
-	if db.Error != nil || gotUser == nil {
+	DB.Where("username = ?", e.Username).First(&gotUser)
+	if DB.Error != nil || gotUser == nil {
 		return false
 	}
 
@@ -101,7 +100,7 @@ func (e *User) IsValid() bool {
 
 func (e *User) IsExisted() bool {
 
-	var count int
+	var count int64
 	DB.Model(&User{}).Where("username = ?", e.Username).Count(&count)
 	if DB.Error == nil && count > 0 {
 		return true

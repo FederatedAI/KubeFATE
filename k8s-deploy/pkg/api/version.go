@@ -18,7 +18,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-const ServiceVersion = "v1.2.0"
+const ServiceVersion = "v1.3.0"
 
 type Version struct {
 }

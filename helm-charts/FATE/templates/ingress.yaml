@@ -8,8 +8,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+{{ if .Values.istio.enabled }}
+{{ else }}
 {{ if .Values.modules.fateboard.include }}
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
   name: fateboard
@@ -29,7 +31,7 @@ spec:
 {{ end }}
 
 {{ if .Values.modules.client.include }}
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
   name: client
@@ -49,7 +51,7 @@ spec:
 {{ end }}
 
 {{ if .Values.modules.spark.include }}
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
   name: spark
@@ -69,7 +71,7 @@ spec:
 {{ end }}
 
 {{ if .Values.modules.rabbitmq.include }}
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
   name: rabbitmq
@@ -86,4 +88,5 @@ spec:
           serviceName: rabbitmq
           servicePort: 15672
 ---
+{{ end }}
 {{ end }}

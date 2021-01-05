@@ -180,6 +180,7 @@ spec:
         {{- else }}
         - image: mysql:8
         {{- end }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           name: mysql
           env:
             - name: MYSQL_ALLOW_EMPTY_PASSWORD 
@@ -204,6 +205,10 @@ spec:
       nodeSelector: 
 {{ toYaml . | indent 8 }}
       {{- end }}
+      {{- with .Values.image.imagePullSecrets }}
+      imagePullSecrets:
+{{ toYaml . | indent 6 }}
+      {{- end }}
       volumes:
         - name: mysql-confs
           configMap:
@@ -226,7 +231,7 @@ metadata:
 {{ include "fate.labels" . | indent 4 }}
 spec:
   ports:
-    - name: "3306"
+    - name: "tcp-mysql"
       port: 3306
       targetPort: 3306
       protocol: TCP

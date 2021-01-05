@@ -20,7 +20,7 @@ import (
 )
 
 func (e *User) DropTable() {
-	DB.DropTable(&User{})
+	DB.Migrator().DropTable(&User{})
 }
 
 func (e *User) InitTable() {
@@ -91,7 +91,7 @@ func (e *User) Insert() (id int, err error) {
 	e.Encrypt()
 
 	// check username
-	var count int
+	var count int64
 	DB.Model(&User{}).Where("username = ?", e.Username).Count(&count)
 	if count > 0 {
 		err = errors.New("Account already exists!")
