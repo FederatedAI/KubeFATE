@@ -1,0 +1,23 @@
+pipeline{
+    agent any
+    stages{
+        stage("Build"){
+            steps{
+                git "https://github.com/jiahaoc1993/jenkins-ci"
+            }
+        }
+        
+        stage("Ping") {
+            steps{
+                    withCredentials([file(credentialsId: 'ansible-inventory', variable: 'FILE')]){
+                    ansiblePlaybook colorized: false, 
+                    credentialsId: 'ssh-ansible',
+                    installation: 'ansible',
+                    inventory: '$FILE',
+                    playbook: 'playbooks/ping.yaml',
+                    disableHostKeyChecking: true
+                }
+            }
+        }
+    }
+}
