@@ -33,7 +33,7 @@ rollsite:
 ~~~
 
 ## Design
-![image-20210108103123025](/Users/zhangcengguang/Library/Application Support/typora-user-images/image-20210108103123025.png)
+![image-20210108103123025](diagrams/ExchangeLB-arch.png)
 
 We set the original only one exchange server to multiple, and add the load balancer of the exchange server to the Nginx module, which can load balance multiple tasks among different users to different exchange servers, improve transmission efficiency and avoid single points malfunction. For implementation, we should start multiple exchange servers, and add the nginx module to the  configuration `yaml` file.
 
