@@ -28,7 +28,7 @@ import (
 )
 
 type Job struct {
-	Uuid      string        `json:"uuid" gorm:"type:varchar(36);index:uuid;unique"`
+	Uuid      string        `json:"uuid" gorm:"type:varchar(36);index;unique"`
 	StartTime time.Time     `json:"start_time" gorm:"default:Null"`
 	EndTime   time.Time     `json:"end_time" gorm:"default:Null"`
 	Method    string        `json:"method" gorm:"type:varchar(16);not null"`

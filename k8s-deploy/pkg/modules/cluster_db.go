@@ -24,8 +24,8 @@ func (e *Cluster) DropTable() {
 
 }
 
-func (e *Cluster) InitTable() {
-	DB.AutoMigrate(&Cluster{})
+func (e *Cluster) InitTable() error {
+	return DB.AutoMigrate(&Cluster{})
 }
 
 func (e *Cluster) GetList() ([]Cluster, error) {

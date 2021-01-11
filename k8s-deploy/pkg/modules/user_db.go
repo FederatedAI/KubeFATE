@@ -23,8 +23,8 @@ func (e *User) DropTable() {
 	DB.Migrator().DropTable(&User{})
 }
 
-func (e *User) InitTable() {
-	DB.AutoMigrate(&User{})
+func (e *User) InitTable() error {
+	return DB.AutoMigrate(&User{})
 }
 
 func (e *User) GetList() ([]User, error) {
