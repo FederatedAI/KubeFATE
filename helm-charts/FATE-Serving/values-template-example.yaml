@@ -4,6 +4,7 @@ chartName: fate-serving
 chartVersion: v2.0.0
 partyId: 10000
 registry: ""
+imageTag: ""
 pullPolicy: 
 persistence: false
 istio:
