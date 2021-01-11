@@ -36,10 +36,9 @@ func VersionCommand() *cli.Command {
 			fmt.Printf("* kubefate commandLine version=%s\r\n", api.ServiceVersion)
 			serviceVersion, err := GetServiceVersion()
 			if err != nil {
-				fmt.Printf("* kubefate service connection error, %s\r\n", err.Error())
-			} else {
-				fmt.Printf("* kubefate service version=%s\r\n", serviceVersion)
+				return fmt.Errorf("* kubefate service connection error, %s", err.Error())
 			}
+			fmt.Printf("* kubefate service version=%s\r\n", serviceVersion)
 			return nil
 		},
 	}

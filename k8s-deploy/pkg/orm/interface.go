@@ -43,8 +43,6 @@ func getDbType(Type string) (Database, error) {
 }
 
 func Setup() (*gorm.DB, error) {
-	a := viper.AllSettings()
-	fmt.Println(a)
 	database, err := getDbType(viper.GetString("db.type"))
 	if err != nil {
 		return nil, err

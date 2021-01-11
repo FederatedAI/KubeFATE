@@ -23,8 +23,8 @@ func (e *Job) DropTable() {
 	DB.Migrator().DropTable(&Job{})
 }
 
-func (e *Job) InitTable() {
-	DB.AutoMigrate(&Job{})
+func (e *Job) InitTable() error {
+	return DB.AutoMigrate(&Job{})
 }
 
 func (e *Job) GetList() ([]Job, error) {

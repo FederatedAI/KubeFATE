@@ -23,8 +23,8 @@ func (e *HelmChart) DropTable() {
 	DB.Migrator().DropTable(&HelmChart{})
 }
 
-func (e *HelmChart) InitTable() {
-	DB.AutoMigrate(&HelmChart{})
+func (e *HelmChart) InitTable() error {
+	return DB.AutoMigrate(&HelmChart{})
 }
 
 func (e *HelmChart) GetList() ([]HelmChart, error) {
