@@ -3,7 +3,7 @@ dir=$(cd $(dirname $0) && pwd)
 
 source $dir/color.sh
 
-kubefateWorkDir=$dir/../../k8s-deploy
+kubefateWorkDir=$dir/../k8s-deploy
 
 check_kubectl() {
     # check kubectl
@@ -26,7 +26,8 @@ kubefate_install() {
     loginfo "apply kubefate"
     # Is mirror specified
     if [$KubeFATE_IMG == ""]; then
-        IMG=federatedai/kubefate:latest
+        # IMG=federatedai/kubefate:latest
+        IMG=federatedai/kubefate:${KUBEFATE_VERSION}
     else
         IMG=$KubeFATE_IMG
     fi
@@ -42,7 +43,7 @@ kubefate_install() {
     for ((i = 1; i <= $MAX_TRY; i++)); do
         status=$(kubectl get pod -l fate=kubefate -n kube-fate -o jsonpath='{.items[0].status.phase}')
         if [ $status == "Running" ]; then
-            sleep 5
+            sleep 20
             echo "# kubefate are ok"
             return 0
         fi
@@ -72,7 +73,7 @@ set_host() {
 
 check_kubefate_version() {
     cd $kubefateWorkDir
-    bin/kubefate version
+    kubefate version
     if [ $? -ne 0 ]; then
         logerror "kubefate command line error, checkout ingress"
         return 1
@@ -132,7 +133,7 @@ jobUUID=""
 cluster_install() {
     # create cluster
     loginfo "Cluster Install"
-    rust=$(bin/kubefate cluster install -f cluster.yaml)
+    rust=$(kubefate cluster install -f cluster.yaml)
     jobUUID=$(echo $rust | sed "s/^.*=//g" | sed "s/\r//g")
     logdebug "jobUUID=$jobUUID"
     if [[ $jobUUID == "" ]]; then
@@ -141,14 +142,14 @@ cluster_install() {
     fi
     MAX_TRY=120
     for ((i = 1; i <= $MAX_TRY; i++)); do
-        jobstatus=$(bin/kubefate job describe $jobUUID | grep -w Status | awk '{print $2}')
+        jobstatus=$(kubefate job describe $jobUUID | grep -w Status | awk '{print $2}')
         if [[ $jobstatus == "Success" ]]; then
             logsuccess "ClusterInstall job success"
             return 0
         fi
         if [[ $jobstatus != "Pending" ]] && [[ $jobstatus != "Running" ]]; then
             logerror "ClusterInstall job status error, status: $jobstatus"
-            bin/kubefate job describe $jobUUID
+            kubefate job describe $jobUUID
             exit 1
         fi
         echo "[INFO] Current kubefate ClusterInstall job status: $jobstatus want Success"
@@ -156,14 +157,14 @@ cluster_install() {
     done
 
     logerror "ClusterInstall job timeOut, please check"
-    bin/kubefate job describe $jobUUID
+    kubefate job describe $jobUUID
     return 1
 }
 
 cluster_update() {
     # update cluster
     loginfo "Cluster Update"
-    rust=$(bin/kubefate cluster update -f cluster-spark.yaml)
+    rust=$(kubefate cluster update -f cluster-spark.yaml)
     jobUUID=$(echo $rust | sed "s/^.*=//g" | sed "s/\r//g")
     logdebug "jobUUID=$jobUUID"
     if [[ $jobUUID == "" ]]; then
@@ -171,14 +172,14 @@ cluster_update() {
         return 1
     fi
     for ((i = 1; i <= $MAX_TRY; i++)); do
-        jobstatus=$(bin/kubefate job describe $jobUUID | grep -w Status | awk '{print $2}')
+        jobstatus=$(kubefate job describe $jobUUID | grep -w Status | awk '{print $2}')
         if [[ $jobstatus == "Success" ]]; then
             logsuccess "ClusterUpdate job success"
             return 0
         fi
         if [[ $jobstatus != "Pending" ]] && [[ $jobstatus != "Running" ]]; then
             logerror "ClusterUpdate job status error, status: $jobstatus"
-            bin/kubefate job describe $jobUUID
+            kubefate job describe $jobUUID
             return 1
         fi
         echo "[INFO] Current kubefate ClusterUpdate job status: $jobstatus want Success"
@@ -186,7 +187,7 @@ cluster_update() {
     done
 
     logerror "ClusterUpdate job timeOut, please check"
-    bin/kubefate job describe $jobUUID
+    kubefate job describe $jobUUID
     return 1
 }
 clusterUUID=""
@@ -194,10 +195,10 @@ check_cluster_status() {
     # cluster list
     # gotUUID=$(bin/kubefate cluster list |  grep -w  | awk '{print $2}' )
     loginfo "Cluster Describe"
-    clusterUUID=$(bin/kubefate job describe $jobUUID | grep -w ClusterId | awk '{print $2}')
+    clusterUUID=$(kubefate job describe $jobUUID | grep -w ClusterId | awk '{print $2}')
     logdebug "clusterUUID=$clusterUUID"
     # cluster describe
-    clusterStatus=$(bin/kubefate cluster describe $clusterUUID | grep -w Status | awk '{print $2}')
+    clusterStatus=$(kubefate cluster describe $clusterUUID | grep -w Status | awk '{print $2}')
     if [ $clusterStatus == "Running" ]; then
         logsuccess "Cluster Status is Running"
     else
@@ -210,7 +211,7 @@ check_cluster_status() {
 cluster_delete() {
     # delete cluster
     loginfo "Cluster Delete"
-    rust=$(bin/kubefate cluster delete $clusterUUID)
+    rust=$(kubefate cluster delete $clusterUUID)
     jobUUID=$(echo $rust | sed "s/^.*=//g" | sed "s/\r//g")
     logdebug "jobUUID=$jobUUID"
     if [[ $jobUUID == "" ]]; then
@@ -218,20 +219,20 @@ cluster_delete() {
         return 1
     fi
     for ((i = 1; i <= $MAX_TRY; i++)); do
-        jobstatus=$(bin/kubefate job describe $jobUUID | grep -w Status | awk '{print $2}')
+        jobstatus=$(kubefate job describe $jobUUID | grep -w Status | awk '{print $2}')
         if [[ $jobstatus == "Success" ]]; then
             logsuccess "ClusterDelete job success"
             return 0
         fi
         if [[ $jobstatus != "Pending" ]] && [[ $jobstatus != "Running" ]]; then
             logerror "ClusterDelete job status error, status: $jobstatus"
-            bin/kubefate job describe $jobUUID
+            kubefate job describe $jobUUID
             return 1
         fi
         echo "[INFO] Current kubefate ClusterDelete job status: $jobstatus want Success"
         sleep 3
     done
     logerror "ClusterDelete job timeOut, please check"
-    bin/kubefate job describe $jobUUID
+    kubefate job describe $jobUUID
     return 1
 }

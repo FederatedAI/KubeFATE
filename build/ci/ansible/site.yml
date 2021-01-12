@@ -11,6 +11,7 @@
     FATE_VERSION: "{{ fate_version }}"
     FATE_SERVING_VERSION: "{{ fate_serving_version }}"
     KUBEFATE_VERSION: "{{ kubefate_version }}"
+    KUBEFATE_CLI_VERSION: "{{ kubefate_cli_version }}"
     DOCKER_REGISTRY: "{{ docker_registry }}"
     INGRESS_TIMEOUT: 120
     KUBEFATE_SERVICE_TIMEOUT: 120
