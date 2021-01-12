@@ -1,0 +1,50 @@
+---
+- name: Copy check file to remote host
+  copy:
+    src: check_status.sh
+    dest: /tmp/check_status.sh
+    mode: 0755
+  tags: run
+
+- name: Check if another job is running
+  shell: /bin/bash /tmp/check_status.sh
+  tags: run
+
+- name: Add group "kubecicd"
+  group:
+    name: kubecicd
+  become: yes
+
+- name: Add user "kubecicd"
+  user:
+    name: kubecicd
+    group: kubecicd
+    home: /home/kubecicd
+  become: yes
+
+- name: Download kubectl
+  get_url:
+    url: https://storage.googleapis.com/kubernetes-release/release/v1.17.3/bin/linux/amd64/kubectl
+    dest: /tmp/kubectl
+
+- name: Copy kubefate project
+  copy:
+    src: kubefate.tar.gz
+    dest: /tmp/kubefate.tar.gz
+
+- name: Extract project
+  unarchive:
+    src: /tmp/kubefate.tar.gz
+    dest: /tmp/
+    remote_src: yes
+
+- name: Copy Clean Script to remote host
+  copy:
+    src: clean.sh
+    dest: /tmp/clean.sh
+    mode: 0755
+  tags: run
+
+- name: Clean
+  shell: /bin/bash /tmp/clean.sh
+  tags: run

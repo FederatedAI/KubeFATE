@@ -1,0 +1,135 @@
+- name: Locking Simultaneous Access to Hosts in Playbooks
+  block:
+    - name: create lock dir if not exists
+      command: mkdir "{{ lock_dir }}"
+      args:
+        warn: false
+      register: lockcode
+      ignore_errors: true
+      changed_when: "lockcode.rc|int==0"
+    - debug:
+        msg: "{{ lockcode.changed }}"
+
+    - name: Wait until lock file has been deleted or timeout
+      block:
+      - name: Shell to Get Epoch
+        command: date +%s
+        register: ansible_date_time_epoch
+      - debug:
+          msg: "{{ ansible_date_time_epoch.stdout }}"
+
+      - name: Get info on lock_dir
+        stat:
+          path: "{{ lock_dir }}"
+        register: lock_dir_cfg
+      - debug:
+          msg: "{{ lock_dir_cfg.stat.mtime }}"
+
+      - name: Get Epochs Info
+        block:
+          - name: Module to Get Epoch
+            command: date +%s
+            register: ansible_date_time_epoch
+          - debug:
+              msg: "{{ ansible_date_time_epoch.stdout }}"
+
+          - name: Get info on lock_dir
+            stat:
+              path: "{{ lock_dir }}"
+            register: lock_dir_cfg
+          - debug:
+              msg: "{{ lock_dir_cfg.stat.mtime }}"
+
+          - name: Debug date comparison
+            debug:
+              msg: "wait_for timeout={{ (state_timeout - (ansible_date_time_epoch.stdout|float - lock_dir_cfg.stat.mtime))|int }}"
+
+          - name: wait for lock file to be absent
+            wait_for:
+              path: "{{ lock_dir }}"
+              state: absent
+              timeout: "{{ (state_timeout - (ansible_date_time_epoch.stdout|float - lock_dir_cfg.stat.mtime))|int }}"
+            ignore_errors: true
+            register: waitfor
+            when:
+              - (ansible_date_time_epoch.stdout|float - lock_dir_cfg.stat.mtime) > 0
+              - (ansible_date_time_epoch.stdout|float - lock_dir_cfg.stat.mtime) < state_timeout
+
+          - name: Remove lock file lock_dir
+            block:
+              - name: Remove lock file lock_dir
+                file:
+                  path: "{{ lock_dir }}"
+                  state: absent
+
+              - name: Sleep for {{ wait_processes_rm_lock_file }} seconds for all waiting processes to make the file absent, May need to increase this
+                wait_for:
+                  delay: "{{ wait_processes_rm_lock_file }}"
+                  timeout: 0
+            when: (waitfor.skipped is defined and waitfor.skipped) or (waitfor.state is defined and waitfor.state!="absent") 
+      when: lockcode.rc|int==1
+
+    - name: create lock dir if not exists, if it got deleted by other waiting workers
+      file:
+        path: "{{ lock_dir }}"
+        state: directory
+      register: check_if_changed
+
+    - name: Initialize the Workplace for Further Job
+      copy:
+        src: files/
+        dest: "{{ base_dir }}"
+        mode: 0755
+      ignore_errors: yes
+
+    # leave a hook here for building kubefate image
+    - name: Setup k8s cluster with kind
+      block:
+        - name: Check if the deploy.sh file is exists.
+          wait_for:
+            path: "{{ deploy_script }}"
+          register: exists
+
+        - name: Check if the ingress.yml file is exists.
+          wait_for:
+            path: "{{ ingress_file }}"
+          register: exists
+
+        - name: Check if the k8s creation script is exists.
+          wait_for:
+            path: "{{ base_dir }}/utils/create_k8s.sh"
+          register: exists
+
+        - name: Create k8s cluster
+          async: "{{ kube_create_timeout }}"
+          poll: "{{ check_interval }}"
+          shell: "{{ base_dir }}/utils/create_k8s.sh >> /tmp/cicd-{{ ansible_host }}.out"
+          register: k8s_status
+          ignore_errors: true
+
+        - name: Clean
+          shell: "{{ base_dir }}/clean.sh"
+          when: k8s_status.changed==false
+
+    - name: Deploy FATE with kind, Please wait, Job is running...
+      block:
+        - name: Running deployment script when file exists.
+          block:
+            - name: Running deployment script.
+              async: "{{ fate_create_timeout }}"
+              poll: "{{ check_interval }}"
+              shell: "{{ base_dir }}/deploy.sh >> /tmp/cicd-{{ ansible_host }}.out"
+              register: fate_status
+              ignore_errors: true
+
+            - name: Clean
+              shell: "{{ base_dir }}/clean.sh"
+              when: fate_status.changed==false
+          when: exists.state=="file"
+
+    - name: Remove lock file lock_dir
+      block:
+        - name: Remove lock file lock_dir
+          file:
+            path: "{{ lock_dir }}"
+            state: absent
