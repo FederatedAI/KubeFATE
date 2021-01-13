@@ -3,7 +3,7 @@ dir=$(cd $(dirname $0) && pwd)
 
 source $dir/color.sh
 
-kubefateWorkDir=$dir/../k8s-deploy
+kubefateWorkDir=$dir/../../../../../../../k8s-deploy
 
 check_kubectl() {
     # check kubectl
@@ -26,10 +26,9 @@ kubefate_install() {
     loginfo "apply kubefate"
     # Is mirror specified
     if [$KubeFATE_IMG == ""]; then
-        # IMG=federatedai/kubefate:latest
-        IMG=federatedai/kubefate:${KUBEFATE_VERSION}
+        IMG=federatedai/kubefate:latest
     else
-        IMG=$KubeFATE_IMG
+        IMG=$KubeFATE_IMG:${KUBEFATE_VERSION}
     fi
     logdebug "IMG=${IMG}"
     # set kubefate image:tag
