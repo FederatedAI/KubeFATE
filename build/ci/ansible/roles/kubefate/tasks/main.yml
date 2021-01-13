@@ -116,6 +116,15 @@
                 (k8s_status.rc|int==1) or
                 (exists.elapsed|int >= check_file_timeout)
 
+    - name: kubefate image and binary build
+      block:
+        - name: kubefate build
+          async: "{{ kube_create_timeout }}"
+          poll: "{{ check_interval }}"
+          shell: "{{ base_dir }}/utils/kubefate_build.sh >> /tmp/cicd-{{ ansible_host }}.out"
+          register: kubefate_build
+          ignore_errors: true
+
     - name: deploy kubefate
       async: "{{ kube_create_timeout }}"
       poll: "{{ check_interval }}"
