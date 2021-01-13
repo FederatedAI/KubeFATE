@@ -10,6 +10,13 @@ clean()
     echo "Deleting kind cluster..." 
     kind delete cluster
   fi
+
+  # delete docker containers
+  docker stop $(docker ps -a -q)
+  docker rm $(docker ps -a -q)
+
+  # delete docker images
+  docker rmi -f $(docker images -q)
 }
 
 main()
