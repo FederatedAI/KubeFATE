@@ -1,5 +1,8 @@
 #/bin/bash
 
+DIR=$(dirname $0)
+source ${DIR}/const.sh
+
 clean()
 {
   rm -rf ${BASE_DIR}/*
