@@ -92,23 +92,13 @@ install_separately()
     esac
   else
     echo "Fatal: Unknown system version"
-    clean
     exit 1
   fi
-}
-
-clean()
-{
-  rm -rf ${BASE_DIR}/*
-
-  echo "Deleting kind cluster..." 
-  kind delete cluster
 }
 
 trap 'onCtrlC' INT
 function onCtrlC () {
   echo 'Ctrl+C is captured'
-  clean
 }
 
 main()
@@ -141,7 +131,6 @@ main()
   state=`kubefate version`
   if [ $? -ne 0 ]; then
     echo "Fatal: There is something wrong with the installation of kubefate, please check"
-    clean
     exit 1
   fi
 
@@ -256,9 +245,6 @@ EOF
   kubefate cluster install -f ./fate-9999.yaml
   kubefate cluster install -f ./fate-10000.yaml
   kubefate cluster ls
-
-  # Clean working directory
-  clean
 }
 
 main

@@ -1,18 +1,38 @@
 #/bin/bash
 
-clean_when_timeout()
+DIR=$(dirname $0)
+source ${DIR}/const.sh
+
+clean()
 {
   rm -rf ${BASE_DIR}/*
 
-  # Install Kind
+  # Delete kubernetes cluster
   kind_status=`kind version`
   if [ $? -eq 0 ]; then
-    echo "Deleting kind cluster..." 
+    echo "Deleting kubernetes cluster..." 
     kind delete cluster
   fi
 
-  echo "exit because of task timeout"
-  exit 1
+  # delete docker containers
+  docker stop $(docker ps -a -q)
+  docker rm $(docker ps -a -q)
+
+  # delete docker images
+  docker rmi -f $(docker images --format "{{.Repository}}\t{{.Tag}}\t{{.ID}}" | grep -E '(${DOCKER_REGISTRY}/)?federatedai' | awk -F ' ' '{print $3}')
 }
 
-clean_when_timeout
+main()
+{
+  if [ "$1" != "" ]; then
+    if [ "$1" == "failed" ]; then
+      clean
+      echo "exit with errors"
+      exit 1
+    fi
+  else
+    clean
+  fi
+}
+
+main $1

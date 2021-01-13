@@ -16,6 +16,10 @@ if [ -z "${DOCKER_REGISTRY}" ]; then
     DOCKER_REGISTRY="docker.io"
 fi
 
+if [ -z "${BASE_DIR}" ]; then
+    BASE_DIR="/tmp"
+fi
+
 docker_version="docker-19.03.10"
 dist_name=""
 DEPLOY_DIR="${BASE_DIR}/cicd-${ANSIBLE_HOST}"

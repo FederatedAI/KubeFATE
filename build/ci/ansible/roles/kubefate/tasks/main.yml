@@ -111,8 +111,10 @@
           ignore_errors: true
 
         - name: Clean
-          shell: "{{ base_dir }}/clean.sh"
-          when: (k8s_status.changed==false) or (exists.elapsed|int >= check_file_timeout)
+          shell: "bash {{ base_dir }}/clean.sh failed" 
+          when: (k8s_status.changed==false) or 
+                (k8s_status.rc|int==1) or
+                (exists.elapsed|int >= check_file_timeout)
 
     - name: deploy kubefate
       async: "{{ kube_create_timeout }}"
@@ -124,11 +126,11 @@
     - name: check fate curd
       shell: "{{ base_dir }}/kubefate-e2e/fate_deploy_test.sh"
       register: fate_deploy_test
-      #ignore_errors: true
+      ignore_errors: true
 
-    #- name: Clean
-    #  shell: "{{ base_dir }}/clean.sh"
-    #  when: (kubefate_deploy_test.rc|int==1) or (fate_deploy_test.rc|int==1)
+    - name: Clean
+      shell: "bash {{ base_dir }}/clean.sh failed"
+      when: (kubefate_deploy_test.rc|int==1) or (fate_deploy_test.rc|int==1)
 
     - name: Deploy FATE with kind, Please wait, Job is running...
       block:
@@ -142,8 +144,10 @@
               ignore_errors: true
 
             - name: Clean
-              shell: "{{ base_dir }}/clean.sh"
-              when: fate_status.changed==false
+              shell: "bash {{ base_dir }}/clean.sh failed"
+              when: (fate_status.changed==false) or
+                    (fate_status.rc|int==1)
+
           when: exists.state=="file"
 
     - name: Remove lock file lock_dir
@@ -152,3 +156,6 @@
           file:
             path: "{{ lock_dir }}"
             state: absent
+
+    - name: Clean
+      shell: "bash {{ base_dir }}/clean.sh"
