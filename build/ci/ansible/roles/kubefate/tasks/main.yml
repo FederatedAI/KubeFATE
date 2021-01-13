@@ -87,16 +87,19 @@
       block:
         - name: Check if the deploy.sh file is exists.
           wait_for:
+            timeout: "{{ check_file_timeout }}"
             path: "{{ deploy_script }}"
           register: exists
 
         - name: Check if the ingress.yml file is exists.
           wait_for:
+            timeout: "{{ check_file_timeout }}"
             path: "{{ ingress_file }}"
           register: exists
 
         - name: Check if the k8s creation script is exists.
           wait_for:
+            timeout: "{{ check_file_timeout }}"
             path: "{{ base_dir }}/utils/create_k8s.sh"
           register: exists
 
@@ -109,7 +112,23 @@
 
         - name: Clean
           shell: "{{ base_dir }}/clean.sh"
-          when: k8s_status.changed==false
+          when: (k8s_status.changed==false) or (exists.elapsed|int >= check_file_timeout)
+
+    - name: deploy kubefate
+      async: "{{ kube_create_timeout }}"
+      poll: "{{ check_interval }}"
+      shell: "{{ base_dir }}/kubefate-e2e/kubefate_deploy_test.sh"
+      register: kubefate_deploy_test
+      ignore_errors: true
+
+    - name: check fate curd
+      shell: "{{ base_dir }}/kubefate-e2e/fate_deploy_test.sh"
+      register: fate_deploy_test
+      #ignore_errors: true
+
+    #- name: Clean
+    #  shell: "{{ base_dir }}/clean.sh"
+    #  when: (kubefate_deploy_test.rc|int==1) or (fate_deploy_test.rc|int==1)
 
     - name: Deploy FATE with kind, Please wait, Job is running...
       block:

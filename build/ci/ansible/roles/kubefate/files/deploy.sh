@@ -115,16 +115,16 @@ main()
 {
   cd ${BASE_DIR}
   # Download KubeFATE Release Pack, KubeFATE Server Image v1.2.0 and Install KubeFATE Command Lines
-  curl -LO https://github.com/FederatedAI/KubeFATE/releases/download/v1.5.0/kubefate-k8s-v1.5.0.tar.gz && tar -xzf ./kubefate-k8s-v1.5.0.tar.gz
+  curl -LO https://github.com/FederatedAI/KubeFATE/releases/download/${KUBEFATE_CLI_VERSION}/kubefate-k8s-${KUBEFATE_CLI_VERSION}.tar.gz && tar -xzf ./kubefate-k8s-${KUBEFATE_CLI_VERSION}.tar.gz
 
   # Move the kubefate executable binary to path,
   chmod +x ./kubefate && mv ./kubefate /usr/bin
 
   # Download the KubeFATE Server Image
-  curl -LO https://github.com/FederatedAI/KubeFATE/releases/download/v1.5.0/kubefate-${KUBEFATE_VERSION}.docker
+  curl -LO https://github.com/FederatedAI/KubeFATE/releases/download/${KUBEFATE_CLI_VERSION}/kubefate-${KUBEFATE_VERSION}.docker
 
   # Load into local Docker
-  docker load < ./kubefate-v1.2.0.docker
+  docker load < ./kubefate-${KUBEFATE_VERSION}.docker
 
   # Create kube-fate namespace and account for KubeFATE service
   kubectl apply -f ./rbac-config.yaml
