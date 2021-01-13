@@ -3,9 +3,9 @@ entries:
   fate:
   - apiVersion: v1
     appVersion: v1.5.0
-    created: "2020-11-18T10:39:20.5743063+08:00"
+    created: "2021-01-13T18:09:23.7834627+08:00"
     description: A Helm chart for fate-training
-    digest: 82ed3c2bdd28668b0d030eabf60828b62d75f320c63dc9800b15c01bc1c95c25
+    digest: 862780d395741edd7ee1e8656c06c35097198be76b2767fbf5745a21e31e5354
     home: https://fate.fedai.org
     icon: https://aisp-1251170195.cos.ap-hongkong.myqcloud.com/wp-content/uploads/sites/12/2019/09/logo.png
     name: fate
@@ -16,8 +16,22 @@ entries:
     - package/fate-v1.5.0.tgz
     version: v1.5.0
   - apiVersion: v1
+    appVersion: v1.5.0
+    created: "2021-01-13T18:09:23.7744612+08:00"
+    description: A Helm chart for fate-training
+    digest: 8f97c499f4ea0139805f247a346f727552e2aad5ae5e9f38d7f8d5b27eeee4ed
+    home: https://fate.fedai.org
+    icon: https://aisp-1251170195.cos.ap-hongkong.myqcloud.com/wp-content/uploads/sites/12/2019/09/logo.png
+    name: fate
+    sources:
+    - https://github.com/FederatedAI/KubeFATE
+    - https://github.com/FederatedAI/FATE
+    urls:
+    - package/fate-v1.5.0-a.tgz
+    version: v1.5.0-a
+  - apiVersion: v1
     appVersion: v1.4.5
-    created: "2020-11-18T10:39:20.5663081+08:00"
+    created: "2021-01-13T18:09:23.7724522+08:00"
     description: A Helm chart for fate-training
     digest: a6e95b70593027a6c4f6fc8c50f40d92c81919334674f14aae2fba5463e1611f
     name: fate
@@ -26,7 +40,7 @@ entries:
     version: v1.4.5
   - apiVersion: v1
     appVersion: v1.4.4
-    created: "2020-11-18T10:39:20.5422172+08:00"
+    created: "2021-01-13T18:09:23.7714532+08:00"
     description: A Helm chart for fate-training
     digest: 0e60139c8fc712812e117fe96bbf7c2689a0315cbcbdca28dd84b2335b86cd74
     name: fate
@@ -35,7 +49,7 @@ entries:
     version: v1.4.4
   - apiVersion: v1
     appVersion: v1.4.3
-    created: "2020-11-18T10:39:20.5260976+08:00"
+    created: "2021-01-13T18:09:23.7694534+08:00"
     description: A Helm chart for fate-training
     digest: 5316b30873dce9f65991004972adb4b13b646735a7e83276fd6ea3b8356ea38c
     name: fate
@@ -44,7 +58,7 @@ entries:
     version: v1.4.3
   - apiVersion: v1
     appVersion: v1.4.2
-    created: "2020-11-18T10:39:20.497601+08:00"
+    created: "2021-01-13T18:09:23.768453+08:00"
     description: A Helm chart for fate-training
     digest: 2ded38085ae6015d72dac4207cd9546365be79bc55a55fd62bc5dd0feebd804f
     name: fate
@@ -53,7 +67,7 @@ entries:
     version: v1.4.2
   - apiVersion: v1
     appVersion: v1.4.2
-    created: "2020-11-18T10:39:20.4561377+08:00"
+    created: "2021-01-13T18:09:23.7664638+08:00"
     description: A Helm chart for fate-training
     digest: a8b14832c6732fbd215c1d7bd3ec0a49c69528da4ee269d5015eb62b4c36126d
     name: fate
@@ -62,7 +76,7 @@ entries:
     version: v1.4.2-b
   - apiVersion: v1
     appVersion: v1.4.1
-    created: "2020-11-18T10:39:20.3937023+08:00"
+    created: "2021-01-13T18:09:23.7654576+08:00"
     description: A Helm chart for fate-training
     digest: 8af01b28d5b1cb11e27d33fa13dc13266a27f09bd315e8fa3b970f7858a6ea40
     name: fate
@@ -71,7 +85,7 @@ entries:
     version: v1.4.1
   - apiVersion: v1
     appVersion: v1.4.1
-    created: "2020-11-18T10:39:20.3857038+08:00"
+    created: "2021-01-13T18:09:23.7644555+08:00"
     description: A Helm chart for fate-training
     digest: f6442753d3095ef1057d9a87fac313470b91aee87ac2107ace502fbb8c549477
     name: fate
@@ -80,7 +94,7 @@ entries:
     version: v1.4.1-a
   - apiVersion: v1
     appVersion: v1.4.0
-    created: "2020-11-18T10:39:20.3708422+08:00"
+    created: "2021-01-13T18:09:23.7634551+08:00"
     description: A Helm chart for fate-training
     digest: c29eb8186f3a2d92679a211568b41a24cff6bd83cf747050f64911f31fa8b2c4
     name: fate
@@ -89,7 +103,7 @@ entries:
     version: v1.4.0
   - apiVersion: v1
     appVersion: v1.4.0
-    created: "2020-11-18T10:39:20.3475271+08:00"
+    created: "2021-01-13T18:09:23.7624559+08:00"
     description: A Helm chart for fate-training
     digest: 0ce67c73ec5e6d98b69a0b01e4b3ea4dae830af6db4a52977984e7f35b5947ad
     name: fate
@@ -98,7 +112,7 @@ entries:
     version: v1.4.0-b
   - apiVersion: v1
     appVersion: v1.4.0
-    created: "2020-11-18T10:39:20.2763547+08:00"
+    created: "2021-01-13T18:09:23.761472+08:00"
     description: A Helm chart for fate-training
     digest: 66b571601a3698204c580aea3e3a946d686125592db3bb6572ef82ca836b4b29
     name: fate
@@ -107,7 +121,7 @@ entries:
     version: v1.4.0-a
   - apiVersion: v1
     appVersion: v1.3.0
-    created: "2020-11-18T10:39:20.046024+08:00"
+    created: "2021-01-13T18:09:23.7544621+08:00"
     description: A Helm chart for fate-party
     digest: 965d92134bbafba670d1d738f92d9198b231e69fe4e726ba35661f4d1b21fa24
     name: fate
@@ -116,7 +130,7 @@ entries:
     version: 1.3.0
   - apiVersion: v1
     appVersion: v1.3.0
-    created: "2020-11-18T10:39:20.2560145+08:00"
+    created: "2021-01-13T18:09:23.7604549+08:00"
     description: A Helm chart for fate-party
     digest: 016dc59c98ee05e27adc461b5d81cb695ddad76b0589061490b7b356db33e824
     name: fate
@@ -125,7 +139,7 @@ entries:
     version: v1.3.0-b
   - apiVersion: v1
     appVersion: v1.3.0
-    created: "2020-11-18T10:39:20.2410151+08:00"
+    created: "2021-01-13T18:09:23.7594556+08:00"
     description: A Helm chart for fate-party
     digest: 4d09058c05f02377642a2224aad43599df9fe77b089947f2e2080b1b8c547bd7
     name: fate
@@ -134,7 +148,7 @@ entries:
     version: v1.3.0-a
   - apiVersion: v1
     appVersion: v1.2.0
-    created: "2020-11-18T10:39:19.9878866+08:00"
+    created: "2021-01-13T18:09:23.7514529+08:00"
     description: A Helm chart for fate-party
     digest: d5e8c02cc542a659f71c561fdac680bc28b1986af7af34fdf375b634646584e5
     name: fate
@@ -144,7 +158,7 @@ entries:
   fate-serving:
   - apiVersion: v1
     appVersion: v2.0.0
-    created: "2020-11-18T10:39:20.1794905+08:00"
+    created: "2021-01-13T18:09:23.7584563+08:00"
     description: A Helm chart for fate serving
     digest: 234c8a60de25be30b12cba6b213f2b6bfa5c7fdf6f109484cb7558f95e28fe49
     name: fate-serving
@@ -153,7 +167,7 @@ entries:
     version: v2.0.0
   - apiVersion: v1
     appVersion: v1.2.4
-    created: "2020-11-18T10:39:20.1610489+08:00"
+    created: "2021-01-13T18:09:23.7574512+08:00"
     description: A Helm chart for fate serving
     digest: 4631b8ab8ac2f4d2488f72a45f50f5b5459eaea616c231a4bac3f5e1190aac9d
     name: fate-serving
@@ -162,7 +176,7 @@ entries:
     version: v1.2.4
   - apiVersion: v1
     appVersion: v1.2.2
-    created: "2020-11-18T10:39:20.1373272+08:00"
+    created: "2021-01-13T18:09:23.7554505+08:00"
     description: A Helm chart for fate serving
     digest: a9b19d91a1586733e6e67c6e72bb76be1df4120f3ee91919647387774da30444
     name: fate-serving
@@ -171,11 +185,11 @@ entries:
     version: v1.2.2
   - apiVersion: v1
     appVersion: v1.2.2
-    created: "2020-11-18T10:39:20.1272889+08:00"
+    created: "2021-01-13T18:09:23.7554505+08:00"
     description: A Helm chart for fate serving
     digest: 2e4a98ba46b67085651d638011a0112079b5f3b3309e77bfdbd2a554dc0e4bec
     name: fate-serving
     urls:
     - package/fate-serving-v1.2.2-a.tgz
     version: v1.2.2-a
-generated: "2020-11-18T10:39:19.8580696+08:00"
+generated: "2021-01-13T18:09:23.7484521+08:00"
