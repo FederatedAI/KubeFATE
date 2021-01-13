@@ -7,7 +7,7 @@ clean()
   # Delete kubernetes cluster
   kind_status=`kind version`
   if [ $? -eq 0 ]; then
-    echo "Deleting kind cluster..." 
+    echo "Deleting kubernetes cluster..." 
     kind delete cluster
   fi
 
@@ -16,7 +16,7 @@ clean()
   docker rm $(docker ps -a -q)
 
   # delete docker images
-  docker images --format "{{.Repository}}\t{{.Tag}}\t{{.ID}}" | grep -E '(${DOCKER_REGISTRY}/)?federatedai' | awk -F ' ' '{print $3}'
+  docker rmi -f $(docker images --format "{{.Repository}}\t{{.Tag}}\t{{.ID}}" | grep -E '(${DOCKER_REGISTRY}/)?federatedai' | awk -F ' ' '{print $3}')
 }
 
 main()
