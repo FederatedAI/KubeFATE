@@ -101,6 +101,38 @@ function onCtrlC () {
   echo 'Ctrl+C is captured'
 }
 
+generate_cluster_config()
+{
+  ip=$(kubectl get nodes -o wide | sed -n "2p" | awk -F ' ' '{printf $6}')
+  cp ./cluster.yaml fate-9999.yaml
+  sed -i 's#registry: ""#registry: "'${DOCKER_REGISTRY}'/federatedai"#g' fate-9999.yaml
+
+  sed -i 's$# rollsite:$rollsite:$g' fate-9999.yaml
+  sed -i '0,/# type:/s//type:/' fate-9999.yaml
+  sed -i '0,/# nodePort:/s//nodePort:/' fate-9999.yaml
+  sed -i '0,/# partyList:/s//partyList:/' fate-9999.yaml
+  sed -i '0,/# - partyId:/s//- partyId:/' fate-9999.yaml
+  sed -i '0,/# partyIp: 192.168.0.1/s//partyIp: '${ip}'/' fate-9999.yaml
+  sed -i '0,/# partyPort:/s//partyPort:/' fate-9999.yaml
+
+  sed -i 's$# python:$python:$g' fate-9999.yaml
+  sed -i '0,/# type:/s//type:/' fate-9999.yaml
+  sed -i '0,/# httpNodePort:/s//httpNodePort:/' fate-9999.yaml
+  sed -i '0,/# grpcNodePort:/s//grpcNodePort:/' fate-9999.yaml
+  # delete rows commented
+  sed -i '/#/'d fate-9999.yaml
+  # delete continuous idle row
+  sed -i 'N;/^\n/D' fate-9999.yaml
+
+  cp ./fate-9999.yaml fate-10000.yaml
+  sed -i 's/9999/10000/g' fate-10000.yaml
+  sed -i '0,/nodePort: 30091/s//nodePort: 30101/' fate-10000.yaml
+  sed -i '0,/- partyId: 10000/s//- partyId: 9999/' fate-10000.yaml
+  sed -i '0,/partyPort: 30101/s//partyPort: 30091/' fate-10000.yaml
+  sed -i '0,/httpNodePort: 30097/s//httpNodePort: 30107/' fate-10000.yaml
+  sed -i '0,/grpcNodePort: 30092/s//grpcNodePort: 30102/' fate-10000.yaml
+}
+
 main()
 {
   cd ${BASE_DIR}
@@ -121,7 +153,7 @@ main()
   # kubectl apply -f ./kubefate.yaml
 
   # Replace the docker registry if it is not "docker.io"
-  if [ "${DOCKER_REGISTRY}" != "docker.io"]; then
+  if [ "${DOCKER_REGISTRY}" != "docker.io" ]; then
     sed -i "s/mariadb:10/${DOCKER_REGISTRY}\/federatedai\/mariadb:10/g" kubefate.yaml
     sed -i "s/registry: \"\"/registry: \"${DOCKER_REGISTRY}\/federatedai\"/g" cluster.yaml
   fi
@@ -139,78 +171,7 @@ main()
   kubectl create namespace fate-10000
 
   # Copy the cluster.yaml sample in the working folder. One for party 9999, the other one for party 10000
-  # cp ./cluster.yaml fate-9999.yaml && cp ./cluster.yaml fate-10000.yaml
-cat > fate-9999.yaml << EOF
-name: fate-9999
-namespace: fate-9999
-chartName: fate
-chartVersion: v1.5.0
-partyId: 9999
-registry: "${DOCKER_REGISTRY}/federatedai"
-pullPolicy:
-persistence: false
-istio:
-  enabled: false
-modules:
-  - rollsite
-  - clustermanager
-  - nodemanager
-  - mysql
-  - python
-  - fateboard
-  - client
-
-backend: eggroll
-
-rollsite:
-  type: NodePort
-  nodePort: 30091
-  partyList:
-  - partyId: 10000
-    partyIp: ${ip}
-    partyPort: 30101
-
-python:
-  type: NodePort
-  httpNodePort: 30097
-  grpcNodePort: 30092
-EOF
-
-cat > fate-10000.yaml << EOF
-name: fate-10000
-namespace: fate-10000
-chartName: fate
-chartVersion: v1.5.0
-partyId: 10000
-registry: "${DOCKER_REGISTRY}/federatedai"
-pullPolicy:
-persistence: false
-istio:
-  enabled: false
-modules:
-  - rollsite
-  - clustermanager
-  - nodemanager
-  - mysql
-  - python
-  - fateboard
-  - client
-
-backend: eggroll
-
-rollsite:
-  type: NodePort
-  nodePort: 30101
-  partyList:
-  - partyId: 9999
-    partyIp: ${ip}
-    partyPort: 30091
-
-python:
-  type: NodePort
-  httpNodePort: 30107
-  grpcNodePort: 30102
-EOF
+  generate_cluster_config
 
   # Start to install these two FATE cluster via KubeFATE with the following command
   echo "Waiting for kubefate service start to create container..."
@@ -245,6 +206,19 @@ EOF
   kubefate cluster install -f ./fate-9999.yaml
   kubefate cluster install -f ./fate-10000.yaml
   kubefate cluster ls
+
+  sleep ${FATE_SERVICE_TIMEOUT}
+  selector_fate9999="name=fate-9999"
+  selector_fate10000="name=fate-10000"
+  kubectl wait --namespace fate-9999 \
+  --for=condition=ready pod \
+  --selector=${selector_fate9999} \
+  --timeout=${INGRESS_KUBEFATE_CLUSTER}s
+
+  kubectl wait --namespace fate-10000 \
+  --for=condition=ready pod \
+  --selector=${selector_fate10000} \
+  --timeout=${INGRESS_KUBEFATE_CLUSTER}s
 }
 
 main
