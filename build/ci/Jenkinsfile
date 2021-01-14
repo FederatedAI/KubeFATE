@@ -30,6 +30,7 @@ pipeline{
                     inventory: '$FILE',
                     playbook: 'build/ci/ansible/site.yml',
                     disableHostKeyChecking: true,
+                    extras: '-vvv',
                     extraVars: [
                         fate_version: '${fate_version}',
                         fate_serving_version: '${fate_serving_version}',
