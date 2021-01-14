@@ -8,14 +8,20 @@ pipeline{
         string(name: 'docker_registry', defaultValue: 'docker.io', description: 'Docker registry address')
     }
     stages{
+        stage('Nofity') {
+            steps {
+                slackSend message: "Build Started - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)" 
+            }
+        }
+
         stage("Build"){
             steps{
-                git "https://github.com/jiahaoc1993/jenkins-ci"
+                git branch: "jenkins-integration", url: "https://github.com/FederatedAI/KubeFATE.git"
             }
         }
         
-
         stage("Run Playbook") {
+            
             steps{
                 withCredentials([file(credentialsId: 'ansible-inventory', variable: 'FILE')]){
                     ansiblePlaybook colorized: false, 
@@ -31,6 +37,16 @@ pipeline{
                         docker_registry: '${docker_registry}']
                 }
             }
+        }
+    }
+    
+    post {
+        success {
+            slackSend message: "Build Success - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)" 
+        }
+            
+        failure {
+            slackSend message: "Build Failure - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)" 
         }
     }
 }
