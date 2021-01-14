@@ -26,10 +26,10 @@ kubefate_install() {
 
     loginfo "apply kubefate"
     # Is mirror specified
-    if [[$KubeFATE_IMG == ""]]; then
-        IMG=federatedai/kubefate:latest
+    if [[ $KubeFATE_IMG != "" ]]; then
+        IMG=${KubeFATE_IMG}:${KUBEFATE_VERSION}
     else
-        IMG=$KubeFATE_IMG:${KUBEFATE_VERSION}
+        IMG=federatedai/kubefate:latest
     fi
     logdebug "IMG=${IMG}"
     # set kubefate image:tag
@@ -103,15 +103,15 @@ upload_chart() {
 
 set_cluster_image() {
     # Is mirror specified
-    if [[$FATE_IMG_REGISTRY == ""]]; then
+    if [[ $FATE_IMG_REGISTRY == "" ]]; then
         REGISTRY=""
     else
         REGISTRY=$FATE_IMG_REGISTRY
     fi
-    if [[$FATE_IMG_TAG == ""]]; then
+    if [[ $FATE_IMG_TAG == "" ]]; then
         FATE_IMG_TAG="latest"
     fi
-    if [[$FATE_SERVING_IMG_TAG == ""]]; then
+    if [[ $FATE_SERVING_IMG_TAG == "" ]]; then
         FATE_SERVING_IMG_TAG="latest"
     fi
     # set kubefate image:tag
