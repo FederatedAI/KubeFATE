@@ -54,7 +54,7 @@ main() {
     kind load docker-image ${DOCKER_REGISTRY}/fluent/fluentd:v1.11-debian-1
 
     curl_status=$(curl --version)
-    if [ $? -ne 0 ]; then
+    if [[ $? -ne 0 ]]; then
         echo "Fatal: Curl does not installed correctly"
         clean
         exit 1
@@ -62,13 +62,13 @@ main() {
 
     # Check if kubectl is installed successfully
     kubectl_status=$(kubectl version --client)
-    if [ $? -eq 0 ]; then
+    if [[ $? -eq 0 ]]; then
         echo "Kubectl is installed on this host, no need to install"
     else
         # Install the latest version of kubectl
         curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl" && chmod +x ./kubectl && mv ./kubectl /usr/bin/
         kubectl_status=$(kubectl version --client)
-        if [ $? -ne 0 ]; then
+        if [[ $? -ne 0 ]]; then
             echo "Fatal: Kubectl does not installed correctly"
             clean
             exit 1
@@ -77,7 +77,7 @@ main() {
 
     # Check if docker is installed already
     docker_status=$(docker ps)
-    if [ $? -eq 0 ]; then
+    if [[ $? -eq 0 ]]; then
         echo "Docker is installed on this host, no need to install"
     else
         # Install Docker with different linux distibutions
@@ -85,7 +85,7 @@ main() {
 
         # check if docker is installed correctly
         docker=$(docker ps)
-        if [ $? -ne 0 ]; then
+        if [[ $? -ne 0 ]]; then
             echo "Fatal: Docker does not installed correctly"
             clean
             exit 1
@@ -99,8 +99,8 @@ main() {
     # Config Ingress
     i=0
     cluster_ip=$(kubectl get service -o wide -A | grep ingress-nginx-controller-admission | awk -F ' ' '{print $4}')
-    while [ "$cluster_ip" == "" ]; do
-        if [ $i == ${INGRESS_TIMEOUT} ]; then
+    while [[ "$cluster_ip" == "" ]]; do
+        if [[ $i == ${INGRESS_TIMEOUT} ]]; then
             echo "Can't install Ingress, Please check you environment"
             exit 1
         fi
@@ -124,7 +124,7 @@ main() {
 
     ip=$(kubectl get nodes -o wide | sed -n "2p" | awk -F ' ' '{printf $6}')
     kubefate_domain=$(cat /etc/hosts | grep "kubefate.net")
-    if [ "$kubefate_domain" == "" ]; then
+    if [[ "$kubefate_domain" == "" ]]; then
         echo "${ip}    kubefate.net" >>/etc/hosts
     else
         sed -i "/kubefate.net/d" /etc/hosts
@@ -132,7 +132,7 @@ main() {
     fi
 
     ingress_nginx_controller_admission=$(cat /etc/hosts | grep "ingress-nginx-controller-admission")
-    if [ "$ingress_nginx_controller_admission" == "" ]; then
+    if [[ "$ingress_nginx_controller_admission" == "" ]]; then
         echo "${cluster_ip}    ingress-nginx-controller-admission" >>/etc/hosts
     else
         sed -i "/ingress-nginx-controller-admission/d" /etc/hosts

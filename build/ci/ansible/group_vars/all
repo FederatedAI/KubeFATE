@@ -3,6 +3,7 @@ lock_dir: /tmp/ansible-playbook-{{ ansible_host }}.lock
 state_timeout: 1800
 wait_processes_rm_lock_file: 2
 base_dir: /tmp
+work_dir: /tmp/KubeFATE/build/ci/ansible/roles/kubefate/files
 deploy_script: /tmp/deploy.sh
 check_file_timeout: 20
 ingress_file: /tmp/ingress.yml

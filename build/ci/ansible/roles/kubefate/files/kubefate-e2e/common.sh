@@ -9,7 +9,7 @@ check_kubectl() {
     # check kubectl
     loginfo "check kubectl"
     kubectl version
-    if [ $? -ne 0 ]; then
+    if [[ $? -ne 0 ]]; then
         logerror "K8s environment abnormal"
         exit 1
     fi
@@ -25,7 +25,7 @@ kubefate_install() {
 
     loginfo "apply kubefate"
     # Is mirror specified
-    if [$KubeFATE_IMG == ""]; then
+    if [[$KubeFATE_IMG == ""]]; then
         IMG=federatedai/kubefate:latest
     else
         IMG=$KubeFATE_IMG:${KUBEFATE_VERSION}
@@ -41,7 +41,7 @@ kubefate_install() {
     MAX_TRY=60
     for ((i = 1; i <= $MAX_TRY; i++)); do
         status=$(kubectl get pod -l fate=kubefate -n kube-fate -o jsonpath='{.items[0].status.phase}')
-        if [ $status == "Running" ]; then
+        if [[ $status == "Running" ]]; then
             sleep 20
             echo "# kubefate are ok"
             return 0
@@ -73,7 +73,7 @@ set_host() {
 check_kubefate_version() {
     cd $kubefateWorkDir
     kubefate version
-    if [ $? -ne 0 ]; then
+    if [[ $? -ne 0 ]]; then
         logerror "kubefate command line error, checkout ingress"
         return 1
     fi
@@ -102,15 +102,15 @@ upload_chart() {
 
 set_cluster_image() {
     # Is mirror specified
-    if [$FATE_IMG_REGISTRY == ""]; then
+    if [[$FATE_IMG_REGISTRY == ""]]; then
         REGISTRY=""
     else
         REGISTRY=$FATE_IMG_REGISTRY
     fi
-    if [$FATE_IMG_TAG == ""]; then
+    if [[$FATE_IMG_TAG == ""]]; then
         FATE_IMG_TAG="latest"
     fi
-    if [$FATE_SERVING_IMG_TAG == ""]; then
+    if [[$FATE_SERVING_IMG_TAG == ""]]; then
         FATE_SERVING_IMG_TAG="latest"
     fi
     # set kubefate image:tag
@@ -198,7 +198,7 @@ check_cluster_status() {
     logdebug "clusterUUID=$clusterUUID"
     # cluster describe
     clusterStatus=$(kubefate cluster describe $clusterUUID | grep -w Status | awk '{print $2}')
-    if [ $clusterStatus == "Running" ]; then
+    if [[ $clusterStatus == "Running" ]]; then
         logsuccess "Cluster Status is Running"
     else
         logerror "Cluster Status is $clusterStatus"

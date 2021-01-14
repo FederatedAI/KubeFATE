@@ -76,42 +76,24 @@
       register: check_if_changed
 
     - name: Initialize the Workplace for Further Job
-      copy:
-        src: files/
+      synchronize:
+        src: ./../../../../../../../KubeFATE
         dest: "{{ base_dir }}"
-        mode: 0755
       ignore_errors: yes
 
     # leave a hook here for building kubefate image
     - name: Setup k8s cluster with kind
       block:
-        - name: Check if the deploy.sh file is exists.
-          wait_for:
-            timeout: "{{ check_file_timeout }}"
-            path: "{{ deploy_script }}"
-          register: exists
-
-        - name: Check if the ingress.yml file is exists.
-          wait_for:
-            timeout: "{{ check_file_timeout }}"
-            path: "{{ ingress_file }}"
-          register: exists
-
-        - name: Check if the k8s creation script is exists.
-          wait_for:
-            timeout: "{{ check_file_timeout }}"
-            path: "{{ base_dir }}/utils/create_k8s.sh"
-          register: exists
 
         - name: Create k8s cluster
           async: "{{ kube_create_timeout }}"
           poll: "{{ check_interval }}"
-          shell: "{{ base_dir }}/utils/create_k8s.sh >> /tmp/cicd-{{ ansible_host }}.out"
+          shell: "bash {{ work_dir }}/utils/create_k8s.sh >> /tmp/cicd-{{ ansible_host }}.out"
           register: k8s_status
           ignore_errors: true
 
         - name: Clean
-          shell: "bash {{ base_dir }}/clean.sh failed" 
+          shell: "bash {{ work_dir }}/clean.sh failed" 
           when: (k8s_status.changed==false) or 
                 (k8s_status.rc|int==1) or
                 (exists.elapsed|int >= check_file_timeout)
@@ -121,19 +103,19 @@
         - name: kubefate build
           async: "{{ kube_create_timeout }}"
           poll: "{{ check_interval }}"
-          shell: "{{ base_dir }}/utils/kubefate_build.sh >> /tmp/cicd-{{ ansible_host }}.out"
+          shell: "bash {{ work_dir }}/utils/kubefate_build.sh >> /tmp/cicd-{{ ansible_host }}.out"
           register: kubefate_build
           ignore_errors: true
 
     - name: deploy kubefate
       async: "{{ kube_create_timeout }}"
       poll: "{{ check_interval }}"
-      shell: "{{ base_dir }}/kubefate-e2e/kubefate_deploy_test.sh"
+      shell: "bash {{ work_dir }}/kubefate-e2e/kubefate_deploy_test.sh"
       register: kubefate_deploy_test
       ignore_errors: true
 
     - name: check fate curd
-      shell: "{{ base_dir }}/kubefate-e2e/fate_deploy_test.sh"
+      shell: "bash {{ work_dir }}/kubefate-e2e/fate_deploy_test.sh"
       register: fate_deploy_test
       ignore_errors: true
 
@@ -148,12 +130,12 @@
             - name: Running deployment script.
               async: "{{ fate_create_timeout }}"
               poll: "{{ check_interval }}"
-              shell: "{{ base_dir }}/deploy.sh >> /tmp/cicd-{{ ansible_host }}.out"
+              shell: "{{ work_dir }}/deploy.sh >> /tmp/cicd-{{ ansible_host }}.out"
               register: fate_status
               ignore_errors: true
 
             - name: Clean
-              shell: "bash {{ base_dir }}/clean.sh failed"
+              shell: "bash {{ work_dir }}/clean.sh failed"
               when: (fate_status.changed==false) or
                     (fate_status.rc|int==1)
 
@@ -167,4 +149,4 @@
             state: absent
 
     - name: Clean
-      shell: "bash {{ base_dir }}/clean.sh"
+      shell: "bash {{ work_dir }}/clean.sh"
