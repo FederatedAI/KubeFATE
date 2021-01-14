@@ -30,13 +30,26 @@ main() {
 
     create_cluster_with_kind
 
+    # handle FATE images
+    for image in "fateboard" "python" "eggroll" "client"
+    do
+	docker pull ${DOCKER_REGISTRY}/federatedai/${image}:${FATE_VERSION}
+	kind load docker-image ${DOCKER_REGISTRY}/federatedai/${image}:${FATE_VERSION}
+    done
+
     docker pull ${DOCKER_REGISTRY}/jettech/kube-webhook-certgen:v1.5.0
+    kind load docker-image ${DOCKER_REGISTRY}/jettech/kube-webhook-certgen:v1.5.0
+
     # federatedai/kubefate should build from source code
     docker pull ${DOCKER_REGISTRY}/federatedai/kubefate:${KUBEFATE_VERSION}
+    kind load docker-image ${DOCKER_REGISTRY}/federatedai/kubefate:${KUBEFATE_VERSION}
+
     docker pull ${DOCKER_REGISTRY}/mariadb:10
-    kind load docker-image jettech/kube-webhook-certgen:v1.5.0
-    kind load docker-image federatedai/kubefate:${KUBEFATE_VERSION}
-    kind load docker-image mariadb:10
+    kind load docker-image ${DOCKER_REGISTRY}/mariadb:10
+
+    docker pull ${DOCKER_REGISTRY}/mysql:8
+    kind load docker-image ${DOCKER_REGISTRY}/mysql:8
+
     curl_status=$(curl --version)
     if [ $? -ne 0 ]; then
         echo "Fatal: Curl does not installed correctly"
