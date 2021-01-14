@@ -236,3 +236,9 @@ cluster_delete() {
     kubefate job describe $jobUUID
     return 1
 }
+
+binary_install() {
+    cd $kubefateWorkDir
+    chmod +x ./bin/kubefate
+    export PATH=$PATH:$kubefateWorkDir/bin
+}
