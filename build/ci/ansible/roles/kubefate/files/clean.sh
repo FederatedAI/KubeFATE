@@ -1,16 +1,15 @@
 #/bin/bash
-
+source ~/.profile
 DIR=$(dirname $0)
 source ${DIR}/const.sh
 
-clean()
-{
+clean() {
   # rm -rf ${BASE_DIR}/*
 
   # Delete kubernetes cluster
-  kind_status=`kind version`
+  kind_status=$(kind version)
   if [ $? -eq 0 ]; then
-    echo "Deleting kubernetes cluster..." 
+    echo "Deleting kubernetes cluster..."
     kind delete cluster
   fi
 
@@ -22,8 +21,7 @@ clean()
   docker rmi -f $(docker images --format "{{.Repository}}\t{{.Tag}}\t{{.ID}}" | grep -E '(${DOCKER_REGISTRY}/)?federatedai' | awk -F ' ' '{print $3}')
 }
 
-main()
-{
+main() {
   if [ "$1" != "" ]; then
     if [ "$1" == "failed" ]; then
       clean

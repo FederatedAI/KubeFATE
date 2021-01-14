@@ -1,6 +1,6 @@
 #!/bin/bash
 set -eux
-
+source ~/.profile
 dir=$(cd $(dirname $0) && pwd)
 
 kubefateWorkDir=$dir/../../../../../../../k8s-deploy

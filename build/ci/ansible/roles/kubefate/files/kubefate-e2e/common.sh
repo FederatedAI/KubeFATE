@@ -1,6 +1,7 @@
 #!/bin/bash
 dir=$(cd $(dirname $0) && pwd)
 
+source ~/.profile
 source $dir/color.sh
 
 kubefateWorkDir=$dir/../../../../../../../k8s-deploy
