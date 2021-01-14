@@ -7,6 +7,9 @@ create_cluster_with_kind() {
     cat <<EOF | kind create cluster --config=-
     kind: Cluster
     apiVersion: kind.x-k8s.io/v1alpha4
+    networking:
+      apiServerAddress: "127.0.0.1"
+      apiServerPort: 6443
     nodes:
     - role: control-plane
       kubeadmConfigPatches:
@@ -91,9 +94,9 @@ main() {
             exit 1
         fi
     fi
-    INGRESS_FILE=${DIR}/../ingress.yaml
+    INGRESS_FILE=${DIR}/../ingress.yml
     # Enable Ingress step 2.
-    sed -i "s#- --publish-status-address=localhost#- --publish-status-address=${ip}#g" ${INGRESS_FILE}
+    # sed -i "s#- --publish-status-address=localhost#- --publish-status-address=${ip}#g" ${INGRESS_FILE}
     kubectl apply -f ${INGRESS_FILE}
 
     # Config Ingress
