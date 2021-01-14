@@ -1,6 +1,6 @@
 #! /bin/bash
 
-DIR=$(dirname $0)
+DIR=$(cd $(dirname $0) && pwd)
 source ${DIR}/../const.sh
 
 create_cluster_with_kind() {
@@ -91,7 +91,7 @@ main() {
             exit 1
         fi
     fi
-
+    INGRESS_FILE=${DIR}/../ingress.yaml
     # Enable Ingress step 2.
     sed -i "s#- --publish-status-address=localhost#- --publish-status-address=${ip}#g" ${INGRESS_FILE}
     kubectl apply -f ${INGRESS_FILE}
