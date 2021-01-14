@@ -1,5 +1,5 @@
 #!/bin/bash
-set -eux
+
 dir=$(cd $(dirname $0) && pwd)
 source $dir/color.sh
 

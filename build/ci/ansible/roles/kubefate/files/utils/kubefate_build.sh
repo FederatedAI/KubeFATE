@@ -1,5 +1,5 @@
 #!/bin/bash
-set -eux
+
 source ~/.profile
 dir=$(cd $(dirname $0) && pwd)
 
