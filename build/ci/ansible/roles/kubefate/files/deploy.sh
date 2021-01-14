@@ -1,26 +1,24 @@
-#! /bin/bash
+#!/bin/bash
 DIR=$(dirname $0)
 source ${DIR}/const.sh
 
 # Get distribution
-get_dist_name()
-{
+get_dist_name() {
   if grep -Eqii "CentOS" /etc/issue || grep -Eq "CentOS" /etc/*-release; then
-        dist_name='CentOS'
+    dist_name='CentOS'
   elif grep -Eqi "Fedora" /etc/issue || grep -Eq "Fedora" /etc/*-release; then
-        dist_name='Fedora'
+    dist_name='Fedora'
   elif grep -Eqi "Debian" /etc/issue || grep -Eq "Debian" /etc/*-release; then
-        dist_name='Debian'
+    dist_name='Debian'
   elif grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
-        dist_name='Ubuntu'
+    dist_name='Ubuntu'
   else
-        dist_name='Unknown'
+    dist_name='Unknown'
   fi
-  echo "dist_name: " $dist_name;
+  echo "dist_name: " $dist_name
 }
 
-centos()
-{
+centos() {
   yum remove docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate docker-engine
   yum install -y yum-utils
   yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
@@ -29,8 +27,7 @@ centos()
   systemctl start docker
 }
 
-fedora()
-{
+fedora() {
   dnf remove docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate docker-selinux docker-engine-selinux docker-engine
   dnf -y install dnf-plugins-core
   dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
@@ -38,8 +35,7 @@ fedora()
   systemctl start docker
 }
 
-debian()
-{
+debian() {
   apt-get remove docker docker-engine docker.io containerd runc
   apt-get purge -y docker-ce docker-ce-cli containerd.io
   rm -rf /var/lib/docker
@@ -53,8 +49,7 @@ debian()
   systemctl start docker.service
 }
 
-ubuntu()
-{
+ubuntu() {
   apt-get remove docker docker-engine docker.io containerd runc
   apt-get purge -y docker-ce docker-ce-cli containerd.io
   rm -rf /var/lib/docker
@@ -69,26 +64,26 @@ ubuntu()
   systemctl start docker.service
 }
 
-install_separately()
-{
+install_separately() {
   # Install Docker with different linux distibutions
   get_dist_name
   if [ $dist_name != "Unknown" ]; then
     case $dist_name in
-      CentOS)
-        centos
-        ;;
-      Fedora)
-        fedora
-        ;;
-      Debian)
-        debian
-        ;;
-      Ubuntu)
-        ubuntu
-        ;;
-      *)
-        echo "Unsupported distribution name"
+    CentOS)
+      centos
+      ;;
+    Fedora)
+      fedora
+      ;;
+    Debian)
+      debian
+      ;;
+    Ubuntu)
+      ubuntu
+      ;;
+    *)
+      echo "Unsupported distribution name"
+      ;;
     esac
   else
     echo "Fatal: Unknown system version"
@@ -97,7 +92,7 @@ install_separately()
 }
 
 trap 'onCtrlC' INT
-function onCtrlC () {
+function onCtrlC() {
   echo 'Ctrl+C is captured'
 }
 
@@ -146,7 +141,7 @@ main()
   curl -LO https://github.com/FederatedAI/KubeFATE/releases/download/${KUBEFATE_CLI_VERSION}/kubefate-${KUBEFATE_VERSION}.docker
 
   # Load into local Docker
-  docker load < ./kubefate-${KUBEFATE_VERSION}.docker
+  docker load <./kubefate-${KUBEFATE_VERSION}.docker
 
   # Create kube-fate namespace and account for KubeFATE service
   kubectl apply -f ./rbac-config.yaml
@@ -160,7 +155,7 @@ main()
   kubectl apply -f ./kubefate.yaml
 
   # Check if the commands above have been executed correctly
-  state=`kubefate version`
+  state=$(kubefate version)
   if [ $? -ne 0 ]; then
     echo "Fatal: There is something wrong with the installation of kubefate, please check"
     exit 1
@@ -179,29 +174,28 @@ main()
 
   selector_kubefate="fate=kubefate"
   kubectl wait --namespace kube-fate \
-  --for=condition=ready pod \
-  --selector=${selector_kubefate} \
-  --timeout=${INGRESS_KUBEFATE_CLUSTER}s
+    --for=condition=ready pod \
+    --selector=${selector_kubefate} \
+    --timeout=${INGRESS_KUBEFATE_CLUSTER}s
 
   selector_mariadb="fate=mariadb"
   kubectl wait --namespace kube-fate \
-  --for=condition=ready pod \
-  --selector=${selector_mariadb} \
-  --timeout=${INGRESS_KUBEFATE_CLUSTER}s
+    --for=condition=ready pod \
+    --selector=${selector_mariadb} \
+    --timeout=${INGRESS_KUBEFATE_CLUSTER}s
 
   echo "Waiting for kubefate service get ready..."
   i=0
-  kubefate_status=`kubefate version`
-  while [ $? -ne 0 ]
-  do
+  kubefate_status=$(kubefate version)
+  while [ $? -ne 0 ]; do
     if [ $i == ${KUBEFATE_CLUSTER_TIMEOUT} ]; then
-        echo "Can't install Ingress, Please check you environment"
-        exit 1
+      echo "Can't install Ingress, Please check you environment"
+      exit 1
     fi
     echo "Kubefate  Service Temporarily Unavailable, please wait..."
     sleep 1
     let i+=1
-    kubefate_status=`kubefate version`
+    kubefate_status=$(kubefate version)
   done
   kubefate cluster install -f ./fate-9999.yaml
   kubefate cluster install -f ./fate-10000.yaml
