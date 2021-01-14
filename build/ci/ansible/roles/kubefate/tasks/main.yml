@@ -95,8 +95,7 @@
         - name: Clean
           shell: "bash {{ work_dir }}/clean.sh failed" 
           when: (k8s_status.changed==false) or 
-                (k8s_status.rc|int==1) or
-                (exists.elapsed|int >= check_file_timeout)
+                (k8s_status.rc|int==1)
 
     - name: kubefate image and binary build
       block:
