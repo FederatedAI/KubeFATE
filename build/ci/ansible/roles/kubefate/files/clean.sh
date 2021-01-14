@@ -5,7 +5,7 @@ source ${DIR}/const.sh
 
 clean()
 {
-  rm -rf ${BASE_DIR}/*
+  # rm -rf ${BASE_DIR}/*
 
   # Delete kubernetes cluster
   kind_status=`kind version`
