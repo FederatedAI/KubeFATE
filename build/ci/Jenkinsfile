@@ -28,7 +28,7 @@ pipeline{
                     credentialsId: 'ssh-ansible',
                     installation: 'ansible',
                     inventory: '$FILE',
-                    playbook: 'ansible/site.yml',
+                    playbook: 'build/ci/ansible/site.yml',
                     disableHostKeyChecking: true,
                     extraVars: [
                         fate_version: '${fate_version}',
@@ -39,7 +39,7 @@ pipeline{
             }
         }
     }
-    
+
     post {
         success {
             slackSend message: "Build Success - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)" 
