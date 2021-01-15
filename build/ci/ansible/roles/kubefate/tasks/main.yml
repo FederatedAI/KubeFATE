@@ -140,12 +140,15 @@
 
           when: exists.state=="file"
 
+    - name: Clean
+      shell: "bash {{ work_dir }}/clean.sh"
+      file:
+        path: "{{ base_dir }}"
+        state: absent
+
     - name: Remove lock file lock_dir
       block:
         - name: Remove lock file lock_dir
           file:
             path: "{{ lock_dir }}"
             state: absent
-
-    - name: Clean
-      shell: "bash {{ work_dir }}/clean.sh"
