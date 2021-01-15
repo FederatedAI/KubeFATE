@@ -84,7 +84,24 @@
     # leave a hook here for building kubefate image
     - name: Setup k8s cluster with kind
       block:
+        - name: Check if the deploy.sh file is exists.
+          wait_for:
+            timeout: "{{ check_file_timeout }}"
+            path: "{{ work_dir }}/deploy.sh"
+          register: exists
 
+        - name: Check if the ingress.yml file is exists.
+          wait_for:
+            timeout: "{{ check_file_timeout }}"
+            path: "{{ work_dir }}/ingress.yml"
+          register: exists
+
+        - name: Check if the k8s creation script is exists.
+          wait_for:
+            timeout: "{{ check_file_timeout }}"
+            path: "{{ work_dir }}/utils/create_k8s.sh"
+          register: exists
+        
         - name: Create k8s cluster
           async: "{{ kube_create_timeout }}"
           poll: "{{ check_interval }}"
@@ -95,7 +112,8 @@
         - name: Clean
           shell: "bash {{ work_dir }}/clean.sh failed" 
           when: (k8s_status.changed==false) or 
-                (k8s_status.rc|int==1)
+                (k8s_status.rc|int==1) or
+                (exists.elapsed|int >= check_file_timeout)
 
     - name: kubefate image and binary build
       block:
