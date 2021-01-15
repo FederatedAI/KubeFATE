@@ -102,19 +102,19 @@ upload_chart() {
 }
 
 set_cluster_image() {
-    
+
     # set kubefate image:tag
-    sed -i "s#registry: ""#image: ${REGISTRY}#g" cluster.yaml
-    sed -i "s#registry: ""#image: ${REGISTRY}#g" cluster-spark.yaml
-    sed -i "s#registry: ""#image: ${REGISTRY}#g" cluster-serving.yaml
+    sed -i "s#registry: ""#image: ${DOCKER_REGISTRY}#g" cluster.yaml
+    sed -i "s#registry: ""#image: ${DOCKER_REGISTRY}#g" cluster-spark.yaml
+    sed -i "s#registry: ""#image: ${DOCKER_REGISTRY}#g" cluster-serving.yaml
 
-    sed -i "s#imageTag: ""#imageTag: ${FATE_IMG_TAG}#g" cluster.yaml
-    sed -i "s#imageTag: ""#imageTag: ${FATE_IMG_TAG}#g" cluster-spark.yaml
-    sed -i "s#imageTag: ""#imageTag: ${FATE_SERVING_IMG_TAG}#g" cluster-serving.yaml
+    sed -i "s#imageTag: ""#imageTag: ${FATE_VERSION}#g" cluster.yaml
+    sed -i "s#imageTag: ""#imageTag: ${FATE_VERSION}#g" cluster-spark.yaml
+    sed -i "s#imageTag: ""#imageTag: ${fate_serving_version}#g" cluster-serving.yaml
 
-    logdebug "REGISTRY=${IMG}"
-    logdebug "FATE_IMG_TAG=${FATE_IMG_TAG}"
-    logdebug "FATE_SERVING_IMG_TAG=${FATE_SERVING_IMG_TAG}"
+    logdebug "REGISTRY=${DOCKER_REGISTRY}"
+    logdebug "FATE_IMG_TAG=${FATE_VERSION}"
+    logdebug "FATE_SERVING_IMG_TAG=${fate_serving_version}"
 }
 
 jobUUID=""
