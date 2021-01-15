@@ -118,7 +118,7 @@
     - name: Pull images
       async: "{{ kube_create_timeout }}"
       poll: "{{ check_interval }}"
-      shell: "bash {{ work_dir }}/get_images.sh >> /tmp/cicd-{{ ansible_host }}.out"
+      shell: "bash {{ work_dir }}/get_images.sh >> {{ out_put }}"
       register: images_pull_status
       ignore_errors: true
 

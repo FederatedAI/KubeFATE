@@ -104,13 +104,13 @@ upload_chart() {
 set_cluster_image() {
 
     # set kubefate image:tag
-    sed -i "s#registry: ""#image: ${DOCKER_REGISTRY}#g" cluster.yaml
-    sed -i "s#registry: ""#image: ${DOCKER_REGISTRY}#g" cluster-spark.yaml
-    sed -i "s#registry: ""#image: ${DOCKER_REGISTRY}#g" cluster-serving.yaml
+    sed -i "s#registry: .*#image: ${DOCKER_REGISTRY}#g" cluster.yaml
+    sed -i "s#registry: .*#image: ${DOCKER_REGISTRY}#g" cluster-spark.yaml
+    sed -i "s#registry: .*#image: ${DOCKER_REGISTRY}#g" cluster-serving.yaml
 
-    sed -i "s#imageTag: ""#imageTag: ${FATE_VERSION}#g" cluster.yaml
-    sed -i "s#imageTag: ""#imageTag: ${FATE_VERSION}#g" cluster-spark.yaml
-    sed -i "s#imageTag: ""#imageTag: ${fate_serving_version}#g" cluster-serving.yaml
+    sed -i "s#imageTag: .*#imageTag: ${FATE_VERSION}#g" cluster.yaml
+    sed -i "s#imageTag: .*#imageTag: ${FATE_VERSION}#g" cluster-spark.yaml
+    sed -i "s#imageTag: .*#imageTag: ${fate_serving_version}#g" cluster-serving.yaml
 
     logdebug "REGISTRY=${DOCKER_REGISTRY}"
     logdebug "FATE_IMG_TAG=${FATE_VERSION}"
