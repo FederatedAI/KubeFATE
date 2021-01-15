@@ -1,5 +1,5 @@
 #!/bin/bash
-
+source ~/.profile
 DIR=$(dirname $0)
 source ${DIR}/const.sh
 
