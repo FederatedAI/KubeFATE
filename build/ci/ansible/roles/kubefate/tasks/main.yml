@@ -154,6 +154,8 @@
           when: (kubefate_deploy_test.rc|int==1) or
                 (fate_deploy_test.rc|int==1) or
                 (kubefate_build.rc|int==1) 
+          ignore_errors: true
+      ignore_errors: true
 
     - name: Deploy FATE with kind, Please wait, Job is running...
       block:
@@ -172,14 +174,17 @@
                     (fate_status.rc|int==1)
 
           when: exists.state=="file"
+      ignore_errors: true
 
     - name: Clean
       shell: "bash {{ work_dir }}/clean.sh"
+      ignore_errors: true
 
     - name: Clean file
       file:
         path: "{{ base_dir }}"
         state: absent
+      ignore_errors: true
 
     - name: Remove lock file lock_dir
       block:
