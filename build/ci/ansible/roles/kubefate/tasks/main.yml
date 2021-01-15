@@ -119,7 +119,7 @@
       ignore_errors: true
 
     - name: Clean
-      shell: "bash {{ base_dir }}/clean.sh failed"
+      shell: "bash {{ work_dir }}/clean.sh failed"
       when: (kubefate_deploy_test.rc|int==1) or (fate_deploy_test.rc|int==1)
 
     - name: Deploy FATE with kind, Please wait, Job is running...
