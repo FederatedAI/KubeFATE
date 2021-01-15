@@ -141,17 +141,19 @@
           shell: "bash {{ work_dir }}/kubefate-e2e/kubefate_deploy_test.sh >> {{ out_put }}"
           register: kubefate_deploy_test
           ignore_errors: true
+          when: (kubefate_build.rc|int==0)
 
         - name: check fate curd
           shell: "bash {{ work_dir }}/kubefate-e2e/fate_deploy_test.sh >> {{ out_put }}"
           register: fate_deploy_test
           ignore_errors: true
+          when: (kubefate_deploy_test.rc|int==0)
 
         - name: Clean
           shell: "bash {{ work_dir }}/clean.sh failed"
           when: (kubefate_deploy_test.rc|int==1) or
-                (fate_deploy_test.rc|int==1)
-
+                (fate_deploy_test.rc|int==1) or
+                (kubefate_build.rc|int==1) 
 
     - name: Deploy FATE with kind, Please wait, Job is running...
       block:
