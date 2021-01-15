@@ -44,6 +44,9 @@ main() {
     docker pull ${DOCKER_REGISTRY}/jettech/kube-webhook-certgen:v1.5.0
     kind load docker-image ${DOCKER_REGISTRY}/jettech/kube-webhook-certgen:v1.5.0
 
+    docker pull k8s.gcr.io/ingress-nginx/controller:v0.43.0
+    kind load docker-image k8s.gcr.io/ingress-nginx/controller:v0.43.0
+
     docker pull ${DOCKER_REGISTRY}/mariadb:10
     kind load docker-image ${DOCKER_REGISTRY}/mariadb:10
 
