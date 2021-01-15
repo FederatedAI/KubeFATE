@@ -41,12 +41,6 @@ main() {
   for image in "fateboard" "python" "eggroll" "client"; do
     docker pull ${DOCKER_REGISTRY}/federatedai/${image}:${FATE_VERSION}
     kind load docker-image ${DOCKER_REGISTRY}/federatedai/${image}:${FATE_VERSION}
-    if [ $? -ne 0 ]; then
-      echo "Fatal: load fate image ${image} failed"
-      exit 1
-    else
-      exit 0
-    fi
   done
 }
 
