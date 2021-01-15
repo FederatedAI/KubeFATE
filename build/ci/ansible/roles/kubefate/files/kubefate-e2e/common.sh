@@ -102,18 +102,7 @@ upload_chart() {
 }
 
 set_cluster_image() {
-    # Is mirror specified
-    if [[ $FATE_IMG_REGISTRY == "" ]]; then
-        REGISTRY=""
-    else
-        REGISTRY=$FATE_IMG_REGISTRY
-    fi
-    if [[ $FATE_IMG_TAG == "" ]]; then
-        FATE_IMG_TAG="latest"
-    fi
-    if [[ $FATE_SERVING_IMG_TAG == "" ]]; then
-        FATE_SERVING_IMG_TAG="latest"
-    fi
+    
     # set kubefate image:tag
     sed -i "s#registry: ""#image: ${REGISTRY}#g" cluster.yaml
     sed -i "s#registry: ""#image: ${REGISTRY}#g" cluster-spark.yaml
