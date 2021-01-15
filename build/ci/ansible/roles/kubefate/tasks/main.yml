@@ -106,7 +106,7 @@
         - name: Create k8s cluster
           async: "{{ kube_create_timeout }}"
           poll: "{{ check_interval }}"
-          shell: "{{ base_dir }}/utils/create_k8s.sh >> /tmp/cicd-{{ ansible_host }}.out"
+          shell: "bash {{ base_dir }}/utils/create_k8s.sh >> /tmp/cicd-{{ ansible_host }}.out"
           register: k8s_status
           ignore_errors: true
 
@@ -116,21 +116,35 @@
                 (k8s_status.rc|int==1) or
                 (exists.elapsed|int >= check_file_timeout)
 
-    - name: deploy kubefate
+    - name: Pull images
       async: "{{ kube_create_timeout }}"
       poll: "{{ check_interval }}"
-      shell: "{{ base_dir }}/kubefate-e2e/kubefate_deploy_test.sh"
-      register: kubefate_deploy_test
-      ignore_errors: true
-
-    - name: check fate curd
-      shell: "{{ base_dir }}/kubefate-e2e/fate_deploy_test.sh"
-      register: fate_deploy_test
+      shell: "bash {{ base_dir }}/get_images.sh >> /tmp/cicd-{{ ansible_host }}.out"
+      register: images_pull_status
       ignore_errors: true
 
     - name: Clean
       shell: "bash {{ base_dir }}/clean.sh failed"
-      when: (kubefate_deploy_test.rc|int==1) or (fate_deploy_test.rc|int==1)
+      when: images_pull_status.rc|int==1
+
+    - name: Test fate curd
+      block:
+        - name: deploy kubefate
+          async: "{{ kube_create_timeout }}"
+          poll: "{{ check_interval }}"
+          shell: "bash {{ base_dir }}/kubefate-e2e/kubefate_deploy_test.sh"
+          register: kubefate_deploy_test
+          ignore_errors: true
+
+        - name: check fate curd
+          shell: "bash {{ base_dir }}/kubefate-e2e/fate_deploy_test.sh"
+          register: fate_deploy_test
+          ignore_errors: true
+
+        - name: Clean
+          shell: "bash {{ base_dir }}/clean.sh failed"
+          when: (kubefate_deploy_test.rc|int==1) or
+                (fate_deploy_test.rc|int==1)
 
     - name: Deploy FATE with kind, Please wait, Job is running...
       block:
@@ -139,7 +153,7 @@
             - name: Running deployment script.
               async: "{{ fate_create_timeout }}"
               poll: "{{ check_interval }}"
-              shell: "{{ base_dir }}/deploy.sh >> /tmp/cicd-{{ ansible_host }}.out"
+              shell: "bash {{ base_dir }}/deploy.sh >> /tmp/cicd-{{ ansible_host }}.out"
               register: fate_status
               ignore_errors: true
 
