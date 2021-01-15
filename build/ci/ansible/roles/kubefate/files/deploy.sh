@@ -99,7 +99,7 @@ function onCtrlC() {
 generate_cluster_config() {
   ip=$(kubectl get nodes -o wide | sed -n "2p" | awk -F ' ' '{printf $6}')
   cp ./cluster.yaml fate-9999.yaml
-  sed -i 's#registry: .*#registry: "'${DOCKER_REGISTRY}'/federatedai"#g' fate-9999.yaml
+  sed -i 's#registry: .*#registry: "'${DOCKER_REGISTRY}'"#g' fate-9999.yaml
 
   sed -i 's$# rollsite:$rollsite:$g' fate-9999.yaml
   sed -i '0,/# type:/s//type:/' fate-9999.yaml
@@ -147,7 +147,7 @@ main() {
 
   # Replace the docker registry if it is not "docker.io"
   if [ "${DOCKER_REGISTRY}" != "docker.io" ]; then
-    sed -i "s/mariadb:10/${DOCKER_REGISTRY}\/federatedai\/mariadb:10/g" kubefate.yaml
+    sed -i "s/mariadb:10/${DOCKER_REGISTRY}\/mariadb:10/g" kubefate.yaml
     sed -i "s/registry: .*/registry: \"${DOCKER_REGISTRY}\/federatedai\"/g" cluster.yaml
   fi
   kubectl apply -f ./kubefate.yaml
