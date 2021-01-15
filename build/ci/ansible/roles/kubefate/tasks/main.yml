@@ -116,15 +116,19 @@
                 (k8s_status.rc|int==1) or
                 (exists.elapsed|int >= check_file_timeout)
 
+    - name: Pull images
+      async: "{{ kube_create_timeout }}"
+      poll: "{{ check_interval }}"
+      shell: "bash {{ base_dir }}/get_images.sh >> /tmp/cicd-{{ ansible_host }}.out"
+      register: images_pull_status
+      ignore_errors: true
+
+    - name: Clean
+      shell: "bash {{ base_dir }}/clean.sh failed"
+      when: images_pull_status.rc|int==1
+
     - name: Test fate curd
       block:
-        - name: Pull fate images
-          async: "{{ kube_create_timeout }}"
-          poll: "{{ check_interval }}"
-          shell: "bash {{ base_dir }}/utils/create_k8s.sh fate >> /tmp/cicd-{{ ansible_host }}.out"
-          register: fate_image_pull_status
-          ignore_errors: true
-
         - name: deploy kubefate
           async: "{{ kube_create_timeout }}"
           poll: "{{ check_interval }}"
@@ -140,20 +144,12 @@
         - name: Clean
           shell: "bash {{ base_dir }}/clean.sh failed"
           when: (kubefate_deploy_test.rc|int==1) or
-                (fate_deploy_test.rc|int==1) or
-                (fate_image_pull_status.rc|int==1)
+                (fate_deploy_test.rc|int==1)
 
     - name: Deploy FATE with kind, Please wait, Job is running...
       block:
         - name: Running deployment script when file exists.
           block:
-            - name: Pull kubefate images
-              async: "{{ kube_create_timeout }}"
-              poll: "{{ check_interval }}"
-              shell: "bash {{ base_dir }}/utils/create_k8s.sh kubefate >> /tmp/cicd-{{ ansible_host }}.out"
-              register: kubefate_image_pull_status
-              ignore_errors: true
-
             - name: Running deployment script.
               async: "{{ fate_create_timeout }}"
               poll: "{{ check_interval }}"
@@ -164,8 +160,7 @@
             - name: Clean
               shell: "bash {{ base_dir }}/clean.sh failed"
               when: (fate_status.changed==false) or
-                    (fate_status.rc|int==1) or
-                    (kubefate_image_pull_status.rc|int==1)
+                    (fate_status.rc|int==1)
 
           when: exists.state=="file"
 
