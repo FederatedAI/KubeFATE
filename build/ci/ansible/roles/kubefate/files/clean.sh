@@ -14,11 +14,11 @@ clean() {
   fi
 
   # delete docker containers
-  docker stop $(docker ps -a -q)
-  docker rm $(docker ps -a -q)
+  # docker stop $(docker ps -a -q)
+  # docker rm $(docker ps -a -q)
 
   # delete docker images
-  docker rmi -f $(docker images --format "{{.Repository}}\t{{.Tag}}\t{{.ID}}" | grep -E '(${DOCKER_REGISTRY}/)?federatedai' | awk -F ' ' '{print $3}')
+  # docker rmi -f $(docker images --format "{{.Repository}}\t{{.Tag}}\t{{.ID}}" | grep -E '(${DOCKER_REGISTRY}/)?federatedai' | awk -F ' ' '{print $3}')
 }
 
 main() {
