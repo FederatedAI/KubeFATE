@@ -50,6 +50,9 @@ main() {
     docker pull ${DOCKER_REGISTRY}/mysql:8
     kind load docker-image ${DOCKER_REGISTRY}/mysql:8
 
+    docker pull ${DOCKER_REGISTRY}/fluent/fluentd:v1.11-debian-1
+    kind load docker-image ${DOCKER_REGISTRY}/fluent/fluentd:v1.11-debian-1
+
     curl_status=$(curl --version)
     if [ $? -ne 0 ]; then
         echo "Fatal: Curl does not installed correctly"
