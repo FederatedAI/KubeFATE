@@ -88,7 +88,7 @@
         - name: Create k8s cluster
           async: "{{ kube_create_timeout }}"
           poll: "{{ check_interval }}"
-          shell: "bash {{ work_dir }}/utils/create_k8s.sh >> /work/cicd-{{ ansible_host }}.out"
+          shell: "bash {{ work_dir }}/utils/create_k8s.sh >> {{ out_put }}"
           register: k8s_status
           ignore_errors: true
 
@@ -102,19 +102,19 @@
         - name: kubefate build
           async: "{{ kube_create_timeout }}"
           poll: "{{ check_interval }}"
-          shell: "bash {{ work_dir }}/utils/kubefate_build.sh >> /work/cicd-{{ ansible_host }}.out"
+          shell: "bash {{ work_dir }}/utils/kubefate_build.sh >> {{ out_put }}"
           register: kubefate_build
           ignore_errors: true
 
     - name: deploy kubefate
       async: "{{ kube_create_timeout }}"
       poll: "{{ check_interval }}"
-      shell: "bash {{ work_dir }}/kubefate-e2e/kubefate_deploy_test.sh >> {{ base_dir }}/cicd-{{ ansible_host }}.out"
+      shell: "bash {{ work_dir }}/kubefate-e2e/kubefate_deploy_test.sh >> {{ out_put }}"
       register: kubefate_deploy_test
       ignore_errors: true
 
     - name: check fate curd
-      shell: "bash {{ work_dir }}/kubefate-e2e/fate_deploy_test.sh >> {{ base_dir }}/cicd-{{ ansible_host }}.out"
+      shell: "bash {{ work_dir }}/kubefate-e2e/fate_deploy_test.sh >> {{ out_put }}"
       register: fate_deploy_test
       ignore_errors: true
 
@@ -129,7 +129,7 @@
             - name: Running deployment script.
               async: "{{ fate_create_timeout }}"
               poll: "{{ check_interval }}"
-              shell: "{{ work_dir }}/deploy.sh >> {{ base_dir }}/cicd-{{ ansible_host }}.out"
+              shell: "{{ work_dir }}/deploy.sh >> {{ out_put }}"
               register: fate_status
               ignore_errors: true
 

@@ -1,13 +1,13 @@
 job_status: running
-lock_dir: /work/ansible-playbook-{{ ansible_host }}.lock
+lock_dir: /tmp/ansible-playbook-{{ ansible_host }}.lock
 state_timeout: 1800
 wait_processes_rm_lock_file: 2
-base_dir: /work
-work_dir: /work/KubeFATE/build/ci/ansible/roles/kubefate/files
-deploy_script: /work/deploy.sh
+base_dir: /tmp/ansible
+work_dir: /tmp/ansible/KubeFATE/build/ci/ansible/roles/kubefate/files
+deploy_script: /tmp/deploy.sh
 check_file_timeout: 20
-ingress_file: /work/ingress.yml
-out_put: /work/cicd-{{ ansible_host }}.out
+ingress_file: /tmp/ansible/ingress.yml
+out_put: /tmp/ansible/cicd-{{ ansible_host }}.out
 fate_version: latest 
 fate_serving_version: latest 
 kubefate_version: latest
