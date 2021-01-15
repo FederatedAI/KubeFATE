@@ -1,8 +1,11 @@
 #!/bin/bash
+
 dir=$(cd $(dirname $0) && pwd)
 source $dir/color.sh
 
 source $dir/common.sh
+
+binary_install
 
 if kubefate_install; then
     loginfo "kubefate install success"

@@ -1,5 +1,6 @@
 ---
 - hosts: all
+  remote_user: root
   roles:
   - role: kubefate
   environment:

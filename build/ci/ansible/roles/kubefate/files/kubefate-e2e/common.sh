@@ -1,15 +1,16 @@
 #!/bin/bash
 dir=$(cd $(dirname $0) && pwd)
 
+source ~/.profile
 source $dir/color.sh
 
-kubefateWorkDir=$dir/../k8s-deploy
+kubefateWorkDir=$dir/../../../../../../../k8s-deploy
 
 check_kubectl() {
     # check kubectl
     loginfo "check kubectl"
     kubectl version
-    if [ $? -ne 0 ]; then
+    if [[ $? -ne 0 ]]; then
         logerror "K8s environment abnormal"
         exit 1
     fi
@@ -25,11 +26,10 @@ kubefate_install() {
 
     loginfo "apply kubefate"
     # Is mirror specified
-    if [$KubeFATE_IMG == ""]; then
-        # IMG=federatedai/kubefate:latest
-        IMG=federatedai/kubefate:${KUBEFATE_VERSION}
+    if [[ $KubeFATE_IMG != "" ]]; then
+        IMG=${KubeFATE_IMG}:${KUBEFATE_VERSION}
     else
-        IMG=$KubeFATE_IMG
+        IMG=federatedai/kubefate:latest
     fi
     logdebug "IMG=${IMG}"
     # set kubefate image:tag
@@ -42,7 +42,7 @@ kubefate_install() {
     MAX_TRY=60
     for ((i = 1; i <= $MAX_TRY; i++)); do
         status=$(kubectl get pod -l fate=kubefate -n kube-fate -o jsonpath='{.items[0].status.phase}')
-        if [ $status == "Running" ]; then
+        if [[ $status == "Running" ]]; then
             sleep 20
             echo "# kubefate are ok"
             return 0
@@ -74,7 +74,7 @@ set_host() {
 check_kubefate_version() {
     cd $kubefateWorkDir
     kubefate version
-    if [ $? -ne 0 ]; then
+    if [[ $? -ne 0 ]]; then
         logerror "kubefate command line error, checkout ingress"
         return 1
     fi
@@ -102,30 +102,19 @@ upload_chart() {
 }
 
 set_cluster_image() {
-    # Is mirror specified
-    if [$FATE_IMG_REGISTRY == ""]; then
-        REGISTRY=""
-    else
-        REGISTRY=$FATE_IMG_REGISTRY
-    fi
-    if [$FATE_IMG_TAG == ""]; then
-        FATE_IMG_TAG="latest"
-    fi
-    if [$FATE_SERVING_IMG_TAG == ""]; then
-        FATE_SERVING_IMG_TAG="latest"
-    fi
+
     # set kubefate image:tag
-    sed -i "s#registry: ""#image: ${REGISTRY}#g" cluster.yaml
-    sed -i "s#registry: ""#image: ${REGISTRY}#g" cluster-spark.yaml
-    sed -i "s#registry: ""#image: ${REGISTRY}#g" cluster-serving.yaml
+    sed -i "s#registry: .*#image: ${DOCKER_REGISTRY}#g" cluster.yaml
+    sed -i "s#registry: .*#image: ${DOCKER_REGISTRY}#g" cluster-spark.yaml
+    sed -i "s#registry: .*#image: ${DOCKER_REGISTRY}#g" cluster-serving.yaml
 
-    sed -i "s#imageTag: ""#imageTag: ${FATE_IMG_TAG}#g" cluster.yaml
-    sed -i "s#imageTag: ""#imageTag: ${FATE_IMG_TAG}#g" cluster-spark.yaml
-    sed -i "s#imageTag: ""#imageTag: ${FATE_SERVING_IMG_TAG}#g" cluster-serving.yaml
+    sed -i "s#imageTag: .*#imageTag: ${FATE_VERSION}#g" cluster.yaml
+    sed -i "s#imageTag: .*#imageTag: ${FATE_VERSION}#g" cluster-spark.yaml
+    sed -i "s#imageTag: .*#imageTag: ${fate_serving_version}#g" cluster-serving.yaml
 
-    logdebug "REGISTRY=${IMG}"
-    logdebug "FATE_IMG_TAG=${FATE_IMG_TAG}"
-    logdebug "FATE_SERVING_IMG_TAG=${FATE_SERVING_IMG_TAG}"
+    logdebug "REGISTRY=${DOCKER_REGISTRY}"
+    logdebug "FATE_IMG_TAG=${FATE_VERSION}"
+    logdebug "FATE_SERVING_IMG_TAG=${fate_serving_version}"
 }
 
 jobUUID=""
@@ -199,7 +188,7 @@ check_cluster_status() {
     logdebug "clusterUUID=$clusterUUID"
     # cluster describe
     clusterStatus=$(kubefate cluster describe $clusterUUID | grep -w Status | awk '{print $2}')
-    if [ $clusterStatus == "Running" ]; then
+    if [[ $clusterStatus == "Running" ]]; then
         logsuccess "Cluster Status is Running"
     else
         logerror "Cluster Status is $clusterStatus"
@@ -235,4 +224,10 @@ cluster_delete() {
     logerror "ClusterDelete job timeOut, please check"
     kubefate job describe $jobUUID
     return 1
+}
+
+binary_install() {
+    cd $kubefateWorkDir
+    chmod +x ./bin/kubefate
+    export PATH=$PATH:$kubefateWorkDir/bin
 }

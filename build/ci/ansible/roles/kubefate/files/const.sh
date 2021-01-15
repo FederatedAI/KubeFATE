@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/bin/bash
 
 if [ -z "${FATE_VERSION}" ]; then
     FATE_VERSION="latest"
