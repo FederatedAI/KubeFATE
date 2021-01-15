@@ -96,11 +96,10 @@ function onCtrlC() {
   echo 'Ctrl+C is captured'
 }
 
-generate_cluster_config()
-{
+generate_cluster_config() {
   ip=$(kubectl get nodes -o wide | sed -n "2p" | awk -F ' ' '{printf $6}')
   cp ./cluster.yaml fate-9999.yaml
-  sed -i 's#registry: ""#registry: "'${DOCKER_REGISTRY}'/federatedai"#g' fate-9999.yaml
+  sed -i 's#registry: .*#registry: "'${DOCKER_REGISTRY}'/federatedai"#g' fate-9999.yaml
 
   sed -i 's$# rollsite:$rollsite:$g' fate-9999.yaml
   sed -i '0,/# type:/s//type:/' fate-9999.yaml
@@ -128,8 +127,7 @@ generate_cluster_config()
   sed -i '0,/grpcNodePort: 30092/s//grpcNodePort: 30102/' fate-10000.yaml
 }
 
-main()
-{
+main() {
   cd ${BASE_DIR}
   # Download KubeFATE Release Pack, KubeFATE Server Image v1.2.0 and Install KubeFATE Command Lines
   curl -LO https://github.com/FederatedAI/KubeFATE/releases/download/${KUBEFATE_CLI_VERSION}/kubefate-k8s-${KUBEFATE_CLI_VERSION}.tar.gz && tar -xzf ./kubefate-k8s-${KUBEFATE_CLI_VERSION}.tar.gz
@@ -150,7 +148,7 @@ main()
   # Replace the docker registry if it is not "docker.io"
   if [ "${DOCKER_REGISTRY}" != "docker.io" ]; then
     sed -i "s/mariadb:10/${DOCKER_REGISTRY}\/federatedai\/mariadb:10/g" kubefate.yaml
-    sed -i "s/registry: \"\"/registry: \"${DOCKER_REGISTRY}\/federatedai\"/g" cluster.yaml
+    sed -i "s/registry: .*/registry: \"${DOCKER_REGISTRY}\/federatedai\"/g" cluster.yaml
   fi
   kubectl apply -f ./kubefate.yaml
 
@@ -205,14 +203,14 @@ main()
   selector_fate9999="name=fate-9999"
   selector_fate10000="name=fate-10000"
   kubectl wait --namespace fate-9999 \
-  --for=condition=ready pod \
-  --selector=${selector_fate9999} \
-  --timeout=${INGRESS_KUBEFATE_CLUSTER}s
+    --for=condition=ready pod \
+    --selector=${selector_fate9999} \
+    --timeout=${INGRESS_KUBEFATE_CLUSTER}s
 
   kubectl wait --namespace fate-10000 \
-  --for=condition=ready pod \
-  --selector=${selector_fate10000} \
-  --timeout=${INGRESS_KUBEFATE_CLUSTER}s
+    --for=condition=ready pod \
+    --selector=${selector_fate10000} \
+    --timeout=${INGRESS_KUBEFATE_CLUSTER}s
 }
 
 main
