@@ -91,8 +91,6 @@
                   shell: "bash {{ work_dir }}/utils/create_k8s.sh >> {{ out_put }}"
 
                 - name: Pull images
-                  async: "{{ kube_create_timeout }}"
-                  poll: "{{ check_interval }}"
                   shell: "bash {{ work_dir }}/get_images.sh >> {{ out_put }}"
 
                 - name: kubefate build
@@ -116,7 +114,7 @@
                 #   shell: "bash {{ work_dir }}/kubefate-e2e/deploy.sh >> {{ out_put }}"
 
               rescue:
-                - name: Clean up k8s environment
+                - name: Dump error logs
                   async: "{{ fate_create_timeout }}"
                   poll: "{{ check_interval }}"
                   shell: "cat {{ out_put }}"
