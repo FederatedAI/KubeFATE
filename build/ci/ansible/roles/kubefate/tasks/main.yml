@@ -69,71 +69,48 @@
             when: (waitfor.skipped is defined and waitfor.skipped) or (waitfor.state is defined and waitfor.state!="absent") 
       when: lockcode.rc|int==1
 
-    - name: create lock dir if not exists, if it got deleted by other waiting workers
-      file:
-        path: "{{ lock_dir }}"
-        state: directory
-      register: check_if_changed
-
-    - name: Initialize the Workplace for Further Job
-      synchronize:
-        src: ./../../../../../../../KubeFATE
-        dest: "{{ base_dir }}"
-      ignore_errors: yes
-
-    # leave a hook here for building kubefate image
-    - name: Setup k8s cluster with kind
+    - name: Start kubefate test
       block:
-        - name: Check if the deploy.sh file is exists.
-          wait_for:
-            timeout: "{{ check_file_timeout }}"
-            path: "{{ work_dir }}/deploy.sh"
-          register: exists
+        - name: create lock dir if not exists, if it got deleted by other waiting workers
+          file:
+            path: "{{ lock_dir }}"
+            state: directory
+          register: check_if_changed
 
-        - name: Check if the ingress.yml file is exists.
-          wait_for:
-            timeout: "{{ check_file_timeout }}"
-            path: "{{ work_dir }}/ingress.yml"
-          register: exists
+        - name: Initialize the Workplace for Further Job
+          synchronize:
+            src: "{{ src_path }}"
+            dest: "{{ base_dir }}"
+          register: project_status
+          ignore_errors: true
 
-        - name: Check if the k8s creation script is exists.
-          wait_for:
-            timeout: "{{ check_file_timeout }}"
-            path: "{{ work_dir }}/utils/create_k8s.sh"
-          register: exists
-        
+        - debug:
+            msg: "{{ project_status }}"
+          ignore_errors: true
+
         - name: Create k8s cluster
           async: "{{ kube_create_timeout }}"
           poll: "{{ check_interval }}"
           shell: "bash {{ work_dir }}/utils/create_k8s.sh >> {{ out_put }}"
           register: k8s_status
+          when: project_status.rc|int==0
           ignore_errors: true
 
-        - name: Clean
-          shell: "bash {{ work_dir }}/clean.sh failed" 
-          when: (k8s_status.changed==false) or 
-                (k8s_status.rc|int==1) or
-                (exists.elapsed|int >= check_file_timeout)
+        - name: Pull images
+          async: "{{ kube_create_timeout }}"
+          poll: "{{ check_interval }}"
+          shell: "bash {{ work_dir }}/get_images.sh >> {{ out_put }}"
+          register: images_pull_status
+          ignore_errors: true
+          when: k8s_status.rc|int==0
 
-    - name: Pull images
-      async: "{{ kube_create_timeout }}"
-      poll: "{{ check_interval }}"
-      shell: "bash {{ work_dir }}/get_images.sh >> {{ out_put }}"
-      register: images_pull_status
-      ignore_errors: true
-
-    - name: Clean
-      shell: "bash {{ work_dir }}/clean.sh failed"
-      when: images_pull_status.rc|int==1
-
-    - name: Test fate curd
-      block:
         - name: kubefate build
           async: "{{ kube_create_timeout }}"
           poll: "{{ check_interval }}"
           shell: "bash {{ work_dir }}/utils/kubefate_build.sh >> {{ out_put }}"
           register: kubefate_build
           ignore_errors: true
+          when: images_pull_status.rc|int==0
 
         - name: deploy kubefate
           async: "{{ kube_create_timeout }}"
@@ -141,54 +118,38 @@
           shell: "bash {{ work_dir }}/kubefate-e2e/kubefate_deploy_test.sh >> {{ out_put }}"
           register: kubefate_deploy_test
           ignore_errors: true
-          when: (kubefate_build.rc|int==0)
+          when: kubefate_build.rc|int==0
 
         - name: check fate curd
           shell: "bash {{ work_dir }}/kubefate-e2e/fate_deploy_test.sh >> {{ out_put }}"
           register: fate_deploy_test
           ignore_errors: true
+          register:  fate_curd_test
           when: (kubefate_deploy_test.rc|int==0)
 
-        - name: Clean
-          shell: "bash {{ work_dir }}/clean.sh failed"
-          when: (kubefate_deploy_test.rc|int==1) or
-                (fate_deploy_test.rc|int==1) or
-                (kubefate_build.rc|int==1) 
+          
+
+        - name: Running deployment script.
+          async: "{{ fate_create_timeout }}"
+          poll: "{{ check_interval }}"
+          shell: "bash {{ work_dir }}/deploy.sh >> {{ out_put }}"
+          register: fate_status
           ignore_errors: true
-      ignore_errors: true
+          when: fate_curd_test.rc|int==0
 
-    - name: Deploy FATE with kind, Please wait, Job is running...
-      block:
-        - name: Running deployment script when file exists.
-          block:
-            - name: Running deployment script.
-              async: "{{ fate_create_timeout }}"
-              poll: "{{ check_interval }}"
-              shell: "bash {{ work_dir }}/deploy.sh >> {{ out_put }}"
-              register: fate_status
-              ignore_errors: true
+        - name: Clean
+          shell: "bash {{ work_dir }}/clean.sh"
+          ignore_errors: true
 
-            - name: Clean
-              shell: "bash {{ work_dir }}/clean.sh failed"
-              when: (fate_status.changed==false) or
-                    (fate_status.rc|int==1)
-
-          when: exists.state=="file"
-      ignore_errors: true
-
-    - name: Clean
-      shell: "bash {{ work_dir }}/clean.sh"
-      ignore_errors: true
-
-    - name: Clean file
-      file:
-        path: "{{ base_dir }}"
-        state: absent
-      ignore_errors: true
-
-    - name: Remove lock file lock_dir
-      block:
-        - name: Remove lock file lock_dir
+        - name: Clean file
           file:
-            path: "{{ lock_dir }}"
+            path: "{{ base_dir }}"
             state: absent
+          ignore_errors: true
+
+        - name: Remove lock file lock_dir
+          block:
+            - name: Remove lock file lock_dir
+              file:
+                path: "{{ lock_dir }}"
+                state: absent
