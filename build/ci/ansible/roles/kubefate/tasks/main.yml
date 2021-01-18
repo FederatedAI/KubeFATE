@@ -75,7 +75,6 @@
           file:
             path: "{{ lock_dir }}"
             state: directory
-          register: check_if_changed
 
         - name: Copy project to target machine
           block:
@@ -83,7 +82,6 @@
               synchronize:
                 src: "{{ src_path }}"
                 dest: "{{ base_dir }}"
-              register: project_status
 
             - name: Testing based on k8s environment
               block:

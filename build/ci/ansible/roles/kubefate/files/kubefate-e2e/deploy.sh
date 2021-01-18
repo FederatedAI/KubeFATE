@@ -102,7 +102,9 @@ function onCtrlC() {
 generate_cluster_config() {
   ip=$(kubectl get nodes -o wide | sed -n "2p" | awk -F ' ' '{printf $6}')
   cp ./cluster.yaml fate-9999.yaml
-  sed -i 's#registry: .*#registry: "'${DOCKER_REGISTRY}'"#g' fate-9999.yaml
+  if [[ $DOCKER_REGISTRY != "docker.io" ]]; then
+    sed -i 's#registry: .*#registry: "'${DOCKER_REGISTRY}'"#g' fate-9999.yaml
+  fi
 
   sed -i 's$# rollsite:$rollsite:$g' fate-9999.yaml
   sed -i '0,/# type:/s//type:/' fate-9999.yaml
@@ -195,18 +197,28 @@ main() {
   kubefate cluster install -f ./fate-10000.yaml
   kubefate cluster ls
 
-  sleep ${FATE_SERVICE_TIMEOUT}
+  sleep 10s
+
   selector_fate9999="name=fate-9999"
   selector_fate10000="name=fate-10000"
   kubectl wait --namespace fate-9999 \
     --for=condition=ready pod \
     --selector=${selector_fate9999} \
-    --timeout=${INGRESS_KUBEFATE_CLUSTER}s
+    --timeout=180s
 
   kubectl wait --namespace fate-10000 \
     --for=condition=ready pod \
     --selector=${selector_fate10000} \
-    --timeout=${INGRESS_KUBEFATE_CLUSTER}s
+    --timeout=180s
+
+  kubectl exec -n fate-9999 -it svc/fateflow -c python -- bash -c "source /data/projects/python/venv/bin/activate && \
+  cd /data/projects/fate/examples/toy_example && \
+  python run_toy_example.py 9999 9999 1"
+
+  kubectl exec -n fate-9999 -it svc/fateflow -c python -- bash -c "source /data/projects/python/venv/bin/activate && \
+  cd /data/projects/fate/examples/toy_example && \
+  python run_toy_example.py 9999 10000 1"
+
 }
 
 main

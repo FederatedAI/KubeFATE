@@ -113,15 +113,19 @@ upload_chart() {
 
 set_cluster_image() {
 
-    # set kubefate image:tag
-    sed -i "s#registry: .*#image: ${DOCKER_REGISTRY}#g" cluster.yaml
-    sed -i "s#registry: .*#image: ${DOCKER_REGISTRY}#g" cluster-spark.yaml
-    sed -i "s#registry: .*#image: ${DOCKER_REGISTRY}#g" cluster-serving.yaml
-
-    sed -i "s#imageTag: .*#imageTag: ${FATE_VERSION}#g" cluster.yaml
-    sed -i "s#imageTag: .*#imageTag: ${FATE_VERSION}#g" cluster-spark.yaml
-    sed -i "s#imageTag: .*#imageTag: ${fate_serving_version}#g" cluster-serving.yaml
-
+    if [[ $DOCKER_REGISTRY != "docker.io" ]]; then
+        # set kubefate image:tag
+        sed -i "s#registry: .*#registry: ${DOCKER_REGISTRY}#g" cluster.yaml
+        sed -i "s#registry: .*#registry: ${DOCKER_REGISTRY}#g" cluster-spark.yaml
+        sed -i "s#registry: .*#registry: ${DOCKER_REGISTRY}#g" cluster-serving.yaml
+    fi
+    if [[ $FATE_VERSION != "" ]]; then
+        sed -i "s#imageTag: .*#imageTag: ${FATE_VERSION}#g" cluster.yaml
+        sed -i "s#imageTag: .*#imageTag: ${FATE_VERSION}#g" cluster-spark.yaml
+    fi
+    if [[ $FATE_VERSION != "" ]]; then
+        sed -i "s#imageTag: .*#imageTag: ${FATE_SERVING_VERSION}#g" cluster-serving.yaml
+    fi
     logdebug "REGISTRY=${DOCKER_REGISTRY}"
     logdebug "FATE_IMG_TAG=${FATE_VERSION}"
     logdebug "FATE_SERVING_IMG_TAG=${fate_serving_version}"
