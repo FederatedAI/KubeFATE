@@ -75,81 +75,69 @@
           file:
             path: "{{ lock_dir }}"
             state: directory
-          register: check_if_changed
 
-        - name: Initialize the Workplace for Further Job
-          synchronize:
-            src: "{{ src_path }}"
-            dest: "{{ base_dir }}"
-          register: project_status
-          ignore_errors: true
-
-        - debug:
-            msg: "{{ project_status }}"
-          ignore_errors: true
-
-        - name: Create k8s cluster
-          async: "{{ kube_create_timeout }}"
-          poll: "{{ check_interval }}"
-          shell: "bash {{ work_dir }}/utils/create_k8s.sh >> {{ out_put }}"
-          register: k8s_status
-          when: project_status.rc|int==0
-          ignore_errors: true
-
-        - name: Pull images
-          async: "{{ kube_create_timeout }}"
-          poll: "{{ check_interval }}"
-          shell: "bash {{ work_dir }}/get_images.sh >> {{ out_put }}"
-          register: images_pull_status
-          ignore_errors: true
-          when: k8s_status.rc|int==0
-
-        - name: kubefate build
-          async: "{{ kube_create_timeout }}"
-          poll: "{{ check_interval }}"
-          shell: "bash {{ work_dir }}/utils/kubefate_build.sh >> {{ out_put }}"
-          register: kubefate_build
-          ignore_errors: true
-          when: images_pull_status.rc|int==0
-
-        - name: deploy kubefate
-          async: "{{ kube_create_timeout }}"
-          poll: "{{ check_interval }}"
-          shell: "bash {{ work_dir }}/kubefate-e2e/kubefate_deploy_test.sh >> {{ out_put }}"
-          register: kubefate_deploy_test
-          ignore_errors: true
-          when: kubefate_build.rc|int==0
-
-        - name: check fate curd
-          shell: "bash {{ work_dir }}/kubefate-e2e/fate_deploy_test.sh >> {{ out_put }}"
-          register: fate_deploy_test
-          ignore_errors: true
-          register:  fate_curd_test
-          when: (kubefate_deploy_test.rc|int==0)
-
-          
-
-        - name: Running deployment script.
-          async: "{{ fate_create_timeout }}"
-          poll: "{{ check_interval }}"
-          shell: "bash {{ work_dir }}/deploy.sh >> {{ out_put }}"
-          register: fate_status
-          ignore_errors: true
-          when: fate_curd_test.rc|int==0
-
-        - name: Clean
-          shell: "bash {{ work_dir }}/clean.sh"
-          ignore_errors: true
-
-        - name: Clean file
-          file:
-            path: "{{ base_dir }}"
-            state: absent
-          ignore_errors: true
-
-        - name: Remove lock file lock_dir
+        - name: Copy project to target machine
           block:
-            - name: Remove lock file lock_dir
+            - name: Initialize the Workplace for Further Job
+              synchronize:
+                src: "{{ src_path }}"
+                dest: "{{ base_dir }}"
+
+            - name: Testing based on k8s environment
+              block:
+                - name: Create k8s cluster
+                  async: "{{ kube_create_timeout }}"
+                  poll: "{{ check_interval }}"
+                  shell: "bash {{ work_dir }}/utils/create_k8s.sh >> {{ out_put }}"
+
+                - name: Pull images
+                  async: "{{ kube_create_timeout }}"
+                  poll: "{{ check_interval }}"
+                  shell: "bash {{ work_dir }}/get_images.sh >> {{ out_put }}"
+
+                - name: kubefate build
+                  async: "{{ kube_create_timeout }}"
+                  poll: "{{ check_interval }}"
+                  shell: "bash {{ work_dir }}/utils/kubefate_build.sh >> {{ out_put }}"
+
+                - name: deploy kubefate
+                  async: "{{ kube_create_timeout }}"
+                  poll: "{{ check_interval }}"
+                  shell: "bash {{ work_dir }}/kubefate-e2e/kubefate_deploy_test.sh >> {{ out_put }}"
+
+                - name: check fate curd
+                  async: "{{ kube_create_timeout }}"
+                  poll: "{{ check_interval }}"
+                  shell: "bash {{ work_dir }}/kubefate-e2e/fate_deploy_test.sh >> {{ out_put }}"
+                  
+                # - name: Running deployment script.
+                #   async: "{{ fate_create_timeout }}"
+                #   poll: "{{ check_interval }}"
+                #   shell: "bash {{ work_dir }}/kubefate-e2e/deploy.sh >> {{ out_put }}"
+
+              rescue:
+                - name: Clean up k8s environment
+                  async: "{{ fate_create_timeout }}"
+                  poll: "{{ check_interval }}"
+                  shell: "cat {{ out_put }}"
+                
+              always:
+                - name: Clean up k8s environment
+                  shell: "bash {{ work_dir }}/clean.sh"
+
+                - name: Clean up log file {{ out_put }}
+                  file:
+                    path: "{{ out_put }}"
+                    state: absent
+                
+          always:
+            - name: Clean up the project files of the target machine
               file:
-                path: "{{ lock_dir }}"
+                path: "{{ base_dir }}"
                 state: absent
+
+      always:
+        - name: Remove lock file lock_dir
+          file:
+            path: "{{ lock_dir }}"
+            state: absent

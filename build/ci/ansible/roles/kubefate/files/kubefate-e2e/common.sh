@@ -38,20 +38,30 @@ kubefate_install() {
     kubectl apply -f kubefate.yaml
 
     # check kubefate deploy success
-    loginfo "check kubefate deploy success"
-    MAX_TRY=60
-    for ((i = 1; i <= $MAX_TRY; i++)); do
-        status=$(kubectl get pod -l fate=kubefate -n kube-fate -o jsonpath='{.items[0].status.phase}')
-        if [[ $status == "Running" ]]; then
-            sleep 20
-            echo "# kubefate are ok"
-            return 0
-        fi
-        echo "# Current kubefate pod status: $status want Running"
-        sleep 3
-    done
-    echo "kubefate deploy timeOut, please check"
-    return 1
+    kubectl wait --namespace kube-fate \
+        --for=condition=ready pod \
+        --selector="fate=mariadb" \
+        --timeout=180s
+    if [[ $? != 0 ]]; then
+        kubectl get pod -n kube-fate
+        echo "kubefate deploy timeOut, please check"
+        return 1
+    fi
+
+    # check kubefate deploy success
+    kubectl wait --namespace kube-fate \
+        --for=condition=ready pod \
+        --selector="fate=kubefate" \
+        --timeout=180s
+    if [[ $? != 0 ]]; then
+        kubectl get pod -n kube-fate
+        echo "kubefate deploy timeOut, please check"
+        return 1
+    fi
+
+    sleep 10
+    echo "# kubefate deploy ok"
+    return 0
 }
 
 set_host() {
@@ -103,15 +113,19 @@ upload_chart() {
 
 set_cluster_image() {
 
-    # set kubefate image:tag
-    sed -i "s#registry: .*#image: ${DOCKER_REGISTRY}#g" cluster.yaml
-    sed -i "s#registry: .*#image: ${DOCKER_REGISTRY}#g" cluster-spark.yaml
-    sed -i "s#registry: .*#image: ${DOCKER_REGISTRY}#g" cluster-serving.yaml
-
-    sed -i "s#imageTag: .*#imageTag: ${FATE_VERSION}#g" cluster.yaml
-    sed -i "s#imageTag: .*#imageTag: ${FATE_VERSION}#g" cluster-spark.yaml
-    sed -i "s#imageTag: .*#imageTag: ${fate_serving_version}#g" cluster-serving.yaml
-
+    if [[ $DOCKER_REGISTRY != "docker.io" ]]; then
+        # set kubefate image:tag
+        sed -i "s#registry: .*#registry: ${DOCKER_REGISTRY}#g" cluster.yaml
+        sed -i "s#registry: .*#registry: ${DOCKER_REGISTRY}#g" cluster-spark.yaml
+        sed -i "s#registry: .*#registry: ${DOCKER_REGISTRY}#g" cluster-serving.yaml
+    fi
+    if [[ $FATE_VERSION != "" ]]; then
+        sed -i "s#imageTag: .*#imageTag: ${FATE_VERSION}#g" cluster.yaml
+        sed -i "s#imageTag: .*#imageTag: ${FATE_VERSION}#g" cluster-spark.yaml
+    fi
+    if [[ $FATE_VERSION != "" ]]; then
+        sed -i "s#imageTag: .*#imageTag: ${FATE_SERVING_VERSION}#g" cluster-serving.yaml
+    fi
     logdebug "REGISTRY=${DOCKER_REGISTRY}"
     logdebug "FATE_IMG_TAG=${FATE_VERSION}"
     logdebug "FATE_SERVING_IMG_TAG=${fate_serving_version}"

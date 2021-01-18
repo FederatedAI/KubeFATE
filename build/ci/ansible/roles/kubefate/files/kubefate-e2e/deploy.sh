@@ -1,6 +1,9 @@
 #!/bin/bash
-DIR=$(dirname $0)
-source ${DIR}/const.sh
+DIR=$(cd $(dirname $0) && pwd)
+source ${DIR}/../const.sh
+
+source ${DIR}/common.sh
+source ${DIR}/color.sh
 
 # Get distribution
 get_dist_name() {
@@ -99,7 +102,9 @@ function onCtrlC() {
 generate_cluster_config() {
   ip=$(kubectl get nodes -o wide | sed -n "2p" | awk -F ' ' '{printf $6}')
   cp ./cluster.yaml fate-9999.yaml
-  sed -i 's#registry: .*#registry: "'${DOCKER_REGISTRY}'"#g' fate-9999.yaml
+  if [[ $DOCKER_REGISTRY != "docker.io" ]]; then
+    sed -i 's#registry: .*#registry: "'${DOCKER_REGISTRY}'"#g' fate-9999.yaml
+  fi
 
   sed -i 's$# rollsite:$rollsite:$g' fate-9999.yaml
   sed -i '0,/# type:/s//type:/' fate-9999.yaml
@@ -129,33 +134,21 @@ generate_cluster_config() {
 
 main() {
   cd ${BASE_DIR}
-  # Download KubeFATE Release Pack, KubeFATE Server Image v1.2.0 and Install KubeFATE Command Lines
-  curl -LO https://github.com/FederatedAI/KubeFATE/releases/download/${KUBEFATE_CLI_VERSION}/kubefate-k8s-${KUBEFATE_CLI_VERSION}.tar.gz && tar -xzf ./kubefate-k8s-${KUBEFATE_CLI_VERSION}.tar.gz
 
-  # Move the kubefate executable binary to path,
-  chmod +x ./kubefate && mv ./kubefate /usr/bin
+  # install kubefate and kubefate CLI
+  binary_install
 
-  # Download the KubeFATE Server Image
-  curl -LO https://github.com/FederatedAI/KubeFATE/releases/download/${KUBEFATE_CLI_VERSION}/kubefate-${KUBEFATE_VERSION}.docker
-
-  # Load into local Docker
-  docker load <./kubefate-${KUBEFATE_VERSION}.docker
-
-  # Create kube-fate namespace and account for KubeFATE service
-  kubectl apply -f ./rbac-config.yaml
-  # kubectl apply -f ./kubefate.yaml
-
-  # Replace the docker registry if it is not "docker.io"
-  if [ "${DOCKER_REGISTRY}" != "docker.io" ]; then
-    sed -i "s/mariadb:10/${DOCKER_REGISTRY}\/mariadb:10/g" kubefate.yaml
-    sed -i "s/registry: .*/registry: \"${DOCKER_REGISTRY}\/federatedai\"/g" cluster.yaml
+  if kubefate_install; then
+    loginfo "kubefate install success"
+  else
+    exit 1
   fi
-  kubectl apply -f ./kubefate.yaml
 
-  # Check if the commands above have been executed correctly
-  state=$(kubefate version)
-  if [ $? -ne 0 ]; then
-    echo "Fatal: There is something wrong with the installation of kubefate, please check"
+  set_host
+
+  if check_kubefate_version; then
+    loginfo "kubefate CLI ready"
+  else
     exit 1
   fi
 
@@ -166,51 +159,64 @@ main() {
   # Copy the cluster.yaml sample in the working folder. One for party 9999, the other one for party 10000
   generate_cluster_config
 
-  # Start to install these two FATE cluster via KubeFATE with the following command
-  echo "Waiting for kubefate service start to create container..."
-  sleep ${KUBEFATE_SERVICE_TIMEOUT}
+  echo "[debug]"
+  cat ./fate-9999.yaml
+  cat ./fate-10000.yaml
 
-  selector_kubefate="fate=kubefate"
-  kubectl wait --namespace kube-fate \
-    --for=condition=ready pod \
-    --selector=${selector_kubefate} \
-    --timeout=${INGRESS_KUBEFATE_CLUSTER}s
-
-  selector_mariadb="fate=mariadb"
-  kubectl wait --namespace kube-fate \
-    --for=condition=ready pod \
-    --selector=${selector_mariadb} \
-    --timeout=${INGRESS_KUBEFATE_CLUSTER}s
-
-  echo "Waiting for kubefate service get ready..."
-  i=0
-  kubefate_status=$(kubefate version)
-  while [ $? -ne 0 ]; do
-    if [ $i == ${KUBEFATE_CLUSTER_TIMEOUT} ]; then
-      echo "Can't install Ingress, Please check you environment"
-      exit 1
-    fi
-    echo "Kubefate  Service Temporarily Unavailable, please wait..."
-    sleep 1
-    let i+=1
-    kubefate_status=$(kubefate version)
-  done
   kubefate cluster install -f ./fate-9999.yaml
   kubefate cluster install -f ./fate-10000.yaml
+
+  sleep 30s
+
   kubefate cluster ls
 
-  sleep ${FATE_SERVICE_TIMEOUT}
   selector_fate9999="name=fate-9999"
   selector_fate10000="name=fate-10000"
   kubectl wait --namespace fate-9999 \
     --for=condition=ready pod \
     --selector=${selector_fate9999} \
-    --timeout=${INGRESS_KUBEFATE_CLUSTER}s
+    --timeout=180s
 
   kubectl wait --namespace fate-10000 \
     --for=condition=ready pod \
     --selector=${selector_fate10000} \
-    --timeout=${INGRESS_KUBEFATE_CLUSTER}s
+    --timeout=180s
+
+  for ((i = 1; i <= $MAX_TRY; i++)); do
+    jobstatus=$(kubefate cluster ls | grep "fate")
+    if [[ $jobstatus == "Success" ]]; then
+      logsuccess "ClusterDelete job success"
+      return 0
+    fi
+    if [[ $jobstatus != "Pending" ]] && [[ $jobstatus != "Running" ]]; then
+      logerror "ClusterDelete job status error, status: $jobstatus"
+      kubefate job describe $jobUUID
+      return 1
+    fi
+    echo "[INFO] Current kubefate ClusterDelete job status: $jobstatus want Success"
+    sleep 3
+  done
+
+  kubectl exec -n fate-9999 -it svc/fateflow -c python -- bash -c "source /data/projects/python/venv/bin/activate && \
+  cd /data/projects/fate/examples/toy_example && \
+  python run_toy_example.py 9999 9999 1"
+
+  kubectl exec -n fate-9999 -it svc/fateflow -c python -- bash -c "source /data/projects/python/venv/bin/activate && \
+  cd /data/projects/fate/examples/toy_example && \
+  python run_toy_example.py 9999 10000 1"
+
+  # delete fate
+  kubefate cluster ls | grep "fate" | awk '{print $1}' | xargs kubefate cluster delete
+
+  kubectl delete namespace fate-9999
+  kubectl delete namespace fate-10000
+
+  kubefate_uninstall
+
+  clean_host
+
+  loginfo "deploy done."
+
 }
 
 main
