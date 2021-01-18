@@ -159,36 +159,6 @@ main() {
   # Copy the cluster.yaml sample in the working folder. One for party 9999, the other one for party 10000
   generate_cluster_config
 
-  # Start to install these two FATE cluster via KubeFATE with the following command
-  echo "Waiting for kubefate service start to create container..."
-  sleep ${KUBEFATE_SERVICE_TIMEOUT}
-
-  selector_kubefate="fate=kubefate"
-  kubectl wait --namespace kube-fate \
-    --for=condition=ready pod \
-    --selector=${selector_kubefate} \
-    --timeout=${INGRESS_KUBEFATE_CLUSTER}s
-
-  selector_mariadb="fate=mariadb"
-  kubectl wait --namespace kube-fate \
-    --for=condition=ready pod \
-    --selector=${selector_mariadb} \
-    --timeout=${INGRESS_KUBEFATE_CLUSTER}s
-
-  echo "Waiting for kubefate service get ready..."
-  i=0
-  kubefate_status=$(kubefate version)
-  while [ $? -ne 0 ]; do
-    if [ $i == ${KUBEFATE_CLUSTER_TIMEOUT} ]; then
-      echo "Can't install Ingress, Please check you environment"
-      exit 1
-    fi
-    echo "Kubefate  Service Temporarily Unavailable, please wait..."
-    sleep 1
-    let i+=1
-    kubefate_status=$(kubefate version)
-  done
-
   echo "[debug]"
   cat ./fate-9999.yaml
   cat ./fate-10000.yaml
