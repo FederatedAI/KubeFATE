@@ -79,10 +79,14 @@
 
         - name: Initialize the Workplace for Further Job
           synchronize:
-            src: "{{ project_path }}"
+            src: "{{ src_path }}"
             dest: "{{ base_dir }}"
           register: project_status
-          ignore_errors: yes
+          ignore_errors: true
+
+        - debug:
+            msg: "{{ project_status }}"
+          ignore_errors: true
 
         - name: Create k8s cluster
           async: "{{ kube_create_timeout }}"
