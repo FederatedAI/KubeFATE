@@ -84,34 +84,11 @@
           register: project_status
           ignore_errors: yes
 
-        # leave a hook here for building kubefate image
-        - name: Setup k8s cluster with kind
-          block:
-            - name: Check if the deploy.sh file is exists.
-              wait_for:
-                timeout: "{{ check_file_timeout }}"
-                path: "{{ work_dir }}/deploy.sh"
-              register: exists
-
-            - name: Check if the ingress.yml file is exists.
-              wait_for:
-                timeout: "{{ check_file_timeout }}"
-                path: "{{ work_dir }}/ingress.yml"
-              register: exists
-
-            - name: Check if the k8s creation script is exists.
-              wait_for:
-                timeout: "{{ check_file_timeout }}"
-                path: "{{ work_dir }}/utils/create_k8s.sh"
-              register: exists
-            
-            - name: Create k8s cluster
-              async: "{{ kube_create_timeout }}"
-              poll: "{{ check_interval }}"
-              shell: "bash {{ work_dir }}/utils/create_k8s.sh >> {{ out_put }}"
-              register: k8s_status
-              ignore_errors: true
-
+        - name: Create k8s cluster
+          async: "{{ kube_create_timeout }}"
+          poll: "{{ check_interval }}"
+          shell: "bash {{ work_dir }}/utils/create_k8s.sh >> {{ out_put }}"
+          register: k8s_status
           when: project_status.rc|int==0
           ignore_errors: true
 
