@@ -110,10 +110,10 @@
                   poll: "{{ check_interval }}"
                   shell: "bash {{ work_dir }}/kubefate-e2e/fate_deploy_test.sh >> {{ out_put }}"
                   
-                - name: Running deployment script.
-                  async: "{{ fate_create_timeout }}"
-                  poll: "{{ check_interval }}"
-                  shell: "bash {{ work_dir }}/kubefate-e2e/deploy.sh >> {{ out_put }}"
+                # - name: Running deployment script.
+                #   async: "{{ fate_create_timeout }}"
+                #   poll: "{{ check_interval }}"
+                #   shell: "bash {{ work_dir }}/kubefate-e2e/deploy.sh >> {{ out_put }}"
 
               rescue:
                 - name: Clean up k8s environment

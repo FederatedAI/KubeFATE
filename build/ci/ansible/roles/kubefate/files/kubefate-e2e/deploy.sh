@@ -165,9 +165,10 @@ main() {
 
   kubefate cluster install -f ./fate-9999.yaml
   kubefate cluster install -f ./fate-10000.yaml
-  kubefate cluster ls
 
-  sleep 10s
+  sleep 30s
+
+  kubefate cluster ls
 
   selector_fate9999="name=fate-9999"
   selector_fate10000="name=fate-10000"
@@ -180,6 +181,21 @@ main() {
     --for=condition=ready pod \
     --selector=${selector_fate10000} \
     --timeout=180s
+
+  for ((i = 1; i <= $MAX_TRY; i++)); do
+    jobstatus=$(kubefate cluster ls | grep "fate")
+    if [[ $jobstatus == "Success" ]]; then
+      logsuccess "ClusterDelete job success"
+      return 0
+    fi
+    if [[ $jobstatus != "Pending" ]] && [[ $jobstatus != "Running" ]]; then
+      logerror "ClusterDelete job status error, status: $jobstatus"
+      kubefate job describe $jobUUID
+      return 1
+    fi
+    echo "[INFO] Current kubefate ClusterDelete job status: $jobstatus want Success"
+    sleep 3
+  done
 
   kubectl exec -n fate-9999 -it svc/fateflow -c python -- bash -c "source /data/projects/python/venv/bin/activate && \
   cd /data/projects/fate/examples/toy_example && \
