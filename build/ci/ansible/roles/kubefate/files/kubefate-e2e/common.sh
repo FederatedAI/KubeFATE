@@ -38,20 +38,30 @@ kubefate_install() {
     kubectl apply -f kubefate.yaml
 
     # check kubefate deploy success
-    loginfo "check kubefate deploy success"
-    MAX_TRY=60
-    for ((i = 1; i <= $MAX_TRY; i++)); do
-        status=$(kubectl get pod -l fate=kubefate -n kube-fate -o jsonpath='{.items[0].status.phase}')
-        if [[ $status == "Running" ]]; then
-            sleep 20
-            echo "# kubefate are ok"
-            return 0
-        fi
-        echo "# Current kubefate pod status: $status want Running"
-        sleep 3
-    done
-    echo "kubefate deploy timeOut, please check"
-    return 1
+    kubectl wait --namespace kube-fate \
+        --for=condition=ready pod \
+        --selector="fate=mariadb" \
+        --timeout=180s
+    if [[ $? != 0 ]]; then
+        kubectl get pod -n kube-fate
+        echo "kubefate deploy timeOut, please check"
+        return 1
+    fi
+
+    # check kubefate deploy success
+    kubectl wait --namespace kube-fate \
+        --for=condition=ready pod \
+        --selector="fate=kubefate" \
+        --timeout=180s
+    if [[ $? != 0 ]]; then
+        kubectl get pod -n kube-fate
+        echo "kubefate deploy timeOut, please check"
+        return 1
+    fi
+
+    sleep 10
+    echo "# kubefate deploy ok"
+    return 0
 }
 
 set_host() {

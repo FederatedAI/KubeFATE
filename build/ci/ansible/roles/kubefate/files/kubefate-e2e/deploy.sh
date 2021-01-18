@@ -1,6 +1,9 @@
 #!/bin/bash
-DIR=$(dirname $0)
-source ${DIR}/const.sh
+DIR=$(cd $(dirname $0) && pwd)
+source ${DIR}/../const.sh
+
+source ${DIR}/common.sh
+source ${DIR}/color.sh
 
 # Get distribution
 get_dist_name() {
@@ -129,33 +132,21 @@ generate_cluster_config() {
 
 main() {
   cd ${BASE_DIR}
-  # Download KubeFATE Release Pack, KubeFATE Server Image v1.2.0 and Install KubeFATE Command Lines
-  curl -LO https://github.com/FederatedAI/KubeFATE/releases/download/${KUBEFATE_CLI_VERSION}/kubefate-k8s-${KUBEFATE_CLI_VERSION}.tar.gz && tar -xzf ./kubefate-k8s-${KUBEFATE_CLI_VERSION}.tar.gz
 
-  # Move the kubefate executable binary to path,
-  chmod +x ./kubefate && mv ./kubefate /usr/bin
+  # install kubefate and kubefate CLI
+  binary_install
 
-  # Download the KubeFATE Server Image
-  curl -LO https://github.com/FederatedAI/KubeFATE/releases/download/${KUBEFATE_CLI_VERSION}/kubefate-${KUBEFATE_VERSION}.docker
-
-  # Load into local Docker
-  docker load <./kubefate-${KUBEFATE_VERSION}.docker
-
-  # Create kube-fate namespace and account for KubeFATE service
-  kubectl apply -f ./rbac-config.yaml
-  # kubectl apply -f ./kubefate.yaml
-
-  # Replace the docker registry if it is not "docker.io"
-  if [ "${DOCKER_REGISTRY}" != "docker.io" ]; then
-    sed -i "s/mariadb:10/${DOCKER_REGISTRY}\/mariadb:10/g" kubefate.yaml
-    sed -i "s/registry: .*/registry: \"${DOCKER_REGISTRY}\/federatedai\"/g" cluster.yaml
+  if kubefate_install; then
+    loginfo "kubefate install success"
+  else
+    exit 1
   fi
-  kubectl apply -f ./kubefate.yaml
 
-  # Check if the commands above have been executed correctly
-  state=$(kubefate version)
-  if [ $? -ne 0 ]; then
-    echo "Fatal: There is something wrong with the installation of kubefate, please check"
+  set_host
+
+  if check_kubefate_version; then
+    loginfo "kubefate CLI ready"
+  else
     exit 1
   fi
 
@@ -195,6 +186,11 @@ main() {
     let i+=1
     kubefate_status=$(kubefate version)
   done
+
+  echo "[debug]"
+  cat ./fate-9999.yaml
+  cat ./fate-10000.yaml
+
   kubefate cluster install -f ./fate-9999.yaml
   kubefate cluster install -f ./fate-10000.yaml
   kubefate cluster ls
