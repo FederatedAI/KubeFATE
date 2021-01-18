@@ -77,7 +77,7 @@
 
     - name: Initialize the Workplace for Further Job
       synchronize:
-        src: ./../../../../../../../KubeFATE
+        src: "{{ project_path }}"
         dest: "{{ base_dir }}"
       ignore_errors: yes
 
