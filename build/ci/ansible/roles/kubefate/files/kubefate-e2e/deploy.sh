@@ -189,6 +189,18 @@ main() {
   cd /data/projects/fate/examples/toy_example && \
   python run_toy_example.py 9999 10000 1"
 
+  # delete fate
+  kubefate cluster ls | grep "fate" | awk '{print $1}' | xargs kubefate cluster delete
+
+  kubectl delete namespace fate-9999
+  kubectl delete namespace fate-10000
+
+  kubefate_uninstall
+
+  clean_host
+
+  loginfo "deploy done."
+
 }
 
 main
