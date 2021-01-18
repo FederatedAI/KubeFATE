@@ -2,9 +2,9 @@ job_status: running
 lock_dir: /tmp/ansible-playbook-{{ ansible_host }}.lock
 state_timeout: 1800
 wait_processes_rm_lock_file: 2
-base_dir: /tmp/ansible/KubeFATE
-project_path: ../../../../../../*
-work_dir: /tmp/ansible/KubeFATE/build/ci/ansible/roles/kubefate/files
+base_dir: /tmp/KubeFATE/
+project_path: ../../../
+work_dir: /tmp/KubeFATE/build/ci/ansible/roles/kubefate/files
 deploy_script: /tmp/deploy.sh
 check_file_timeout: 20
 ingress_file: /tmp/ansible/ingress.yml
