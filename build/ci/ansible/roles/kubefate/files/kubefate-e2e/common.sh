@@ -83,11 +83,18 @@ set_host() {
 
 check_kubefate_version() {
     cd $kubefateWorkDir
-    kubefate version
-    if [[ $? -ne 0 ]]; then
-        logerror "kubefate command line error, checkout ingress"
-        return 1
-    fi
+
+    MAX_TRY=20
+    for ((i = 1; i <= $MAX_TRY; i++)); do
+        kubefate version
+        if [[ $? == 0 ]]; then
+            logsuccess "Check kubefate version success"
+            return 0
+        fi
+        echo "[INFO] Kubefate version not Success"
+        sleep 5
+    done
+    logerror "Kubefate command line error, checkout ingress"
     return 0
 }
 
