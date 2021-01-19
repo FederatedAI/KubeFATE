@@ -18,9 +18,11 @@ host:
   client: 9999.notebook.kubefate.net
   sparkUI: 9999.spark.kubefate.net
   rabbitmqUI: 9999.rabbitmq.kubefate.net
-exchange:
-  partyIp: 192.168.1.1
-  partyPort: 30000
+
+fedList:
+- Id: 9990
+  Ip: 192.168.1.1
+  Port: 30000
 
 partyList:
 - partyId: 8888
@@ -168,4 +170,10 @@ modules:
 #      10000:
 #        host: 192.168.10.1 
 #        port: 30104
-    
+  exchange:
+    include: true
+    nodeSelector:
+    type: ClusterIP
+    nodePort: 30093
+    size: "2M"
+    route_table:

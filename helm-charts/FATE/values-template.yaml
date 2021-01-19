@@ -8,7 +8,7 @@ image:
   imagePullSecrets:
 {{ toYaml . | indent 2 }}
   {{- end }}
-  
+
 partyId: {{ .partyId }}
 partyName: {{ .name }}
 
@@ -23,11 +23,12 @@ istio:
   enabled: {{ .enabled | default false }}
 {{- end }}
 
-exchange:
-{{- with .rollsite }}
+fedList:
 {{- with .exchange }}
-  partyIp: {{ .ip }}
-  partyPort: {{ .port }}
+{{- range .fedList }}
+  - id: {{ .id }}
+    ip: {{ .ip }}
+    port: {{ .port }}
 {{- end }}
 {{- end }}
 
@@ -157,17 +158,17 @@ modules:
     {{- with .mysql }}
     type: {{ .type }}
     nodeSelector: 
-{{ toYaml .nodeSelector | indent 6 }}
-    ip: {{ .ip | default "mysql" }}
-    port: {{ .port | default "3306" }}
-    database: {{ .database | default "eggroll_meta" }}
-    user: {{ .user | default "fate" }}
-    password: {{ .password | default "fate_dev" }}
-    subPath: {{ .subPath }}
-    existingClaim: {{ .existingClaim }}
-    storageClass: {{ .storageClass }}
-    accessMode: {{ .accessMode | default "ReadWriteOnce" }}
-    size: {{ .size | default "1Gi" }}
+{{ toYaml .mysql.nodeSelector | indent 6 }}
+    ip: {{ .mysql.ip | default "mysql" }}
+    port: {{ .mysql.port | default "3306" }}
+    database: {{ .mysql.database | default "eggroll_meta" }}
+    user: {{ .mysql.user | default "fate" }}
+    password: {{ .mysql.password | default "fate_dev" }}
+    subPath: {{ .mysql.subPath }}
+    existingClaim: {{ .mysql.existingClaim }}
+    storageClass: {{ .mysql.storageClass }}
+    accessMode: {{ .mysql.accessMode | default "ReadWriteOnce" }}
+    size: {{ .mysql.size | default "1Gi" }}
     {{- end }}
 
 
@@ -254,6 +255,23 @@ modules:
     route_table:
       {{- range $key, $val := .route_table }}
       {{ $key }}: 
+{{ toYaml $val | indent 8 }}
+      {{- end }}
+    {{- end }}
+
+  exchange:
+    include: {{ has "exchange" .modules }}
+    {{- with .exchange }}
+    {{- with .nodeSelector }}
+    nodeSelector:
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    type: {{ .type | default "ClusterIP" }}
+    nodePort: {{ .nodePort }}
+    size: {{ .size | default "2M"}}
+    route_table:
+      {{- range $key, $val := .route_table }}
+      {{ $key }}:
 {{ toYaml $val | indent 8 }}
       {{- end }}
     {{- end }}

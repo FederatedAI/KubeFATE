@@ -29,9 +29,6 @@ backend: eggroll
 # rollsite: 
   # type: NodePort
   # nodePort: 30091
-  # exchange:
-    # ip: 192.168.0.1
-    # port: 30000
   # partyList:
   # - partyId: 10000
     # partyIp: 192.168.0.1
@@ -150,3 +147,10 @@ backend: eggroll
     # 10000:
       # host: 192.168.0.1
       # port: 30104
+
+# exchange:
+  # type: ClusterIP
+  # nodePort: 30095
+  # nodeSelector:
+  # size: "2M"
+  # rout_table:

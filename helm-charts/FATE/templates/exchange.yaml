@@ -1,0 +1,151 @@
+# Copyright 2019-2020 VMware, Inc.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+{{ if .Values.modules.exchange.include }}
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: exchange-config
+  labels:
+    fateMoudle: exchange
+{{ include "fate.labels" . | indent 4 }}
+data:
+  route_table.yaml: |
+    default:
+      proxy:
+        - host: exchange 
+          port: 9390
+    {{ .Values.partyId }}:
+      proxy:
+        - host: exchange 
+          port: 9390
+      fateflow:
+        - host: fateflow 
+          port: 9360
+{{- range $key, $val := .Values.modules.exchange.route_table }}
+    {{ $key }}: 
+{{ toYaml . | indent 6 }}
+{{- end }}
+  nginx.conf: |
+    
+    #user  nobody;
+    worker_processes  10;
+    
+    #error_log  logs/error.log;
+    #error_log  logs/error.log  notice;
+    error_log  /dev/stdout info;
+    
+    #pid        logs/nginx.pid;
+    
+    
+    events {
+        worker_connections  1024;
+    }
+    
+    
+    http {
+        include       mime.types;
+        default_type  application/octet-stream;
+    
+        log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                          '$status $body_bytes_sent "$http_referer" '
+                          '"$http_user_agent" "$http_x_forwarded_for"';
+    
+        access_log  /dev/stdout  main;
+    
+        sendfile        on;
+        client_max_body_size {{ .Values.modules.exchange.size }};
+        #tcp_nopush     on;
+    
+        #keepalive_timeout  0;
+        keepalive_timeout  65;
+    
+        #gzip  on;
+        upstream exchange_services {
+            least_conn;
+            {{- range .Values.fedList }}
+            server {{ .ip }}:{{ .port }};
+            {{- end }}
+        }
+        server {
+        listen       9390 http2;
+        location / {
+            grpc_pass grpc://exchange_services;
+        }
+        }
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: exchange
+  labels:
+    fateMoudle: exchange
+{{ include "fate.labels" . | indent 4 }}
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      fateMoudle: exchange
+{{ include "fate.matchLabels" . | indent 6 }}
+  template:
+    metadata:
+      labels:
+        fateMoudle: exchange
+{{ include "fate.labels" . | indent 8 }}
+    spec:
+      containers:
+        - name: exchange
+          image: {{ .Values.image.registry }}/nginx:1.17
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 9390
+          volumeMounts:
+            - mountPath: /data/projects/fate/proxy/nginx/conf/route_table.yaml
+              name: exchange-confs
+              subPath: route_table.yaml
+            - mountPath: /data/projects/fate/proxy/nginx/conf/nginx.conf
+              name: exchange-confs
+              subPath: nginx.conf
+      {{- with .Values.modules.exchange.nodeSelector }}
+      nodeSelector: 
+{{ toYaml . | indent 6 }}
+      {{- end }}
+      restartPolicy: Always
+      volumes:
+        - name: exchange-confs
+          configMap:
+            name: exchange-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: exchange
+  labels:
+    fateMoudle: exchange
+{{ include "fate.labels" . | indent 4 }}
+spec:
+  ports:
+    - name: "9390"
+      port: 9390
+      targetPort: 9390
+      {{- if eq .Values.modules.exchange.type "NodePort" "LoadBalancer" }}
+      nodePort: {{ .Values.modules.exchange.nodePort }}
+      {{- end }}
+      protocol: TCP
+  type: {{ .Values.modules.exchange.type }}
+  selector:
+    fateMoudle: exchange
+{{ include "fate.matchLabels" . | indent 4 }}
+---
+{{ end }}
