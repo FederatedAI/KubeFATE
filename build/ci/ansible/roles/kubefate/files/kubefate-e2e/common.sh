@@ -160,7 +160,7 @@ cluster_install() {
         if [[ $jobstatus != "Pending" ]] && [[ $jobstatus != "Running" ]]; then
             logerror "ClusterInstall job status error, status: $jobstatus"
             kubefate job describe $jobUUID
-            exit 1
+            return 1
         fi
         echo "[INFO] Current kubefate ClusterInstall job status: $jobstatus want Success"
         sleep 5
