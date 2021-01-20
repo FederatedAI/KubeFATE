@@ -95,7 +95,7 @@ check_kubefate_version() {
         sleep 5
     done
     logerror "Kubefate command line error, checkout ingress"
-    return 0
+    return 1
 }
 
 kubefate_uninstall() {
