@@ -143,6 +143,7 @@ check_fate_10000_fateflow_status() {
     if [[ "${python_status}" =~ "${EXPECT_PYTHON_STATUS}" ]]; then
       return 0
     fi
+    echo "fate-10000 fateflow successfully started"
     echo "# Currently have containers: ${python_status} want ${EXPECT_PYTHON_STATUS}"
     sleep 3
   done
@@ -157,6 +158,7 @@ check_fate_9999_fateflow_status() {
     python_status=$(kubectl logs -n fate-9999 svc/fateflow -c python --tail 1 2>&1)
     echo "${python_status}"
     if [[ "${python_status}" =~ "${EXPECT_PYTHON_STATUS}" ]]; then
+      echo "fate-9999 fateflow successfully started"
       return 0
     fi
     echo "# Currently have containers: ${python_status} want ${EXPECT_PYTHON_STATUS}"
@@ -229,7 +231,9 @@ main() {
   python run_toy_example.py 9999 10000 1"
 
   # delete fate
-  kubefate cluster ls | grep "fate" | awk '{print $1}' | xargs kubefate cluster delete
+  kubefate cluster ls | grep "fate" | awk '{print $1}' | xargs -n1 kubefate cluster delete
+
+  sleep 30s
 
   kubectl delete namespace fate-9999
   kubectl delete namespace fate-10000
