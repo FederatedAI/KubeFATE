@@ -144,7 +144,7 @@ check_fate_10000_fateflow_status() {
       return 0
     fi
     echo "fate-10000 fateflow successfully started"
-    echo "# Currently have containers: ${python_status} want ${EXPECT_PYTHON_STATUS}"
+    echo "# fate-9999 fateflow log: ${python_status} want ${EXPECT_PYTHON_STATUS}"
     sleep 3
   done
 
@@ -161,7 +161,7 @@ check_fate_9999_fateflow_status() {
       echo "fate-9999 fateflow successfully started"
       return 0
     fi
-    echo "# Currently have containers: ${python_status} want ${EXPECT_PYTHON_STATUS}"
+    echo "# fate-9999 fateflow log: ${python_status} want ${EXPECT_PYTHON_STATUS}"
     sleep 3
   done
 
