@@ -16,10 +16,12 @@ loginfo() {
 
 logwarning() {
     echo -e $Warning $@
+    echo -e $Warning $@ >&2
 }
 
 logerror() {
     echo -e $ERROR $@
+    echo -e $ERROR $@ >&2
 }
 
 logsuccess() {
