@@ -158,17 +158,17 @@ modules:
     {{- with .mysql }}
     type: {{ .type }}
     nodeSelector: 
-{{ toYaml .mysql.nodeSelector | indent 6 }}
-    ip: {{ .mysql.ip | default "mysql" }}
-    port: {{ .mysql.port | default "3306" }}
-    database: {{ .mysql.database | default "eggroll_meta" }}
-    user: {{ .mysql.user | default "fate" }}
-    password: {{ .mysql.password | default "fate_dev" }}
-    subPath: {{ .mysql.subPath }}
-    existingClaim: {{ .mysql.existingClaim }}
-    storageClass: {{ .mysql.storageClass }}
-    accessMode: {{ .mysql.accessMode | default "ReadWriteOnce" }}
-    size: {{ .mysql.size | default "1Gi" }}
+{{ toYaml .nodeSelector | indent 6 }}
+    ip: {{ .ip | default "mysql" }}
+    port: {{ .port | default "3306" }}
+    database: {{ .database | default "eggroll_meta" }}
+    user: {{ .user | default "fate" }}
+    password: {{ .password | default "fate_dev" }}
+    subPath: {{ .subPath }}
+    existingClaim: {{ .existingClaim }}
+    storageClass: {{ .storageClass }}
+    accessMode: {{ .accessMode | default "ReadWriteOnce" }}
+    size: {{ .size | default "1Gi" }}
     {{- end }}
 
 
