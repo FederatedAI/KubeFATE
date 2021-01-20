@@ -8,7 +8,6 @@
     ANSIBLE_HOST: "{{ ansible_host }}"
     DEPLOY_SCRIPT: "{{ deploy_script }}"
     INGRESS_FILE: "{{ ingress_file }}"
-    OUT_PUT: "{{ out_put }}"
     FATE_VERSION: "{{ fate_version }}"
     FATE_SERVING_VERSION: "{{ fate_serving_version }}"
     KUBEFATE_VERSION: "{{ kubefate_version }}"

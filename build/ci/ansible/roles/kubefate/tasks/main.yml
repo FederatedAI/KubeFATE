@@ -88,46 +88,35 @@
                 - name: Create k8s cluster
                   async: "{{ kube_create_timeout }}"
                   poll: "{{ check_interval }}"
-                  shell: "bash {{ work_dir }}/utils/create_k8s.sh >> {{ out_put }}"
+                  shell: "bash {{ work_dir }}/utils/create_k8s.sh"
 
                 - name: Pull images
-                  shell: "bash {{ work_dir }}/get_images.sh >> {{ out_put }}"
+                  shell: "bash {{ work_dir }}/get_images.sh"
 
                 - name: kubefate build
                   async: "{{ kube_create_timeout }}"
                   poll: "{{ check_interval }}"
-                  shell: "bash {{ work_dir }}/utils/kubefate_build.sh >> {{ out_put }}"
+                  shell: "bash {{ work_dir }}/utils/kubefate_build.sh"
 
                 - name: deploy kubefate
                   async: "{{ kube_create_timeout }}"
                   poll: "{{ check_interval }}"
-                  shell: "bash {{ work_dir }}/kubefate-e2e/kubefate_deploy_test.sh >> {{ out_put }}"
+                  shell: "bash {{ work_dir }}/kubefate-e2e/kubefate_deploy_test.sh"
 
                 - name: check fate curd
                   async: "{{ kube_create_timeout }}"
                   poll: "{{ check_interval }}"
-                  shell: "bash {{ work_dir }}/kubefate-e2e/fate_deploy_test.sh >> {{ out_put }}"
+                  shell: "bash {{ work_dir }}/kubefate-e2e/fate_deploy_test.sh"
                   
                 - name: Running deployment script.
                   async: "{{ fate_create_timeout }}"
                   poll: "{{ check_interval }}"
-                  shell: "bash {{ work_dir }}/kubefate-e2e/deploy.sh >> {{ out_put }}"
+                  shell: "bash {{ work_dir }}/kubefate-e2e/deploy.sh"
 
-              rescue:
-                - name: Dump error logs
-                  async: "{{ fate_create_timeout }}"
-                  poll: "{{ check_interval }}"
-                  shell: "cat {{ out_put }}"
-                
               always:
                 - name: Clean up k8s environment
                   shell: "bash {{ work_dir }}/clean.sh"
 
-                - name: Clean up log file {{ out_put }}
-                  file:
-                    path: "{{ out_put }}"
-                    state: absent
-                
           always:
             - name: Clean up the project files of the target machine
               file:

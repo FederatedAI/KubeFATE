@@ -8,7 +8,6 @@ work_dir: /tmp/KubeFATE/build/ci/ansible/roles/kubefate/files
 deploy_script: /tmp/deploy.sh
 check_file_timeout: 20
 ingress_file: /tmp/ingress.yml
-out_put: /tmp/cicd-{{ ansible_host }}.out
 fate_version: latest 
 fate_serving_version: latest 
 kubefate_version: latest
