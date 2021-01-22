@@ -18,6 +18,7 @@ host:
   client: 9999.notebook.kubefate.net
   sparkUI: 9999.spark.kubefate.net
   rabbitmqUI: 9999.rabbitmq.kubefate.net
+  
 exchange:
   partyIp: 192.168.1.1
   partyPort: 30000

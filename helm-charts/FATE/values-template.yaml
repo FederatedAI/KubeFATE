@@ -9,14 +9,23 @@ image:
 {{ toYaml . | indent 2 }}
   {{- end }}
   
-partyId: {{ .partyId }}
+partyId: {{ .partyId | int64 | toString }}
 partyName: {{ .name }}
 
+{{- $partyId := (.partyId | int64 | toString) }}
+{{- with .host }}
+host:
+  fateboard: {{ .fateboard | default (printf "%v.fateboard.kubefate.net" $partyId) }}
+  client: {{ .client | default (printf "%v.notebook.kubefate.net" $partyId) }}
+  sparkUI: {{ .sparkUI | default (printf "%v.spark.kubefate.net" $partyId) }}
+  rabbitmqUI: {{ .rabbitmqUI | default (printf "%v.rabbitmq.kubefate.net" $partyId) }}
+{{- else }}
 host:
   fateboard: {{ .partyId }}.fateboard.kubefate.net
   client: {{ .partyId }}.notebook.kubefate.net
   sparkUI: {{ .partyId }}.spark.kubefate.net
   rabbitmqUI: {{ .partyId }}.rabbitmq.kubefate.net
+{{- end }}
 
 {{- with .istio }}
 istio:
