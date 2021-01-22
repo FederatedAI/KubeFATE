@@ -14,6 +14,7 @@
 | * persistence         | bool               | mysql and nodemanager data persistence.                      |
 | * modules             | sequences          | Modules to be deployed in the FATE cluster.                  |
 | backend               | set(eggroll,spark) | Configure cluster computing engine( eggroll or spark)        |
+| host                  | mappings           | Custom domain of FATE UI component                           |
 | rollsite              | mappings           | Configuration of FATE cluster `rollsite` module.             |
 | nodemanager           | mappings           | Configuration of FATE cluster `nodemanager` module.          |
 | python                | mappings           | Configuration of FATE cluster `python` module.               |
@@ -46,6 +47,17 @@
 - hdfs
 - nginx
 - rabbitmq
+
+
+
+### host mappings
+
+| Name       | Type    | Description                          |
+| ---------- | ------- | ------------------------------------ |
+| fateboard  | scalars | Configuration of Fateboard UI domain |
+| client     | scalars | Configuration of Notebook UI domain  |
+| sparkUI    | scalars | Configuration of Spark UI domain     |
+| rabbitmqUI | scalars | Configuration of Rabbitmq UI domain  |
 
 
 
