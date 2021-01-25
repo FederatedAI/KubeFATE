@@ -1,17 +1,21 @@
 # Overview
 
-The jenkins CI workflow
+This is a demo for jenkins CI workflow
 
-## Prerequisites
+## Usage
 
-A linux host with jenkins and ansible installed.
+Assume you have built jenkins image called `jenkin:test`, use the following command to start jenkins service:
+
+```bash
+docker run -d -p 8888:8080 --name jenkins -v /home/luke/document/github/jenkins/data:/var/jenkins_home/  -u 1000 jenkins:test
+```
 
 ## Configuration
 
 ### Plugins
 
 1. Install ansible plugin
-2. Set global ansible tool path, for example `/usr/local/bin`
+2. Set global ansible tool with path `/usr/local/bin`
 
 ### Credential
 

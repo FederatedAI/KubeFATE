@@ -1,23 +1,53 @@
 pipeline{
     agent any
+
+    parameters{
+        string(name: 'fate_version', defaultValue: 'latest', description: 'Docker image tag for FATE')
+        string(name: 'fate_serving_version', defaultValue: 'latest', description: 'Docker image tag for FATE Serving')
+        string(name: 'kubefate_version', defaultValue: 'latest', description: 'Docker image tag for KubeFATE')
+        string(name: 'docker_registry', defaultValue: 'docker.io', description: 'Docker registry address')
+    }
     stages{
-        stage("Build"){
+        stage('Nofity') {
+            steps {
+                slackSend message: "Build Started - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)" 
+            }
+        }
+
+        stage("Checkout"){
             steps{
-                git "https://github.com/jiahaoc1993/jenkins-ci"
+                git branch: "jenkins-integration", url: "https://github.com/FederatedAI/KubeFATE.git"
             }
         }
         
-        stage("Ping") {
+        stage("Run Playbook") {
+            
             steps{
-                    withCredentials([file(credentialsId: 'ansible-inventory', variable: 'FILE')]){
+                withCredentials([file(credentialsId: 'ansible-inventory', variable: 'FILE')]){
                     ansiblePlaybook colorized: false, 
                     credentialsId: 'ssh-ansible',
                     installation: 'ansible',
                     inventory: '$FILE',
-                    playbook: 'playbooks/ping.yaml',
-                    disableHostKeyChecking: true
+                    playbook: 'build/ci/ansible/site.yml',
+                    disableHostKeyChecking: true,
+                    extras: '-vvv',
+                    extraVars: [
+                        fate_version: '${fate_version}',
+                        fate_serving_version: '${fate_serving_version}',
+                        kubefate_version: '${kubefate_version}',
+                        docker_registry: '${docker_registry}']
                 }
             }
+        }
+    }
+
+    post {
+        success {
+            slackSend color: "good", message: "Build Success - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)" 
+        }
+            
+        failure {
+            slackSend color: "danger", message: "Build Failure - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)" 
         }
     }
 }
