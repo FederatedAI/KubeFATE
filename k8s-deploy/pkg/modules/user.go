@@ -18,6 +18,7 @@ package modules
 import (
 	"bytes"
 	"crypto/sha256"
+	"errors"
 	"fmt"
 
 	uuid "github.com/satori/go.uuid"
@@ -61,6 +62,24 @@ func (s UserStatus) MarshalJSON() ([]byte, error) {
 	buffer.WriteString(s.String())
 	buffer.WriteString(`"`)
 	return buffer.Bytes(), nil
+}
+
+// UnmarshalJSON sets *m to a copy of data.
+func (s *UserStatus) UnmarshalJSON(data []byte) error {
+	if s == nil {
+		return errors.New("json.RawMessage: UnmarshalJSON on nil pointer")
+	}
+	var UserStatus UserStatus
+	switch string(data) {
+	case "\"Deprecate\"":
+		UserStatus = Deprecate_u
+	case "\"Available\"":
+		UserStatus = Available_u
+	default:
+		return errors.New("data can't UnmarshalJSON")
+	}
+	*s = UserStatus
+	return nil
 }
 
 func encryption(plaintext, salt string) string {
