@@ -16,7 +16,7 @@ pipeline{
 
         stage("Checkout"){
             steps{
-                git branch: "jenkins-integration", url: "https://github.com/FederatedAI/KubeFATE.git"
+                git branch: "master", url: "https://github.com/FederatedAI/KubeFATE.git"
             }
         }
         
