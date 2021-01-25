@@ -1,1 +1,0 @@
-# check to target machine and build
