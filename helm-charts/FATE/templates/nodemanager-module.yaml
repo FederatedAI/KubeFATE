@@ -79,7 +79,7 @@ data:
     <source>
       @type tail
       path /data/projects/fate/eggroll/logs/*/*.*
-      exclude_path ["/data/projects/fate/eggroll/logs/eggroll/"]
+      exclude_path ["/data/projects/fate/eggroll/logs/eggroll/*", "/data/projects/fate/eggroll/logs/log.pos"]
       pos_file /data/projects/fate/eggroll/logs/log.pos
       tag eggroll
       multiline_flush_interval 2s

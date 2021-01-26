@@ -37,6 +37,7 @@ func ClusterCommand() *cli.Command {
 			ClusterDeleteCommand(),
 			ClusterInstallCommand(),
 			ClusterUpdateCommand(),
+			LogCommand(),
 		},
 		Usage: "Manage cluster install, delete and update",
 	}
