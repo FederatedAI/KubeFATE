@@ -37,7 +37,7 @@ type Job struct {
 	Creator   string        `json:"creator" gorm:"type:varchar(16);not null"`
 	SubJobs   SubJobs       `json:"sub_jobs" gorm:"type:blob"`
 	Status    JobStatus     `json:"status"  gorm:"size:8"`
-	TimeLimit time.Duration `json:"time_limit"`
+	TimeLimit time.Duration `json:"time_limit" swaggertype:"string"`
 
 	gorm.Model
 }

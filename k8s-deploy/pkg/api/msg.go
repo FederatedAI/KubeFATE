@@ -12,6 +12,7 @@
  * limitations under the License.
  *
  */
+
 package api
 
 import (
@@ -22,8 +23,10 @@ import (
 // todo: Definition of all returned information
 
 const (
-	SUCCESS     = "success"
-	USEREXISTED = "User is existed."
+	// SUCCESS     string = "success"
+
+	// USEREXISTED USER EXISTED
+	USEREXISTED string = "User is existed."
 )
 
 func recovery() {

@@ -23,9 +23,11 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+// Job API struct
 type Job struct {
 }
 
+// Router of Job API
 func (j *Job) Router(r *gin.RouterGroup) {
 
 	authMiddleware, _ := GetAuthMiddleware()
@@ -38,7 +40,17 @@ func (j *Job) Router(r *gin.RouterGroup) {
 	}
 }
 
-func (_ *Job) getJobList(c *gin.Context) {
+// getJobList List all historical jobs
+// @Summary List all historical jobs
+// @Tags Job
+// @Produce  json
+// @Success 200 {object} JSONResult{data=[]modules.Job} "Success"
+// @Failure 400 {object} JSONERRORResult "Bad Request"
+// @Failure 401 {object} JSONERRORResult "Unauthorized operation"
+// @Router /job/ [get]
+// @Param Authorization header string true "Authentication header"
+// @Security ApiKeyAuth
+func (*Job) getJobList(c *gin.Context) {
 
 	jobList, err := new(modules.Job).GetList()
 	if err != nil {
@@ -50,15 +62,27 @@ func (_ *Job) getJobList(c *gin.Context) {
 	c.JSON(200, gin.H{"data": jobList, "msg": "getJobList success"})
 }
 
-func (_ *Job) getJob(c *gin.Context) {
+// getJob Get job by jobId
+// @Summary Get job by jobId
+// @Tags Job
+// @Produce  json
+// @Param  jobId path int true "Job ID"
+// @Success 200 {object} JSONResult{data=[]modules.Job} "Success"
+// @Failure 400 {object} JSONERRORResult "Bad Request"
+// @Failure 401 {object} JSONERRORResult "Unauthorized operation"
+// @Failure 500 {object} JSONERRORResult "Internal server error"
+// @Router /job/{jobId} [get]
+// @Param Authorization header string true "Authentication header"
+// @Security ApiKeyAuth
+func (*Job) getJob(c *gin.Context) {
 
-	jobId := c.Param("jobId")
-	if jobId == "" {
+	jobID := c.Param("jobId")
+	if jobID == "" {
 		log.Error().Err(errors.New("not exit jobId")).Msg("request error")
 		c.JSON(400, gin.H{"error": "not exit jobId"})
 		return
 	}
-	j := modules.Job{Uuid: jobId}
+	j := modules.Job{Uuid: jobID}
 	job, err := j.Get()
 	if err != nil {
 		log.Error().Err(err).Msg("request error")
@@ -69,15 +93,27 @@ func (_ *Job) getJob(c *gin.Context) {
 	c.JSON(200, gin.H{"msg": "getJob success", "data": job})
 }
 
-func (_ *Job) deleteJob(c *gin.Context) {
+// deleteJob Delete Job by jobId
+// @Summary Delete Job by jobId
+// @Tags Job
+// @Produce  json
+// @Param  jobId path int true "Job ID"
+// @Success 200 {object} JSONEMSGResult "Success"
+// @Failure 400 {object} JSONERRORResult "Bad Request"
+// @Failure 401 {object} JSONERRORResult "Unauthorized operation"
+// @Failure 500 {object} JSONERRORResult "Internal server error"
+// @Router /job/{jobId} [delete]
+// @Param Authorization header string true "Authentication header"
+// @Security ApiKeyAuth
+func (*Job) deleteJob(c *gin.Context) {
 
-	jobId := c.Param("jobId")
-	if jobId == "" {
+	jobID := c.Param("jobId")
+	if jobID == "" {
 		log.Error().Err(errors.New("not exit jobId")).Msg("request error")
 		c.JSON(400, gin.H{"error": "not exit jobId"})
 		return
 	}
-	j := modules.Job{Uuid: jobId}
+	j := modules.Job{Uuid: jobID}
 	_, err := j.Delete()
 	if err != nil {
 		log.Error().Err(err).Msg("request error")

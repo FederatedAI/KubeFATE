@@ -29,6 +29,7 @@ import (
 type kubeLog struct {
 }
 
+// RequestArgs Request Args
 type RequestArgs struct {
 	Container                    string    `form:"container"`
 	Follow                       bool      `form:"follow"`
@@ -51,7 +52,27 @@ func (e *kubeLog) Router(r *gin.RouterGroup) {
 	}
 }
 
-func (_ *kubeLog) getClusterLog(c *gin.Context) {
+// getClusterLog Get cluster log by clusterID
+// @Summary Get cluster log by clusterID
+// @Description When the container of requestArgs is not set, the logs of all components will be obtained
+// @Tags Log
+// @Produce  json
+// @Param  clusterID path int true "Cluster ID"
+// @Param  container query string true "container name"
+// @Param  previous query boolean  true "previous"
+// @Param  since query string true "since"
+// @Param  since-time query string true "since-time"
+// @Param  timestamps query boolean  true "timestamps"
+// @Param  tail query string true "tail"
+// @Param  limit-bytes query string true "limit-bytes"
+// @Success 200 {object} JSONResult{data=string} "Success"
+// @Failure 400 {object} JSONERRORResult "Bad Request"
+// @Failure 401 {object} JSONERRORResult "Unauthorized operation"
+// @Failure 500 {object} JSONERRORResult "Internal server error"
+// @Router /log/{clusterID} [get]
+// @Param Authorization header string true "Authentication header"
+// @Security ApiKeyAuth
+func (*kubeLog) getClusterLog(c *gin.Context) {
 
 	clusterID := c.Param("clusterID")
 	if clusterID == "" {
@@ -100,7 +121,26 @@ func (_ *kubeLog) getClusterLog(c *gin.Context) {
 
 }
 
-func (_ *kubeLog) getClusterLogWs(c *gin.Context) {
+// getClusterLog Get Cluster Log flow (http1.1)
+// @Summary Get Cluster Log flow (http1.1)
+// @Tags Log
+// @Produce  json
+// @Param  clusterID path int true "Cluster ID"
+// @Param  container query string true "container name"
+// @Param  previous query boolean  true "previous"
+// @Param  since query string true "since"
+// @Param  since-time query string true "since-time"
+// @Param  timestamps query boolean  true "timestamps"
+// @Param  tail query string true "tail"
+// @Param  limit-bytes query string true "limit-bytes"
+// @Success 200 {object} string "Success"
+// @Failure 400 {object} JSONERRORResult "Bad Request"
+// @Failure 401 {object} JSONERRORResult "Unauthorized operation"
+// @Failure 500 {object} JSONERRORResult "Internal server error"
+// @Router /log/{clusterID}/ws [get]
+// @Param Authorization header string true "Authentication header"
+// @Security ApiKeyAuth
+func (*kubeLog) getClusterLogWs(c *gin.Context) {
 
 	clusterID := c.Param("clusterID")
 	if clusterID == "" {

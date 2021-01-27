@@ -12,6 +12,7 @@
  * limitations under the License.
  *
  */
+
 package api
 
 import (
@@ -31,7 +32,7 @@ import (
 func initUser() error {
 	err := generateAdminUser()
 	if err != nil {
-		return fmt.Errorf("generate admin user error: %s\n", err)
+		return fmt.Errorf("generate admin user error: %s ", err.Error())
 	}
 	return nil
 }
@@ -71,9 +72,22 @@ func initTables() error {
 }
 
 // Run starts the API server
+// @title KubeFATE service API
+// @version v1
+// @description This is a KubeFATE.
+// @termsOfService http://swagger.io/terms/
+// @contact.name API Support
+// @contact.url https://github.com/FederatedAI/KubeFATE
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+// @host kubefate.net
+// @BasePath /v1
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
 func Run() error {
 	log.Info().Msgf("logLevel: %v", viper.GetString("log.level"))
-	log.Info().Msgf("api version: %v", ApiVersion)
+	log.Info().Msgf("api version: %v", APIVersion)
 	log.Info().Msgf("service version: %v", ServiceVersion)
 	log.Info().Msgf("DbType: %v", viper.GetString("db.type"))
 	log.Info().Msgf("LogNocolor: %v", viper.GetString("log.nocolor"))

@@ -131,7 +131,7 @@ func GetModuleLog(uuid, args string) (string, error) {
 	}
 
 	serviceUrl := viper.GetString("serviceurl")
-	apiVersion := api.ApiVersion + "/"
+	apiVersion := api.APIVersion + "/"
 	if serviceUrl == "" {
 		serviceUrl = "localhost:8080/"
 	}
@@ -202,7 +202,7 @@ func GetModuleLogFollow(uuid, args string) error {
 	}
 
 	serviceUrl := viper.GetString("serviceurl")
-	apiVersion := api.ApiVersion + "/"
+	apiVersion := api.APIVersion + "/"
 	if serviceUrl == "" {
 		serviceUrl = "localhost:8080/"
 	}
