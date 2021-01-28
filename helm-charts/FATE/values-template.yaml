@@ -8,7 +8,7 @@ image:
   imagePullSecrets:
 {{ toYaml . | indent 2 }}
   {{- end }}
-
+  
 partyId: {{ .partyId }}
 partyName: {{ .name }}
 
@@ -22,6 +22,12 @@ host:
 istio:
   enabled: {{ .enabled | default false }}
 {{- end }}
+
+exchange:
+{{- with .rollsite }}
+{{- with .exchange }}
+  partyIp: {{ .ip }}
+  partyPort: {{ .port }}
 
 exchangeList:
 {{- with .lbrollsite }}
