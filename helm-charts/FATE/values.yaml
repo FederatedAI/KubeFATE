@@ -19,10 +19,10 @@ host:
   sparkUI: 9999.spark.kubefate.net
   rabbitmqUI: 9999.rabbitmq.kubefate.net
 
-fedList:
-- Id: 9990
-  Ip: 192.168.1.1
-  Port: 30000
+exchangeList:
+- id: 9991
+  ip: 192.168.1.1
+  port: 30910
 
 partyList:
 - partyId: 8888
@@ -42,6 +42,13 @@ modules:
     type: ClusterIP
     nodePort: 30091
     nodeSelector: 
+  lbrollsite:
+    include: true
+    ip: rollsite
+    type: ClusterIP
+    nodePort: 30091
+    size: "2M"
+    nodeSelector:
   python: 
     include: true
     type: ClusterIP
@@ -170,10 +177,3 @@ modules:
 #      10000:
 #        host: 192.168.10.1 
 #        port: 30104
-  exchange:
-    include: true
-    nodeSelector:
-    type: ClusterIP
-    nodePort: 30093
-    size: "2M"
-    route_table:
