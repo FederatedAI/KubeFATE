@@ -24,9 +24,9 @@ data:
             "default": {
                 "default": [
                     {
-                      {{- if .Values.modules.exchange.include }}
-                        "ip": "exchange",
-                        "port": 9390
+                      {{- with .Values.exchange }}
+                        "ip": "{{ .partyIp }}",
+                        "port": {{ .partyPort }}
                       {{- else }}
                         "ip": "rollsite",
                         "port": 9370
