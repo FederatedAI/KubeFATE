@@ -19,6 +19,7 @@ modules:
   - python
   - fateboard
   - client
+  # - lbrollsite
   # - spark
   # - hdfs
   # - nginx
@@ -43,6 +44,16 @@ backend: eggroll
     # partyIp: 192.168.0.1
     # partyPort: 30101
   # nodeSelector: 
+
+# lbrollsite:
+  # type: NodePort
+  # nodePort: 30091
+  # size: "2M"
+  # exchangeList:
+  # - id: 9991
+    # ip: 192.168.0.1
+    # port: 30910
+  # nodeSelector:
 
 # nodemanager:
   # count: 3

@@ -17,11 +17,15 @@ host:
   fateboard: 9999.fateboard.kubefate.net
   client: 9999.notebook.kubefate.net
   sparkUI: 9999.spark.kubefate.net
-  rabbitmqUI: 9999.rabbitmq.kubefate.net
-  
+
 exchange:
   partyIp: 192.168.1.1
   partyPort: 30000
+
+exchangeList:
+- id: 9991
+  ip: 192.168.1.1
+  port: 30910
 
 partyList:
 - partyId: 8888
@@ -41,6 +45,13 @@ modules:
     type: ClusterIP
     nodePort: 30091
     nodeSelector: 
+  lbrollsite:
+    include: true
+    ip: rollsite
+    type: ClusterIP
+    nodePort: 30091
+    size: "2M"
+    nodeSelector:
   python: 
     include: true
     type: ClusterIP

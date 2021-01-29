@@ -37,6 +37,13 @@ exchange:
 {{- with .exchange }}
   partyIp: {{ .ip }}
   partyPort: {{ .port }}
+
+exchangeList:
+{{- with .lbrollsite }}
+{{- range .exchangeList }}
+  - id: {{ .id }}
+    ip: {{ .ip }}
+    port: {{ .port }}
 {{- end }}
 {{- end }}
 
@@ -61,6 +68,20 @@ modules:
     nodePort: {{ .nodePort }}
     {{- with .nodeSelector }}
     nodeSelector: 
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    {{- end }}
+
+
+  lbrollsite:
+    include: {{ has "lbrollsite" .modules }}
+    {{- with .lbrollsite }}
+    ip: rollsite
+    type: {{ .type | default "ClusterIP" }}
+    nodePort: {{ .nodePort }}
+    size: {{ .size | default "2M" }}
+    {{- with .nodeSelector }}
+    nodeSelector:
 {{ toYaml . | indent 6 }}
     {{- end }}
     {{- end }}
