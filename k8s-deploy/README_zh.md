@@ -171,4 +171,4 @@ Info            dashboard:
 #### [KubeFATE Examples](examples)
 
 ## KubeFATE服务的API参考
-[API Reference](https://app.swaggerhub.com/apis-docs/vmware-octo/kubefate2/1.0.0-oas3#/cluster/createcluster)
+#### [API Reference](docs/KubeFATE_API_Reference_Swagger.md)
