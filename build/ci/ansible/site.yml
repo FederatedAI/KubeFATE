@@ -1,0 +1,20 @@
+---
+- hosts: all
+  remote_user: root
+  roles:
+  - role: kubefate
+  environment:
+    BASE_DIR: "{{ base_dir }}"
+    ANSIBLE_HOST: "{{ ansible_host }}"
+    DEPLOY_SCRIPT: "{{ deploy_script }}"
+    INGRESS_FILE: "{{ ingress_file }}"
+    FATE_VERSION: "{{ fate_version }}"
+    FATE_SERVING_VERSION: "{{ fate_serving_version }}"
+    KUBEFATE_VERSION: "{{ kubefate_version }}"
+    KUBEFATE_CLI_VERSION: "{{ kubefate_cli_version }}"
+    DOCKER_REGISTRY: "{{ docker_registry }}"
+    INGRESS_TIMEOUT: 20
+    KUBEFATE_SERVICE_TIMEOUT: 20
+    KUBEFATE_CLUSTER_TIMEOUT: 600
+    INGRESS_KUBEFATE_CLUSTER: 600
+    FATE_SERVICE_TIMEOUT: 20

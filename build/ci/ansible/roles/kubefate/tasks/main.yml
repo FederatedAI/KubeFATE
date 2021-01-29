@@ -1,0 +1,130 @@
+- name: Locking Simultaneous Access to Hosts in Playbooks
+  block:
+    - name: create lock dir if not exists
+      command: mkdir "{{ lock_dir }}"
+      args:
+        warn: false
+      register: lockcode
+      ignore_errors: true
+      changed_when: "lockcode.rc|int==0"
+    - debug:
+        msg: "{{ lockcode.changed }}"
+
+    - name: Wait until lock file has been deleted or timeout
+      block:
+      - name: Shell to Get Epoch
+        command: date +%s
+        register: ansible_date_time_epoch
+      - debug:
+          msg: "{{ ansible_date_time_epoch.stdout }}"
+
+      - name: Get info on lock_dir
+        stat:
+          path: "{{ lock_dir }}"
+        register: lock_dir_cfg
+      - debug:
+          msg: "{{ lock_dir_cfg.stat.mtime }}"
+
+      - name: Get Epochs Info
+        block:
+          - name: Module to Get Epoch
+            command: date +%s
+            register: ansible_date_time_epoch
+          - debug:
+              msg: "{{ ansible_date_time_epoch.stdout }}"
+
+          - name: Get info on lock_dir
+            stat:
+              path: "{{ lock_dir }}"
+            register: lock_dir_cfg
+          - debug:
+              msg: "{{ lock_dir_cfg.stat.mtime }}"
+
+          - name: Debug date comparison
+            debug:
+              msg: "wait_for timeout={{ (state_timeout - (ansible_date_time_epoch.stdout|float - lock_dir_cfg.stat.mtime))|int }}"
+
+          - name: wait for lock file to be absent
+            wait_for:
+              path: "{{ lock_dir }}"
+              state: absent
+              timeout: "{{ (state_timeout - (ansible_date_time_epoch.stdout|float - lock_dir_cfg.stat.mtime))|int }}"
+            ignore_errors: true
+            register: waitfor
+            when:
+              - (ansible_date_time_epoch.stdout|float - lock_dir_cfg.stat.mtime) > 0
+              - (ansible_date_time_epoch.stdout|float - lock_dir_cfg.stat.mtime) < state_timeout
+
+          - name: Remove lock file lock_dir
+            block:
+              - name: Remove lock file lock_dir
+                file:
+                  path: "{{ lock_dir }}"
+                  state: absent
+
+              - name: Sleep for {{ wait_processes_rm_lock_file }} seconds for all waiting processes to make the file absent, May need to increase this
+                wait_for:
+                  delay: "{{ wait_processes_rm_lock_file }}"
+                  timeout: 0
+            when: (waitfor.skipped is defined and waitfor.skipped) or (waitfor.state is defined and waitfor.state!="absent") 
+      when: lockcode.rc|int==1
+
+    - name: Start kubefate test
+      block:
+        - name: create lock dir if not exists, if it got deleted by other waiting workers
+          file:
+            path: "{{ lock_dir }}"
+            state: directory
+
+        - name: Copy project to target machine
+          block:
+            - name: Initialize the Workplace for Further Job
+              synchronize:
+                src: "{{ src_path }}"
+                dest: "{{ base_dir }}"
+
+            - name: Testing based on k8s environment
+              block:
+                - name: Create k8s cluster
+                  async: "{{ kube_create_timeout }}"
+                  poll: "{{ check_interval }}"
+                  shell: "bash {{ work_dir }}/utils/create_k8s.sh"
+
+                - name: Pull images
+                  shell: "bash {{ work_dir }}/get_images.sh"
+
+                - name: kubefate build
+                  async: "{{ kube_create_timeout }}"
+                  poll: "{{ check_interval }}"
+                  shell: "bash {{ work_dir }}/utils/kubefate_build.sh"
+
+                - name: deploy kubefate
+                  async: "{{ kube_create_timeout }}"
+                  poll: "{{ check_interval }}"
+                  shell: "bash {{ work_dir }}/kubefate-e2e/kubefate_deploy_test.sh"
+
+                - name: check fate curd
+                  async: "{{ kube_create_timeout }}"
+                  poll: "{{ check_interval }}"
+                  shell: "bash {{ work_dir }}/kubefate-e2e/fate_deploy_test.sh"
+                  
+                - name: Running deployment script.
+                  async: "{{ fate_create_timeout }}"
+                  poll: "{{ check_interval }}"
+                  shell: "bash {{ work_dir }}/kubefate-e2e/deploy.sh"
+
+              always:
+                - name: Clean up k8s environment
+                  shell: "bash {{ work_dir }}/clean.sh"
+
+          always:
+            - name: Clean up the project files of the target machine
+              file:
+                path: "{{ base_dir }}"
+                state: absent
+
+      always:
+        - name: Remove lock file lock_dir
+          file:
+            path: "{{ lock_dir }}"
+            state: absent

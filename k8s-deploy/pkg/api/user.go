@@ -41,6 +41,7 @@ func (u *User) Router(r *gin.RouterGroup) {
 	user.Use(authMiddleware.MiddlewareFunc())
 	{
 		user.POST("", u.createUser)
+		user.GET("/", u.getUserLisr)
 		user.GET("/:userId", u.getUser)
 		user.PUT("/:userId", u.setUser)
 		user.DELETE("/:userId", u.deleteUser)
@@ -130,7 +131,17 @@ func (*User) getUser(c *gin.Context) {
 	log.Debug().Interface("result", result).Msg("result")
 	c.JSON(200, gin.H{"data": result})
 }
+func (*User) getUserLisr(c *gin.Context) {
 
+	u := new(modules.User)
+	result, err := u.GetList()
+	if err != nil {
+		log.Error().Err(err).Msg("request error")
+		c.JSON(500, gin.H{"error": err.Error()})
+	}
+	log.Debug().Interface("result", result).Msg("result")
+	c.JSON(200, gin.H{"data": result})
+}
 func getUserFindByUUID(uuid string) (modules.User, error) {
 	u := modules.User{Uuid: uuid}
 	user, err := u.Get()

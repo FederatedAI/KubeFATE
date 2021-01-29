@@ -18,6 +18,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+
+	"github.com/rs/zerolog/log"
 )
 
 const (
@@ -167,6 +169,8 @@ func GetItemList(i Item) error {
 	if err != nil {
 		return err
 	}
+
+	log.Debug().Int("rep.Code", rep.Code).Msg("rep.Code")
 
 	if rep.Code != 200 {
 		msg, err := i.getResult(ERROR)

@@ -1,0 +1,1 @@
+Self-built jenkins docker image with ansible

@@ -27,6 +27,12 @@ modules:
 
 backend: eggroll
 
+# host:
+  # fateboard: 9999.fateboard.kubefate.net
+  # client: 9999.notebook.kubefate.net
+  # sparkUI: 9999.spark.kubefate.net
+  # rabbitmqUI: 9999.rabbitmq.kubefate.net
+
 # rollsite: 
   # type: NodePort
   # nodePort: 30091

@@ -1,7 +1,7 @@
 name: fate-9999
 namespace: fate-9999
 chartName: fate
-chartVersion: v1.5.0
+chartVersion: v1.5.0-b
 partyId: 9999
 registry: ""
 imageTag: ""
@@ -24,6 +24,12 @@ modules:
 
 backend: eggroll
 
+# host:
+  # fateboard: 9999.fateboard.kubefate.net
+  # client: 9999.notebook.kubefate.net
+  # sparkUI: 9999.spark.kubefate.net
+  # rabbitmqUI: 9999.rabbitmq.kubefate.net
+  
 # rollsite: 
   # type: NodePort
   # nodePort: 30091

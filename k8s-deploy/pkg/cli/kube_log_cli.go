@@ -35,7 +35,7 @@ import (
 
 func LogCommand() *cli.Command {
 	return &cli.Command{
-		Name: "log",
+		Name: "logs",
 		Flags: []cli.Flag{
 			&cli.BoolFlag{
 				Name:    "follow",
