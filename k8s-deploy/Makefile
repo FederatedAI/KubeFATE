@@ -10,11 +10,11 @@ endif
 
 
 ifeq ($(OS),Windows_NT)
-Buildmode = -buildmode=exe
-OutFile = bin/kubefate.exe
+BUILD_MODE = -buildmode=exe
+OUTPUT_FILE = bin/kubefate.exe
 else
-Buildmode = 
-OutFile = bin/kubefate
+BUILD_MODE = 
+OUTPUT_FILE = bin/kubefate
 endif
 
 
@@ -26,7 +26,7 @@ test: fmt vet
 
 # Build manager binary
 kubefate: fmt vet swag
-	go build -o ${OutFile} ${Buildmode} kubefate.go
+	go build -o ${OUTPUT_FILE} ${BUILD_MODE} kubefate.go
 
 run: fmt vet 
 	go run ./kubefate.go service
