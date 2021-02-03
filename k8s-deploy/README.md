@@ -164,6 +164,7 @@ Info            dashboard:
 #### [Update and Delete a FATE Cluster](../docs/Update_and_Delete_a_FATE_Cluster.md)
 #### [KubeFATE Examples](examples)
 
+#### [KubeFATE Command Line User Guide](../docs/KubeFATE_command_line_user_guide.md)
+
 ## KubeFATE Service RESTful APIs Reference
 #### [API Reference](docs/KubeFATE_API_Reference_Swagger.md)
-
