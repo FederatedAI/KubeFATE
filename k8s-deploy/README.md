@@ -167,4 +167,4 @@ Info            dashboard:
 #### [KubeFATE Command Line User Guide](../docs/KubeFATE_command_line_user_guide.md)
 
 ## KubeFATE Service RESTful APIs Reference
-[API Reference](https://app.swaggerhub.com/apis-docs/vmware-octo/kubefate2/1.0.0-oas3#/cluster/createcluster)
+#### [API Reference](docs/KubeFATE_API_Reference_Swagger.md)

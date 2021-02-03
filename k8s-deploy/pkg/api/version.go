@@ -12,14 +12,17 @@
  * limitations under the License.
  *
  */
+
 package api
 
 import (
 	"github.com/gin-gonic/gin"
 )
 
+// ServiceVersion code release version
 const ServiceVersion = "v1.3.0"
 
+// Version API struct
 type Version struct {
 }
 
@@ -34,6 +37,15 @@ func (c *Version) Router(r *gin.RouterGroup) {
 	}
 }
 
-func (_ *Version) getVersion(c *gin.Context) {
+// getVersion Get build version
+// @Summary Get build version
+// @Tags Version
+// @Produce  json
+// @Success 200 {object} VersionResult
+// @Failure 401 {object} JSONERRORResult
+// @Router /version [get]
+// @Param Authorization header string true "Authentication header" default(Bearer <Token>)
+// @Security ApiKeyAuth
+func (*Version) getVersion(c *gin.Context) {
 	c.JSON(200, gin.H{"msg": "getVersion success", "version": ServiceVersion})
 }

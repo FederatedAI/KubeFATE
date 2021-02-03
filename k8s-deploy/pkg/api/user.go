@@ -12,12 +12,14 @@
  * limitations under the License.
  *
  */
+
 package api
 
 import (
 	"errors"
 
 	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/modules"
+	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
@@ -28,17 +30,18 @@ type User modules.User
 
 // Router is user router definition method
 func (u *User) Router(r *gin.RouterGroup) {
+	authM, _ := GetAuthMiddleware()
+	auth := authMiddleware{authM}
 
-	authMiddleware, _ := GetAuthMiddleware()
 	user := r.Group("/user")
 	{
-		user.POST("/login", authMiddleware.LoginHandler)
-		user.POST("/logout", authMiddleware.LogoutHandler)
+		user.POST("/login", auth.login)
+		user.POST("/logout", auth.logout)
 
 		//user.GET("/findByName",u.findUser)
 		//user.GET("/findByStatus",u.findUser)
 	}
-	user.Use(authMiddleware.MiddlewareFunc())
+	user.Use(auth.MiddlewareFunc())
 	{
 		user.POST("", u.createUser)
 		user.GET("/", u.getUserLisr)
@@ -46,6 +49,36 @@ func (u *User) Router(r *gin.RouterGroup) {
 		user.PUT("/:userId", u.setUser)
 		user.DELETE("/:userId", u.deleteUser)
 	}
+}
+
+type authMiddleware struct {
+	*jwt.GinJWTMiddleware
+}
+
+// login login
+// @Summary login
+// @Tags User
+// @Accept  json
+// @Produce  json
+// @Param login body Login true "Login"
+// @Success 200 {object} TokenResult
+// @Failure 401 {object} JSONEMSGResult
+// @Router /user/login [post]
+func (authMiddleware *authMiddleware) login(c *gin.Context) {
+	authMiddleware.LoginHandler(c)
+}
+
+// logout logout
+// @Summary logout
+// @Tags User
+// @Produce  json
+// @Success 200 {object} string
+// @Failure 401 {object} JSONEMSGResult
+// @Router /user/logout [post]
+// @Param Authorization header string true "Authentication header"
+// @Security ApiKeyAuth
+func (authMiddleware *authMiddleware) logout(c *gin.Context) {
+	authMiddleware.LogoutHandler(c)
 }
 
 func generateAdminUser() error {
@@ -73,6 +106,18 @@ func generateAdminUser() error {
 	return nil
 }
 
+// createUser Create a user
+// @Summary Create a user
+// @Tags User
+// @Produce  json
+// @Param  User body modules.User true "User"
+// @Success 200 {object} JSONResult{data=modules.User} "Success"
+// @Failure 400 {object} JSONERRORResult "Bad Request"
+// @Failure 401 {object} JSONERRORResult Unauthorized operation"
+// @Failure 500 {object} JSONERRORResult "Internal server error"
+// @Router /user [post]
+// @Param Authorization header string true "Authentication header"
+// @Security ApiKeyAuth
 func (*User) createUser(c *gin.Context) {
 
 	user := new(modules.User)
@@ -98,16 +143,28 @@ func (*User) createUser(c *gin.Context) {
 	c.JSON(200, gin.H{"msg": "createCluster success", "data": user})
 }
 
+// setUser Update user
+// @Summary Update user
+// @Tags User
+// @Produce  json
+// @Param  User body modules.User true "User"
+// @Success 200 {object} JSONResult{data=modules.User} "Success"
+// @Failure 400 {object} JSONERRORResult "Bad Request"
+// @Failure 401 {object} JSONERRORResult "Unauthorized operation"
+// @Failure 500 {object} JSONERRORResult "Internal server error"
+// @Router /user [put]
+// @Param Authorization header string true "Authentication header"
+// @Security ApiKeyAuth
 func (*User) setUser(c *gin.Context) {
 
-	userId := c.Param("userId")
+	userID := c.Param("userId")
 	user := new(modules.User)
 	if err := c.ShouldBindJSON(user); err != nil {
 		log.Error().Err(err).Msg("request error")
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
-	user.Uuid = userId
+	user.Uuid = userID
 	_, err := user.Update(user.ID)
 	if err != nil {
 		log.Error().Err(err).Msg("request error")
@@ -116,21 +173,46 @@ func (*User) setUser(c *gin.Context) {
 	log.Debug().Interface("result", "setUser success").Msg("result")
 	c.JSON(200, gin.H{"msg": "setUser success"})
 }
+
+// getUserLisr Get user by userId
+// @Summary Get user by userId
+// @Tags User
+// @Produce  json
+// @Param  userId path string true "User"
+// @Success 200 {object} JSONResult{data=modules.User} "Success"
+// @Failure 400 {object} JSONERRORResult "Bad Request"
+// @Failure 401 {object} JSONERRORResult "Unauthorized operation"
+// @Failure 500 {object} JSONERRORResult "Internal server error"
+// @Router /user/{userId} [get]
+// @Param Authorization header string true "Authentication header"
+// @Security ApiKeyAuth
 func (*User) getUser(c *gin.Context) {
 
-	userId := c.Param("userId")
-	if userId == "" {
+	userID := c.Param("userId")
+	if userID == "" {
 		log.Error().Err(errors.New("not exit userId")).Msg("request error")
 		c.JSON(400, gin.H{"error": "not exit userId"})
 	}
-	result, err := getUserFindByUUID(userId)
+	result, err := getUserFindByUUID(userID)
 	if err != nil {
 		log.Error().Err(err).Msg("request error")
 		c.JSON(500, gin.H{"error": err.Error()})
 	}
 	log.Debug().Interface("result", result).Msg("result")
-	c.JSON(200, gin.H{"data": result})
+	c.JSON(200, gin.H{"msg": "getUser success", "data": result})
 }
+
+// getUserLisr List all available user
+// @Summary List all available user
+// @Tags User
+// @Produce  json
+// @Success 200 {object} JSONResult{data=[]modules.User} "Success"
+// @Failure 400 {object} JSONERRORResult "Bad Request"
+// @Failure 401 {object} JSONERRORResult "Unauthorized operation"
+// @Failure 500 {object} JSONERRORResult "Internal server error"
+// @Router /user [get]
+// @Param Authorization header string true "Authentication header"
+// @Security ApiKeyAuth
 func (*User) getUserLisr(c *gin.Context) {
 
 	u := new(modules.User)
@@ -140,22 +222,35 @@ func (*User) getUserLisr(c *gin.Context) {
 		c.JSON(500, gin.H{"error": err.Error()})
 	}
 	log.Debug().Interface("result", result).Msg("result")
-	c.JSON(200, gin.H{"data": result})
+	c.JSON(200, gin.H{"msg": "getUserLisr success", "data": result})
 }
+
 func getUserFindByUUID(uuid string) (modules.User, error) {
 	u := modules.User{Uuid: uuid}
 	user, err := u.Get()
 	return user, err
 }
 
+// deleteUser Delete user by userId
+// @Summary Delete user by userId
+// @Tags User
+// @Produce  json
+// @Param  userId path string true "User"
+// @Success 200 {object} JSONEMSGResult "Success"
+// @Failure 400 {object} JSONERRORResult "Bad Request"
+// @Failure 401 {object} JSONERRORResult "Unauthorized operation"
+// @Failure 500 {object} JSONERRORResult "Internal server error"
+// @Router /user/{userId} [get]
+// @Param Authorization header string true "Authentication header"
+// @Security ApiKeyAuth
 func (*User) deleteUser(c *gin.Context) {
 
-	userId := c.Param("userId")
-	if userId == "" {
+	userID := c.Param("userId")
+	if userID == "" {
 		log.Error().Err(errors.New("not exit userId")).Msg("request error")
 		c.JSON(400, gin.H{"error": "not exit userId"})
 	}
-	u := modules.User{Uuid: userId}
+	u := modules.User{Uuid: userID}
 	_, err := u.Delete()
 	if err != nil {
 		log.Error().Err(err).Msg("request error")

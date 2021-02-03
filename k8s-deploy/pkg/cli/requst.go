@@ -97,7 +97,7 @@ type Response struct {
 
 func Send(r *Request) (*Response, error) {
 	serviceUrl := viper.GetString("serviceurl")
-	apiVersion := api.ApiVersion + "/"
+	apiVersion := api.APIVersion + "/"
 	if serviceUrl == "" {
 		serviceUrl = "localhost:8080/"
 	}

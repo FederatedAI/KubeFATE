@@ -12,22 +12,41 @@
  * limitations under the License.
  *
  */
+
 package api
 
-type endpoint struct {
-	ip   string
-	port string
+// JSONResult success Result
+type JSONResult struct {
+	Message string `json:"msg" example:"success"`
 }
 
-type boostrapParties struct {
-	PartyId   string   `json:"party_id"`
-	Endpoint  endpoint `json:"endpoint"`
-	PartyType string   `json:"party_type"`
+// JSONERRORResult error Result
+type JSONERRORResult struct {
+	Code  int    `json:"code" `
+	Error string `json:"error"`
 }
-type installCluster struct {
-	Name            string           `json:"name"`
-	Namespace       string           `json:"namespace"`
-	Version         string           `json:"version"`
-	EggNumber       int              `json:"egg_number"`
-	BoostrapParties *boostrapParties `json:"boostrap_parties"`
+
+// JSONEMSGResult 401 Result
+type JSONEMSGResult struct {
+	Code    int    `json:"code" example:"401"`
+	Message string `json:"msg" example:"cookie token is empty"`
+}
+
+// VersionResult GET Version Result
+type VersionResult struct {
+	Version string `example:"v1.3.0"`
+	Message string `json:"msg" example:"getVersion success"`
+}
+
+//TokenResult LOgin Result
+type TokenResult struct {
+	Code   int    `example:"200"`
+	Expire string `example:"2021-01-28T14:48:53+08:00"`
+	Token  string `example:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."`
+}
+
+// Login body
+type Login struct {
+	Username string `example:"admin"`
+	Password string `example:"admin"`
 }

@@ -12,6 +12,7 @@
  * limitations under the License.
  *
  */
+
 package api
 
 import (
@@ -23,6 +24,7 @@ import (
 	"helm.sh/helm/v3/pkg/chart/loader"
 )
 
+// Chart API struct
 type Chart struct {
 }
 
@@ -40,7 +42,24 @@ func (c *Chart) Router(r *gin.RouterGroup) {
 	}
 }
 
-func (_ *Chart) createChart(c *gin.Context) {
+// HelmUUID HelmUUID
+type HelmUUID struct {
+	HelmUUID string
+}
+
+// createChart Upload a chart
+// @Summary Upload a chart
+// @Tags Chart
+// @Produce  json
+// @Param file formData file true "cluster chart"
+// @Success 200 {object} JSONResult{data=HelmUUID} "Success"
+// @Failure 400 {object} JSONERRORResult "Bad Request"
+// @Failure 401 {object} JSONERRORResult "Unauthorized operation"
+// @Failure 500 {object} JSONERRORResult "Internal server error"
+// @Router /chart [post]
+// @Param Authorization header string true "Authentication header"
+// @Security ApiKeyAuth
+func (*Chart) createChart(c *gin.Context) {
 	// single file
 	file, err := c.FormFile("file")
 	if err != nil {
@@ -77,7 +96,17 @@ func (_ *Chart) createChart(c *gin.Context) {
 	c.JSON(200, gin.H{"msg": "createChart success", "data": gin.H{"helmUUID": helmChart.Uuid}})
 }
 
-func (_ *Chart) getChartList(c *gin.Context) {
+// getChartList List all historical charts
+// @Summary List all historical charts
+// @Tags Chart
+// @Produce  json
+// @Success 200 {object} JSONResult{data=[]modules.HelmChart} "Success"
+// @Failure 401 {object} JSONERRORResult "Unauthorized operation"
+// @Failure 500 {object} JSONERRORResult "Internal server error"
+// @Router /chart [get]
+// @Param Authorization header string true "Authentication header"
+// @Security ApiKeyAuth
+func (*Chart) getChartList(c *gin.Context) {
 
 	chartList, err := new(modules.HelmChart).GetList()
 	if err != nil {
@@ -89,16 +118,28 @@ func (_ *Chart) getChartList(c *gin.Context) {
 	c.JSON(200, gin.H{"msg": "getChartList success", "data": chartList})
 }
 
-func (_ *Chart) getChart(c *gin.Context) {
+// getChart Get Chart by chartId
+// @Summary Get Chart by chartId
+// @Tags Chart
+// @Produce  json
+// @Param  chartId path string true "chart Id"
+// @Success 200 {object} JSONResult{data=modules.HelmChart} "Success"
+// @Failure 400 {object} JSONERRORResult "Bad Request"
+// @Failure 401 {object} JSONERRORResult "Unauthorized operation"
+// @Failure 500 {object} JSONERRORResult "Internal server error"
+// @Router /chart/{chartId} [get]
+// @Param Authorization header string true "Authentication header"
+// @Security ApiKeyAuth
+func (*Chart) getChart(c *gin.Context) {
 
-	chartId := c.Param("chartId")
-	if chartId == "" {
+	chartID := c.Param("chartId")
+	if chartID == "" {
 		log.Error().Err(errors.New("not exit chartId")).Msg("request error")
 		c.JSON(400, gin.H{"error": "not exit chartId"})
 		return
 	}
 
-	hc := modules.HelmChart{Uuid: chartId}
+	hc := modules.HelmChart{Uuid: chartID}
 	chartList, err := hc.Get()
 	if err != nil {
 		log.Error().Err(err).Msg("request error")
@@ -109,14 +150,26 @@ func (_ *Chart) getChart(c *gin.Context) {
 	c.JSON(200, gin.H{"msg": "getChart success", "data": chartList})
 }
 
-func (_ *Chart) deleteChart(c *gin.Context) {
-	chartId := c.Param("chartId")
-	if chartId == "" {
+// deleteChart Delete Chart by chartId
+// @Summary Delete Chart by chartId
+// @Tags Chart
+// @Produce  json
+// @Param  chartId path string true "chart Id"
+// @Success 200 {object} JSONEMSGResult "Success"
+// @Failure 400 {object} JSONERRORResult "Bad Request"
+// @Failure 401 {object} JSONEMSGResult "Unauthorized operation"
+// @Failure 500 {object} JSONERRORResult "Internal server error"
+// @Router /chart/{chartId} [delete]
+// @Param Authorization header string true "Authentication header"
+// @Security ApiKeyAuth
+func (*Chart) deleteChart(c *gin.Context) {
+	chartID := c.Param("chartId")
+	if chartID == "" {
 		c.JSON(400, gin.H{"error": "not exit chartId"})
 		return
 	}
 	chart := new(modules.HelmChart)
-	_, err := chart.DeleteByUuid(chartId)
+	_, err := chart.DeleteByUuid(chartID)
 	if err != nil {
 		log.Error().Err(err).Msg("request error")
 		c.JSON(500, gin.H{"error": err.Error()})
