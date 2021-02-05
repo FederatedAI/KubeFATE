@@ -87,7 +87,6 @@ cd $dir
 cd confs-$target_party_id
 
 docker-compose exec -T python bash -c '
-source /data/projects/python/venv/bin/activate;
 cd ../examples/toy_example; 
 python run_toy_example.py $guest $host 1 -b $backend
 '
@@ -114,7 +113,6 @@ cd $dir
 cd confs-$target_party_id
 
 docker-compose exec -T python bash -c '
-source /data/projects/python/venv/bin/activate;
 cd ../examples/scripts; 
 python upload_default_data.py -m ${work_mode}
 '
@@ -149,7 +147,6 @@ cd $dir
 cd confs-$target_party_id
 
 docker-compose exec -T python bash -c '
-source /data/projects/python/venv/bin/activate;
 cd ../examples/min_test_task; 
 python run_task.py -m ${work_mode} -gid ${guest_id} -hid ${host_id} -aid ${arbiter_id}
 '
