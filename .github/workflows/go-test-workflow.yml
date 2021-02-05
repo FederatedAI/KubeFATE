@@ -1,8 +1,5 @@
 name: A workflow for k8s-deploy
-on: 
-  pull_request:
-    paths:
-    - "k8s-deploy/**"
+on: pull_request
 jobs:
   Unit-test:
     name: Unit Test
