@@ -2,7 +2,7 @@ name: A workflow for k8s-deploy
 on: 
   pull_request:
     paths:
-    - "k8s-deploy/**.go"
+    - "k8s-deploy/**"
 jobs:
   Unit-test:
     name: Unit Test
