@@ -9,6 +9,7 @@ RUN go mod download
 
 COPY kubefate.go kubefate.go
 COPY pkg/ pkg/
+COPY docs/docs.go docs/docs.go 
 COPY config.yaml config.yaml
 
 ARG LDFLAGS
