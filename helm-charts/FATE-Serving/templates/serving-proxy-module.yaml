@@ -38,7 +38,7 @@ data:
     # limitations under the License.
     #
     # coordinator same as Party ID
-    #coordinator={{ .Values.partyId }}
+    coordinator={{ .Values.partyId }}
     server.port=8059
     #inference.service.name=serving
     #random, consistent
