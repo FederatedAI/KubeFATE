@@ -17,7 +17,7 @@ package cli
 import (
 	"errors"
 
-	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/job"
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/modules"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/rs/zerolog/log"
 	"github.com/urfave/cli/v2"
@@ -171,7 +171,7 @@ func ClusterInstallCommand() *cli.Command {
 			}
 
 			cluster := new(Cluster)
-			args := &job.ClusterArgs{
+			args := &modules.ClusterArgs{
 				Name:         name.(string),
 				Namespace:    namespace.(string),
 				ChartName:    chartName.(string),
@@ -246,7 +246,7 @@ func ClusterUpdateCommand() *cli.Command {
 			}
 
 			cluster := new(Cluster)
-			args := &job.ClusterArgs{
+			args := &modules.ClusterArgs{
 				Name:         name.(string),
 				Namespace:    namespace.(string),
 				ChartVersion: chartVersion.(string),

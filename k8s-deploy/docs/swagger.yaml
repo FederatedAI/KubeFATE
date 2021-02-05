@@ -65,23 +65,6 @@ definitions:
         description: Valid is true if Time is not NULL
         type: boolean
     type: object
-  job.ClusterArgs:
-    properties:
-      chart_name:
-        type: string
-      chart_version:
-        type: string
-      cover:
-        type: boolean
-      data:
-        items:
-          type: integer
-        type: array
-      name:
-        type: string
-      namespace:
-        type: string
-    type: object
   modules.Cluster:
     properties:
       Info:
@@ -128,6 +111,23 @@ definitions:
         description: Values field storage cluster.yaml File content of
         type: string
     type: object
+  modules.ClusterArgs:
+    properties:
+      chart_name:
+        type: string
+      chart_version:
+        type: string
+      cover:
+        type: boolean
+      data:
+        items:
+          type: integer
+        type: array
+      name:
+        type: string
+      namespace:
+        type: string
+    type: object
   modules.HelmChart:
     properties:
       app_version:
@@ -165,11 +165,17 @@ definitions:
         $ref: '#/definitions/gorm.DeletedAt'
       end_time:
         type: string
+      events:
+        items:
+          type: string
+        type: array
       id:
         type: integer
+      meta_data:
+        $ref: '#/definitions/modules.ClusterArgs'
       method:
         type: string
-      result:
+      results:
         type: string
       start_time:
         type: string
@@ -419,7 +425,7 @@ paths:
         name: ClusterArgs
         required: true
         schema:
-          $ref: '#/definitions/job.ClusterArgs'
+          $ref: '#/definitions/modules.ClusterArgs'
       - description: Authentication header
         in: header
         name: Authorization
@@ -464,7 +470,7 @@ paths:
         name: ClusterArgs
         required: true
         schema:
-          $ref: '#/definitions/job.ClusterArgs'
+          $ref: '#/definitions/modules.ClusterArgs'
       - description: Authentication header
         in: header
         name: Authorization
@@ -717,6 +723,11 @@ paths:
         name: jobId
         required: true
         type: integer
+      - description: jobStatus=stop
+        in: path
+        name: jobStatus
+        required: true
+        type: string
       - description: Authentication header
         in: header
         name: Authorization
@@ -732,9 +743,7 @@ paths:
             - $ref: '#/definitions/api.JSONResult'
             - properties:
                 data:
-                  items:
-                    $ref: '#/definitions/modules.Job'
-                  type: array
+                  type: string
               type: object
         "400":
           description: Bad Request
@@ -750,7 +759,7 @@ paths:
             $ref: '#/definitions/api.JSONERRORResult'
       security:
       - ApiKeyAuth: []
-      summary: Get job by jobId
+      summary: Update job status to stop, stop job
       tags:
       - Job
   /log/{clusterID}:

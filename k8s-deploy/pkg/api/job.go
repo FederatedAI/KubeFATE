@@ -18,6 +18,7 @@ package api
 import (
 	"errors"
 
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/job"
 	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/modules"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
@@ -36,6 +37,7 @@ func (j *Job) Router(r *gin.RouterGroup) {
 	{
 		job.GET("/", j.getJobList)
 		job.GET("/:jobId", j.getJob)
+		job.PUT("/:jobId", j.putJob)
 		job.DELETE("/:jobId", j.deleteJob)
 	}
 }
@@ -67,7 +69,7 @@ func (*Job) getJobList(c *gin.Context) {
 // @Tags Job
 // @Produce  json
 // @Param  jobId path int true "Job ID"
-// @Success 200 {object} JSONResult{data=[]modules.Job} "Success"
+// @Success 200 {object} JSONResult{data=modules.Job} "Success"
 // @Failure 400 {object} JSONERRORResult "Bad Request"
 // @Failure 401 {object} JSONERRORResult "Unauthorized operation"
 // @Failure 500 {object} JSONERRORResult "Internal server error"
@@ -91,6 +93,44 @@ func (*Job) getJob(c *gin.Context) {
 	}
 	log.Debug().Interface("data", job).Msg("getJob success")
 	c.JSON(200, gin.H{"msg": "getJob success", "data": job})
+}
+
+// stopJob Update job status to stop
+// @Summary Update job status to stop, stop job
+// @Tags Job
+// @Produce  json
+// @Param  jobId path int true "Job ID"
+// @Param  jobStatus path string true "jobStatus=stop"
+// @Success 200 {object} JSONResult{data=string} "Success"
+// @Failure 400 {object} JSONERRORResult "Bad Request"
+// @Failure 401 {object} JSONERRORResult "Unauthorized operation"
+// @Failure 500 {object} JSONERRORResult "Internal server error"
+// @Router /job/{jobId} [get]
+// @Param Authorization header string true "Authentication header"
+// @Security ApiKeyAuth
+func (*Job) putJob(c *gin.Context) {
+
+	jobID := c.Param("jobId")
+	if jobID == "" {
+		log.Error().Err(errors.New("not exit jobId")).Msg("request error")
+		c.JSON(400, gin.H{"error": "not exit jobId"})
+		return
+	}
+	qall := c.Query("jobStatus")
+	if qall != "stop" {
+		c.JSON(400, gin.H{"error": "jobStatus error"})
+		return
+	}
+
+	err := job.Stop(jobID)
+	if err != nil {
+		log.Error().Err(err).Msg("request error")
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	log.Debug().Interface("jobID", jobID).Msg("stop Job success")
+	c.JSON(200, gin.H{"msg": "stop Job success", "data": "Stop Job success"})
 }
 
 // deleteJob Delete Job by jobId

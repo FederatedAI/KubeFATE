@@ -20,7 +20,7 @@ import (
 )
 
 // ServiceVersion code release version
-const ServiceVersion = "v1.3.0"
+const ServiceVersion = "v1.4.0"
 
 // Version API struct
 type Version struct {

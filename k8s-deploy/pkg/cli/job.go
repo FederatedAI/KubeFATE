@@ -25,6 +25,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"golang.org/x/crypto/ssh/terminal"
 	"helm.sh/helm/v3/pkg/cli/output"
+	yaml "sigs.k8s.io/yaml"
 )
 
 type Job struct {
@@ -154,6 +155,11 @@ func (c *Job) outPutInfo(result interface{}) error {
 			v.ModuleName, v.ModulesPodStatus, v.Status, GetDuration(v.StartTime, v.EndTime), v.StartTime.Format("2006-01-02 15:04:05"), v.EndTime.Format("2006-01-02 15:04:05")))
 	}
 
+	events, err := yaml.Marshal(job.Events)
+	if err != nil {
+		return err
+	}
+
 	table := uitable.New()
 
 	colWidth, _, _ := terminal.GetSize(int(os.Stdout.Fd()))
@@ -171,7 +177,7 @@ func (c *Job) outPutInfo(result interface{}) error {
 	table.AddRow("Status", job.Status.String())
 	table.AddRow("Creator", job.Creator)
 	table.AddRow("ClusterId", job.ClusterId)
-	table.AddRow("Result", job.Result)
+	table.AddRow("Events", string(events))
 	for i, v := range subJobs {
 		if i == 0 {
 			table.AddRow("SubJobs", v)

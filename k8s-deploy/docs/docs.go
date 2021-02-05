@@ -313,7 +313,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/job.ClusterArgs"
+                            "$ref": "#/definitions/modules.ClusterArgs"
                         }
                     },
                     {
@@ -389,7 +389,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/job.ClusterArgs"
+                            "$ref": "#/definitions/modules.ClusterArgs"
                         }
                     },
                     {
@@ -742,12 +742,19 @@ var doc = `{
                 "tags": [
                     "Job"
                 ],
-                "summary": "Get job by jobId",
+                "summary": "Update job status to stop, stop job",
                 "parameters": [
                     {
                         "type": "integer",
                         "description": "Job ID",
                         "name": "jobId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "jobStatus=stop",
+                        "name": "jobStatus",
                         "in": "path",
                         "required": true
                     },
@@ -771,10 +778,7 @@ var doc = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/definitions/modules.Job"
-                                            }
+                                            "type": "string"
                                         }
                                     }
                                 }
@@ -1628,32 +1632,6 @@ var doc = `{
                 }
             }
         },
-        "job.ClusterArgs": {
-            "type": "object",
-            "properties": {
-                "chart_name": {
-                    "type": "string"
-                },
-                "chart_version": {
-                    "type": "string"
-                },
-                "cover": {
-                    "type": "boolean"
-                },
-                "data": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
-                },
-                "name": {
-                    "type": "string"
-                },
-                "namespace": {
-                    "type": "string"
-                }
-            }
-        },
         "modules.Cluster": {
             "type": "object",
             "properties": {
@@ -1715,6 +1693,32 @@ var doc = `{
                 }
             }
         },
+        "modules.ClusterArgs": {
+            "type": "object",
+            "properties": {
+                "chart_name": {
+                    "type": "string"
+                },
+                "chart_version": {
+                    "type": "string"
+                },
+                "cover": {
+                    "type": "boolean"
+                },
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "namespace": {
+                    "type": "string"
+                }
+            }
+        },
         "modules.HelmChart": {
             "type": "object",
             "properties": {
@@ -1771,13 +1775,22 @@ var doc = `{
                 "end_time": {
                     "type": "string"
                 },
+                "events": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
                 "id": {
                     "type": "integer"
+                },
+                "meta_data": {
+                    "$ref": "#/definitions/modules.ClusterArgs"
                 },
                 "method": {
                     "type": "string"
                 },
-                "result": {
+                "results": {
                     "type": "string"
                 },
                 "start_time": {

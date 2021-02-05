@@ -151,8 +151,16 @@ func (e *Job) SetStatus(status JobStatus) error {
 	return nil
 }
 
-func (e *Job) SetResult(result string) error {
-	if err := DB.Model(e).Update("result", result).Error; err != nil {
+func (e *Job) SetEvent(Event string) error {
+
+	j, err := e.Get()
+	if err != nil {
+		return err
+	}
+
+	j.Events = append(j.Events, Event)
+
+	if err := DB.Model(j).Update("Events", j.Events).Error; err != nil {
 		return err
 	}
 	return nil
@@ -169,6 +177,20 @@ func (e *Job) IsExisted(uuid string) bool {
 	var count int64
 	DB.Model(&Job{}).Where("uuid = ?", uuid).Count(&count)
 	if DB.Error == nil && count > 0 {
+		return true
+	}
+	return false
+}
+
+func (e *Job) IsStop() bool {
+	if e.Status == JobStatusStopping {
+		return true
+	}
+	return false
+}
+
+func (e *Job) IsRunning() bool {
+	if e.Status == JobStatusRunning {
 		return true
 	}
 	return false

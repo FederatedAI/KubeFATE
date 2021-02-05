@@ -19,7 +19,7 @@ spec:
     spec:
       serviceAccountName: kubefate-admin
       containers:
-        - image: federatedai/kubefate:v1.3.0
+        - image: federatedai/kubefate:v1.4.0
           imagePullPolicy: IfNotPresent
           name: kubefate
           env:
@@ -44,7 +44,7 @@ spec:
             - name: FATECLOUD_REPO_NAME
               value: "kubefate"
             - name: FATECLOUD_REPO_URL
-              value: "https://federatedai.github.io/KubeFATE/"
+              value: "https://federatedai.github.io/KubeFATE"
             - name: FATECLOUD_USER_USERNAME
               valueFrom:
                 secretKeyRef:

@@ -48,7 +48,7 @@ func (c *Cluster) Router(r *gin.RouterGroup) {
 // @Summary Create a new cluster
 // @Tags Cluster
 // @Produce  json
-// @Param  ClusterArgs body job.ClusterArgs true "Cluster Args"
+// @Param  ClusterArgs body modules.ClusterArgs true "Cluster Args"
 // @Success 200 {object} JSONResult{data=modules.Job} "Success"
 // @Failure 400 {object} JSONERRORResult "Bad Request"
 // @Failure 401 {object} JSONERRORResult "Unauthorized operation"
@@ -61,7 +61,7 @@ func (*Cluster) createCluster(c *gin.Context) {
 
 	user, _ := c.Get(identityKey)
 
-	clusterArgs := new(job.ClusterArgs)
+	clusterArgs := new(modules.ClusterArgs)
 
 	if err := c.ShouldBindJSON(&clusterArgs); err != nil {
 		log.Error().Err(err).Msg("request error")
@@ -85,7 +85,7 @@ func (*Cluster) createCluster(c *gin.Context) {
 // @Summary Updates a cluster in the store with form data
 // @Tags Cluster
 // @Produce  json
-// @Param  ClusterArgs body job.ClusterArgs true "Cluster Args"
+// @Param  ClusterArgs body modules.ClusterArgs true "Cluster Args"
 // @Success 200 {object} JSONResult{data=modules.Job} "Success"
 // @Failure 400 {object} JSONERRORResult "Bad Request"
 // @Failure 401 {object} JSONERRORResult "Unauthorized operation"
@@ -104,7 +104,7 @@ func (*Cluster) setCluster(c *gin.Context) {
 
 	user, _ := c.Get(identityKey)
 
-	clusterArgs := new(job.ClusterArgs)
+	clusterArgs := new(modules.ClusterArgs)
 
 	if err := c.ShouldBindJSON(&clusterArgs); err != nil {
 		log.Error().Err(err).Msg("request error")

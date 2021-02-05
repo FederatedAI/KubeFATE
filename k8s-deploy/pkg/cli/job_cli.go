@@ -15,8 +15,16 @@
 package cli
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
+	"fmt"
+	"io/ioutil"
+	"net/http"
 
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/api"
+	"github.com/rs/zerolog/log"
+	"github.com/spf13/viper"
 	"github.com/urfave/cli/v2"
 )
 
@@ -27,6 +35,7 @@ func JobCommand() *cli.Command {
 		Subcommands: []*cli.Command{
 			JobListCommand(),
 			JobInfoCommand(),
+			JobStopCommand(),
 			JobDeleteCommand(),
 		},
 		Usage: "List jobs, describe and delete a job",
@@ -86,6 +95,95 @@ func JobInfoCommand() *cli.Command {
 			}
 			Job := new(Job)
 			return GetItem(Job, uuid)
+		},
+	}
+}
+
+func JobStopCommand() *cli.Command {
+	return &cli.Command{
+		Name: "stop",
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:  "uuid",
+				Value: "",
+				Usage: "Describe a job with given UUID",
+			},
+		},
+		Usage: "stop job",
+		Action: func(c *cli.Context) error {
+
+			var uuid string
+			if c.Args().Len() > 0 {
+				uuid = c.Args().Get(0)
+			} else {
+				return errors.New("not uuid")
+			}
+
+			r := &Request{
+				Type: "PUT",
+				Path: "job",
+				Body: nil,
+			}
+
+			serviceURL := viper.GetString("serviceurl")
+			apiVersion := api.APIVersion + "/"
+			if serviceURL == "" {
+				serviceURL = "localhost:8080/"
+			}
+			URL := "http://" + serviceURL + "/" + apiVersion + r.Path + "/" + uuid + "?jobStatus=stop"
+			body := bytes.NewReader(r.Body)
+			log.Debug().Str("Type", r.Type).Str("url", URL).Msg("Request")
+			request, err := http.NewRequest(r.Type, URL, body)
+			if err != nil {
+				return err
+			}
+
+			token, err := getToken()
+			if err != nil {
+				return err
+			}
+			Authorization := fmt.Sprintf("Bearer %s", token)
+
+			request.Header.Add("Authorization", Authorization)
+			request.Header.Add("user-agent", "kubefate")
+			resp, err := http.DefaultClient.Do(request)
+			if err != nil {
+				return err
+			}
+			respBody, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return err
+			}
+
+			if resp.StatusCode != 200 {
+				type JobErrMsg struct {
+					Error string
+				}
+				jobErrMsg := new(JobErrMsg)
+				err = json.Unmarshal(respBody, &jobErrMsg)
+				if err != nil {
+					return err
+				}
+				return fmt.Errorf("resp.StatusCode=%d, error: %s", resp.StatusCode, jobErrMsg.Error)
+			}
+
+			type JobResultMsg struct {
+				Msg  string
+				Data string
+			}
+
+			JobResult := new(JobResultMsg)
+
+			err = json.Unmarshal(respBody, &JobResult)
+			if err != nil {
+				return err
+			}
+
+			log.Debug().Int("Code", resp.StatusCode).Bytes("Body", respBody).Msg("ok")
+
+			fmt.Println(JobResult.Data)
+			return nil
+
 		},
 	}
 }
