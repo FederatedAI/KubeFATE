@@ -28,5 +28,5 @@ docker build --build-arg SOURCE_PREFIX=${PREFIX} --build-arg SOURCE_TAG=${IMG_TA
 # spark
 docker build --build-arg SOURCE_PREFIX=${PREFIX} --build-arg SOURCE_TAG=${IMG_TAG} -o ${PREFIX}/spark-base:${IMG_TAG} spark/base
 
-docker build -o ${PREFIX}/spark-master:${IMG_TAG} spark/master
-docker build -o ${PREFIX}/spark-worker:${IMG_TAG} spark/worker
+docker build --build-arg SOURCE_PREFIX=${PREFIX} --build-arg SOURCE_TAG=${IMG_TAG} -o ${PREFIX}/spark-master:${IMG_TAG} spark/master
+docker build --build-arg SOURCE_PREFIX=${PREFIX} --build-arg SOURCE_TAG=${IMG_TAG} -o ${PREFIX}/spark-worker:${IMG_TAG} spark/worker
