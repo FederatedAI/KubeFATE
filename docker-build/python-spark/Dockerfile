@@ -1,6 +1,6 @@
-#ARG PREFIX=prefix
-#ARG BASE_TAG=tag
-FROM federatedai/python:1.5.0-release
+ARG SOURCE_PREFIX=federatedai
+ARG SOURCE_TAG=1.5.0-release
+FROM ${SOURCE_PREFIX}/python:${SOURCE_TAG}
 
 RUN rpm --rebuilddb && \
     rpm --import /etc/pki/rpm-gpg/RPM* && \

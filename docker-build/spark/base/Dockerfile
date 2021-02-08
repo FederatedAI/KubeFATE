@@ -1,6 +1,7 @@
 # Refer to https://github.com/big-data-europe/docker-spark/tree/2.4.1-hadoop2.7/base
-
-FROM federatedai/python:1.5.0-release as source
+ARG SOURCE_PREFIX=federatedai
+ARG SOURCE_TAG=1.5.0-release
+FROM ${SOURCE_PREFIX}/python:${SOURCE_TAG} as source
 
 FROM centos:7 
 

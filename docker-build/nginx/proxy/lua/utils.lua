@@ -17,17 +17,23 @@ local _M = {
     _VERSION = '0.1'
 }
 
-local ngx = ngx
-local ngx_balancer = require "ngx.balancer"
+local string = require "string"
 
-local function balance()
-    local dest_cluster = ngx.ctx.dest_cluster
-    local ok, err = ngx_balancer.set_current_peer(dest_cluster)
-    if not ok then
-        ngx.log(ngx.INFO, 'failed to set current peer: ' .. err, ngx.HTTP_SERVICE_UNAVAILABLE)
-        return ngx.ERROR
-    end
+function _M.string_startswith(str, start)
+    return string.sub(str, 1, string.len(start)) == start
 end
 
-balance()
+function _M.string_split(str, delimiter)
+    if str == nil or str == "" or delimiter==nil then
+        return nil
+    end
+
+    local result = {}
+    for match in (str..delimiter):gmatch("(.-)"..delimiter) do
+        table.insert(result, match)
+    end
+    return result
+end
+
+return _M
 
