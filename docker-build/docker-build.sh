@@ -20,13 +20,18 @@ IMG_TAG=latest
 source .env
 
 # nginx
-docker build --build-arg SOURCE_PREFIX=${PREFIX} --build-arg SOURCE_TAG=${IMG_TAG} -o ${PREFIX}/nginx:${IMG_TAG} nginx
+docker build --build-arg SOURCE_PREFIX=${PREFIX} --build-arg SOURCE_TAG=${IMG_TAG} -t ${PREFIX}/nginx:${IMG_TAG} nginx
+echo "Image: "${PREFIX}/nginx:${IMG_TAG}" Build Successful"
 
 # python-spark
-docker build --build-arg SOURCE_PREFIX=${PREFIX} --build-arg SOURCE_TAG=${IMG_TAG} -o ${PREFIX}/python-spark:${IMG_TAG} python-spark
+docker build --build-arg SOURCE_PREFIX=${PREFIX} --build-arg SOURCE_TAG=${IMG_TAG} -t ${PREFIX}/python-spark:${IMG_TAG} python-spark
+echo "Image: " ${PREFIX}/python-spark:${IMG_TAG}" Build Successful"
 
 # spark
-docker build --build-arg SOURCE_PREFIX=${PREFIX} --build-arg SOURCE_TAG=${IMG_TAG} -o ${PREFIX}/spark-base:${IMG_TAG} spark/base
+docker build --build-arg SOURCE_PREFIX=${PREFIX} --build-arg SOURCE_TAG=${IMG_TAG} -t ${PREFIX}/spark-base:${IMG_TAG} spark/base
+echo "Image: "${PREFIX}/spark-base:${IMG_TAG}" Build Successful"
 
-docker build --build-arg SOURCE_PREFIX=${PREFIX} --build-arg SOURCE_TAG=${IMG_TAG} -o ${PREFIX}/spark-master:${IMG_TAG} spark/master
-docker build --build-arg SOURCE_PREFIX=${PREFIX} --build-arg SOURCE_TAG=${IMG_TAG} -o ${PREFIX}/spark-worker:${IMG_TAG} spark/worker
+docker build --build-arg SOURCE_PREFIX=${PREFIX} --build-arg SOURCE_TAG=${IMG_TAG} -t ${PREFIX}/spark-master:${IMG_TAG} spark/master
+echo "Image: "${PREFIX}/spark-master:${IMG_TAG}" Build Successful"
+docker build --build-arg SOURCE_PREFIX=${PREFIX} --build-arg SOURCE_TAG=${IMG_TAG} -t ${PREFIX}/spark-worker:${IMG_TAG} spark/worker
+echo "Image: "${PREFIX}/spark-worker:${IMG_TAG}" Build Successful"
