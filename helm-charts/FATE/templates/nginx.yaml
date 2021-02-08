@@ -122,7 +122,7 @@ spec:
     spec:
       containers:
         - name: nginx
-          image: {{ .Values.image.registry }}/nginx:1.17
+          image: {{ .Values.image.registry }}/nginx:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - containerPort: 9390
