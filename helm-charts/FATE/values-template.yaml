@@ -37,6 +37,8 @@ exchange:
 {{- with .exchange }}
   partyIp: {{ .ip }}
   partyPort: {{ .port }}
+{{- end }}
+{{- end }}
 
 exchangeList:
 {{- with .lbrollsite }}
