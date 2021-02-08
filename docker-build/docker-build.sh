@@ -42,7 +42,7 @@ pushImage() {
     ## push image
     for module in "nginx" "python-spark" "spark-base" "spark-master" "spark-worker"; do
         echo "### START PUSH ${module} ###"
-        docker push ${PREFIX}/${module}:${TAG}
+        docker push ${PREFIX}/${module}:${IMG_TAG}
         echo "### FINISH PUSH ${module} ###"
         echo ""
     done
