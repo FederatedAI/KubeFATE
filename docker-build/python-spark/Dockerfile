@@ -12,7 +12,7 @@ RUN rpm --rebuilddb && \
 RUN wget https://archive.apache.org/dist/spark/spark-2.4.1/spark-2.4.1-bin-hadoop2.7.tgz && \
     tar -xf ./spark-2.4.1-bin-hadoop2.7.tgz -C /data/projects/ && rm ./spark-2.4.1-bin-hadoop2.7.tgz
 
-ENV JAVA_HOME=/usr/lib/jvm/jre-1.8.0-openjdk-1.8.0.262.b10-0.el7_8.x86_64
+ENV JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk
 ENV SPARK_HOME=/data/projects/spark-2.4.1-bin-hadoop2.7/
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/data/projects/hadoop-2.7.4/lib/native
 ENV PATH=$PATH:/data/projects/spark-2.4.1-bin-hadoop2.7/bin:/data/projects/hadoop-2.7.4/bin

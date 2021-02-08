@@ -30,4 +30,4 @@ COPY --from=source /data/projects/fate/python /data/projects/fate/python
 COPY --from=source /data/projects/python/ /data/projects/python/
 ENV PYTHONPATH=$PYTHONPATH:/data/projects/fate/python
 ENV PYSPARK_PYTHON=/data/projects/python/venv/bin/python
-ENV JAVA_HOME=/usr/lib/jvm/jre-1.8.0-openjdk-1.8.0.262.b10-0.el7_8.x86_64
+ENV JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk
