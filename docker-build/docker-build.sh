@@ -19,19 +19,46 @@ IMG_TAG=latest
 
 source .env
 
-# nginx
-docker build --build-arg SOURCE_PREFIX=${PREFIX} --build-arg SOURCE_TAG=${IMG_TAG} -t ${PREFIX}/nginx:${IMG_TAG} nginx
-echo "Image: "${PREFIX}/nginx:${IMG_TAG}" Build Successful"
+buildModule() {
+    # nginx
+    docker build --build-arg SOURCE_PREFIX=${PREFIX} --build-arg SOURCE_TAG=${IMG_TAG} -t ${PREFIX}/nginx:${IMG_TAG} nginx
+    echo "Image: "${PREFIX}/nginx:${IMG_TAG}" Build Successful"
 
-# python-spark
-docker build --build-arg SOURCE_PREFIX=${PREFIX} --build-arg SOURCE_TAG=${IMG_TAG} -t ${PREFIX}/python-spark:${IMG_TAG} python-spark
-echo "Image: " ${PREFIX}/python-spark:${IMG_TAG}" Build Successful"
+    # python-spark
+    docker build --build-arg SOURCE_PREFIX=${PREFIX} --build-arg SOURCE_TAG=${IMG_TAG} -t ${PREFIX}/python-spark:${IMG_TAG} python-spark
+    echo "Image: " ${PREFIX}/python-spark:${IMG_TAG}" Build Successful"
 
-# spark
-docker build --build-arg SOURCE_PREFIX=${PREFIX} --build-arg SOURCE_TAG=${IMG_TAG} -t ${PREFIX}/spark-base:${IMG_TAG} spark/base
-echo "Image: "${PREFIX}/spark-base:${IMG_TAG}" Build Successful"
+    # spark
+    docker build --build-arg SOURCE_PREFIX=${PREFIX} --build-arg SOURCE_TAG=${IMG_TAG} -t ${PREFIX}/spark-base:${IMG_TAG} spark/base
+    echo "Image: "${PREFIX}/spark-base:${IMG_TAG}" Build Successful"
 
-docker build --build-arg SOURCE_PREFIX=${PREFIX} --build-arg SOURCE_TAG=${IMG_TAG} -t ${PREFIX}/spark-master:${IMG_TAG} spark/master
-echo "Image: "${PREFIX}/spark-master:${IMG_TAG}" Build Successful"
-docker build --build-arg SOURCE_PREFIX=${PREFIX} --build-arg SOURCE_TAG=${IMG_TAG} -t ${PREFIX}/spark-worker:${IMG_TAG} spark/worker
-echo "Image: "${PREFIX}/spark-worker:${IMG_TAG}" Build Successful"
+    docker build --build-arg SOURCE_PREFIX=${PREFIX} --build-arg SOURCE_TAG=${IMG_TAG} -t ${PREFIX}/spark-master:${IMG_TAG} spark/master
+    echo "Image: "${PREFIX}/spark-master:${IMG_TAG}" Build Successful"
+    docker build --build-arg SOURCE_PREFIX=${PREFIX} --build-arg SOURCE_TAG=${IMG_TAG} -t ${PREFIX}/spark-worker:${IMG_TAG} spark/worker
+    echo "Image: "${PREFIX}/spark-worker:${IMG_TAG}" Build Successful"
+}
+
+pushImage() {
+    ## push image
+    for module in "nginx" "python-spark" "spark-base" "spark-master" "spark-worker"; do
+        echo "### START PUSH ${module} ###"
+        docker push ${PREFIX}/${module}:${TAG}
+        echo "### FINISH PUSH ${module} ###"
+        echo ""
+    done
+}
+
+while [ "$1" != "" ]; do
+    case $1 in
+    modules)
+        buildModule
+        ;;
+    all)
+        buildModule
+        ;;
+    push)
+        pushImage
+        ;;
+    esac
+    shift
+done
