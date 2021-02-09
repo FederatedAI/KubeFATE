@@ -3,7 +3,7 @@ set -e
 dir=$(dirname $0)
 
 echo "# config prepare"
-cd ${dir}/../../docker-deploy
+cd ${dir}/../../../docker-deploy
 host_ip=$(echo $(hostname -I | awk '{print $1}'))
 
 sed -i "/mysql_user=fate/ ! s/user=fate/user=root/g" ./parties.conf
