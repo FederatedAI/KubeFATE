@@ -157,9 +157,10 @@ services:
       - fate-network
 
   nginx:
-    image: federatedai/nginx:1.17
+    image: "federatedai/nginx:${TAG}"
     ports:
-      - 9390:9390
+      - 9300:9300
+      - 9310:9310
     volumes:
       - ./confs/nginx/route_table.yaml:/data/projects/fate/proxy/nginx/conf/route_table.yaml
       - ./confs/nginx/nginx.conf:/data/projects/fate/proxy/nginx/conf/nginx.conf

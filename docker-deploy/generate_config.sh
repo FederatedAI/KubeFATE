@@ -185,7 +185,8 @@ GenerateConfig() {
 default:
   proxy:
     - host: nginx
-      port: 9390
+      http_port: 9300
+      grpc_port: 9310
 $(for ((j = 0; j < ${#party_list[*]}; j++)); do
 				if [ "${party_id}" == "${party_list[${j}]}" ]; then
 					continue
@@ -193,19 +194,23 @@ $(for ((j = 0; j < ${#party_list[*]}; j++)); do
 				echo "${party_list[${j}]}:
   proxy:
     - host: ${party_ip_list[${j}]} 
-      port: 9390
+      http_port: 9300
+      grpc_port: 9310
   fateflow:
     - host: ${party_ip_list[${j}]}
-      port: ${fate_flow_grpc_port}
+      grpc_port: ${fate_flow_grpc_port}
+      http_port: ${fate_flow_http_port}
 "
 			done)
 ${party_id}:
   proxy:
     - host: nginx
-      port: 9390
+      http_port: 9300
+      grpc_port: 9310
   fateflow:
     - host: ${fate_flow_ip}
-      port: ${fate_flow_grpc_port}
+      grpc_port: ${fate_flow_grpc_port}
+      http_port: ${fate_flow_http_port}
 EOF
 			cat >./confs-$party_id/confs/fate_flow/conf/rabbitmq_route_table.yaml <<EOF
 $(for ((j = 0; j < ${#party_list[*]}; j++)); do

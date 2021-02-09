@@ -1,18 +1,27 @@
 default:
   proxy:
-    - host: nginx 
-      port: 9390
+    - host: 127.0.0.1
+      http_port: 9300
+      grpc_port: 9310
+local:
+  test_proxy:
+    - host: 127.0.0.1
+      http_port: 9302
 9999:
   proxy:
-    - host: nginx 
-      port: 9390
+    - host: 127.0.0.1
+      http_port: 9300
+      grpc_port: 9310
   fateflow:
-    - host: fate-flow 
-      port: 9360
+    - host: 127.0.0.1
+      http_port: 9380
+      grpc_port: 9360
 10000:
   proxy:
-    - host: nginx
-      port: 9390 
+    - host: 127.0.0.1
+      http_port: 9300
+      grpc_port: 9310
   fateflow:
-    - host: fate-flow 
-      port: 9360
+    - host: 127.0.0.1
+      http_port: 9380
+      grpc_port: 9360
