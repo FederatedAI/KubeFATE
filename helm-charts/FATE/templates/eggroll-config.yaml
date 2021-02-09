@@ -37,7 +37,7 @@ data:
     eggroll.bootstrap.root.script=bin/eggroll_boot.sh
     
     eggroll.resourcemanager.bootstrap.egg_pair.exepath=bin/roll_pair/egg_pair_bootstrap.sh
-    eggroll.resourcemanager.bootstrap.egg_pair.venv=/data/projects/python/venv
+    eggroll.resourcemanager.bootstrap.egg_pair.venv=
     eggroll.resourcemanager.bootstrap.egg_pair.pythonpath=/data/projects/fate/python:/data/projects/fate/eggroll/python
     eggroll.resourcemanager.bootstrap.egg_pair.filepath=python/eggroll/roll_pair/egg_pair.py
     eggroll.resourcemanager.bootstrap.egg_pair.ld_library_path=
@@ -49,7 +49,7 @@ data:
     eggroll.resourcemanager.bootstrap.egg_frame.jvm.options=
     
     eggroll.core.grpc.channel.keepalive.timeout.sec=20
-
+    
     # roll_frame
     arrow.enable_unsafe_memory_access=true
     
@@ -64,10 +64,10 @@ data:
     # session
     eggroll.session.processors.per.node=4
     eggroll.session.start.timeout.ms=180000
-
+    
     # rollpair
     eggroll.rollpair.transferpair.sendbuf.size=250000
-
+    
     # rollsite
     eggroll.rollsite.coordinator={{ .Values.partyName }}
     eggroll.rollsite.host=rollsite
