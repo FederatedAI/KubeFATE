@@ -89,7 +89,7 @@ RegistryURI=192.168.10.1/federatedai
 
 根据需求修改配置文件`kubeFATE\docker-deploy\parties.conf`。
 
-下面是修改好的文件，`party 10000`的集群将部署在*192.168.7.1*上，而`party 9999`的集群将部署在*192.168.7.2*上。为了减少所需拉取镜像的大小，KubeFATE在默认情况下，会使用不带神经网络的“python”容器，若需要跑神经网络的算法则需把“parties.conf”中的`enabled_nn`设置成`true`
+下面是修改好的文件，`party 10000`的集群将部署在*192.168.7.1*上，而`party 9999`的集群将部署在*192.168.7.2*上。为了减少所需拉取镜像的大小，KubeFATE在默认情况下，会使用不带神经网络的“python”容器，若需要跑神经网络的算法则需把“parties.conf”中的`enabled_nn`设置成`true`。
 
 ```
 user=fate                                   # 运行FATE容器的用户
