@@ -10,6 +10,8 @@ ENV INIT_DAEMON_STEP spark_master_init
 ENV SPARK_VERSION=2.4.1
 ENV HADOOP_VERSION=2.7
 
+WORKDIR /
+
 RUN set -eux && \
     rpm --rebuilddb && \
     rpm --import /etc/pki/rpm-gpg/RPM* && \
@@ -26,5 +28,3 @@ RUN set -eux && \
 
 ENV PYTHONPATH=$PYTHONPATH:/data/projects/fate/python
 ENV JAVA_HOME=/usr/lib/jvm/jre-1.8.0-openjdk
-
-WORKDIR /
