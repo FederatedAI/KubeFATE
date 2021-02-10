@@ -261,7 +261,8 @@ modules:
 {{ toYaml . | indent 6 }}
     {{- end }}
     type: {{ .type }}
-    nodePort: {{ .nodePort }}
+    httpNodePort:  {{ .httpNodePort }}
+    grpcNodePort:  {{ .grpcNodePort }}
     route_table: 
       {{- range $key, $val := .route_table }}
       {{ $key }}: 

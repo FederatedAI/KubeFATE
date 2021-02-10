@@ -143,18 +143,21 @@ backend: eggroll
   # datanode:
     # nodeSelector: 
     # type: ClusterIP
-# nginx:
-  # nodeSelector: 
-  # type: ClusterIP
-  # nodePort: 30093
-  # route_table: 
-    # 10000: 
-      # proxy: 
-        # - host: 192.168.0.1 
-          # port: 30103
-      # fateflow: 
-        # - host: 192.168.0.1
-          # port: 30102
+nginx:
+  nodeSelector: 
+  type: ClusterIP
+  httpNodePort: 30093
+  grpcNodePort: 30098
+  route_table: 
+    10000: 
+      proxy: 
+        - host: 192.168.0.1 
+          http_port: 30103
+          grpc_port: 30108 
+      fateflow: 
+        - host: 192.168.0.1
+          http_port: 30107
+          grpc_port: 30102
 # rabbitmq:
   # nodeSelector: 
   # type: ClusterIP
