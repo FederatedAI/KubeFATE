@@ -39,13 +39,13 @@ RegistryURI=192.168.10.1/federatedai
 
 
 ### Configuring multiple parties of FATE
-There are usually multiple parties participating a federated training. Each party should install FATE using a set of configuration files and scripts. 
+There are usually multiple parties participating a federated training. Each party should install FATE using a set of configuration files and scripts.
 
 The following steps illustrate how to generate necessary configuration files and deploy two parties on different hosts.
 
-Before deploying the FATE system, multiple parties should be defined in the configuration file: `docker-deploy/parties.conf`. 
+Before deploying the FATE system, multiple parties should be defined in the configuration file: `docker-deploy/parties.conf`.
 
-In the following sample of `docker-deploy/parties.conf` , two parities are specified by id as `10000` and `9999`. Their cluster are going to be deployed on hosts with IP addresses of *192.168.7.1* and *192.168.7.2*
+In the following sample of `docker-deploy/parties.conf` , two parities are specified by id as `10000` and `9999`. Their cluster are going to be deployed on hosts with IP addresses of *192.168.7.1* and *192.168.7.2*. By default, to save time for downloading images, KubeFATE will use images without neural network dependencies, set the `enabled_nn` to `true` in "parties.conf" if neural network workflow is required.
 
 ```bash
 user=fate
@@ -56,6 +56,9 @@ servingiplist=(192.168.7.1 192.168.7.2)
 exchangeip=
 # computing_backend could be eggroll or spark.
 computing_backend=eggroll
+
+# true if you need python-nn else false, the default value will be false
+enabled_nn=false
 ```
 
 Spark was introduced in FATE v1.5 as the underlying computing backend, for more details

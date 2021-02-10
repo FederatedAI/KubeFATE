@@ -2,7 +2,7 @@ BUILD-PATH = ${shell pwd}
 K8S-DEPLOY = ./k8s-deploy
 CHART = ./helm-charts
 FML = ./fml_manager
-RELEASE_VERSION ?= v1.5.0
+RELEASE_VERSION ?= ${shell git describe --tags}
 
 define sub_make
  cd $1 && make $2 && cd ${BUILD-PATH}
