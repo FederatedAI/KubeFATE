@@ -1,14 +1,11 @@
-## 如何配置使用私有镜像仓库部署FATE
-
-### 1. 生成`imagePullSecrets`
-
-生成docker hub的Secrets
-
+## How to configure username and password for a images repository/registry
+### 1. Create `imagePullSecrets`
+This solution can be used in both [Dockerhub](https://hub.docker.com/) or other private/public image repositories/registries. The following example take Dockerhub as an example,
 ```bash
-DOCKER_REGISTRY_SERVER=<registry的URL>
-DOCKER_USER=<你的docker用户名>
-DOCKER_EMAIL=<你的docker邮箱>
-DOCKER_PASSWORD=<你的docker密码>
+DOCKER_REGISTRY_SERVER=<URL of Dockerhub>
+DOCKER_USER=<username of registry>
+DOCKER_EMAIL=<email of registry>
+DOCKER_PASSWORD=<password of registry>
 
 kubectl create secret docker-registry myregistrykey \
   --docker-server=$DOCKER_REGISTRY_SERVER \
@@ -17,16 +14,14 @@ kubectl create secret docker-registry myregistrykey \
   --docker-email=$DOCKER_EMAIL
 ```
 
-> docker hub的registry的URL：https://index.docker.io/v1/
+> Note: The URL of Dockerhub is：https://index.docker.io/v1/
 
-### 2. 配置
-
-在要部署FATE的对应namespace下生成上述secret，然后将secret的name写入`cluster.yaml`的`imagePullSecrets`
+### 2. Add the created secret to KubeFATE config
+Make sure the secrete is created in the same namespace going to deploy FATE, add it in the `imagePullSecrets` of `cluster.yaml` as following,
 
 ```bash
-# 例如这样
 imagePullSecrets: 
 - name: myregistrykey
 ```
 
-配合`registry`可以使用私有的仓库镜像，也可以应对docker hub限流。
+> Adding account information to registry can solve the problem of traffic limitation by Dockerhub
