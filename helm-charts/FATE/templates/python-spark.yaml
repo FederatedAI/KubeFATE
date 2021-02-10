@@ -221,11 +221,6 @@ spec:
           image: {{ .Values.image.registry }}/python:{{ .Values.image.tag }}
           {{- end }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          env:
-          - name: PYSPARK_PYTHON
-            value: /data/projects/python/venv/bin/python
-          - name: PYSPARK_DRIVER_PYTHON
-            value: /data/projects/python/venv/bin/python
           - name: POD_IP
             valueFrom:
               fieldRef:

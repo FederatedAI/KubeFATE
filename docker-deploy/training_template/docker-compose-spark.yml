@@ -54,9 +54,6 @@ services:
 
   python:
     image: "federatedai/python-spark:${TAG}"
-    environment:
-      PYSPARK_PYTHON: /opt/app-root/bin/python
-      PYSPARK_DRIVER_PYTHON: /opt/app-root/bin/python
     restart: always
     ports:
       - 9380:9380
