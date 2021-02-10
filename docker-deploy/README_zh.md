@@ -89,7 +89,7 @@ RegistryURI=192.168.10.1/federatedai
 
 根据需求修改配置文件`kubeFATE\docker-deploy\parties.conf`。
 
-下面是修改好的文件，`party 10000`的集群将部署在*192.168.7.1*上，而`party 9999`的集群将部署在*192.168.7.2*上。
+下面是修改好的文件，`party 10000`的集群将部署在*192.168.7.1*上，而`party 9999`的集群将部署在*192.168.7.2*上。为了减少所需拉取镜像的大小，KubeFATE在默认情况下，会使用不带神经网络的“python”容器，若需要跑神经网络的算法则需把“parties.conf”中的`enabled_nn`设置成`true`。
 
 ```
 user=fate                                   # 运行FATE容器的用户
@@ -99,6 +99,9 @@ partyiplist=(192.168.7.1 192.168.7.2)       # id对应训练集群ip
 servingiplist=(192.168.7.1 192.168.7.2)     # id对应在线预测集群ip
 # computing_backend could be eggroll or spark.
 computing_backend=eggroll
+
+# true if you need python-nn else false, the default value will be false
+enabled_nn=false
 ```
 
 FATE 1.5 支持使用Spark作为底层的分布式计算引擎，Spark集群默认会通过容器的方式部署。相关的简介可以参考这个[链接](../docs/FATE_On_Spark.md).
