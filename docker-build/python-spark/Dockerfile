@@ -17,4 +17,4 @@ ENV SPARK_HOME=/data/projects/spark-2.4.1-bin-hadoop2.7/
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/data/projects/hadoop-2.7.4/lib/native
 ENV PATH=$PATH:/data/projects/spark-2.4.1-bin-hadoop2.7/bin:/data/projects/hadoop-2.7.4/bin
 
-RUN pip install -y pyspark
+RUN pip install pyspark
