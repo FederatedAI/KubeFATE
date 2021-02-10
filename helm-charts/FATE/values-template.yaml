@@ -125,7 +125,8 @@ modules:
     {{- with .nginx }}
     nginx:
       host: {{ .host }}
-      port: {{ .port }}
+      http_port: {{ .http_port }}
+      grpc_port: {{ .grpc_port }}
     {{- end }}
     {{- end }}
 

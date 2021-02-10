@@ -74,7 +74,8 @@ backend: spark
     # route_table: 
   # nginx:
     # host: nginx
-    # port: 9390
+    # http_port: 9300
+    # grpc_port: 9310
 # mysql: 
   # nodeSelector: 
   # ip: mysql

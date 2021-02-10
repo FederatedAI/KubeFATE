@@ -44,7 +44,7 @@ data:
       # rollsite support fate on eggroll, use grpc protocol
       # nginx support fate on eggroll and fate on spark, use http or grpc protocol, default is http
       # fateflow support fate on eggroll and fate on spark, use http protocol, but not support exchange network mode
-
+    
       # format(proxy: rollsite) means rollsite use the rollsite configuration of fate_one_eggroll and nginx use the nginx configuration of fate_one_spark
       # you also can customize the config like this(set fateflow of the opposite party as proxy):
       # proxy:
@@ -98,7 +98,8 @@ data:
         route_table: {{ .Values.modules.python.rabbitmq.route_table }}
       nginx:
         host: {{ .Values.modules.python.nginx.host }}
-        port: {{ .Values.modules.python.nginx.port }}
+        http_port: {{ .Values.modules.python.nginx.http_port }}
+        grpc_port: {{ .Values.modules.python.nginx.grpc_port }}
     model_store_address:
       storage: mysql
       name: model
@@ -221,6 +222,7 @@ spec:
           image: {{ .Values.image.registry }}/python:{{ .Values.image.tag }}
           {{- end }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
           - name: POD_IP
             valueFrom:
               fieldRef:
