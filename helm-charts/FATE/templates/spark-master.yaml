@@ -35,11 +35,6 @@ spec:
         - name: spark-master
           image: {{ if .Values.modules.spark.master.Image }}{{ .Values.modules.spark.master.Image }}{{ else }}{{ .Values.image.registry }}/spark-master{{ end }}:{{ default .Values.image.tag .Values.modules.spark.master.ImageTag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          env:
-          - name: PYSPARK_PYTHON
-            value: /data/projects/python/venv/bin/python
-          - name: PYSPARK_DRIVER_PYTHON
-            value: /data/projects/python/venv/bin/python
           resources:
             requests:
               cpu: "{{ .Values.modules.spark.worker.cpu }}"

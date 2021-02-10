@@ -22,6 +22,20 @@ deploy_dir=/data/projects/fate
 source ${WORKINGDIR}/.env
 source ${WORKINGDIR}/parties.conf
 
+echo "Generate Config"
+echo "Info:"
+echo "  RegistryURI: ${RegistryURI}"
+echo "  Tag: ${TAG}"
+echo "  Serving_Tag: ${SERVING_TAG}"
+echo "  Computing_Backend: ${computing_backend}"
+
+echo "  Party_List:"
+for ((i = 0; i < ${#party_list[*]}; i++)); do
+	echo "  - Party_ID:${party_list[${i}]}"
+	echo "    Party_IP:${party_ip_list[${i}]}"
+done
+echo ""
+echo ""
 cd ${WORKINGDIR}
 
 GenerateConfig() {
@@ -76,7 +90,7 @@ GenerateConfig() {
 			# eggroll config
 			#db connect inf
 			# use the fixed db name here
-			sed -i "s#<jdbc.url>#jdbc:mysql://${db_ip}:3306/eggroll_meta?useSSL=false\&serverTimezone=UTC\&characterEncoding=utf8\&allowPublicKeyRetrieval=true#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
+			sed -i "s#<jdbc.url>#jdbc:mysql://${db_ip}:3306/${db_name}?useSSL=false\&serverTimezone=UTC\&characterEncoding=utf8\&allowPublicKeyRetrieval=true#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
 			sed -i "s#<jdbc.username>#${db_user}#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
 			sed -i "s#<jdbc.password>#${db_password}#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
 
@@ -106,15 +120,15 @@ GenerateConfig() {
 			#sed -i 's#image: "redis:5"#image: "${RegistryURI}/redis:5"#g' ./confs-$party_id/docker-compose.yml
 		fi
 
-        # check if use python-nn
-        if [ "$enabled_nn" = "true" ]; then
-            sed -i 's#image: "federatedai/python:${TAG}"#image: "federatedai/python-nn:${TAG}"#g' ./confs-$party_id/docker-compose.yml
-        fi
+		# check if use python-nn
+		if [ "$enabled_nn" = "true" ]; then
+			sed -i 's#image: "federatedai/python:${TAG}"#image: "federatedai/python-nn:${TAG}"#g' ./confs-$party_id/docker-compose.yml
+		fi
 
-        # replace namenode in training_template/public/fate_flow/conf/service_conf.yaml
-        if [ "$name_node" != "" ]; then
-            sed -i "s#name_node: hdfs://namenode:9000#name_node: ${name_node}#g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
-        fi
+		# replace namenode in training_template/public/fate_flow/conf/service_conf.yaml
+		if [ "$name_node" != "" ]; then
+			sed -i "s#name_node: hdfs://namenode:9000#name_node: ${name_node}#g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
+		fi
 
 		# update serving ip
 		sed -i "s/fate-serving/${serving_ip}/g" ./confs-$party_id/docker-compose.yml
@@ -139,12 +153,12 @@ GenerateConfig() {
 		echo fateboard module of $party_id done!
 
 		# mysql
-		# sed -i "s/eggroll_meta/${db_name}/g" ./confs-$party_id/confs/mysql/init/create-eggroll-meta-tables.sql
+		sed -i "s/eggroll_meta/${db_name}/g" ./confs-$party_id/confs/mysql/init/create-eggroll-meta-tables.sql
 		echo >./confs-$party_id/confs/mysql/init/insert-node.sql
 		echo "CREATE DATABASE IF NOT EXISTS ${db_name};" >>./confs-$party_id/confs/mysql/init/insert-node.sql
 		echo "CREATE USER '${db_user}'@'%' IDENTIFIED BY '${db_password}';" >>./confs-$party_id/confs/mysql/init/insert-node.sql
 		echo "GRANT ALL ON *.* TO '${db_user}'@'%';" >>./confs-$party_id/confs/mysql/init/insert-node.sql
-		echo 'USE `eggroll_meta`;' >>./confs-$party_id/confs/mysql/init/insert-node.sql
+		echo 'USE `'${db_name}'`;' >>./confs-$party_id/confs/mysql/init/insert-node.sql
 		echo "INSERT INTO server_node (host, port, node_type, status) values ('${clustermanager_ip}', '${clustermanager_port_db}', 'CLUSTER_MANAGER', 'HEALTHY');" >>./confs-$party_id/confs/mysql/init/insert-node.sql
 		for ((j = 0; j < ${#nodemanager_ip[*]}; j++)); do
 			echo "INSERT INTO server_node (host, port, node_type, status) values ('${nodemanager_ip[j]}', '${nodemanager_port_db}', 'NODE_MANAGER', 'HEALTHY');" >>./confs-$party_id/confs/mysql/init/insert-node.sql
@@ -154,14 +168,10 @@ GenerateConfig() {
 		echo mysql module of $party_id done!
 
 		# fate_flow
-		sed -i "12 s/name:.*/name: '${db_name}'/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
-		sed -i "13 s/user:.*/user: '${db_user}'/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
-		sed -i "14 s/passwd:.*/passwd: '${db_password}'/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
-		sed -i "15 s/host: 192.168.0.1*/host: '${db_ip}'/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
-		sed -i "43 s/name:.*/name: '${db_name}'/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
-		sed -i "44 s/host: 192.168.0.1*/host: '${db_ip}'/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
-		sed -i "46 s/user:.*/user: '${db_user}'/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
-		sed -i "47 s/passwd:.*/passwd: '${db_password}'/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
+		sed -i "s/name: <db_name>/name: '${db_name}'/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
+		sed -i "s/user: <db_user>/user: '${db_user}'/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
+		sed -i "s/passwd: <db_passwd>/passwd: '${db_password}'/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
+		sed -i "s/host: <db_host>/host: '${db_ip}'/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
 		sed -i "s/127.0.0.1:8000/${serving_ip}:8000/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
 
 		if [ $computing_backend = "spark" ]; then
@@ -175,7 +185,8 @@ GenerateConfig() {
 default:
   proxy:
     - host: nginx
-      port: 9390
+      http_port: 9300
+      grpc_port: 9310
 $(for ((j = 0; j < ${#party_list[*]}; j++)); do
 				if [ "${party_id}" == "${party_list[${j}]}" ]; then
 					continue
@@ -183,19 +194,23 @@ $(for ((j = 0; j < ${#party_list[*]}; j++)); do
 				echo "${party_list[${j}]}:
   proxy:
     - host: ${party_ip_list[${j}]} 
-      port: 9390
+      http_port: 9300
+      grpc_port: 9310
   fateflow:
     - host: ${party_ip_list[${j}]}
-      port: ${fate_flow_grpc_port}
+      grpc_port: ${fate_flow_grpc_port}
+      http_port: ${fate_flow_http_port}
 "
 			done)
 ${party_id}:
   proxy:
     - host: nginx
-      port: 9390
+      http_port: 9300
+      grpc_port: 9310
   fateflow:
     - host: ${fate_flow_ip}
-      port: ${fate_flow_grpc_port}
+      grpc_port: ${fate_flow_grpc_port}
+      http_port: ${fate_flow_http_port}
 EOF
 			cat >./confs-$party_id/confs/fate_flow/conf/rabbitmq_route_table.yaml <<EOF
 $(for ((j = 0; j < ${#party_list[*]}; j++)); do

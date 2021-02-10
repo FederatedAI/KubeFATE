@@ -2,7 +2,7 @@
 image:
   registry: federatedai
   isThridParty:
-  tag: 1.5.0-release
+  tag: 1.5.1-release
   pullPolicy: IfNotPresent
   imagePullSecrets: 
 #  - name: 
@@ -17,7 +17,7 @@ host:
   fateboard: 9999.fateboard.kubefate.net
   client: 9999.notebook.kubefate.net
   sparkUI: 9999.spark.kubefate.net
-
+  rabbitmqUI: 9999.rabbitmq.kubefate.net
 exchange:
   partyIp: 192.168.1.1
   partyPort: 30000
@@ -77,7 +77,8 @@ modules:
       route_table: 
     nginx:
       host: nginx
-      port: 9390
+      http_port: 9300
+      grpc_port: 9310
   clustermanager: 
     include: true
     ip: clustermanager
@@ -158,15 +159,18 @@ modules:
     include: true
     nodeSelector: 
     type: ClusterIP
-    nodePort: 30093
+    httpNodePort: 30093
+    grpcNodePort: 30098
     route_table: 
 #      10000: 
 #        proxy: 
 #        - host: 192.168.10.1 
-#          port: 30103
+#          http_port: 30103
+#          grpc_port: 30108
 #        fateflow:
 #        - host: 192.168.10.1  
-#          port: 30102
+#          http_port: 30107
+#          grpc_port: 30102
   rabbitmq:
     include: true
     nodeSelector: 

@@ -1,10 +1,13 @@
 name: fate-10000
 namespace: fate-10000
 chartName: fate
-chartVersion: v1.5.0
+chartVersion: v1.5.1
 partyId: 10000
 registry: ""
+imageTag: ""
 pullPolicy: 
+imagePullSecrets: 
+- name: myregistrykey
 persistence: false
 istio:
   enabled: false
@@ -30,15 +33,18 @@ servingPort: 30105
 
 nginx:
   type: NodePort
-  nodePort: 30103
+  http_port: 30103
+  grpc_port: 30108 
   route_table: 
     9999: 
       proxy: 
         - host: 192.168.9.1
-          port: 30093
+          http_port: 30093
+          grpc_port: 30098
       fateflow: 
         - host: 192.168.9.1
-          port: 30092
+          http_port: 30097
+          grpc_port: 30092
 rabbitmq:
   type: NodePort
   nodePort: 30104

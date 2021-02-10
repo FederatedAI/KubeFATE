@@ -14,7 +14,7 @@ rm -f ${target_dir}/confs-${target_party_id}.tar ${target_dir}/serving-${target_
 echo "# config is ok!"
 echo "# training cluster and serving cluster copy begin"
 
-cd ${dir}/../../docker-deploy
+cd ${dir}/../../../docker-deploy
 mv ./outputs/confs-${target_party_id}.tar ./outputs/serving-${target_party_id}.tar ${target_dir}/
 echo "# training cluster and serving cluster copy is ok!"
 echo "# training cluster deploy begin"

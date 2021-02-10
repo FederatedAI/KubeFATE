@@ -54,9 +54,6 @@ services:
 
   python:
     image: "federatedai/python-spark:${TAG}"
-    environment:
-      PYSPARK_PYTHON: /data/projects/python/venv/bin/python
-      PYSPARK_DRIVER_PYTHON: /data/projects/python/venv/bin/python
     restart: always
     ports:
       - 9380:9380
@@ -71,6 +68,8 @@ services:
     networks:
       fate-network:
         ipv4_address: 192.167.0.100
+    command: ["/bin/bash", "-c", "sleep 5 && python ./fate_flow/fate_flow_server.py"]
+
 
   namenode:
     image: federatedai/hadoop-namenode:2.0.0-hadoop2.7.4-java8
@@ -157,9 +156,10 @@ services:
       - fate-network
 
   nginx:
-    image: federatedai/nginx:1.17
+    image: "federatedai/nginx:${TAG}"
     ports:
-      - 9390:9390
+      - 9300:9300
+      - 9310:9310
     volumes:
       - ./confs/nginx/route_table.yaml:/data/projects/fate/proxy/nginx/conf/route_table.yaml
       - ./confs/nginx/nginx.conf:/data/projects/fate/proxy/nginx/conf/nginx.conf

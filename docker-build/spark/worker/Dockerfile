@@ -1,4 +1,6 @@
-FROM federatedai/spark-base:1.5.0-release
+ARG SOURCE_PREFIX=federatedai
+ARG SOURCE_TAG=1.5.0-release
+FROM ${SOURCE_PREFIX}/spark-base:${SOURCE_TAG}
 
 COPY worker.sh /
 

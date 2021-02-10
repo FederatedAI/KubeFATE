@@ -1,8 +1,7 @@
 # Refer to https://github.com/big-data-europe/docker-spark/tree/2.4.1-hadoop2.7/base
-
-FROM federatedai/python:1.5.0-release as source
-
-FROM centos:7 
+ARG SOURCE_PREFIX=federatedai
+ARG SOURCE_TAG=1.5.0-release
+FROM ${SOURCE_PREFIX}/python:${SOURCE_TAG}
 
 ENV ENABLE_INIT_DAEMON true
 ENV INIT_DAEMON_BASE_URI http://identifier/init-daemon
@@ -10,6 +9,8 @@ ENV INIT_DAEMON_STEP spark_master_init
 
 ENV SPARK_VERSION=2.4.1
 ENV HADOOP_VERSION=2.7
+
+WORKDIR /
 
 RUN set -eux && \
     rpm --rebuilddb && \
@@ -25,8 +26,5 @@ RUN set -eux && \
     rm spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz && \
     cd /
 
-COPY --from=source /data/projects/fate/python /data/projects/fate/python
-COPY --from=source /data/projects/python/ /data/projects/python/
 ENV PYTHONPATH=$PYTHONPATH:/data/projects/fate/python
-ENV PYSPARK_PYTHON=/data/projects/python/venv/bin/python
-ENV JAVA_HOME=/usr/lib/jvm/jre-1.8.0-openjdk-1.8.0.262.b10-0.el7_8.x86_64
+ENV JAVA_HOME=/usr/lib/jvm/jre-1.8.0-openjdk

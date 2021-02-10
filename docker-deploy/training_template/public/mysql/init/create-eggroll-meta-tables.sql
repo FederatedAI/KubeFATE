@@ -1,6 +1,5 @@
--- create database if not exists
+-- create database if not exists, default database is eggroll_meta
 CREATE DATABASE IF NOT EXISTS `eggroll_meta`;
-CREATE DATABASE IF NOT EXISTS `fate`;
 
 -- all operation under this database
 USE `eggroll_meta`;
@@ -23,15 +22,16 @@ CREATE TABLE IF NOT EXISTS `store_locator` (
 
 CREATE UNIQUE INDEX `idx_u_store_locator_ns_n` ON `store_locator` (`namespace`(120), `name`(640));
 CREATE INDEX `idx_store_locator_st` ON `store_locator` (`store_type`(255));
-CREATE INDEX `idx_store_locator_ns` ON `store_locator` (`namespace`(768));
-CREATE INDEX `idx_store_locator_n` ON `store_locator` (`name`(768));
+CREATE INDEX `idx_store_locator_ns` ON `store_locator` (`namespace`(767));
+CREATE INDEX `idx_store_locator_n` ON `store_locator` (`name`(767));
 CREATE INDEX `idx_store_locator_s` ON `store_locator` (`status`(255));
 CREATE INDEX `idx_store_locator_v` ON `store_locator` (`version`);
 
 
 -- store (option)
 CREATE TABLE IF NOT EXISTS `store_option` (
-  `store_locator_id` VARCHAR(2000),
+  `store_option_id` SERIAL PRIMARY KEY,
+  `store_locator_id` BIGINT UNSIGNED NOT NULL,
   `name` VARCHAR(255) NOT NULL,
   `data` VARCHAR(2000) NOT NULL DEFAULT '',
   `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -72,8 +72,8 @@ CREATE TABLE IF NOT EXISTS `server_node` (
   `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
 
-CREATE INDEX `idx_server_node_h_p_nt` ON `server_node` (`host`, `port`, `node_type`);
-CREATE INDEX `idx_server_node_h` ON `server_node` (`host`(768));
+CREATE INDEX `idx_server_node_h_p_nt` ON `server_node` (`host`(600), `port`, `node_type`(100));
+CREATE INDEX `idx_server_node_h` ON `server_node` (`host`(767));
 CREATE INDEX `idx_server_node_sci` ON `server_node` (`server_cluster_id`);
 CREATE INDEX `idx_server_node_nt` ON `server_node` (`node_type`(255));
 CREATE INDEX `idx_server_node_s` ON `server_node` (`status`(255));
@@ -81,7 +81,7 @@ CREATE INDEX `idx_server_node_s` ON `server_node` (`status`(255));
 
 -- session (main)
 CREATE TABLE IF NOT EXISTS `session_main` (
-  `session_id` VARCHAR(2000) PRIMARY KEY,
+  `session_id` VARCHAR(767) PRIMARY KEY,
   `name` VARCHAR(2000) NOT NULL DEFAULT '',
   `status` VARCHAR(255) NOT NULL,
   `tag` VARCHAR(255),
@@ -96,6 +96,7 @@ CREATE INDEX `idx_session_main_s` ON `session_main` (`status`);
 
 -- session (option)
 CREATE TABLE IF NOT EXISTS `session_option` (
+  `session_option_id`  SERIAL PRIMARY KEY,
   `session_id` VARCHAR(2000),
   `name` VARCHAR(255) NOT NULL,
   `data` VARCHAR(2000) NOT NULL DEFAULT '',
@@ -103,13 +104,13 @@ CREATE TABLE IF NOT EXISTS `session_option` (
   `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
 
-CREATE INDEX `idx_session_option_si` ON `session_option` (`session_id`);
+CREATE INDEX `idx_session_option_si` ON `session_option` (`session_id`(767));
 
 
 -- session (processor)
 CREATE TABLE IF NOT EXISTS `session_processor` (
   `processor_id` SERIAL PRIMARY KEY,
-  `session_id` VARCHAR(2000),
+  `session_id` VARCHAR(767),
   `server_node_id` INT NOT NULL,
   `processor_type` VARCHAR(255) NOT NULL,
   `status` VARCHAR(255),
@@ -121,5 +122,4 @@ CREATE TABLE IF NOT EXISTS `session_processor` (
   `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
 
-CREATE INDEX `idx_session_processor_si` ON `session_processor` (`session_id`);
-
+CREATE INDEX `idx_session_processor_si` ON `session_processor` (`session_id`(767));
