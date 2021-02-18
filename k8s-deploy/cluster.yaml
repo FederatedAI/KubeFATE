@@ -64,7 +64,8 @@ backend: eggroll
   # type: NodePort
   # httpNodePort: 30097
   # grpcNodePort: 30092
-  # nodeSelector: 
+  # nodeSelector:
+  # enabled_nn: false
   # spark: 
     # master: spark://spark-master:7077
     # home: 
