@@ -36,11 +36,14 @@ buildModule() {
     echo "Image: "${PREFIX}/spark-master:${IMG_TAG}" Build Successful"
     docker build --build-arg SOURCE_PREFIX=${PREFIX} --build-arg SOURCE_TAG=${IMG_TAG} -t ${PREFIX}/spark-worker:${IMG_TAG} spark/worker
     echo "Image: "${PREFIX}/spark-worker:${IMG_TAG}" Build Successful"
+
+    # client
+    docker build -t ${PREFIX}/client:${IMG_TAG} client
 }
 
 pushImage() {
     ## push image
-    for module in "nginx" "python-spark" "spark-base" "spark-master" "spark-worker"; do
+    for module in "nginx" "python-spark" "spark-base" "spark-master" "spark-worker" "client"; do
         echo "### START PUSH ${module} ###"
         docker push ${PREFIX}/${module}:${IMG_TAG}
         echo "### FINISH PUSH ${module} ###"
@@ -59,6 +62,12 @@ while [ "$1" != "" ]; do
     push)
         pushImage
         ;;
+    --tag)
+	IMG_TAG=$2
+	shift
+	;;
+    *)
+        echo "Usage: bash docker-build.sh --tag \$TAG [modules|all|push]"
     esac
     shift
 done
