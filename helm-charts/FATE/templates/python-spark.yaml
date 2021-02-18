@@ -219,7 +219,7 @@ spec:
           {{- if eq .Values.modules.python.backend  "spark" }}
           image: {{ .Values.image.registry }}/python-spark:{{ .Values.image.tag }}
           {{- else }}
-          image: {{ .Values.image.registry }}/python:{{ .Values.image.tag }}
+          image: {{ .Values.image.registry }}/{{ if .Values.modules.python.enabled_nn }}python-nn{{ else }}python{{ end }}:{{ .Values.image.tag }}
           {{- end }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
