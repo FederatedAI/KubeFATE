@@ -62,6 +62,12 @@ while [ "$1" != "" ]; do
     push)
         pushImage
         ;;
+    --tag)
+	IMG_TAG=$2
+	shift
+	;;
+    *)
+        echo "Usage: bash docker-build.sh --tag \$TAG [modules|all|push]"
     esac
     shift
 done
