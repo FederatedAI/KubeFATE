@@ -1,6 +1,6 @@
 FROM python:3.7
 
-COPY .Examples /Examples
+COPY Examples /Examples
 RUN pip install notebook fate-client
 RUN python setup.py sdist bdist_wheel && pip install dist/*.whl 
 RUN mkdir /Examples/Pipeline/logs
