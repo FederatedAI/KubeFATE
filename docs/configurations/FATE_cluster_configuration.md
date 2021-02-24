@@ -111,7 +111,7 @@ The parties are directly connected.
 | type                 | scalars  | Kubernetes ServiceTypes, default is NodePort.<br />Other modules can connect to the fateflow |
 | nodePort             | scalars  | The port used by `proxy` module's kubernetes service, default range: 30000-32767. |
 | nodeSelector         | mappings | kubernetes nodeSelector.                                     |
-| enabled_nn           | bool     | If or not neural network workflow is required                |
+| enabledNN            | bool     | If or not neural network workflow is required                |
 | spark                | mappings | If you use your own spark, modify the configuration          |
 | spark.master         | scalars  | If you do not need to use the spark configuration, you can use the spark configuration |
 | spark.home           | scalars  | configuration of FATE fateflow module                        |
