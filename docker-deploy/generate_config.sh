@@ -114,15 +114,15 @@ GenerateConfig() {
 
 		# generate conf dir
 		cp ${WORKINGDIR}/.env ./confs-$party_id
+				# check if use python-nn
+		if [ "$enabled_nn" = "true" ]; then
+			sed -i 's#image: "federatedai/python:${TAG}"#image: "federatedai/python-nn:${TAG}"#g' ./confs-$party_id/docker-compose.yml
+		fi
+
 		if [ "$RegistryURI" != "" ]; then
 			sed -i 's#federatedai#${RegistryURI}/federatedai#g' ./confs-$party_id/docker-compose.yml
 			sed -i 's#image: "mysql:8"#image: ${RegistryURI}/federatedai/mysql:8#g' ./confs-$party_id/docker-compose.yml
 			#sed -i 's#image: "redis:5"#image: "${RegistryURI}/redis:5"#g' ./confs-$party_id/docker-compose.yml
-		fi
-
-		# check if use python-nn
-		if [ "$enabled_nn" = "true" ]; then
-			sed -i 's#image: "federatedai/python:${TAG}"#image: "federatedai/python-nn:${TAG}"#g' ./confs-$party_id/docker-compose.yml
 		fi
 
 		# replace namenode in training_template/public/fate_flow/conf/service_conf.yaml
