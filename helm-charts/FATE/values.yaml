@@ -59,7 +59,7 @@ modules:
     grpcNodePort: 30092
     nodeSelector: 
     backend: eggroll
-    enabled_nn: false
+    enabledNN: false
     spark: 
       master: spark://spark-master:7077
       home: 
