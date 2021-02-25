@@ -100,7 +100,7 @@ modules:
     nodeSelector: 
 {{ toYaml . | indent 6 }}
     {{- end }}
-    enabled_nn: {{ .enabled_nn | default false }}
+    enabledNN: {{ .enabledNN | default false }}
     {{- with .spark }}
     spark: 
       master: {{ .master }}
