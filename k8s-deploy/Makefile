@@ -28,6 +28,9 @@ test: fmt vet
 kubefate: fmt vet swag
 	go build -o ${OUTPUT_FILE} ${BUILD_MODE} kubefate.go
 
+kubefate-without-swag: fmt vet
+	go build -o ${OUTPUT_FILE} ${BUILD_MODE} kubefate.go
+
 run: fmt vet 
 	go run ./kubefate.go service
 

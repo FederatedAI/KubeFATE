@@ -723,6 +723,47 @@ paths:
         name: jobId
         required: true
         type: integer
+      - description: Authentication header
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            allOf:
+            - $ref: '#/definitions/api.JSONResult'
+            - properties:
+                data:
+                  $ref: '#/definitions/modules.Job'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.JSONERRORResult'
+        "401":
+          description: Unauthorized operation
+          schema:
+            $ref: '#/definitions/api.JSONERRORResult'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/api.JSONERRORResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Get job by jobId
+      tags:
+      - Job
+    put:
+      parameters:
+      - description: Job ID
+        in: path
+        name: jobId
+        required: true
+        type: integer
       - description: jobStatus=stop
         in: path
         name: jobStatus

@@ -105,7 +105,7 @@ func (*Job) getJob(c *gin.Context) {
 // @Failure 400 {object} JSONERRORResult "Bad Request"
 // @Failure 401 {object} JSONERRORResult "Unauthorized operation"
 // @Failure 500 {object} JSONERRORResult "Internal server error"
-// @Router /job/{jobId} [get]
+// @Router /job/{jobId} [put]
 // @Param Authorization header string true "Authentication header"
 // @Security ApiKeyAuth
 func (*Job) putJob(c *gin.Context) {

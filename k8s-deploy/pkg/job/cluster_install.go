@@ -195,12 +195,6 @@ func clusterInstallRun(job *modules.Job) {
 				if err != nil {
 					log.Error().Err(err).Str("jobId", job.Uuid).Msg("update job By Uuid error")
 				}
-
-				if job.Status == modules.JobStatusSuccess {
-					log.Debug().Interface("job", job).Msg("job run success")
-				} else {
-					log.Warn().Interface("job", job).Msg("job run failed")
-				}
 			}
 
 			break
@@ -318,7 +312,7 @@ func addJobEvent(job *modules.Job, Event string) {
 
 	job.Events = append(job.Events, Event)
 
-	_, dbErr := job.UpdateByUuid(job.Uuid)
+	dbErr := job.SetEvents(job.Events)
 	if dbErr != nil {
 		log.Error().Err(dbErr).Msg("job.SetStatus error")
 	}
@@ -328,7 +322,7 @@ func updateLastJobEvent(job *modules.Job, Event string) {
 
 	job.Events[len(job.Events)-1] = Event
 
-	_, dbErr := job.UpdateByUuid(job.Uuid)
+	dbErr := job.SetEvents(job.Events)
 	if dbErr != nil {
 		log.Error().Err(dbErr).Msg("job.SetStatus error")
 	}
