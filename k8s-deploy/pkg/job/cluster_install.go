@@ -274,8 +274,6 @@ func helmInstall(job *modules.Job, cluster *modules.Cluster) error {
 	if err != nil {
 		log.Error().Err(err).Str("ClusterId", cluster.Uuid).Msg("helm install cluster error")
 
-		addJobEvent(job, err.Error())
-
 		dbErr := job.SetStatus(modules.JobStatusFailed)
 		if dbErr != nil {
 			log.Error().Err(dbErr).Msg("job.SetStatus error")
@@ -283,9 +281,6 @@ func helmInstall(job *modules.Job, cluster *modules.Cluster) error {
 		return err
 	}
 
-	log.Debug().Str("ClusterId", cluster.Uuid).Msg("helm install cluster success")
-
-	addJobEvent(job, "Cluster install success")
 	dbErr := job.SetStatus(modules.JobStatusRunning)
 	if dbErr != nil {
 		log.Error().Err(dbErr).Msg("job.SetStatus error")
