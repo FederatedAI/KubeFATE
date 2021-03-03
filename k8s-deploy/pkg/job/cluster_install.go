@@ -85,7 +85,7 @@ func clusterInstallRun(job *modules.Job) {
 	err := updateJobStatusToRunning(job)
 	// update Event
 	if err != nil {
-		addJobEvent(job, err.Error())
+		addJobEvent(job, "Update JobStatus to Running, "+err.Error())
 		log.Error().Str("jobID", job.Uuid).Err(err).Msg("update job.status to Running")
 		return
 	}
@@ -97,7 +97,7 @@ func clusterInstallRun(job *modules.Job) {
 
 	// update Event
 	if err != nil {
-		addJobEvent(job, err.Error())
+		addJobEvent(job, "Create cluster error, "+err.Error())
 		log.Error().Str("jobID", job.Uuid).Err(err).Msg("Create Cluster in DB")
 		return
 	}
@@ -110,7 +110,7 @@ func clusterInstallRun(job *modules.Job) {
 	// update Event
 	if err != nil {
 		clean(job, cluster)
-		addJobEvent(job, err.Error())
+		addJobEvent(job, "Helm install error, "+err.Error())
 		log.Error().Str("jobID", job.Uuid).Err(err).Msg("Helm install")
 		return
 	}
