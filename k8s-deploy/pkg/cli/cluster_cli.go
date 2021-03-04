@@ -197,7 +197,7 @@ func ClusterUpdateCommand() *cli.Command {
 				Name:     "file",
 				Aliases:  []string{"f"},
 				Value:    "",
-				Usage:    "chart cluster.yaml",
+				Usage:    "Enter your own configured cluster.yaml file",
 				Required: true,
 			},
 		},

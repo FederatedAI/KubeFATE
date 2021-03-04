@@ -26,6 +26,10 @@ const (
 	TableMaxColWidthDefault uint = 120
 )
 
+func init() {
+	cli.HelpFlag = &cli.BoolFlag{Name: "help", Aliases: []string{"h"}, Usage: "Show help"}
+}
+
 func initCommandLine() *cli.App {
 	app := &cli.App{
 
