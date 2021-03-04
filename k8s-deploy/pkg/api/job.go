@@ -68,7 +68,7 @@ func (*Job) getJobList(c *gin.Context) {
 // @Summary Get job by jobId
 // @Tags Job
 // @Produce  json
-// @Param  jobId path int true "Job ID"
+// @Param  jobId path string true "Job ID"
 // @Success 200 {object} JSONResult{data=modules.Job} "Success"
 // @Failure 400 {object} JSONERRORResult "Bad Request"
 // @Failure 401 {object} JSONERRORResult "Unauthorized operation"
@@ -99,8 +99,8 @@ func (*Job) getJob(c *gin.Context) {
 // @Summary Update job status to stop, stop job
 // @Tags Job
 // @Produce  json
-// @Param  jobId path int true "Job ID"
-// @Param  jobStatus path string true "jobStatus=stop"
+// @Param  jobId path string true "Job ID"
+// @Param  jobStatus query string true "jobStatus=stop" default(stop)
 // @Success 200 {object} JSONResult{data=string} "Success"
 // @Failure 400 {object} JSONERRORResult "Bad Request"
 // @Failure 401 {object} JSONERRORResult "Unauthorized operation"
@@ -137,7 +137,7 @@ func (*Job) putJob(c *gin.Context) {
 // @Summary Delete Job by jobId
 // @Tags Job
 // @Produce  json
-// @Param  jobId path int true "Job ID"
+// @Param  jobId path string true "Job ID"
 // @Success 200 {object} JSONEMSGResult "Success"
 // @Failure 400 {object} JSONERRORResult "Bad Request"
 // @Failure 401 {object} JSONERRORResult "Unauthorized operation"

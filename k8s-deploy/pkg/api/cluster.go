@@ -196,7 +196,7 @@ func (*Cluster) getCluster(c *gin.Context) {
 // @Summary List all available clusters
 // @Tags Cluster
 // @Produce  json
-// @Param   all     query    boolean      true        "get All cluster"
+// @Param   all     query    boolean      true        "get All cluster" default(false)
 // @Success 200 {object} JSONResult{data=[]modules.Cluster} "Success"
 // @Failure 400 {object} JSONERRORResult "Bad Request"
 // @Failure 401 {object} JSONERRORResult "Unauthorized operation"

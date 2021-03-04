@@ -463,6 +463,7 @@ var doc = `{
                 "parameters": [
                     {
                         "type": "boolean",
+                        "default": false,
                         "description": "get All cluster",
                         "name": "all",
                         "in": "query",
@@ -745,7 +746,7 @@ var doc = `{
                 "summary": "Get job by jobId",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "Job ID",
                         "name": "jobId",
                         "in": "path",
@@ -813,7 +814,7 @@ var doc = `{
                 "summary": "Update job status to stop, stop job",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "Job ID",
                         "name": "jobId",
                         "in": "path",
@@ -821,9 +822,10 @@ var doc = `{
                     },
                     {
                         "type": "string",
+                        "default": "stop",
                         "description": "jobStatus=stop",
                         "name": "jobStatus",
-                        "in": "path",
+                        "in": "query",
                         "required": true
                     },
                     {
@@ -888,7 +890,7 @@ var doc = `{
                 "summary": "Delete Job by jobId",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "Job ID",
                         "name": "jobId",
                         "in": "path",
@@ -962,6 +964,7 @@ var doc = `{
                     },
                     {
                         "type": "boolean",
+                        "default": false,
                         "description": "previous",
                         "name": "previous",
                         "in": "query",
@@ -983,6 +986,7 @@ var doc = `{
                     },
                     {
                         "type": "boolean",
+                        "default": false,
                         "description": "timestamps",
                         "name": "timestamps",
                         "in": "query",
@@ -1843,12 +1847,6 @@ var doc = `{
                 "end_time": {
                     "type": "string"
                 },
-                "events": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
                 "id": {
                     "type": "integer"
                 },
@@ -1863,6 +1861,12 @@ var doc = `{
                 },
                 "start_time": {
                     "type": "string"
+                },
+                "states": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "status": {
                     "type": "integer"

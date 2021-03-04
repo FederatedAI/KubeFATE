@@ -448,6 +448,7 @@
                 "parameters": [
                     {
                         "type": "boolean",
+                        "default": false,
                         "description": "get All cluster",
                         "name": "all",
                         "in": "query",
@@ -730,7 +731,7 @@
                 "summary": "Get job by jobId",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "Job ID",
                         "name": "jobId",
                         "in": "path",
@@ -798,7 +799,7 @@
                 "summary": "Update job status to stop, stop job",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "Job ID",
                         "name": "jobId",
                         "in": "path",
@@ -806,9 +807,10 @@
                     },
                     {
                         "type": "string",
+                        "default": "stop",
                         "description": "jobStatus=stop",
                         "name": "jobStatus",
-                        "in": "path",
+                        "in": "query",
                         "required": true
                     },
                     {
@@ -873,7 +875,7 @@
                 "summary": "Delete Job by jobId",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "Job ID",
                         "name": "jobId",
                         "in": "path",
@@ -947,6 +949,7 @@
                     },
                     {
                         "type": "boolean",
+                        "default": false,
                         "description": "previous",
                         "name": "previous",
                         "in": "query",
@@ -968,6 +971,7 @@
                     },
                     {
                         "type": "boolean",
+                        "default": false,
                         "description": "timestamps",
                         "name": "timestamps",
                         "in": "query",
@@ -1828,12 +1832,6 @@
                 "end_time": {
                     "type": "string"
                 },
-                "events": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
                 "id": {
                     "type": "integer"
                 },
@@ -1848,6 +1846,12 @@
                 },
                 "start_time": {
                     "type": "string"
+                },
+                "states": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "status": {
                     "type": "integer"

@@ -165,10 +165,6 @@ definitions:
         $ref: '#/definitions/gorm.DeletedAt'
       end_time:
         type: string
-      events:
-        items:
-          type: string
-        type: array
       id:
         type: integer
       meta_data:
@@ -179,6 +175,10 @@ definitions:
         type: string
       start_time:
         type: string
+      states:
+        items:
+          type: string
+        type: array
       status:
         type: integer
       sub_jobs:
@@ -511,7 +511,8 @@ paths:
   /cluster/:
     get:
       parameters:
-      - description: get All cluster
+      - default: false
+        description: get All cluster
         in: query
         name: all
         required: true
@@ -686,7 +687,7 @@ paths:
         in: path
         name: jobId
         required: true
-        type: integer
+        type: string
       - description: Authentication header
         in: header
         name: Authorization
@@ -722,7 +723,7 @@ paths:
         in: path
         name: jobId
         required: true
-        type: integer
+        type: string
       - description: Authentication header
         in: header
         name: Authorization
@@ -763,9 +764,10 @@ paths:
         in: path
         name: jobId
         required: true
-        type: integer
-      - description: jobStatus=stop
-        in: path
+        type: string
+      - default: stop
+        description: jobStatus=stop
+        in: query
         name: jobStatus
         required: true
         type: string
@@ -818,7 +820,8 @@ paths:
         name: container
         required: true
         type: string
-      - description: previous
+      - default: false
+        description: previous
         in: query
         name: previous
         required: true
@@ -833,7 +836,8 @@ paths:
         name: since-time
         required: true
         type: string
-      - description: timestamps
+      - default: false
+        description: timestamps
         in: query
         name: timestamps
         required: true

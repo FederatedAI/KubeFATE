@@ -59,10 +59,10 @@ func (e *kubeLog) Router(r *gin.RouterGroup) {
 // @Produce  json
 // @Param  clusterID path int true "Cluster ID"
 // @Param  container query string true "container name"
-// @Param  previous query boolean  true "previous"
+// @Param  previous query boolean  true "previous" default(false)
 // @Param  since query string true "since"
 // @Param  since-time query string true "since-time"
-// @Param  timestamps query boolean  true "timestamps"
+// @Param  timestamps query boolean  true "timestamps" default(false)
 // @Param  tail query string true "tail"
 // @Param  limit-bytes query string true "limit-bytes"
 // @Success 200 {object} JSONResult{data=string} "Success"
