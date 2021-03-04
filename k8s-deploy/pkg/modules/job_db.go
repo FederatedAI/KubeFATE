@@ -153,20 +153,20 @@ func (e *Job) SetStatus(status JobStatus) error {
 
 func (e *Job) SetStates(States States) error {
 
-	if err := DB.Model(e).Update("States", States).Error; err != nil {
+	if err := DB.Model(e).Update("states", States).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
-func (e *Job) SetState(Event string) error {
+func (e *Job) SetState(State string) error {
 	j, err := e.Get()
 	if err != nil {
 		return err
 	}
-	j.States = append(j.States, Event)
+	j.States = append(j.States, State)
 
-	if err := DB.Model(e).Update("States", j.States).Error; err != nil {
+	if err := DB.Model(e).Update("states", j.States).Error; err != nil {
 		return err
 	}
 	return nil
