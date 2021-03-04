@@ -109,7 +109,7 @@ func JobStopCommand() *cli.Command {
 				Usage: "Describe a job with given UUID",
 			},
 		},
-		Usage: "stop job",
+		Usage: "Stop job",
 		Action: func(c *cli.Context) error {
 
 			var uuid string
