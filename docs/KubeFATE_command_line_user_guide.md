@@ -182,6 +182,16 @@ Get the list of all jobs
 kubefate job list
 ```
 
+##### stop
+
+Cancel the Running job
+
+```bash
+kubefate job stop <job_uuid>
+```
+
+*This only works for Running jobs of type ClusterInstall*
+
 ##### describe
 
 Get the description information of the given job
