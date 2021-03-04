@@ -40,18 +40,18 @@ type Job struct {
 	TimeLimit time.Duration `json:"time_limit" swaggertype:"string"`
 	Metadata  *ClusterArgs  `json:"meta_data" gorm:"embedded;embeddedPrefix:args_"`
 
-	Events Events `json:"events"  gorm:"type:text"`
+	States States `json:"states"  gorm:"type:text"`
 	gorm.Model
 }
 
-type Events []string
+type States []string
 
-func (s Events) Value() (driver.Value, error) {
+func (s States) Value() (driver.Value, error) {
 	bJson, err := json.Marshal(s)
 	return bJson, err
 }
 
-func (s *Events) Scan(v interface{}) error {
+func (s *States) Scan(v interface{}) error {
 	return json.Unmarshal(v.([]byte), s)
 }
 

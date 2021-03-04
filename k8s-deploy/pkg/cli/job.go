@@ -155,7 +155,7 @@ func (c *Job) outPutInfo(result interface{}) error {
 			v.ModuleName, v.ModulesPodStatus, v.Status, GetDuration(v.StartTime, v.EndTime), v.StartTime.Format("2006-01-02 15:04:05"), v.EndTime.Format("2006-01-02 15:04:05")))
 	}
 
-	events, err := yaml.Marshal(job.Events)
+	states, err := yaml.Marshal(job.States)
 	if err != nil {
 		return err
 	}
@@ -177,7 +177,7 @@ func (c *Job) outPutInfo(result interface{}) error {
 	table.AddRow("Status", job.Status.String())
 	table.AddRow("Creator", job.Creator)
 	table.AddRow("ClusterId", job.ClusterId)
-	table.AddRow("Events", string(events))
+	table.AddRow("States", string(states))
 	for i, v := range subJobs {
 		if i == 0 {
 			table.AddRow("SubJobs", v)

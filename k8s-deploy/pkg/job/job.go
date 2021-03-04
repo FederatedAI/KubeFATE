@@ -343,7 +343,7 @@ func ClusterUpdate(clusterArgs *modules.ClusterArgs, creator string) (*modules.J
 		if err != nil {
 			log.Error().Err(err).Str("ClusterId", cluster.Uuid).Msg("helm upgrade cluster error")
 
-			dbErr := job.SetEvent(err.Error())
+			dbErr := job.SetState(err.Error())
 			if dbErr != nil {
 				log.Error().Err(dbErr).Msg("job.SetResult error")
 			}
@@ -354,7 +354,7 @@ func ClusterUpdate(clusterArgs *modules.ClusterArgs, creator string) (*modules.J
 		} else {
 			log.Debug().Str("ClusterId", cluster.Uuid).Msg("helm upgrade cluster success")
 
-			dbErr := job.SetEvent("Cluster update success")
+			dbErr := job.SetState("Cluster update success")
 			if dbErr != nil {
 				log.Error().Err(dbErr).Msg("job.SetResult error")
 			}
@@ -371,7 +371,7 @@ func ClusterUpdate(clusterArgs *modules.ClusterArgs, creator string) (*modules.J
 			}
 
 			if job.TimeOut() {
-				dbErr := job.SetEvent("Checkout cluster status timeOut!")
+				dbErr := job.SetState("Checkout cluster status timeOut!")
 				if dbErr != nil {
 					log.Error().Err(dbErr).Msg("job.SetResult error")
 				}
@@ -406,7 +406,7 @@ func ClusterUpdate(clusterArgs *modules.ClusterArgs, creator string) (*modules.J
 		}
 
 		if job.Status == modules.JobStatusCanceled {
-			dbErr := job.SetEvent("Job canceled")
+			dbErr := job.SetState("Job canceled")
 			if dbErr != nil {
 				log.Error().Err(dbErr).Msg("job.SetResult error")
 			}
@@ -447,7 +447,7 @@ func ClusterUpdate(clusterArgs *modules.ClusterArgs, creator string) (*modules.J
 			if err != nil {
 				log.Error().Err(err).Str("ClusterId", cluster.Uuid).Msg("helm upgrade cluster error")
 
-				dbErr := job.SetEvent(err.Error())
+				dbErr := job.SetState(err.Error())
 				if dbErr != nil {
 					log.Error().Err(dbErr).Msg("job.SetResult error")
 				}
@@ -458,7 +458,7 @@ func ClusterUpdate(clusterArgs *modules.ClusterArgs, creator string) (*modules.J
 			} else {
 				log.Debug().Str("ClusterId", cluster.Uuid).Msg("helm upgrade cluster success")
 
-				dbErr := job.SetEvent("Cluster run rollback success")
+				dbErr := job.SetState("Cluster run rollback success")
 				if dbErr != nil {
 					log.Error().Err(dbErr).Msg("job.SetResult error")
 				}
@@ -471,7 +471,7 @@ func ClusterUpdate(clusterArgs *modules.ClusterArgs, creator string) (*modules.J
 			//
 			for job.Status == modules.JobStatusRunning {
 				if job.TimeOut() {
-					dbErr := job.SetEvent("Checkout cluster status timeOut!")
+					dbErr := job.SetState("Checkout cluster status timeOut!")
 					if dbErr != nil {
 						log.Error().Err(dbErr).Msg("job.SetResult error")
 					}
@@ -564,14 +564,14 @@ func ClusterDelete(clusterId string, creator string) (*modules.Job, error) {
 
 		err = cluster.HelmDelete()
 		if err != nil {
-			dbErr := job.SetEvent(err.Error())
+			dbErr := job.SetState(err.Error())
 			if dbErr != nil {
 				log.Error().Err(dbErr).Msg("job.SetResult error")
 			}
 			job.Status = modules.JobStatusFailed
 			log.Err(err).Str("ClusterId", cluster.Uuid).Msg("helm delete cluster error")
 		} else {
-			dbErr := job.SetEvent("uninstall success")
+			dbErr := job.SetState("uninstall success")
 			if dbErr != nil {
 				log.Error().Err(dbErr).Msg("job.SetResult error")
 			}
@@ -584,7 +584,7 @@ func ClusterDelete(clusterId string, creator string) (*modules.Job, error) {
 		}
 
 		if job.Status == modules.JobStatusCanceled {
-			dbErr := job.SetEvent("Job canceled")
+			dbErr := job.SetState("Job canceled")
 			if dbErr != nil {
 				log.Error().Err(dbErr).Msg("job.SetResult error")
 			}

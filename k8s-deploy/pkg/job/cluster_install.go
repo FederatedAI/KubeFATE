@@ -258,7 +258,7 @@ func updateJobStatusToRunning(job *modules.Job) error {
 		log.Error().Err(dbErr).Msg("job setStatus error")
 		return dbErr
 	}
-	dbErr = job.SetEvent("job start Running")
+	dbErr = job.SetState("job start Running")
 	if dbErr != nil {
 		log.Error().Err(dbErr).Msg("job setResult error")
 		return dbErr
@@ -305,9 +305,9 @@ func clean(job *modules.Job, cluster *modules.Cluster) {
 
 func addJobEvent(job *modules.Job, Event string) {
 
-	job.Events = append(job.Events, Event)
+	job.States = append(job.States, Event)
 
-	dbErr := job.SetEvents(job.Events)
+	dbErr := job.SetStates(job.States)
 	if dbErr != nil {
 		log.Error().Err(dbErr).Msg("job.SetStatus error")
 	}
@@ -315,9 +315,9 @@ func addJobEvent(job *modules.Job, Event string) {
 }
 func updateLastJobEvent(job *modules.Job, Event string) {
 
-	job.Events[len(job.Events)-1] = Event
+	job.States[len(job.States)-1] = Event
 
-	dbErr := job.SetEvents(job.Events)
+	dbErr := job.SetStates(job.States)
 	if dbErr != nil {
 		log.Error().Err(dbErr).Msg("job.SetStatus error")
 	}
