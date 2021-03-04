@@ -113,7 +113,7 @@ func ClusterInstallCommand() *cli.Command {
 				Name:     "file",
 				Aliases:  []string{"f"},
 				Value:    "",
-				Usage:    "chart cluster.yaml",
+				Usage:    "YAML configuration file for the cluster",
 				Required: true,
 			},
 			&cli.BoolFlag{
