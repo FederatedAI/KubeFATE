@@ -26,7 +26,7 @@ test: fmt vet
 
 # Build manager binary
 kubefate: fmt vet swag
-	go build -o ${OUTPUT_FILE} ${BUILD_MODE} kubefate.go
+	env CGO_ENABLED=0 go build -o ${OUTPUT_FILE} ${BUILD_MODE} kubefate.go
 
 run: fmt vet 
 	go run ./kubefate.go service
