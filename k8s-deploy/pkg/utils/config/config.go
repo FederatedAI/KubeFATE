@@ -39,8 +39,6 @@ func InitViper() {
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
 
-	viper.ReadInConfig()
-
 	return
 }
 

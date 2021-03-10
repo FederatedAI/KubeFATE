@@ -27,11 +27,12 @@ import (
 
 func main() {
 	config.InitViper()
-	logging.InitLog()
 	err := viper.ReadInConfig()
 	if err != nil {
 		log.Debug().Err(err).Msg("load config.yaml error")
 	}
+
+	logging.InitLog()
 
 	err = cli.Run(os.Args)
 	if err != nil {
