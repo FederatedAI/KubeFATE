@@ -114,7 +114,7 @@ spec:
       volumes:
         - name: mariadb-data
           hostPath:
-            path: /home/kubefate/mysql/db
+            path: /data/kubefate/mysql/db
             type: DirectoryOrCreate
 ---
 apiVersion: v1
