@@ -19,12 +19,13 @@ import (
 	"github.com/spf13/viper"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 type Sqlite struct {
 }
 
-func (e *Sqlite) Open() (db *gorm.DB, err error) {
+func (e *Sqlite) Open(logLevel logger.LogLevel) (db *gorm.DB, err error) {
 	dsn := viper.GetString("db.file")
-	return gorm.Open(sqlite.Open(dsn), &gorm.Config{})
+	return gorm.Open(sqlite.Open(dsn), &gorm.Config{Logger: logger.Default.LogMode(logLevel)})
 }

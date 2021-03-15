@@ -48,7 +48,7 @@ func getDbConfig() *DbConfig {
 	}
 }
 
-func (e *Mysql) Open() (db *gorm.DB, err error) {
+func (e *Mysql) Open(logLevel logger.LogLevel) (db *gorm.DB, err error) {
 	dbConfig := getDbConfig()
 	var conn bytes.Buffer
 	conn.WriteString(dbConfig.Username)
@@ -67,7 +67,7 @@ func (e *Mysql) Open() (db *gorm.DB, err error) {
 		log.New(os.Stdout, "\r\n", log.LstdFlags),
 		logger.Config{
 			SlowThreshold: time.Second,
-			LogLevel:      logger.Silent,
+			LogLevel:      logLevel,
 			Colorful:      false,
 		},
 	)
