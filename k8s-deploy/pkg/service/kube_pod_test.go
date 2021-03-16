@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 VMware, Inc.
+ * Copyright 2019-2021 VMware, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,12 +24,6 @@ import (
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
-
-// GetPods hook
-
-type pod interface {
-	GetPods(string, string) (*v1.PodList, error)
-}
 
 type podtest struct {
 	kube.Kube
@@ -70,11 +64,11 @@ func (e *podtesterr) GetPods(namespace, LabelSelector string) (*v1.PodList, erro
 	return nil, errors.New("")
 }
 
-type podtestNofind struct {
+type podtestNoFind struct {
 	kube.Kube
 }
 
-func (e *podtestNofind) GetPods(namespace, LabelSelector string) (*v1.PodList, error) {
+func (e *podtestNoFind) GetPods(namespace, LabelSelector string) (*v1.PodList, error) {
 	return &v1.PodList{}, nil
 }
 func TestGetPodNameByModule(t *testing.T) {
@@ -102,13 +96,13 @@ func TestGetPodNameByModule(t *testing.T) {
 		{
 			name: "no find",
 			args: args{
-				client: &podtestNofind{},
+				client: &podtestNoFind{},
 			},
 			want:    "",
 			wantErr: true,
 		},
 		{
-			name: "success",
+			name: "Success",
 			args: args{
 				name:      testpod.Items[0].Labels["name"],
 				namespace: testpod.Items[0].Namespace,
@@ -119,7 +113,7 @@ func TestGetPodNameByModule(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "success-1",
+			name: "Success-1",
 			args: args{
 				name:      testpod.Items[0].Labels["name"],
 				namespace: testpod.Items[0].Namespace,
@@ -158,7 +152,7 @@ func TestGetPodList(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "error",
+			name: "Error",
 			args: args{
 				client: &podtesterr{},
 			},
@@ -166,7 +160,7 @@ func TestGetPodList(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "success",
+			name: "Success",
 			args: args{
 				name:      testpod.Items[0].Labels["name"],
 				namespace: testpod.Items[0].Namespace,

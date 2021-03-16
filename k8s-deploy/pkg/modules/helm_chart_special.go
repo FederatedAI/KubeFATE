@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 VMware, Inc.
+ * Copyright 2019-2021 VMware, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ import (
 	"helm.sh/helm/v3/pkg/chart"
 )
 
-func (e *HelmChart) ChartRequestedTohelmChart(chartRequested *chart.Chart) (*HelmChart, error) {
+func (e *HelmChart) ChartRequestedToHelmChart(chartRequested *chart.Chart) (*HelmChart, error) {
 	if chartRequested == nil || chartRequested.Raw == nil {
 		log.Error().Msg("chartRequested not exist")
 		return nil, errors.New("chartRequested not exist")
@@ -86,7 +86,7 @@ func HelmChartDownload(chartName, chartVersion string) (*HelmChart, error) {
 		return nil, err
 	}
 
-	helmChart, err := ChartRequestedTohelmChart(chartRequested)
+	helmChart, err := ChartRequestedToHelmChart(chartRequested)
 	if err != nil {
 		return nil, err
 	}
@@ -94,7 +94,7 @@ func HelmChartDownload(chartName, chartVersion string) (*HelmChart, error) {
 	return helmChart, nil
 }
 
-func ChartRequestedTohelmChart(chartRequested *chart.Chart) (*HelmChart, error) {
+func ChartRequestedToHelmChart(chartRequested *chart.Chart) (*HelmChart, error) {
 	if chartRequested == nil || chartRequested.Raw == nil {
 		log.Error().Msg("chartRequested not exist")
 		return nil, errors.New("chartRequested not exist")
@@ -166,13 +166,13 @@ func (e *HelmChart) GetChartValues(v map[string]interface{}) (map[string]interfa
 		return nil, err
 	}
 	// values to map
-	vals := make(map[string]interface{})
-	err = yaml.Unmarshal([]byte(values), &vals)
+	chartValues := make(map[string]interface{})
+	err = yaml.Unmarshal([]byte(values), &chartValues)
 	if err != nil {
 		log.Err(err).Msg("values yaml Unmarshal error")
 		return nil, err
 	}
-	return vals, nil
+	return chartValues, nil
 }
 
 // todo  get chart by version from repository

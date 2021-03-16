@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 VMware, Inc.
+ * Copyright 2019-2021 VMware, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,6 +56,6 @@ func (*Namespace) getNamespaceList(c *gin.Context) {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
-	log.Debug().Interface("data", namespaceList).Msg("getNamespaceList success")
-	c.JSON(200, gin.H{"data": namespaceList, "msg": "getNamespaceList success"})
+	log.Debug().Interface("data", namespaceList).Msg("getNamespaceList Success")
+	c.JSON(200, gin.H{"data": namespaceList, "msg": "getNamespaceList Success"})
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 VMware, Inc.
+ * Copyright 2019-2021 VMware, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import (
 // ClusterInstall Cluster Install New, Create and run job
 func ClusterInstall(clusterArgs *modules.ClusterArgs, creator string) (*modules.Job, error) {
 
-	// Preconditions for running job
+	// Preconditions for Running job
 	// - check cluster args
 	// - cluster.IsExisted
 	if err := preconditionsReady(clusterArgs, creator); err != nil {
@@ -41,7 +41,7 @@ func ClusterInstall(clusterArgs *modules.ClusterArgs, creator string) (*modules.
 	if err != nil {
 		return nil, err
 	}
-	log.Debug().Msg("init Job success")
+	log.Debug().Msg("init Job Success")
 
 	go clusterInstallRun(job)
 
@@ -61,7 +61,7 @@ func preconditionsReady(clusterArgs *modules.ClusterArgs, creator string) error 
 
 	cluster := new(modules.Cluster)
 	if ok := cluster.IsExisted(clusterArgs.Name, clusterArgs.Namespace); ok {
-		return fmt.Errorf("Name=%s & Namespace=%s cluster is existed", clusterArgs.Name, clusterArgs.Namespace)
+		return fmt.Errorf("name=%s & namespace=%s Cluster already existed", clusterArgs.Name, clusterArgs.Namespace)
 	}
 	return nil
 }
@@ -92,19 +92,19 @@ func clusterInstallRun(job *modules.Job) {
 	addJobEvent(job, "update job status to Running")
 	log.Debug().Str("jobID", job.Uuid).Msg("update job.status to Running")
 
-	// create cluster to db
+	// create Cluster to db
 	cluster, err := createCluster(job)
 
 	// update Event
 	if err != nil {
-		addJobEvent(job, "create cluster error, "+err.Error())
-		log.Error().Str("jobID", job.Uuid).Err(err).Msg("create cluster in DB")
+		addJobEvent(job, "create Cluster error, "+err.Error())
+		log.Error().Str("jobID", job.Uuid).Err(err).Msg("create Cluster in DB")
 		return
 	}
-	addJobEvent(job, "create cluster in DB Success")
-	log.Debug().Str("jobID", job.Uuid).Msg("create Cluster in DB success")
+	addJobEvent(job, "create Cluster in DB Success")
+	log.Debug().Str("jobID", job.Uuid).Msg("create Cluster in DB Success")
 
-	// helm install a cluster
+	// helm install a Cluster
 	err = helmInstall(job, cluster)
 
 	// update Event
@@ -114,14 +114,14 @@ func clusterInstallRun(job *modules.Job) {
 		log.Error().Str("jobID", job.Uuid).Err(err).Msg("Helm install")
 		return
 	}
-	addJobEvent(job, "helm install success")
-	log.Debug().Str("jobID", job.Uuid).Msg("Helm install success")
+	addJobEvent(job, "helm install Success")
+	log.Debug().Str("jobID", job.Uuid).Msg("Helm install Success")
 
 	i := 0
-	addJobEvent(job, fmt.Sprintf("checkout cluster status [%d]", i))
+	addJobEvent(job, fmt.Sprintf("checkout Cluster status [%d]", i))
 	for job.IsRunning() {
 		i++
-		updateLastJobEvent(job, fmt.Sprintf("checkout cluster status [%d]", i))
+		updateLastJobEvent(job, fmt.Sprintf("checkout Cluster status [%d]", i))
 
 		e := &modules.Job{Uuid: job.Uuid}
 		j, err := e.Get()
@@ -133,8 +133,8 @@ func clusterInstallRun(job *modules.Job) {
 
 		// timeOut
 		if job.TimeOut() {
-			addJobEvent(job, "checkout cluster status timeOut!")
-			log.Debug().Str("jobID", job.Uuid).Msg("checkout cluster status timeOut!")
+			addJobEvent(job, "checkout Cluster status timeOut!")
+			log.Debug().Str("jobID", job.Uuid).Msg("checkout Cluster status timeOut!")
 			dbErr := job.SetStatus(modules.JobStatusFailed)
 			if dbErr != nil {
 				log.Error().Err(dbErr).Msg("job setStatus error")
@@ -147,7 +147,7 @@ func clusterInstallRun(job *modules.Job) {
 		if job.IsStop() {
 			clean(job, cluster)
 
-			addJobEvent(job, "job stoped")
+			addJobEvent(job, "job stopped")
 
 			dbErr := job.SetStatus(modules.JobStatusCanceled)
 			if dbErr != nil {
@@ -155,7 +155,7 @@ func clusterInstallRun(job *modules.Job) {
 				return
 			}
 
-			log.Debug().Str("jobID", job.Uuid).Msg("job stoped")
+			log.Debug().Str("jobID", job.Uuid).Msg("job stopped")
 			break
 		}
 
@@ -163,13 +163,13 @@ func clusterInstallRun(job *modules.Job) {
 		if stopJob(job, cluster) {
 			clean(job, cluster)
 
-			addJobEvent(job, "cluster delete")
+			addJobEvent(job, "Cluster delete")
 			dbErr := job.SetStatus(modules.JobStatusFailed)
 			if dbErr != nil {
 				log.Error().Err(dbErr).Msg("job.SetStatus error")
 				return
 			}
-			log.Debug().Str("jobID", job.Uuid).Msg("cluster delete")
+			log.Debug().Str("jobID", job.Uuid).Msg("Cluster delete")
 			break
 		}
 		log.Debug().Str("jobID", job.Uuid).Msg("check job Status")
@@ -183,9 +183,9 @@ func clusterInstallRun(job *modules.Job) {
 				cluster.Revision++
 				_, err = cluster.UpdateByUuid(job.ClusterId)
 				if err != nil {
-					log.Error().Err(err).Interface("cluster", cluster).Msg("update cluster error")
+					log.Error().Err(err).Interface("cluster", cluster).Msg("update Cluster error")
 				}
-				log.Debug().Str("chart_version", cluster.ChartVersion).Str("status", cluster.Status.String()).Str("cluster uuid", cluster.Uuid).Msg("update cluster success")
+				log.Debug().Str("chart_version", cluster.ChartVersion).Str("status", cluster.Status.String()).Str("Cluster uuid", cluster.Uuid).Msg("update cluster Success")
 			}
 
 			{
@@ -204,7 +204,7 @@ func clusterInstallRun(job *modules.Job) {
 	}
 
 	if job.Status == modules.JobStatusSuccess {
-		log.Debug().Interface("job", job).Msg("job run success")
+		log.Debug().Interface("job", job).Msg("job run Success")
 	} else {
 		log.Warn().Interface("job", job).Msg("job run failed")
 	}
@@ -212,33 +212,33 @@ func clusterInstallRun(job *modules.Job) {
 }
 
 func createCluster(job *modules.Job) (*modules.Cluster, error) {
-	// create a cluster
+	// create a Cluster
 	cluster, err := modules.NewCluster(job.Metadata.Name, job.Metadata.Namespace, job.Metadata.ChartName, job.Metadata.ChartVersion, string(job.Metadata.Data))
 	if err != nil {
 		log.Error().Err(err).Interface("clusterArgs", job.Metadata).Msg("NewCluster")
 		return nil, err
 	}
 
-	// Save cluster to database
+	// Save Cluster to database
 	_, err = cluster.Insert()
 	if err != nil {
-		log.Error().Err(err).Interface("cluster", cluster).Msg("save cluster error")
+		log.Error().Err(err).Interface("cluster", cluster).Msg("Save Cluster error")
 		return nil, err
 	}
 
 	dbErr := cluster.SetStatus(modules.ClusterStatusCreating)
 	if dbErr != nil {
-		log.Error().Err(dbErr).Msg("cluster setStatus error")
+		log.Error().Err(dbErr).Msg("Cluster setStatus error")
 	}
 
 	// update ClusterId of job
 	job.ClusterId = cluster.Uuid
 	_, dbErr = job.UpdateByUuid(job.Uuid)
 	if dbErr != nil {
-		log.Error().Err(dbErr).Msg("cluster setStatus error")
+		log.Error().Err(dbErr).Msg("Cluster setStatus error")
 	}
 
-	log.Info().Str("cluster uuid", cluster.Uuid).Msg("save cluster Success")
+	log.Info().Str("cluster uuid", cluster.Uuid).Msg("Save Cluster Success")
 	return cluster, nil
 }
 
@@ -272,7 +272,7 @@ func helmInstall(job *modules.Job, cluster *modules.Cluster) error {
 
 	err := cluster.HelmInstall()
 	if err != nil {
-		log.Error().Err(err).Str("ClusterId", cluster.Uuid).Msg("helm install cluster error")
+		log.Error().Err(err).Str("ClusterId", cluster.Uuid).Msg("Helm install Cluster error")
 
 		dbErr := job.SetStatus(modules.JobStatusFailed)
 		if dbErr != nil {
@@ -293,14 +293,14 @@ func clean(job *modules.Job, cluster *modules.Cluster) {
 
 	_, err := cluster.Delete()
 	if err != nil {
-		log.Error().Err(err).Interface("cluster", cluster).Msg("DB delete cluster error")
+		log.Error().Err(err).Interface("cluster", cluster).Msg("DB delete Cluster error")
 	}
 	err = cluster.HelmDelete()
 	if err != nil {
-		log.Error().Err(err).Interface("cluster", cluster).Msg("helm delete cluster error")
+		log.Error().Err(err).Interface("cluster", cluster).Msg("Helm delete Cluster error")
 	}
 
-	log.Debug().Str("cluster uuid", cluster.Uuid).Msg("install cluster rollBACK success")
+	log.Debug().Str("cluster uuid", cluster.Uuid).Msg("Install Cluster rollBACK Success")
 }
 
 func addJobEvent(job *modules.Job, Event string) {
@@ -311,7 +311,6 @@ func addJobEvent(job *modules.Job, Event string) {
 	if dbErr != nil {
 		log.Error().Err(dbErr).Msg("job.SetStatus error")
 	}
-	return
 }
 func updateLastJobEvent(job *modules.Job, Event string) {
 
@@ -321,7 +320,6 @@ func updateLastJobEvent(job *modules.Job, Event string) {
 	if dbErr != nil {
 		log.Error().Err(dbErr).Msg("job.SetStatus error")
 	}
-	return
 }
 func checkStatus(job *modules.Job, cluster *modules.Cluster) bool {
 
@@ -329,6 +327,7 @@ func checkStatus(job *modules.Job, cluster *modules.Cluster) bool {
 	ClusterStatus, err := service.GetClusterPodStatus(cluster.Name, cluster.NameSpace)
 	if err != nil {
 		log.Error().Err(err).Msg("GetClusterPodStatus error")
+		return false
 	}
 
 	log.Debug().Interface("ClusterStatus", ClusterStatus).Msg("GetClusterPodStatus()")
@@ -337,6 +336,7 @@ func checkStatus(job *modules.Job, cluster *modules.Cluster) bool {
 	dbErr := job.SetSubJobs(subJobs)
 	if dbErr != nil {
 		log.Error().Err(dbErr).Msg("job setSubJobs error")
+		return false
 	}
 
 	if service.CheckClusterStatus(ClusterStatus) {
@@ -358,6 +358,6 @@ func clusterCover(job *modules.Job, cluster *modules.Cluster) {
 			log.Error().Err(err).Msg("helm clean error")
 		}
 		addJobEvent(job, "overwrite current installation")
-		log.Info().Str("name", cluster.Name).Str("namespace", cluster.NameSpace).Msg("HelmClean success")
+		log.Info().Str("name", cluster.Name).Str("namespace", cluster.NameSpace).Msg("HelmClean Success")
 	}
 }

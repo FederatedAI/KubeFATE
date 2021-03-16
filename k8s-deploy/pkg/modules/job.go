@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 VMware, Inc.
+ * Copyright 2019-2021 VMware, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,6 @@ type Job struct {
 	StartTime time.Time     `json:"start_time" gorm:"default:Null"`
 	EndTime   time.Time     `json:"end_time" gorm:"default:Null"`
 	Method    string        `json:"method" gorm:"type:varchar(16);not null"`
-	Results   string        `json:"results"  gorm:"type:text"`
 	ClusterId string        `json:"cluster_id" gorm:"type:varchar(36)"`
 	Creator   string        `json:"creator" gorm:"type:varchar(16);not null"`
 	SubJobs   SubJobs       `json:"sub_jobs" gorm:"type:blob"`
@@ -147,7 +146,6 @@ func (s *JobStatus) UnmarshalJSON(data []byte) error {
 		return errors.New("data can't UnmarshalJSON")
 	}
 
-	//log.Debug().Interface("JobStatus", JobStatus).Bytes("datab", data).Str("data", string(data)).Msg("UnmarshalJSON")
 	*s = JobStatus
 	return nil
 }

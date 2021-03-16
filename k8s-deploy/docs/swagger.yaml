@@ -24,7 +24,7 @@ definitions:
   api.JSONResult:
     properties:
       msg:
-        example: success
+        example: Success
         type: string
     type: object
   api.Login:
@@ -51,7 +51,7 @@ definitions:
   api.VersionResult:
     properties:
       msg:
-        example: getVersion success
+        example: getVersion Success
         type: string
       version:
         example: v1.3.0
@@ -69,7 +69,7 @@ definitions:
     properties:
       Info:
         $ref: '#/definitions/modules.MapStringInterface'
-        description: Info is the corresponding information of cluster in k8s
+        description: Info is the corresponding information of Cluster in k8s
       Spec:
         $ref: '#/definitions/modules.MapStringInterface'
         description: Spec corresponding to values(of Cluster) is decoded into interface
@@ -78,7 +78,7 @@ definitions:
         type: string
       chart_values:
         $ref: '#/definitions/modules.MapStringInterface'
-        description: Values through the values in the chart file- template.yaml The
+        description: Values through the values in the Chart file- template.yaml The
           file generates the corresponding helm values file
       chart_version:
         type: string
@@ -99,7 +99,7 @@ definitions:
         description: Cluster revision
         type: integer
       status:
-        description: 'The status of the cluster, including: "Creating","Deleting","Updating","Running","Unavailable","Deleted"'
+        description: 'The status of the Cluster, including: "Creating","Deleting","Updating","Running","Unavailable","Deleted"'
         type: integer
       updatedAt:
         type: string
@@ -170,8 +170,6 @@ definitions:
       meta_data:
         $ref: '#/definitions/modules.ClusterArgs'
       method:
-        type: string
-      results:
         type: string
       start_time:
         type: string
@@ -295,12 +293,12 @@ paths:
             $ref: '#/definitions/api.JSONERRORResult'
       security:
       - ApiKeyAuth: []
-      summary: List all historical charts
+      summary: List all historical Charts
       tags:
       - Chart
     post:
       parameters:
-      - description: cluster chart
+      - description: Cluster Chart
         in: formData
         name: file
         required: true
@@ -336,7 +334,7 @@ paths:
             $ref: '#/definitions/api.JSONERRORResult'
       security:
       - ApiKeyAuth: []
-      summary: Upload a chart
+      summary: Upload a Chart
       tags:
       - Chart
   /chart/{chartId}:
@@ -378,7 +376,7 @@ paths:
       - Chart
     get:
       parameters:
-      - description: chart Id
+      - description: Chart Id
         in: path
         name: chartId
         required: true
@@ -422,7 +420,7 @@ paths:
       parameters:
       - description: Cluster Args
         in: body
-        name: ClusterArgs
+        name: clusterArgs
         required: true
         schema:
           $ref: '#/definitions/modules.ClusterArgs'
@@ -460,7 +458,7 @@ paths:
       - OAuth2Application:
         - write
         - admin
-      summary: Create a new cluster
+      summary: Create a new Cluster
       tags:
       - Cluster
     put:
@@ -505,14 +503,14 @@ paths:
       - OAuth2Application:
         - write
         - admin
-      summary: Updates a cluster in the store with form data
+      summary: Updates a Cluster in the store with form data
       tags:
       - Cluster
   /cluster/:
     get:
       parameters:
       - default: false
-        description: get All cluster
+        description: get All Cluster
         in: query
         name: all
         required: true
@@ -553,13 +551,13 @@ paths:
       - OAuth2Application:
         - write
         - admin
-      summary: List all available clusters
+      summary: List all available Clusters
       tags:
       - Cluster
   /cluster/{clusterId}:
     delete:
       parameters:
-      - description: cluster Id
+      - description: Cluster Id
         in: path
         name: clusterId
         required: true
@@ -598,12 +596,12 @@ paths:
       - OAuth2Application:
         - write
         - admin
-      summary: Delete a cluster
+      summary: Delete a Cluster
       tags:
       - Cluster
     get:
       parameters:
-      - description: cluster Id
+      - description: Cluster Id
         in: path
         name: clusterId
         required: true
@@ -883,7 +881,7 @@ paths:
             $ref: '#/definitions/api.JSONERRORResult'
       security:
       - ApiKeyAuth: []
-      summary: Get cluster log by clusterID
+      summary: Get Cluster log by clusterID
       tags:
       - Log
   /log/{clusterID}/ws:

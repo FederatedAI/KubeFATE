@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 VMware, Inc.
+ * Copyright 2019-2021 VMware, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ type Queue interface {
 	Put(val interface{}) (ok bool, quantity uint32)
 	Get() (val interface{}, ok bool, quantity uint32)
 	Quantity() uint32
-	Capaciity() uint32
+	Capacity() uint32
 }
 
 type esCache struct {
@@ -35,40 +35,40 @@ type esCache struct {
 
 // lock free queue
 type EsQueue struct {
-	capaciity uint32
-	capMod    uint32
-	putPos    uint32
-	getPos    uint32
-	cache     []esCache
+	capacity uint32
+	capMod   uint32
+	putPos   uint32
+	getPos   uint32
+	cache    []esCache
 }
 
-func NewQueue(capaciity uint32) *EsQueue {
+func NewQueue(capacity uint32) *EsQueue {
 	q := new(EsQueue)
-	q.capaciity = minQuantity(capaciity)
-	q.capMod = q.capaciity - 1
+	q.capacity = minQuantity(capacity)
+	q.capMod = q.capacity - 1
 	q.putPos = 0
 	q.getPos = 0
-	q.cache = make([]esCache, q.capaciity)
+	q.cache = make([]esCache, q.capacity)
 	for i := range q.cache {
 		cache := &q.cache[i]
 		cache.getNo = uint32(i)
 		cache.putNo = uint32(i)
 	}
 	cache := &q.cache[0]
-	cache.getNo = q.capaciity
-	cache.putNo = q.capaciity
+	cache.getNo = q.capacity
+	cache.putNo = q.capacity
 	return q
 }
 
 func (q *EsQueue) String() string {
 	getPos := atomic.LoadUint32(&q.getPos)
 	putPos := atomic.LoadUint32(&q.putPos)
-	return fmt.Sprintf("Queue{capaciity: %v, capMod: %v, putPos: %v, getPos: %v}",
-		q.capaciity, q.capMod, putPos, getPos)
+	return fmt.Sprintf("Queue{capacity: %v, capMod: %v, putPos: %v, getPos: %v}",
+		q.capacity, q.capMod, putPos, getPos)
 }
 
-func (q *EsQueue) Capaciity() uint32 {
-	return q.capaciity
+func (q *EsQueue) Capacity() uint32 {
+	return q.capacity
 }
 
 func (q *EsQueue) Quantity() uint32 {
@@ -119,7 +119,7 @@ func (q *EsQueue) Put(val interface{}) (ok bool, quantity uint32) {
 		putNo := atomic.LoadUint32(&cache.putNo)
 		if putPosNew == putNo && getNo == putNo {
 			cache.value = val
-			atomic.AddUint32(&cache.putNo, q.capaciity)
+			atomic.AddUint32(&cache.putNo, q.capacity)
 			return true, posCnt + 1
 		} else {
 			runtime.Gosched()
@@ -158,10 +158,10 @@ func (q *EsQueue) Get() (val interface{}, ok bool, quantity uint32) {
 	for {
 		getNo := atomic.LoadUint32(&cache.getNo)
 		putNo := atomic.LoadUint32(&cache.putNo)
-		if getPosNew == getNo && getNo == putNo-q.capaciity {
+		if getPosNew == getNo && getNo == putNo-q.capacity {
 			val = cache.value
 			cache.value = nil
-			atomic.AddUint32(&cache.getNo, q.capaciity)
+			atomic.AddUint32(&cache.getNo, q.capacity)
 			return val, true, posCnt - 1
 		} else {
 			runtime.Gosched()

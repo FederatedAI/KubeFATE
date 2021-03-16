@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 VMware, Inc.
+ * Copyright 2019-2021 VMware, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -94,19 +94,6 @@ func readLogToString(logRead io.ReadCloser, prefix string) (string, error) {
 	return buf.String(), nil
 }
 
-// getLogFollowOfModule is Get container Logs
-func getLogFollowOfModule(namespace, Name, containerName string) (io.ReadCloser, error) {
-
-	podName, err := GetPodNameByModule(getDefaultNamespace(namespace), Name, containerName)
-	if err != nil {
-		return nil, err
-	}
-	return KubeClient.GetPodLogs(getDefaultNamespace(namespace), podName, &kube.PodLogArgs{
-		Container: containerName,
-		Follow:    false,
-	})
-}
-
 // getLogFollow is Get container Logs
 func getLogRead(args *LogChanArgs) (map[string]io.ReadCloser, error) {
 
@@ -115,7 +102,7 @@ func getLogRead(args *LogChanArgs) (map[string]io.ReadCloser, error) {
 		return nil, err
 	}
 
-	readCloserList := make(map[string]io.ReadCloser, 0)
+	readCloserList := make(map[string]io.ReadCloser)
 
 	for containerName, podName := range podContainerList {
 		readCloser, err := KubeClient.GetPodLogs(getDefaultNamespace(args.Namespace), podName, &kube.PodLogArgs{
@@ -224,7 +211,7 @@ func readLogToQueue(logRead io.ReadCloser, prefix string, queue utils.Queue) err
 			return nil
 		}
 
-		for queue.Quantity() > queue.Capaciity() {
+		for queue.Quantity() > queue.Capacity() {
 			time.Sleep(time.Millisecond)
 		}
 		queue.Put(fmt.Sprintf("%s%s", prefix, msgstr))

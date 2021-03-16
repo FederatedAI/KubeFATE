@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 VMware, Inc.
+ * Copyright 2019-2021 VMware, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,8 +49,8 @@ func JobListCommand() *cli.Command {
 		Flags:   []cli.Flag{},
 		Usage:   "Show job list",
 		Action: func(c *cli.Context) error {
-			cluster := new(Job)
-			return GetItemList(cluster)
+			job := new(Job)
+			return GetItemList(job)
 		},
 	}
 }
@@ -68,8 +68,8 @@ func JobDeleteCommand() *cli.Command {
 			} else {
 				return errors.New("not uuid")
 			}
-			cluster := new(Job)
-			return DeleteItem(cluster, uuid)
+			job := new(Job)
+			return DeleteItem(job, uuid)
 		},
 	}
 }
@@ -93,8 +93,8 @@ func JobInfoCommand() *cli.Command {
 			} else {
 				return errors.New("not uuid")
 			}
-			Job := new(Job)
-			return GetItem(Job, uuid)
+			job := new(Job)
+			return GetItem(job, uuid)
 		},
 	}
 }

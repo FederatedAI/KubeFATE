@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 VMware, Inc.
+ * Copyright 2019-2021 VMware, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,7 @@ import (
 
 // GetProxySvcNodePorts return rollsite svc NodePort
 func GetProxySvcNodePorts(name, namespace string) (int32, error) {
-	var labelSelector string
-	labelSelector = fmt.Sprintf("name=%s", name)
+	labelSelector := fmt.Sprintf("name=%s", name)
 	svcs, err := KubeClient.GetServices(namespace, labelSelector)
 	if err != nil {
 		return 0, err
@@ -54,8 +53,7 @@ func GetServiceStatus(Services *v1.ServiceList) map[string]string {
 
 // GetClusterServiceStatus func
 func GetClusterServiceStatus(name, namespace string) (map[string]string, error) {
-	var labelSelector string
-	labelSelector = fmt.Sprintf("name=%s", name)
+	labelSelector := fmt.Sprintf("name=%s", name)
 	list, err := KubeClient.GetServices(namespace, labelSelector)
 	if err != nil {
 		return nil, err

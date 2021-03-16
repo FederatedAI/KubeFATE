@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 VMware, Inc.
+ * Copyright 2019-2021 VMware, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
 
 package api
 
-// JSONResult success Result
+// JSONResult Success Result
 type JSONResult struct {
-	Message string `json:"msg" example:"success"`
+	Message string `json:"msg" example:"Success"`
 }
 
 // JSONERRORResult error Result
@@ -35,7 +35,7 @@ type JSONEMSGResult struct {
 // VersionResult GET Version Result
 type VersionResult struct {
 	Version string `example:"v1.3.0"`
-	Message string `json:"msg" example:"getVersion success"`
+	Message string `json:"msg" example:"getVersion Success"`
 }
 
 //TokenResult LOgin Result

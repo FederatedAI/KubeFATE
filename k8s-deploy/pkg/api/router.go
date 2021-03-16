@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 VMware, Inc.
+ * Copyright 2019-2021 VMware, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ func Router(r *gin.Engine) {
 
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(200, gin.H{
-			"msg": "kubefate run success",
+			"msg": "kubefate run Success",
 		})
 	})
 

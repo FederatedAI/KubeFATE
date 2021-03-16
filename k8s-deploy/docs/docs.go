@@ -45,7 +45,7 @@ var doc = `{
                 "tags": [
                     "Chart"
                 ],
-                "summary": "List all historical charts",
+                "summary": "List all historical Charts",
                 "parameters": [
                     {
                         "type": "string",
@@ -103,11 +103,11 @@ var doc = `{
                 "tags": [
                     "Chart"
                 ],
-                "summary": "Upload a chart",
+                "summary": "Upload a Chart",
                 "parameters": [
                     {
                         "type": "file",
-                        "description": "cluster chart",
+                        "description": "Cluster Chart",
                         "name": "file",
                         "in": "formData",
                         "required": true
@@ -177,7 +177,7 @@ var doc = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "chart Id",
+                        "description": "Chart Id",
                         "name": "chartId",
                         "in": "path",
                         "required": true
@@ -305,7 +305,7 @@ var doc = `{
                 "tags": [
                     "Cluster"
                 ],
-                "summary": "Updates a cluster in the store with form data",
+                "summary": "Updates a Cluster in the store with form data",
                 "parameters": [
                     {
                         "description": "Cluster Args",
@@ -381,11 +381,11 @@ var doc = `{
                 "tags": [
                     "Cluster"
                 ],
-                "summary": "Create a new cluster",
+                "summary": "Create a new Cluster",
                 "parameters": [
                     {
                         "description": "Cluster Args",
-                        "name": "ClusterArgs",
+                        "name": "clusterArgs",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -459,12 +459,12 @@ var doc = `{
                 "tags": [
                     "Cluster"
                 ],
-                "summary": "List all available clusters",
+                "summary": "List all available Clusters",
                 "parameters": [
                     {
                         "type": "boolean",
                         "default": false,
-                        "description": "get All cluster",
+                        "description": "get All Cluster",
                         "name": "all",
                         "in": "query",
                         "required": true
@@ -543,7 +543,7 @@ var doc = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "cluster Id",
+                        "description": "Cluster Id",
                         "name": "clusterId",
                         "in": "path",
                         "required": true
@@ -613,11 +613,11 @@ var doc = `{
                 "tags": [
                     "Cluster"
                 ],
-                "summary": "Delete a cluster",
+                "summary": "Delete a Cluster",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "cluster Id",
+                        "description": "Cluster Id",
                         "name": "clusterId",
                         "in": "path",
                         "required": true
@@ -946,7 +946,7 @@ var doc = `{
                 "tags": [
                     "Log"
                 ],
-                "summary": "Get cluster log by clusterID",
+                "summary": "Get Cluster log by clusterID",
                 "parameters": [
                     {
                         "type": "integer",
@@ -1645,7 +1645,7 @@ var doc = `{
             "properties": {
                 "msg": {
                     "type": "string",
-                    "example": "success"
+                    "example": "Success"
                 }
             }
         },
@@ -1684,7 +1684,7 @@ var doc = `{
             "properties": {
                 "msg": {
                     "type": "string",
-                    "example": "getVersion success"
+                    "example": "getVersion Success"
                 },
                 "version": {
                     "type": "string",
@@ -1708,7 +1708,7 @@ var doc = `{
             "type": "object",
             "properties": {
                 "Info": {
-                    "description": "Info is the corresponding information of cluster in k8s",
+                    "description": "Info is the corresponding information of Cluster in k8s",
                     "$ref": "#/definitions/modules.MapStringInterface"
                 },
                 "Spec": {
@@ -1719,7 +1719,7 @@ var doc = `{
                     "type": "string"
                 },
                 "chart_values": {
-                    "description": "Values through the values in the chart file- template.yaml The file generates the corresponding helm values file",
+                    "description": "Values through the values in the Chart file- template.yaml The file generates the corresponding helm values file",
                     "$ref": "#/definitions/modules.MapStringInterface"
                 },
                 "chart_version": {
@@ -1749,7 +1749,7 @@ var doc = `{
                     "type": "integer"
                 },
                 "status": {
-                    "description": "The status of the cluster, including: \"Creating\",\"Deleting\",\"Updating\",\"Running\",\"Unavailable\",\"Deleted\"",
+                    "description": "The status of the Cluster, including: \"Creating\",\"Deleting\",\"Updating\",\"Running\",\"Unavailable\",\"Deleted\"",
                     "type": "integer"
                 },
                 "updatedAt": {
@@ -1854,9 +1854,6 @@ var doc = `{
                     "$ref": "#/definitions/modules.ClusterArgs"
                 },
                 "method": {
-                    "type": "string"
-                },
-                "results": {
                     "type": "string"
                 },
                 "start_time": {

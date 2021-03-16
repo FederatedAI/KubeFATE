@@ -31,13 +31,13 @@ func (e *Cluster) HelmInstall() error {
 	//	return nil, err
 	//}
 
-	// get chart by version from repository
+	// get Chart by version from repository
 	fc, err := GetFateChart(e.ChartName, e.ChartVersion)
 	if err != nil {
 		log.Err(err).Msg("GetFateChart error")
 		return err
 	}
-	log.Debug().Interface("FateChartName", fc.Name).Interface("FateChartVersion", fc.Version).Msg("GetFateChart success")
+	log.Debug().Interface("FateChartName", fc.Name).Interface("FateChartVersion", fc.Version).Msg("GetFateChart Success")
 
 	// fateChart to helmChart
 	chartRequested, err := fc.ToHelmChart()
@@ -53,7 +53,7 @@ func (e *Cluster) HelmInstall() error {
 		return err
 	}
 
-	log.Debug().Fields(val).Msg("chart values: ")
+	log.Debug().Fields(val).Msg("Chart values: ")
 
 	client.ReleaseName = e.Name
 	client.Namespace = settings.Namespace()
@@ -93,7 +93,7 @@ func (e *Cluster) HelmUpgrade() error {
 		log.Err(err).Msg("GetFateChart error")
 		return err
 	}
-	log.Debug().Interface("FateChartName", fc.Name).Interface("FateChartVersion", fc.Version).Msg("GetFateChart success")
+	log.Debug().Interface("FateChartName", fc.Name).Interface("FateChartVersion", fc.Version).Msg("GetFateChart Success")
 
 	// fateChart to helmChart
 	ch, err := fc.ToHelmChart()
@@ -108,7 +108,7 @@ func (e *Cluster) HelmUpgrade() error {
 		log.Err(err).Msg("values yaml Unmarshal error")
 		return err
 	}
-	log.Debug().Fields(val).Msg("chart values: ")
+	log.Debug().Fields(val).Msg("Chart values: ")
 
 	if req := ch.Metadata.Dependencies; req != nil {
 		if err := action.CheckDependencies(ch, req); err != nil {
@@ -117,7 +117,7 @@ func (e *Cluster) HelmUpgrade() error {
 	}
 
 	if ch.Metadata.Deprecated {
-		fmt.Println("WARNING: This chart is deprecated")
+		fmt.Println("WARNING: This Chart is deprecated")
 	}
 
 	_, err = client.Run(e.Name, ch, val)

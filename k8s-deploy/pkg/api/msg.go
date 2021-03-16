@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 VMware, Inc.
+ * Copyright 2019-2021 VMware, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ import (
 // todo: Definition of all returned information
 
 const (
-	// SUCCESS     string = "success"
 
 	// USEREXISTED USER EXISTED
 	USEREXISTED string = "User is existed."

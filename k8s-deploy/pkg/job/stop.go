@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 VMware, Inc.
+ * Copyright 2019-2021 VMware, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ func Stop(jobID string) error {
 	j := modules.Job{Uuid: jobID}
 	job, err := j.Get()
 	if err != nil {
-		return fmt.Errorf("get job by jobID error,please check job ID, %s", err.Error())
+		return fmt.Errorf("get job by jobID error, please check job ID, %s", err.Error())
 	}
 
 	// check Method

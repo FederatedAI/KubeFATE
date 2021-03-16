@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 VMware, Inc.
+ * Copyright 2019-2021 VMware, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -186,7 +186,6 @@ func (c *Cluster) outPutInfo(result interface{}) error {
 	table.AddRow("Revision", cluster.Revision)
 	table.AddRow("Age", HumanDuration(time.Since(cluster.CreatedAt)))
 	table.AddRow("Status", cluster.Status)
-	//table.AddRow("Values", cluster.Values)
 	table.AddRow("Spec", string(spec))
 	table.AddRow("Info", string(info))
 	table.AddRow("")
@@ -202,6 +201,6 @@ func (c *Cluster) outPutJob(result interface{}) error {
 	if !ok {
 		return errors.New("type ClusterResult not ok")
 	}
-	fmt.Printf("create job success, job id=%s\r\n", item.Data.Uuid)
+	fmt.Printf("create job Success, job id=%s\r\n", item.Data.Uuid)
 	return nil
 }

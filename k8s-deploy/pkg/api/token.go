@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 VMware, Inc.
+ * Copyright 2019-2021 VMware, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,13 +72,13 @@ func initAuthmiddleware() error {
 
 		// Check if user exists
 		Authenticator: func(c *gin.Context) (interface{}, error) {
-			loginVals := new(modules.User)
-			if err := c.ShouldBindJSON(loginVals); err != nil {
+			loginValues := new(modules.User)
+			if err := c.ShouldBindJSON(loginValues); err != nil {
 				return "", jwt.ErrMissingLoginValues
 			}
-			log.Debug().Msg("Login user name: " + loginVals.Username)
-			if loginVals.IsValid() {
-				return loginVals, nil
+			log.Debug().Msg("Login user name: " + loginValues.Username)
+			if loginValues.IsValid() {
+				return loginValues, nil
 			}
 
 			return nil, jwt.ErrFailedAuthentication

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 VMware, Inc.
+ * Copyright 2019-2021 VMware, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import (
 	"helm.sh/helm/v3/pkg/chart"
 )
 
-// HelmChart helm chart model
+// HelmChart Helm Chart model
 type HelmChart struct {
 	Uuid           string    `json:"uuid" gorm:"type:varchar(36);index;unique"`
 	Name           string    `json:"name" gorm:"type:varchar(16);not null"`
@@ -41,7 +41,7 @@ type Templates []*chart.File
 
 type HelmCharts []HelmChart
 
-// NewHelmChart create a new helm chart
+// NewHelmChart create a new Helm Chart
 func NewHelmChart(name string, chart string, values string, templates []*chart.File, version, appVersion string) *HelmChart {
 	helm := &HelmChart{
 

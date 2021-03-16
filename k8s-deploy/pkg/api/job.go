@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 VMware, Inc.
+ * Copyright 2019-2021 VMware, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,8 +60,8 @@ func (*Job) getJobList(c *gin.Context) {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
-	log.Debug().Interface("data", jobList).Msg("getJobList success")
-	c.JSON(200, gin.H{"data": jobList, "msg": "getJobList success"})
+	log.Debug().Interface("data", jobList).Msg("getJobList Success")
+	c.JSON(200, gin.H{"data": jobList, "msg": "getJobList Success"})
 }
 
 // getJob Get job by jobId
@@ -91,11 +91,11 @@ func (*Job) getJob(c *gin.Context) {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
-	log.Debug().Interface("data", job).Msg("getJob success")
-	c.JSON(200, gin.H{"msg": "getJob success", "data": job})
+	log.Debug().Interface("data", job).Msg("getJob Success")
+	c.JSON(200, gin.H{"msg": "getJob Success", "data": job})
 }
 
-// stopJob Update job status to stop
+// putJob currently supports stopping a Running job
 // @Summary Update job status to stop, stop job
 // @Tags Job
 // @Produce  json
@@ -116,8 +116,8 @@ func (*Job) putJob(c *gin.Context) {
 		c.JSON(400, gin.H{"error": "not exit jobId"})
 		return
 	}
-	qall := c.Query("jobStatus")
-	if qall != "stop" {
+	jobStatus := c.Query("jobStatus")
+	if jobStatus != "stop" {
 		c.JSON(400, gin.H{"error": "jobStatus error"})
 		return
 	}
@@ -129,8 +129,8 @@ func (*Job) putJob(c *gin.Context) {
 		return
 	}
 
-	log.Debug().Interface("jobID", jobID).Msg("stop Job success")
-	c.JSON(200, gin.H{"msg": "stop Job success", "data": "Stop Job success"})
+	log.Debug().Interface("jobID", jobID).Msg("stop Job Success")
+	c.JSON(200, gin.H{"msg": "stop Job Success", "data": "Stop Job Success"})
 }
 
 // deleteJob Delete Job by jobId
@@ -160,6 +160,6 @@ func (*Job) deleteJob(c *gin.Context) {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
-	log.Debug().Interface("msg", "delete Job success").Msg("delete Job success")
-	c.JSON(200, gin.H{"msg": "delete Job success"})
+	log.Debug().Interface("msg", "delete Job Success").Msg("delete Job Success")
+	c.JSON(200, gin.H{"msg": "delete Job Success"})
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 VMware, Inc.
+ * Copyright 2019-2021 VMware, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,8 +52,8 @@ func (e *kubeLog) Router(r *gin.RouterGroup) {
 	}
 }
 
-// getClusterLog Get cluster log by clusterID
-// @Summary Get cluster log by clusterID
+// getClusterLog Get Cluster log by clusterID
+// @Summary Get Cluster log by clusterID
 // @Description When the container of requestArgs is not set, the logs of all components will be obtained
 // @Tags Log
 // @Produce  json
@@ -91,8 +91,8 @@ func (*kubeLog) getClusterLog(c *gin.Context) {
 	hc := modules.Cluster{Uuid: clusterID}
 	cluster, err := hc.Get()
 	if err != nil {
-		log.Error().Err(err).Str("uuid", clusterID).Msg("get cluster error")
-		c.JSON(400, gin.H{"error": "get cluster error, " + err.Error()})
+		log.Error().Err(err).Str("uuid", clusterID).Msg("get Cluster error")
+		c.JSON(400, gin.H{"error": "get Cluster error, " + err.Error()})
 		return
 	}
 
@@ -116,8 +116,8 @@ func (*kubeLog) getClusterLog(c *gin.Context) {
 		return
 	}
 
-	log.Debug().Int("data.size", buf.Len()).Msg("getClusterLog success")
-	c.JSON(200, gin.H{"data": buf.String(), "msg": "getClusterLog success"})
+	log.Debug().Int("data.size", buf.Len()).Msg("getClusterLog Success")
+	c.JSON(200, gin.H{"data": buf.String(), "msg": "getClusterLog Success"})
 
 }
 
@@ -159,13 +159,13 @@ func (*kubeLog) getClusterLogWs(c *gin.Context) {
 	hc := modules.Cluster{Uuid: clusterID}
 	cluster, err := hc.Get()
 	if err != nil {
-		log.Error().Err(err).Str("uuid", clusterID).Msg("get cluster error")
-		c.JSON(400, gin.H{"error": "get cluster error, " + err.Error()})
+		log.Error().Err(err).Str("uuid", clusterID).Msg("get Cluster error")
+		c.JSON(400, gin.H{"error": "get Cluster error, " + err.Error()})
 		return
 	}
 
 	handler := websocket.Handler(func(c *websocket.Conn) {
-		log.Debug().Msg("get log websocket reader success")
+		log.Debug().Msg("get log websocket reader Success")
 		defer log.Debug().Msg("websocket close")
 
 		err := service.WriteLog(c, &service.LogChanArgs{

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 VMware, Inc.
+ * Copyright 2019-2021 VMware, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -144,7 +144,7 @@ func (e *Cluster) Insert() (id int, err error) {
 	var count int64
 	DB.Debug().Model(&Cluster{}).Where("name = ?", e.Name).Where("name_space = ?", e.NameSpace).Count(&count)
 	if count > 0 {
-		err = fmt.Errorf("cluster already exists in database, name = %s, namespace=%s", e.Name, e.NameSpace)
+		err = fmt.Errorf("Cluster already exists in database, name = %s, namespace=%s", e.Name, e.NameSpace)
 		return
 	}
 
