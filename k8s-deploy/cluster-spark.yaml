@@ -74,7 +74,8 @@ backend: spark
     # route_table: 
   # nginx:
     # host: nginx
-    # port: 9390
+    # http_port: 9300
+    # grpc_port: 9310
 # mysql: 
   # nodeSelector: 
   # ip: mysql
@@ -128,15 +129,18 @@ backend: spark
 # nginx:
   # nodeSelector: 
   # type: ClusterIP
-  # nodePort: 30093
+  # httpNodePort: 30093
+  # grpcNodePort: 30098
   # route_table: 
     # 10000: 
       # proxy: 
         # - host: 192.168.0.1 
-          # port: 30103
+          # http_port: 30103
+          # grpc_port: 30108 
       # fateflow: 
         # - host: 192.168.0.1
-          # port: 30102
+          # http_port: 30107
+          # grpc_port: 30102
 # rabbitmq:
   # nodeSelector: 
   # type: ClusterIP

@@ -222,8 +222,7 @@ main() {
 
   check_fate_9999_fateflow_status
 
-  kubectl exec -n fate-9999 -it svc/fateflow -c python -- bash -c "source /data/projects/python/venv/bin/activate && \
-  cd /data/projects/fate/examples/toy_example && \
+  kubectl exec -n fate-9999 -it svc/fateflow -c python -- bash -c "cd /data/projects/fate/examples/toy_example && \
   python run_toy_example.py 9999 9999 1"
 
   if [[ $? -eq 0 ]]; then
@@ -232,8 +231,7 @@ main() {
     exit 1
   fi
 
-  kubectl exec -n fate-9999 -it svc/fateflow -c python -- bash -c "source /data/projects/python/venv/bin/activate && \
-  cd /data/projects/fate/examples/toy_example && \
+  kubectl exec -n fate-9999 -it svc/fateflow -c python -- bash -c "cd /data/projects/fate/examples/toy_example && \
   python run_toy_example.py 9999 10000 1"
   if [[ $? -eq 0 ]]; then
     loginfo "Bilateral test successful"

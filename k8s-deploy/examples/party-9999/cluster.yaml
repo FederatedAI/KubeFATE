@@ -1,10 +1,13 @@
 name: fate-9999
 namespace: fate-9999
 chartName: fate
-chartVersion: v1.5.0
+chartVersion: v1.5.1
 partyId: 9999
 registry: ""
+imageTag: ""
 pullPolicy: 
+imagePullSecrets: 
+- name: myregistrykey
 persistence: false
 istio:
   enabled: false

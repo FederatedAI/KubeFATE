@@ -1,11 +1,13 @@
 name: fate-9999
 namespace: fate-9999
 chartName: fate
-chartVersion: v1.5.0-b
+chartVersion: v1.5.1
 partyId: 9999
 registry: ""
 imageTag: ""
 pullPolicy: 
+imagePullSecrets: 
+- name: myregistrykey
 persistence: false
 istio:
   enabled: false
@@ -62,7 +64,8 @@ backend: eggroll
   # type: NodePort
   # httpNodePort: 30097
   # grpcNodePort: 30092
-  # nodeSelector: 
+  # nodeSelector:
+  # enabledNN: false
   # spark: 
     # master: spark://spark-master:7077
     # home: 
@@ -81,7 +84,8 @@ backend: eggroll
     # route_table: 
   # nginx:
     # host: nginx
-    # port: 9390
+    # http_port: 9300
+    # grpc_port: 9310
 # mysql: 
   # nodeSelector: 
   # ip: mysql

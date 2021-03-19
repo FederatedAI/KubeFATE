@@ -22,14 +22,17 @@ data:
     default:
       proxy:
         - host: nginx 
-          port: 9390
+          http_port: 9300
+          grpc_port: 9310
     {{ .Values.partyId }}:
       proxy:
         - host: nginx 
-          port: 9390
+          http_port: 9300
+          grpc_port: 9310
       fateflow:
         - host: fateflow 
-          port: 9360
+          http_port: 9380
+          grpc_port: 9360
 {{- range $key, $val := .Values.modules.nginx.route_table }}
     {{ $key }}: 
 {{ toYaml . | indent 6 }}
@@ -41,7 +44,8 @@ data:
     
     #error_log  logs/error.log;
     #error_log  logs/error.log  notice;
-    error_log  /dev/stdout info;
+    error_log  /dev/stdout  info;
+    error_log  /dev/stderr  error;
     
     #pid        logs/nginx.pid;
     
@@ -55,49 +59,54 @@ data:
         include       mime.types;
         default_type  application/octet-stream;
     
-        log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+        log_format  main  '$remote_addr - $remote_user [$time_local] "$request" "$http_host" '
                           '$status $body_bytes_sent "$http_referer" '
-                          '"$http_user_agent" "$http_x_forwarded_for"';
-    
-        access_log  /dev/stdout  main;
+                          '"$http_user_agent" "$http_x_forwarded_for" '
+                          '$upstream_status $upstream_addr '
+                          '$request_time $upstream_response_time'
+                          ;
+        
+        access_log  logs/access.log  main;
     
         sendfile        on;
         #tcp_nopush     on;
     
-        #keepalive_timeout  0;
         keepalive_timeout  65;
+        underscores_in_headers on;
     
         #gzip  on;
-        upstream fate_cluster {
-            server fateflow:9360;   # just an invalid address as a place holder
-            balancer_by_lua_file 'lua/balancer.lua';
-        }
         lua_package_path "$prefix/lua/?.lua;;";
         init_worker_by_lua_file 'lua/initialize.lua';
     
+        upstream http_cluster {
+            server fateflow:9380;   # just an invalid address as a place holder
+            balancer_by_lua_file 'lua/balancer.lua';
+        }
+    
+        upstream grpc_cluster {
+            server fateflow:9360;   # just an invalid address as a place holder
+            balancer_by_lua_file 'lua/balancer.lua';
+        }
+    
+        include vhost/*.conf;
+    }
+    
+    stream {
+        log_format tcp_proxy '$remote_addr [$time_local] '
+                             '$protocol $status $bytes_sent $bytes_received '
+                             '$session_time "$upstream_addr" '
+                             '"$upstream_bytes_sent" "$upstream_bytes_received" "$upstream_connect_time"';
+    
+        access_log logs/tcp-access.log tcp_proxy;
+    
         server {
-            listen       9390 http2;
-            server_name  fate_proxy;
-    
-            #charset koi8-r;
-    
-            access_log  /dev/stdout  main;
-    
-            location / {
-                access_by_lua_file 'lua/router.lua';
-                grpc_pass grpc://fate_cluster;
-            }
-    
-            #error_page  404              /404.html;
-    
-            # redirect server error pages to the static page /50x.html
-            #
-            error_page   500 502 503 504  /50x.html;
-            location = /50x.html {
-                root   html;
-            }
+            listen 9128;
+            proxy_connect_timeout 1s;
+            proxy_timeout 3s;
+            proxy_pass 127.0.0.1:3128;
         }
     }
+
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -122,10 +131,11 @@ spec:
     spec:
       containers:
         - name: nginx
-          image: {{ .Values.image.registry }}/nginx:1.17
+          image: {{ .Values.image.registry }}/nginx:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - containerPort: 9390
+            - containerPort: 9300
+            - containerPort: 9310
           volumeMounts:
             - mountPath: /data/projects/fate/proxy/nginx/conf/route_table.yaml
               name: nginx-confs
@@ -156,11 +166,18 @@ metadata:
 {{ include "fate.labels" . | indent 4 }}
 spec:
   ports:
-    - name: "9390"
-      port: 9390
-      targetPort: 9390
+    - name: "http"
+      port: 9300
+      targetPort: 9300
       {{- if eq .Values.modules.nginx.type "NodePort" "LoadBalancer" }}
-      nodePort: {{ .Values.modules.nginx.nodePort }}
+      nodePort: {{ .Values.modules.nginx.httpNodePort }}
+      {{- end }}
+      protocol: TCP
+    - name: "grpc"
+      port: 9310
+      targetPort: 9310
+      {{- if eq .Values.modules.nginx.type "NodePort" "LoadBalancer" }}
+      nodePort: {{ .Values.modules.nginx.grpcNodePort }}
       {{- end }}
       protocol: TCP
   type: {{ .Values.modules.nginx.type }}

@@ -53,6 +53,12 @@ git fetch -a
 git rebase kubfate/master
 Please use fetch / rebase (as shown above) instead of git pull. git pull does a merge, which leaves merge commits. These make the commit history messy and violate the principle that commits ought to be individually understandable and useful (see below). You can also consider changing your .git/config file via git config branch.autoSetupRebase always to change the behavior of git pull.
 ```
+
+### Update the APIs and related documents
+Our RESTful APIs are documented with [Swagger](https://swagger.io/)
+If your commit that changes the RESTful APIs, make sure to run `make swag` in `./k8s-deploy/Makefile` to update the Swagger documents.
+If your commit that exposes a user-faced function, make sure to add related introductions to documents.
+
 ### Commit
 As KubeFATE has integrated the [DCO (Developer Certificate of Origin)](https://probot.github.io/apps/dco/) check tool, contributors are required to sign-off that they adhere to those requirements by adding a Signed-off-by line to the commit messages. Git has even provided a -s command line option to append that automatically to your commit messages, please use it when you commit your changes.
 ```
