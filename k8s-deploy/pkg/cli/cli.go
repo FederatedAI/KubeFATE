@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 VMware, Inc.
+ * Copyright 2019-2021 VMware, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,10 @@ const (
 	ColWidthOffset          int  = 20
 	TableMaxColWidthDefault uint = 120
 )
+
+func init() {
+	cli.HelpFlag = &cli.BoolFlag{Name: "help", Aliases: []string{"h"}, Usage: "Show help"}
+}
 
 func initCommandLine() *cli.App {
 	app := &cli.App{

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 VMware, Inc.
+ * Copyright 2019-2021 VMware, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,14 +32,26 @@ type Job struct {
 	StartTime time.Time     `json:"start_time" gorm:"default:Null"`
 	EndTime   time.Time     `json:"end_time" gorm:"default:Null"`
 	Method    string        `json:"method" gorm:"type:varchar(16);not null"`
-	Result    string        `json:"result"  gorm:"type:text"`
 	ClusterId string        `json:"cluster_id" gorm:"type:varchar(36)"`
 	Creator   string        `json:"creator" gorm:"type:varchar(16);not null"`
 	SubJobs   SubJobs       `json:"sub_jobs" gorm:"type:blob"`
 	Status    JobStatus     `json:"status"  gorm:"size:8"`
 	TimeLimit time.Duration `json:"time_limit" swaggertype:"string"`
+	Metadata  *ClusterArgs  `json:"meta_data" gorm:"embedded;embeddedPrefix:args_"`
 
+	States States `json:"states"  gorm:"type:text"`
 	gorm.Model
+}
+
+type States []string
+
+func (s States) Value() (driver.Value, error) {
+	bJson, err := json.Marshal(s)
+	return bJson, err
+}
+
+func (s *States) Scan(v interface{}) error {
+	return json.Unmarshal(v.([]byte), s)
 }
 
 type ClusterArgs struct {
@@ -81,6 +93,7 @@ const (
 	JobStatusFailed
 	JobStatusRollback
 	JobStatusTimeout
+	JobStatusStopping
 	JobStatusCanceled
 )
 
@@ -91,6 +104,7 @@ func (s JobStatus) String() string {
 		JobStatusSuccess:  "Success",
 		JobStatusFailed:   "Failed",
 		JobStatusTimeout:  "Timeout",
+		JobStatusStopping: "Stopping",
 		JobStatusCanceled: "Canceled",
 		JobStatusRollback: "Rollback",
 	}
@@ -122,6 +136,8 @@ func (s *JobStatus) UnmarshalJSON(data []byte) error {
 		JobStatus = JobStatusFailed
 	case "\"Timeout\"":
 		JobStatus = JobStatusTimeout
+	case "\"Stopping\"":
+		JobStatus = JobStatusStopping
 	case "\"Canceled\"":
 		JobStatus = JobStatusCanceled
 	case "\"Rollback\"":
@@ -130,12 +146,11 @@ func (s *JobStatus) UnmarshalJSON(data []byte) error {
 		return errors.New("data can't UnmarshalJSON")
 	}
 
-	//log.Debug().Interface("JobStatus", JobStatus).Bytes("datab", data).Str("data", string(data)).Msg("UnmarshalJSON")
 	*s = JobStatus
 	return nil
 }
 
-func NewJob(method string, creator string, clusterUuid string) *Job {
+func NewJob(metadata *ClusterArgs, method, creator, clusterUuid string) *Job {
 
 	job := &Job{
 		Uuid:      uuid.NewV4().String(),
@@ -145,6 +160,7 @@ func NewJob(method string, creator string, clusterUuid string) *Job {
 		StartTime: time.Now(),
 		Status:    JobStatusPending,
 		TimeLimit: 1 * time.Hour,
+		Metadata:  metadata,
 	}
 
 	return job

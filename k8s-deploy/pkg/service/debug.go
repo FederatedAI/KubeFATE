@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 VMware, Inc.
+ * Copyright 2019-2021 VMware, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,4 @@ import (
 func Debug(format string, v ...interface{}) {
 	s := fmt.Sprintf("helm Debug %s", format)
 	log.Debug().Msgf(s, v...)
-	//log.Debug().Object()
-	//log.Debug().Msgf(format, v)
 }

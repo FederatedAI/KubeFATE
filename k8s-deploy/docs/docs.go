@@ -45,7 +45,7 @@ var doc = `{
                 "tags": [
                     "Chart"
                 ],
-                "summary": "List all historical charts",
+                "summary": "List all historical Charts",
                 "parameters": [
                     {
                         "type": "string",
@@ -103,11 +103,11 @@ var doc = `{
                 "tags": [
                     "Chart"
                 ],
-                "summary": "Upload a chart",
+                "summary": "Upload a Chart",
                 "parameters": [
                     {
                         "type": "file",
-                        "description": "cluster chart",
+                        "description": "Cluster Chart",
                         "name": "file",
                         "in": "formData",
                         "required": true
@@ -177,7 +177,7 @@ var doc = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "chart Id",
+                        "description": "Chart Id",
                         "name": "chartId",
                         "in": "path",
                         "required": true
@@ -305,7 +305,7 @@ var doc = `{
                 "tags": [
                     "Cluster"
                 ],
-                "summary": "Updates a cluster in the store with form data",
+                "summary": "Updates a Cluster in the store with form data",
                 "parameters": [
                     {
                         "description": "Cluster Args",
@@ -313,7 +313,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/job.ClusterArgs"
+                            "$ref": "#/definitions/modules.ClusterArgs"
                         }
                     },
                     {
@@ -381,15 +381,15 @@ var doc = `{
                 "tags": [
                     "Cluster"
                 ],
-                "summary": "Create a new cluster",
+                "summary": "Create a new Cluster",
                 "parameters": [
                     {
                         "description": "Cluster Args",
-                        "name": "ClusterArgs",
+                        "name": "clusterArgs",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/job.ClusterArgs"
+                            "$ref": "#/definitions/modules.ClusterArgs"
                         }
                     },
                     {
@@ -459,11 +459,12 @@ var doc = `{
                 "tags": [
                     "Cluster"
                 ],
-                "summary": "List all available clusters",
+                "summary": "List all available Clusters",
                 "parameters": [
                     {
                         "type": "boolean",
-                        "description": "get All cluster",
+                        "default": false,
+                        "description": "get All Cluster",
                         "name": "all",
                         "in": "query",
                         "required": true
@@ -542,7 +543,7 @@ var doc = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "cluster Id",
+                        "description": "Cluster Id",
                         "name": "clusterId",
                         "in": "path",
                         "required": true
@@ -612,11 +613,11 @@ var doc = `{
                 "tags": [
                     "Cluster"
                 ],
-                "summary": "Delete a cluster",
+                "summary": "Delete a Cluster",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "cluster Id",
+                        "description": "Cluster Id",
                         "name": "clusterId",
                         "in": "path",
                         "required": true
@@ -745,7 +746,7 @@ var doc = `{
                 "summary": "Get job by jobId",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "Job ID",
                         "name": "jobId",
                         "in": "path",
@@ -771,10 +772,83 @@ var doc = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/definitions/modules.Job"
-                                            }
+                                            "$ref": "#/definitions/modules.Job"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.JSONERRORResult"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized operation",
+                        "schema": {
+                            "$ref": "#/definitions/api.JSONERRORResult"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/api.JSONERRORResult"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Job"
+                ],
+                "summary": "Update job status to stop, stop job",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Job ID",
+                        "name": "jobId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "stop",
+                        "description": "jobStatus=stop",
+                        "name": "jobStatus",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Authentication header",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/api.JSONResult"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
                                         }
                                     }
                                 }
@@ -816,7 +890,7 @@ var doc = `{
                 "summary": "Delete Job by jobId",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "Job ID",
                         "name": "jobId",
                         "in": "path",
@@ -872,7 +946,7 @@ var doc = `{
                 "tags": [
                     "Log"
                 ],
-                "summary": "Get cluster log by clusterID",
+                "summary": "Get Cluster log by clusterID",
                 "parameters": [
                     {
                         "type": "integer",
@@ -890,6 +964,7 @@ var doc = `{
                     },
                     {
                         "type": "boolean",
+                        "default": false,
                         "description": "previous",
                         "name": "previous",
                         "in": "query",
@@ -911,6 +986,7 @@ var doc = `{
                     },
                     {
                         "type": "boolean",
+                        "default": false,
                         "description": "timestamps",
                         "name": "timestamps",
                         "in": "query",
@@ -1569,7 +1645,7 @@ var doc = `{
             "properties": {
                 "msg": {
                     "type": "string",
-                    "example": "success"
+                    "example": "Success"
                 }
             }
         },
@@ -1608,7 +1684,7 @@ var doc = `{
             "properties": {
                 "msg": {
                     "type": "string",
-                    "example": "getVersion success"
+                    "example": "getVersion Success"
                 },
                 "version": {
                     "type": "string",
@@ -1628,37 +1704,11 @@ var doc = `{
                 }
             }
         },
-        "job.ClusterArgs": {
-            "type": "object",
-            "properties": {
-                "chart_name": {
-                    "type": "string"
-                },
-                "chart_version": {
-                    "type": "string"
-                },
-                "cover": {
-                    "type": "boolean"
-                },
-                "data": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
-                },
-                "name": {
-                    "type": "string"
-                },
-                "namespace": {
-                    "type": "string"
-                }
-            }
-        },
         "modules.Cluster": {
             "type": "object",
             "properties": {
                 "Info": {
-                    "description": "Info is the corresponding information of cluster in k8s",
+                    "description": "Info is the corresponding information of Cluster in k8s",
                     "$ref": "#/definitions/modules.MapStringInterface"
                 },
                 "Spec": {
@@ -1669,7 +1719,7 @@ var doc = `{
                     "type": "string"
                 },
                 "chart_values": {
-                    "description": "Values through the values in the chart file- template.yaml The file generates the corresponding helm values file",
+                    "description": "Values through the values in the Chart file- template.yaml The file generates the corresponding helm values file",
                     "$ref": "#/definitions/modules.MapStringInterface"
                 },
                 "chart_version": {
@@ -1699,7 +1749,7 @@ var doc = `{
                     "type": "integer"
                 },
                 "status": {
-                    "description": "The status of the cluster, including: \"Creating\",\"Deleting\",\"Updating\",\"Running\",\"Unavailable\",\"Deleted\"",
+                    "description": "The status of the Cluster, including: \"Creating\",\"Deleting\",\"Updating\",\"Running\",\"Unavailable\",\"Deleted\"",
                     "type": "integer"
                 },
                 "updatedAt": {
@@ -1711,6 +1761,32 @@ var doc = `{
                 },
                 "values": {
                     "description": "Values field storage cluster.yaml File content of",
+                    "type": "string"
+                }
+            }
+        },
+        "modules.ClusterArgs": {
+            "type": "object",
+            "properties": {
+                "chart_name": {
+                    "type": "string"
+                },
+                "chart_version": {
+                    "type": "string"
+                },
+                "cover": {
+                    "type": "boolean"
+                },
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "namespace": {
                     "type": "string"
                 }
             }
@@ -1774,14 +1850,20 @@ var doc = `{
                 "id": {
                     "type": "integer"
                 },
-                "method": {
-                    "type": "string"
+                "meta_data": {
+                    "$ref": "#/definitions/modules.ClusterArgs"
                 },
-                "result": {
+                "method": {
                     "type": "string"
                 },
                 "start_time": {
                     "type": "string"
+                },
+                "states": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "status": {
                     "type": "integer"

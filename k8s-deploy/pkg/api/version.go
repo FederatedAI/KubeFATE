@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 VMware, Inc.
+ * Copyright 2019-2021 VMware, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,20 +20,20 @@ import (
 )
 
 // ServiceVersion code release version
-const ServiceVersion = "v1.3.0"
+const ServiceVersion = "v1.4.0"
 
 // Version API struct
 type Version struct {
 }
 
-// Router is cluster router definition method
+// Router is Cluster router definition method
 func (c *Version) Router(r *gin.RouterGroup) {
 
 	authMiddleware, _ := GetAuthMiddleware()
-	cluster := r.Group("/version")
-	cluster.Use(authMiddleware.MiddlewareFunc())
+	version := r.Group("/version")
+	version.Use(authMiddleware.MiddlewareFunc())
 	{
-		cluster.GET("/", c.getVersion)
+		version.GET("/", c.getVersion)
 	}
 }
 
@@ -47,5 +47,5 @@ func (c *Version) Router(r *gin.RouterGroup) {
 // @Param Authorization header string true "Authentication header" default(Bearer <Token>)
 // @Security ApiKeyAuth
 func (*Version) getVersion(c *gin.Context) {
-	c.JSON(200, gin.H{"msg": "getVersion success", "version": ServiceVersion})
+	c.JSON(200, gin.H{"msg": "getVersion Success", "version": ServiceVersion})
 }

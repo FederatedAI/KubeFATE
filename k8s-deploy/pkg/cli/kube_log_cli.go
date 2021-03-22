@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 VMware, Inc.
+ * Copyright 2019-2021 VMware, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,7 +72,7 @@ func LogCommand() *cli.Command {
 				Usage: "Maximum bytes of logs to return. Defaults to no limit.",
 			},
 		},
-		Usage: "Get this cluster module log",
+		Usage: "Get this Cluster module log",
 		Action: func(c *cli.Context) error {
 
 			var uuid string

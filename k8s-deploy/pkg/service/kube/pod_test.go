@@ -38,20 +38,19 @@ func TestKube_GetPods(t *testing.T) {
 		want    *corev1.PodList
 		wantErr bool
 	}{
-		// TODO: Add test cases.
 		{
 			name: "",
 			e:    &kube,
 			args: args{
 				name:          "",
 				namespace:     "",
-				LabelSelector: "app=pod, lable=test",
+				LabelSelector: "app=pod, label=test",
 			},
 			want: &v1.PodList{
 				Items: []v1.Pod{
-					v1.Pod{ObjectMeta: metav1.ObjectMeta{Name: "pod-0", Namespace: "defaule", Labels: map[string]string{"app": "pod", "lable": "test", "name": "pod-0"}}},
-					v1.Pod{ObjectMeta: metav1.ObjectMeta{Name: "pod-1", Namespace: "defaule", Labels: map[string]string{"app": "pod", "lable": "test", "name": "pod-1"}}},
-					v1.Pod{ObjectMeta: metav1.ObjectMeta{Name: "pod-2", Namespace: "defaule", Labels: map[string]string{"app": "pod", "lable": "test", "name": "pod-2"}}},
+					{ObjectMeta: metav1.ObjectMeta{Name: "pod-0", Namespace: "default", Labels: map[string]string{"app": "pod", "label": "test", "name": "pod-0"}}},
+					{ObjectMeta: metav1.ObjectMeta{Name: "pod-1", Namespace: "default", Labels: map[string]string{"app": "pod", "label": "test", "name": "pod-1"}}},
+					{ObjectMeta: metav1.ObjectMeta{Name: "pod-2", Namespace: "default", Labels: map[string]string{"app": "pod", "label": "test", "name": "pod-2"}}},
 				},
 			},
 			wantErr: false,
@@ -67,8 +66,8 @@ func TestKube_GetPods(t *testing.T) {
 					t.Fatalf("error injecting pod add: %v", err)
 				}
 			}
-			// add a pod of no lable
-			_, err := kube.client.CoreV1().Pods("defaule").Create(context.TODO(), &v1.Pod{ObjectMeta: metav1.ObjectMeta{Name: "nolable", Namespace: "defaule"}}, metav1.CreateOptions{})
+			// add a pod of no label
+			_, err := kube.client.CoreV1().Pods("default").Create(context.TODO(), &v1.Pod{ObjectMeta: metav1.ObjectMeta{Name: "nolabel", Namespace: "default"}}, metav1.CreateOptions{})
 			if err != nil {
 				t.Fatalf("error injecting pod add: %v", err)
 			}
@@ -114,10 +113,10 @@ func TestKube_GetPod(t *testing.T) {
 			e:    &kube,
 			args: args{
 				podName:   "python",
-				namespace: "defaule",
+				namespace: "default",
 			},
 			want: &v1.Pod{
-				ObjectMeta: metav1.ObjectMeta{Name: "python", Namespace: "defaule"},
+				ObjectMeta: metav1.ObjectMeta{Name: "python", Namespace: "default"},
 			},
 			wantErr: false,
 		},

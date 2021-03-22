@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 VMware, Inc.
+ * Copyright 2019-2021 VMware, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,7 +54,7 @@ func getToken() (string, error) {
 		return "", err
 	}
 
-	rbody, err := ioutil.ReadAll(resp.Body)
+	rBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return "", err
 	}
@@ -64,12 +64,12 @@ func getToken() (string, error) {
 	}
 
 	if resp.StatusCode != 200 {
-		return "", fmt.Errorf("resp.StatusCode=%d, error: %s", resp.StatusCode, rbody)
+		return "", fmt.Errorf("resp.StatusCode=%d, error: %s", resp.StatusCode, rBody)
 	}
 
 	Result := map[string]interface{}{}
 
-	err = json.Unmarshal(rbody, &Result)
+	err = json.Unmarshal(rBody, &Result)
 	if err != nil {
 		return "", err
 	}
@@ -80,7 +80,7 @@ func getToken() (string, error) {
 
 	token := fmt.Sprint(Result["token"])
 
-	log.Debug().Str("token", token).Msg("get token success")
+	log.Debug().Str("token", token).Msg("get token Success")
 	return token, nil
 }
 

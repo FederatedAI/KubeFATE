@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 VMware, Inc.
+ * Copyright 2019-2021 VMware, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -141,7 +141,7 @@ func (o *repoAddOptions) run(settings *cli.EnvSettings) error {
 	}
 
 	if _, err := r.DownloadIndexFile(); err != nil {
-		return errors.Wrapf(err, "looks like %q is not a valid chart repository or cannot be reached", o.url)
+		return errors.Wrapf(err, "looks like %q is not a valid Chart repository or cannot be reached", o.url)
 	}
 
 	f.Update(&c)
@@ -164,32 +164,32 @@ func (o *repoUpdateOptions) run(settings *cli.EnvSettings) error {
 	if isNotExist(err) || len(f.Repositories) == 0 {
 		return errors.New("no repositories found. You must add one before updating")
 	}
-	var repos []*repo.ChartRepository
+	var chartRepositories []*repo.ChartRepository
 	for _, cfg := range f.Repositories {
 		r, err := repo.NewChartRepository(cfg, getter.All(settings))
 		if err != nil {
 			return err
 		}
-		repos = append(repos, r)
+		chartRepositories = append(chartRepositories, r)
 	}
 
-	o.update(repos)
+	o.update(chartRepositories)
 	return nil
 }
 func isNotExist(err error) bool {
 	return os.IsNotExist(errors.Cause(err))
 }
-func updateCharts(repos []*repo.ChartRepository) {
-	log.Debug().Msg("Hang tight while we grab the latest from your chart repositories...")
+func updateCharts(chartRepositories []*repo.ChartRepository) {
+	log.Debug().Msg("Hang tight while we grab the latest from your Chart repositories...")
 	var wg sync.WaitGroup
-	for _, re := range repos {
+	for _, re := range chartRepositories {
 		wg.Add(1)
 		go func(re *repo.ChartRepository) {
 			defer wg.Done()
 			if _, err := re.DownloadIndexFile(); err != nil {
-				log.Debug().Msgf("...Unable to get an update from the %q chart repository (%s):\n\t%s\n", re.Config.Name, re.Config.URL, err)
+				log.Debug().Msgf("...Unable to get an update from the %q Chart repository (%s):\n\t%s\n", re.Config.Name, re.Config.URL, err)
 			} else {
-				log.Debug().Msgf("...Successfully got an update from the %q chart repository\n", re.Config.Name)
+				log.Debug().Msgf("...Successfully got an update from the %q Chart repository\n", re.Config.Name)
 			}
 		}(re)
 	}
@@ -211,28 +211,9 @@ func RepoAddAndUpdate() error {
 		log.Error().Err(err).Msg("repoAdd")
 		return err
 	}
-	log.Debug().Msg("repoAdd success")
+	log.Debug().Msg("repoAdd Success")
 	ou := &repoUpdateOptions{update: updateCharts}
 	ou.repoFile = settings.RepositoryConfig
 	err = ou.run(settings)
 	return err
-}
-
-func mergeMaps(a, b map[string]interface{}) map[string]interface{} {
-	out := make(map[string]interface{}, len(a))
-	for k, v := range a {
-		out[k] = v
-	}
-	for k, v := range b {
-		if v, ok := v.(map[string]interface{}); ok {
-			if bv, ok := out[k]; ok {
-				if bv, ok := bv.(map[string]interface{}); ok {
-					out[k] = mergeMaps(bv, v)
-					continue
-				}
-			}
-		}
-		out[k] = v
-	}
-	return out
 }

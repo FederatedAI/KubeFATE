@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 VMware, Inc.
+ * Copyright 2019-2021 VMware, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ func (u *User) Router(r *gin.RouterGroup) {
 	user.Use(auth.MiddlewareFunc())
 	{
 		user.POST("", u.createUser)
-		user.GET("/", u.getUserLisr)
+		user.GET("/", u.getUserList)
 		user.GET("/:userId", u.getUser)
 		user.PUT("/:userId", u.setUser)
 		user.DELETE("/:userId", u.deleteUser)
@@ -93,7 +93,7 @@ func generateAdminUser() error {
 			log.Err(err).Str("userName", username).Msg("Delete user by name error")
 			return err
 		}
-		log.Info().Str("Username", u.Username).Bool("ok", ok).Msg("user delete success")
+		log.Info().Str("Username", u.Username).Bool("ok", ok).Msg("user delete Success")
 	}
 
 	u = modules.NewUser(username, password, "")
@@ -102,7 +102,7 @@ func generateAdminUser() error {
 		log.Err(err).Str("userName", username).Msg("user save error")
 		return err
 	}
-	log.Info().Str("userUuid", u.Uuid).Str("userName", username).Msg("user  save success")
+	log.Info().Str("userUuid", u.Uuid).Str("userName", username).Msg("user  save Success")
 	return nil
 }
 
@@ -140,7 +140,7 @@ func (*User) createUser(c *gin.Context) {
 	}
 
 	log.Debug().Interface("data", "user").Msg("result")
-	c.JSON(200, gin.H{"msg": "createCluster success", "data": user})
+	c.JSON(200, gin.H{"msg": "createCluster Success", "data": user})
 }
 
 // setUser Update user
@@ -170,11 +170,11 @@ func (*User) setUser(c *gin.Context) {
 		log.Error().Err(err).Msg("request error")
 		c.JSON(500, gin.H{"error": err.Error()})
 	}
-	log.Debug().Interface("result", "setUser success").Msg("result")
-	c.JSON(200, gin.H{"msg": "setUser success"})
+	log.Debug().Interface("result", "setUser Success").Msg("result")
+	c.JSON(200, gin.H{"msg": "setUser Success"})
 }
 
-// getUserLisr Get user by userId
+// getUser Get user by userId
 // @Summary Get user by userId
 // @Tags User
 // @Produce  json
@@ -199,10 +199,10 @@ func (*User) getUser(c *gin.Context) {
 		c.JSON(500, gin.H{"error": err.Error()})
 	}
 	log.Debug().Interface("result", result).Msg("result")
-	c.JSON(200, gin.H{"msg": "getUser success", "data": result})
+	c.JSON(200, gin.H{"msg": "getUser Success", "data": result})
 }
 
-// getUserLisr List all available user
+// getUserList List all available user
 // @Summary List all available user
 // @Tags User
 // @Produce  json
@@ -213,7 +213,7 @@ func (*User) getUser(c *gin.Context) {
 // @Router /user [get]
 // @Param Authorization header string true "Authentication header"
 // @Security ApiKeyAuth
-func (*User) getUserLisr(c *gin.Context) {
+func (*User) getUserList(c *gin.Context) {
 
 	u := new(modules.User)
 	result, err := u.GetList()
@@ -222,7 +222,7 @@ func (*User) getUserLisr(c *gin.Context) {
 		c.JSON(500, gin.H{"error": err.Error()})
 	}
 	log.Debug().Interface("result", result).Msg("result")
-	c.JSON(200, gin.H{"msg": "getUserLisr success", "data": result})
+	c.JSON(200, gin.H{"msg": "getUserList Success", "data": result})
 }
 
 func getUserFindByUUID(uuid string) (modules.User, error) {
@@ -257,5 +257,5 @@ func (*User) deleteUser(c *gin.Context) {
 		c.JSON(500, gin.H{"error": err.Error()})
 	}
 
-	c.JSON(200, gin.H{"msg": "deleteUser success"})
+	c.JSON(200, gin.H{"msg": "deleteUser Success"})
 }

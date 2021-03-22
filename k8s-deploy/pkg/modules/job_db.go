@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 VMware, Inc.
+ * Copyright 2019-2021 VMware, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -151,8 +151,22 @@ func (e *Job) SetStatus(status JobStatus) error {
 	return nil
 }
 
-func (e *Job) SetResult(result string) error {
-	if err := DB.Model(e).Update("result", result).Error; err != nil {
+func (e *Job) SetStates(States States) error {
+
+	if err := DB.Model(e).Update("states", States).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func (e *Job) SetState(State string) error {
+	j, err := e.Get()
+	if err != nil {
+		return err
+	}
+	j.States = append(j.States, State)
+
+	if err := DB.Model(e).Update("states", j.States).Error; err != nil {
 		return err
 	}
 	return nil
@@ -169,6 +183,20 @@ func (e *Job) IsExisted(uuid string) bool {
 	var count int64
 	DB.Model(&Job{}).Where("uuid = ?", uuid).Count(&count)
 	if DB.Error == nil && count > 0 {
+		return true
+	}
+	return false
+}
+
+func (e *Job) IsStop() bool {
+	if e.Status == JobStatusStopping {
+		return true
+	}
+	return false
+}
+
+func (e *Job) IsRunning() bool {
+	if e.Status == JobStatusRunning {
 		return true
 	}
 	return false

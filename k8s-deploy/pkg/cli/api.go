@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 VMware, Inc.
+ * Copyright 2019-2021 VMware, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,6 +64,9 @@ func PostItem(i Item, Body []byte) error {
 		return nil
 	}
 	msg, err := i.getResult(JOB)
+	if err != nil {
+		return err
+	}
 
 	err = json.Unmarshal(rep.Body, &msg)
 	if err != nil {

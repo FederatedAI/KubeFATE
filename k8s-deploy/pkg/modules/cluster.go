@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 VMware, Inc.
+ * Copyright 2019-2021 VMware, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,13 +44,13 @@ type Cluster struct {
 	Revision int8 `json:"revision" gorm:"size:8"`
 	// Cluster revision of helm
 	HelmRevision int8 `json:"helm_revision" gorm:"size:8"`
-	//Values through the values in the chart file- template.yaml The file generates the corresponding helm values file
+	//Values through the values in the Chart file- template.yaml The file generates the corresponding helm values file
 	ChartValues MapStringInterface `json:"chart_values" gorm:"type:blob"`
 
-	//The status of the cluster, including: "Creating","Deleting","Updating","Running","Unavailable","Deleted"
+	//The status of the Cluster, including: "Creating","Deleting","Updating","Running","Unavailable","Deleted"
 	Status ClusterStatus `json:"status"  gorm:"size:8"`
 
-	//Info is the corresponding information of cluster in k8s
+	//Info is the corresponding information of Cluster in k8s
 	Info MapStringInterface `json:"Info,omitempty" gorm:"type:blob"`
 
 	gorm.Model
@@ -92,7 +92,7 @@ func (s ClusterStatus) String() string {
 	return names[s]
 }
 
-// MarshalJSON convert cluster status to string
+// MarshalJSON convert Cluster status to string
 func (s *ClusterStatus) MarshalJSON() ([]byte, error) {
 	buffer := bytes.NewBufferString(`"`)
 	buffer.WriteString(s.String())
@@ -134,7 +134,7 @@ func (s *ClusterStatus) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// NewCluster create cluster object with basic argument
+// NewCluster create Cluster object with basic argument
 func NewCluster(name string, nameSpaces, chartName, chartVersion, values string) (*Cluster, error) {
 	var spec MapStringInterface
 	err := yaml.Unmarshal([]byte(values), &spec)

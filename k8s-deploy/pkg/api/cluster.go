@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 VMware, Inc.
+ * Copyright 2019-2021 VMware, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,11 +25,11 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-// Cluster api of cluster
+// Cluster api of Cluster
 type Cluster struct {
 }
 
-// Router is cluster router definition method
+// Router is Cluster router definition method
 func (c *Cluster) Router(r *gin.RouterGroup) {
 
 	authMiddleware, _ := GetAuthMiddleware()
@@ -44,11 +44,11 @@ func (c *Cluster) Router(r *gin.RouterGroup) {
 	}
 }
 
-// createCluster Create a new cluster
-// @Summary Create a new cluster
+// createCluster Create a new Cluster
+// @Summary Create a new Cluster
 // @Tags Cluster
 // @Produce  json
-// @Param  ClusterArgs body job.ClusterArgs true "Cluster Args"
+// @Param  clusterArgs body modules.ClusterArgs true "Cluster Args"
 // @Success 200 {object} JSONResult{data=modules.Job} "Success"
 // @Failure 400 {object} JSONERRORResult "Bad Request"
 // @Failure 401 {object} JSONERRORResult "Unauthorized operation"
@@ -61,7 +61,7 @@ func (*Cluster) createCluster(c *gin.Context) {
 
 	user, _ := c.Get(identityKey)
 
-	clusterArgs := new(job.ClusterArgs)
+	clusterArgs := new(modules.ClusterArgs)
 
 	if err := c.ShouldBindJSON(&clusterArgs); err != nil {
 		log.Error().Err(err).Msg("request error")
@@ -77,15 +77,15 @@ func (*Cluster) createCluster(c *gin.Context) {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
-	log.Debug().Interface("data", j).Msg("createCluster success")
-	c.JSON(200, gin.H{"msg": "createCluster success", "data": j})
+	log.Debug().Interface("data", j).Msg("createCluster Success")
+	c.JSON(200, gin.H{"msg": "createCluster Success", "data": j})
 }
 
-// setCluster Updates a cluster in the store with form data
-// @Summary Updates a cluster in the store with form data
+// setCluster Updates a Cluster in the store with form data
+// @Summary Updates a Cluster in the store with form data
 // @Tags Cluster
 // @Produce  json
-// @Param  ClusterArgs body job.ClusterArgs true "Cluster Args"
+// @Param  ClusterArgs body modules.ClusterArgs true "Cluster Args"
 // @Success 200 {object} JSONResult{data=modules.Job} "Success"
 // @Failure 400 {object} JSONERRORResult "Bad Request"
 // @Failure 401 {object} JSONERRORResult "Unauthorized operation"
@@ -104,7 +104,7 @@ func (*Cluster) setCluster(c *gin.Context) {
 
 	user, _ := c.Get(identityKey)
 
-	clusterArgs := new(job.ClusterArgs)
+	clusterArgs := new(modules.ClusterArgs)
 
 	if err := c.ShouldBindJSON(&clusterArgs); err != nil {
 		log.Error().Err(err).Msg("request error")
@@ -120,15 +120,15 @@ func (*Cluster) setCluster(c *gin.Context) {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
-	log.Debug().Interface("data", j).Msg("setCluster success")
-	c.JSON(200, gin.H{"msg": "setCluster success", "data": j})
+	log.Debug().Interface("data", j).Msg("setCluster Success")
+	c.JSON(200, gin.H{"msg": "setCluster Success", "data": j})
 }
 
 // getCluster create a Cluster
 // @Summary create Cluster
 // @Tags Cluster
 // @Produce  json
-// @Param   clusterId   path  string  true  "cluster Id"
+// @Param   clusterId   path  string  true  "Cluster Id"
 // @Success 200 {object} JSONResult{data=modules.Cluster} "Success"
 // @Failure 400 {object} JSONERRORResult "Bad Request"
 // @Failure 401 {object} JSONERRORResult "Unauthorized operation"
@@ -149,7 +149,7 @@ func (*Cluster) getCluster(c *gin.Context) {
 	hc := modules.Cluster{Uuid: clusterID}
 	cluster, err := hc.Get()
 	if err != nil {
-		log.Error().Err(err).Str("uuid", clusterID).Msg("get cluster error")
+		log.Error().Err(err).Str("uuid", clusterID).Msg("get Cluster error")
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
@@ -188,15 +188,15 @@ func (*Cluster) getCluster(c *gin.Context) {
 			}
 		}
 	}
-	log.Debug().Interface("data", cluster).Msg("getCluster success")
-	c.JSON(200, gin.H{"msg": "getCluster success", "data": &cluster})
+	log.Debug().Interface("data", cluster).Msg("getCluster Success")
+	c.JSON(200, gin.H{"msg": "getCluster Success", "data": &cluster})
 }
 
-// getClusterList List all available clusters
-// @Summary List all available clusters
+// getClusterList List all available Clusters
+// @Summary List all available Clusters
 // @Tags Cluster
 // @Produce  json
-// @Param   all     query    boolean      true        "get All cluster"
+// @Param   all     query    boolean      true        "get All Cluster" default(false)
 // @Success 200 {object} JSONResult{data=[]modules.Cluster} "Success"
 // @Failure 400 {object} JSONERRORResult "Bad Request"
 // @Failure 401 {object} JSONERRORResult "Unauthorized operation"
@@ -208,8 +208,8 @@ func (*Cluster) getCluster(c *gin.Context) {
 func (*Cluster) getClusterList(c *gin.Context) {
 
 	all := false
-	qall := c.Query("all")
-	if qall == "true" {
+
+	if c.Query("all") == "true" {
 		all = true
 	}
 
@@ -222,15 +222,15 @@ func (*Cluster) getClusterList(c *gin.Context) {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
-	log.Debug().Interface("data", clusterList).Msg("getClusterList success")
-	c.JSON(200, gin.H{"msg": "getClusterList success", "data": clusterList})
+	log.Debug().Interface("data", clusterList).Msg("getClusterList Success")
+	c.JSON(200, gin.H{"msg": "getClusterList Success", "data": clusterList})
 }
 
-// deleteCluster Delete a cluster
-// @Summary Delete a cluster
+// deleteCluster Delete a Cluster
+// @Summary Delete a Cluster
 // @Tags Cluster
 // @Produce  json
-// @Param   clusterId   path  string  true  "cluster Id"
+// @Param   clusterId   path  string  true  "Cluster Id"
 // @Success 200 {object} JSONResult{data=modules.Job} "Success"
 // @Failure 400 {object} JSONERRORResult "Bad Request"
 // @Failure 401 {object} JSONERRORResult "Unauthorized operation"
@@ -255,6 +255,6 @@ func (*Cluster) deleteCluster(c *gin.Context) {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
-	log.Debug().Interface("data", j).Msg("deleteCluster success")
-	c.JSON(200, gin.H{"msg": "deleteCluster success", "data": j})
+	log.Debug().Interface("data", j).Msg("deleteCluster Success")
+	c.JSON(200, gin.H{"msg": "deleteCluster Success", "data": j})
 }

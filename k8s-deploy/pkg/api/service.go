@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 VMware, Inc.
+ * Copyright 2019-2021 VMware, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -101,7 +101,7 @@ func Run() error {
 
 	modules.DB = orm.DB
 
-	log.Info().Msg("Database connection successful")
+	log.Info().Msg("Database connection Successful")
 
 	err = initTables()
 	if err != nil {
@@ -117,7 +117,7 @@ func Run() error {
 		return err
 	}
 
-	log.Info().Msg("User created successfully")
+	log.Info().Msg("User created Successfully")
 
 	// use gin.New() instead
 	r := gin.New()
@@ -144,7 +144,7 @@ func Run() error {
 		log.Info().Msg("Listening and serving HTTP on " + address + ":" + port)
 	}
 
-	log.Info().Msg("Gin configuration successful")
+	log.Info().Msg("Gin configuration Successful")
 
 	err = r.Run(endpoint)
 	if err != nil {

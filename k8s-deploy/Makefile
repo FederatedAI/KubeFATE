@@ -1,5 +1,5 @@
 NAME ?= federatedai/kubefate
-VERSION ?= v1.3.0
+VERSION ?= v1.4.0
 IMG ?= ${NAME}:${VERSION}
 
 ifeq (,$(shell go env GOBIN))
@@ -27,6 +27,9 @@ test: fmt vet
 # Build manager binary
 kubefate: fmt vet swag
 	CGO_ENABLED=0 go build -a --ldflags '-extldflags "-static"' -o ${OUTPUT_FILE} ${BUILD_MODE} kubefate.go
+
+kubefate-without-swag: fmt vet
+	go build -o ${OUTPUT_FILE} ${BUILD_MODE} kubefate.go
 
 run: fmt vet 
 	go run ./kubefate.go service

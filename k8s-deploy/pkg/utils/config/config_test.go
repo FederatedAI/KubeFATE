@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 VMware, Inc.
+ * Copyright 2019-2021 VMware, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import (
 func TestInitViper(t *testing.T) {
 	InitViper()
 
-	defauleConfig := []byte(`db:
+	defaultConfig := []byte(`db:
   file: file::memory:?cache=shared
   type: sqlite
 log:
@@ -43,7 +43,7 @@ user:
   password: admin
   username: admin
 `)
-	want := defauleConfig
+	want := defaultConfig
 
 	config := viper.AllSettings()
 	got, err := yaml.Marshal(config)

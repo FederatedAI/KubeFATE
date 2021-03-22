@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 VMware, Inc.
+ * Copyright 2019-2021 VMware, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,23 +38,6 @@ func GetPodStatus(pods *corev1.PodList) map[string]string {
 
 	status := make(map[string]string)
 	for _, v := range pods.Items {
-		/*
-			for _, vv := range v.Status.ContainerStatuses {
-				if vv.State.Running != nil {
-					status[vv.Name] = "Running"
-					continue
-				}
-				if vv.State.Waiting != nil {
-					status[vv.Name] = "Waiting"
-					continue
-				}
-				if vv.State.Terminated != nil {
-					status[vv.Name] = "Terminated"
-					continue
-				}
-				status[vv.Name] = "Unknown"
-			}
-		*/
 		switch string(v.Status.Phase) {
 		case "Running", "Succeeded", "Pending", "Failed":
 			status[v.Name] = string(v.Status.Phase)

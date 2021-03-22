@@ -116,7 +116,12 @@ Duration        42s
 Status          Success
 Creator         admin
 ClusterId       27e37a60-fffb-4031-a76f-990b2ff43cf2
-Result          install success
+States          - update job status to Running
+                - create cluster in DB Success
+                - overwrite current installation
+                - helm install success
+                - checkout cluster status [28]
+                - job run Success
 SubJobs         clustermanager       PodStatus: Running, SubJobStatus: Success, Duration:     6s, StartTime: 2020-11-13 07:22:53, EndTime: 2020-11-13 07:22:59
                 fateboard            PodStatus: Running, SubJobStatus: Success, Duration:     1s, StartTime: 2020-11-13 07:22:53, EndTime: 2020-11-13 07:22:55
                 mysql                PodStatus: Running, SubJobStatus: Success, Duration:     8s, StartTime: 2020-11-13 07:22:53, EndTime: 2020-11-13 07:23:01
