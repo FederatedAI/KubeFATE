@@ -6,7 +6,7 @@ FATE supports using [Spark](https://spark.apache.org/) as a computing engine sin
 
 <div style="text-align:center", align=center>
 <img src="./images/fate_on_spark_with_pulsar.png" />
-</div>>
+</div>
 
 ## Configuration and Usage
 
@@ -116,7 +116,7 @@ The architecture is shown in the following diagram. The Pulsar service "10000.fa
 
 <div style="text-align:center", align=center>
 <img src="./images/pulsar_sni_proxy.png" />
-</div>>
+</div>
 #### Certificate generation
 
 Since the SNI proxy is based on TLS, it is necessary to configure the certificate for the ATS and Pulsar services. 
