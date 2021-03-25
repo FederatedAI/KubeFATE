@@ -117,9 +117,10 @@ The architecture is shown in the following diagram. The Pulsar service "10000.fa
 <div style="text-align:center", align=center>
 <img src="./images/pulsar_sni_proxy.png" />
 </div>
-#### Certificate generation
 
-Since the SNI proxy is based on TLS, it is necessary to configure the certificate for the ATS and Pulsar services. 
+#### Certificate Generation
+
+Since the SNI proxy is based on TLS, it is necessary to configure the certificate for the ATS and Pulsar services.
 
 ##### Generate CA's Certificate
 
