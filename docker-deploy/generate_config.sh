@@ -27,7 +27,7 @@ echo "Info:"
 echo "  RegistryURI: ${RegistryURI}"
 echo "  Tag: ${TAG}"
 echo "  Serving_Tag: ${SERVING_TAG}"
-echo "  Computing_Backend: ${computing_backend}"
+echo "  Backend: ${backend}"
 
 echo "  Party_List:"
 for ((i = 0; i < ${#party_list[*]}; i++)); do
@@ -79,10 +79,19 @@ GenerateConfig() {
 		mkdir -p confs-$party_id/confs
 		cp -r training_template/public/* confs-$party_id/confs/
 		# handle spark backend here
-		if [ "$computing_backend" == "spark" ]; then
+		if [ "$backend" == "spark_rabbitmq" ]; then
 			cp -r training_template/backends/spark/* confs-$party_id/confs/
 			cp training_template/docker-compose-spark.yml confs-$party_id/docker-compose.yml
-		else
+			sed -i '144,159d' confs-$party_id/docker-compose.yml
+		fi
+
+		if [ "$backend" == "spark_pulsar" ]; then
+			cp -r training_template/backends/spark/* confs-$party_id/confs/
+			cp training_template/docker-compose-spark.yml confs-$party_id/docker-compose.yml
+			sed -i '127,144d' confs-$party_id/docker-compose.yml
+		fi
+
+		if [ "$backend" == "eggroll" ]; then
 			# if the computing backend is not spark, use eggroll anyway
 			cp -r training_template/backends/eggroll confs-$party_id/confs/
 			cp training_template/docker-compose-eggroll.yml confs-$party_id/docker-compose.yml
@@ -109,7 +118,6 @@ GenerateConfig() {
 
 			sed -i "s#<rollsite.host>#${proxy_ip}#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
 			sed -i "s#<rollsite.port>#${proxy_port}#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
-
 		fi
 
 		# generate conf dir
@@ -174,13 +182,13 @@ GenerateConfig() {
 		sed -i "s/host: <db_host>/host: '${db_ip}'/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
 		sed -i "s/127.0.0.1:8000/${serving_ip}:8000/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
 
-		if [ $computing_backend = "spark" ]; then
+		if [[ "$backend" == "spark"* ]]; then
 			sed -i "s/proxy: rollsite/proxy: nginx/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
 		fi
 
 		echo fate_flow module of $party_id done!
 		# now we handles the route table
-		if [ $computing_backend = "spark" ]; then
+		if [[ "$backend" == "spark"* ]]; then
 			cat >./confs-$party_id/confs/nginx/route_table.yaml <<EOF
 default:
   proxy:
@@ -225,6 +233,21 @@ $(for ((j = 0; j < ${#party_list[*]}; j++)); do
 ${party_id}:
     host: rabbitmq
     port: 5672
+EOF
+
+			cat >./confs-$party_id/confs/fate_flow/conf/pulsar_route_table.yaml <<EOF
+$(for ((j = 0; j < ${#party_list[*]}; j++)); do
+				if [ "${party_id}" == "${party_list[${j}]}" ]; then
+					continue
+				fi
+				echo "${party_list[${j}]}:
+    host: ${party_ip_list[${j}]}
+    port: 6650
+"
+			done)
+${party_id}:
+    host: pulsar
+    port: 6650
 EOF
 
 		else
