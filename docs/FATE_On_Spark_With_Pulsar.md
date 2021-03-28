@@ -155,17 +155,20 @@ Once the above commands are completed, the CA-related certificates and keys have
 
 ##### Generate a certificate for "10000.fate.org"
 
-1. Generate the directory
+1. Create the directory
+
 ```
 $ mkdir 10000.fate.org
 ```
 
 2. Generate private key
+
 ```
 $ openssl genrsa -out 10000.fate.org/broker.key.pem 2048
 ```
 
 3. Transform format
+
 ```
 $ openssl pkcs8 -topk8 -inform PEM -outform PEM \
       -in 10000.fate.org/broker.key.pem -out 10000.fate.org/broker.key-pk8.pem -nocrypt
