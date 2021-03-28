@@ -2,7 +2,7 @@
 
 ## Overview
 
-FATE supports using [Spark](https://spark.apache.org/) as a computing engine since 1.5. Along with Spark, it also requires HDFS and RabbitMQ as storage and transmission service respectively, to compose a functional FATE cluster. In 1.6, the FATE also supports to use [Pulsar](https://pulsar.apache.org/admin-rest-api/?version=2.7.0&apiversion=v2#tag/clusters) as the transmission engine, a user can switch the transmission engine easily. Ideally, the Pulsar provides better throughput and scalability, more importantly, organizations can compose FATE clusters of star network using Pulsar. The overall architecture of "FATE on Spark with Pulsar" is as the following diagram:
+FATE supports using [Spark](https://spark.apache.org/) as a computing engine since v1.5.0 Along with Spark, it also requires HDFS and RabbitMQ as storage and transmission service respectively, to compose a functional FATE cluster. In v1.6.0, the FATE also supports to use [Pulsar](https://pulsar.apache.org/admin-rest-api/?version=2.7.0&apiversion=v2#tag/clusters) as the transmission engine, a user can switch the transmission engine easily. Ideally, the Pulsar provides better throughput and scalability, more importantly, organizations can compose FATE clusters of star network using Pulsar. The overall architecture of "FATE on Spark with Pulsar" is as the following diagram:
 
 <div style="text-align:center", align=center>
 <img src="./images/fate_on_spark_with_pulsar.png" />
@@ -11,7 +11,7 @@ FATE supports using [Spark](https://spark.apache.org/) as a computing engine sin
 ## Configuration and Usage
 
 ### Update Config of the FATE Flow service
-For more details of the Pulsar Deployment, a user can refer to this [Deployment Guide](https://github.com/FederatedAI/FATE/blob/develop-1.6/cluster-deploy/doc/fate_on_spark/pulsar_deployment_guide.md). After the Pulsar cluster is running, a user needs to update the configuration of the "fate flow" service, the update is splitting into two parts, they are:
+For more details of the Pulsar Deployment, a user can refer to this [Deployment Guide](https://github.com/FederatedAI/FATE/blob/develop-1.6/cluster-deploy/doc/fate_on_spark/pulsar_deployment_guide.md). After the Pulsar cluster is running, a user needs to update the configuration of the "fate flow" service. The update splits into two parts. They are:
 
 - "conf/service_conf.yaml" 
 ``` yml
@@ -88,13 +88,13 @@ When submitting a task, the user can declare in the config file to use Pulsar as
    }
 ```
 
-Among them, the `backend: 2` specifies the use of Pulsar as the transmission service. In `pulsar_run`, a user can also specify the parameters when creating "producer" and "consumer". 
+In above configuration, the `backend: 2` specifies the use of Pulsar as the transmission service. In `pulsar_run`, a user can also specify the parameters when creating "producer" and "consumer". 
 
 Generally, there is no need to set such a configuration. As for the available parameters, please refer to the [`create_producer`](https://pulsar.apache.org/api/python/2.7.0-SNAPSHOT/#pulsar.Client.create_producer) and [`subscribe`](https://pulsar.apache.org/api/python/2.7.0-SNAPSHOT/#pulsar.Client.subscribe) methods in the Pulsar python client.
 
 ## Deployment of Star Network
 
-Using Pulsar as a transmission service can support star deployment. Its central node is an SNI (Server Name Indication) proxy. The `SNI` proxy process is as follows:
+Using Pulsar as a transmission engine can support star deployment. Its central node is an SNI (Server Name Indication) proxy. The `SNI` proxy process is as follows:
 
 1. The client sends a TLS Client Hello request to the proxy server, with the SNI field in the request, which declares the domain name or hostname of the remote server that the client wants to connect to.
 2. The proxy server establishes a TCP tunnel with the remote server according to the SNI field and its routing information and forwards the client's TLS Hello.
@@ -148,7 +148,8 @@ $ openssl req -config openssl.cnf -key private/ca.key.pem \
 $ chmod 444 certs/ca.cert.pem
 ```
 
-Beyond the above command, further information is required to generate the key and certificate. Once the above command is completed, the CA-related certificates and keys have been generated, they are:
+Once the above commands are completed, the CA-related certificates and keys have been generated, they are:
+
 - certs/ca.cert.pem   the certification of CA
 - private/ca.key.pem  the key of CA
 
@@ -164,19 +165,20 @@ $ mkdir 10000.fate.org
 $ openssl genrsa -out 10000.fate.org/broker.key.pem 2048
 ```
 
-3. Transfer format
+3. Transform format
 ```
 $ openssl pkcs8 -topk8 -inform PEM -outform PEM \
       -in 10000.fate.org/broker.key.pem -out 10000.fate.org/broker.key-pk8.pem -nocrypt
 ```
 
-4. Enter the following command to generate a certificate request, where the `Common Name` is set to "10000.fate.org"
+4. Enter the following commands to generate a certificate request, where the `common name` is set to "10000.fate.org"
 ```
 $ openssl req -config openssl.cnf \
     -key 10000.fate.org/broker.key.pem -new -sha256 -out 10000.fate.org/broker.csr.pem
 ```
 
-5. Enter the following command to sign the certificate with CA's private key
+5. Enter the following commands to sign the certificate with CA's private key
+
 ```
 $ openssl ca -config openssl.cnf -extensions server_cert \
     -days 1000 -notext -md sha256 \
@@ -187,14 +189,14 @@ At this time, the certificate "broker.cert.pem" and a key "broker.key-pk8.pem" a
 
 ##### Generate a certificate for "9999.fate.org"
 
-The generation of the "9999.fate.org" certificate is consistent with the above steps, however, the Common Name step 4 is "9999.fate.org".
+The generation of the "9999.fate.org" certificate is consistent with the above steps, however, the Common Name in the step 4 is "9999.fate.org".
 
-The following operation will assume that the certificate of "9999.fate.org" has been generated.
+The following operation assume that the certificate of "9999.fate.org" has been generated.
 
 ##### Generate a certificate for "proxy.fate.org"
 The generation of the "proxy.fate.org" certificate is the same as the above steps, the conversion in step 3 can be omitted, and the Common Name in step 4 is "proxy.fate.org".
 
-The following operation will assume that the certificate of "proxy.fate.org" has been generated.
+The following operation assume that the certificate of "proxy.fate.org" has been generated.
 
 #### Deploy Apache Traffic Server
 
@@ -221,11 +223,12 @@ $ echo 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/ts/lib' >> ~/.profile
 $ source ~/.profile
 ```
 
-Once the process was finished, the traffic server will be installed in the "/opt/ts" directory and the configuration file path is "/opt/ts/etc/trafficserver/".
+Once the processes were finished, the traffic server will be installed in the "/opt/ts" directory and the configuration file path is "/opt/ts/etc/trafficserver/".
 
 ##### Start Apache Traffic Server
 
-1. Setting Configuration
+1. Configure the ATS
+
  - /opt/ts/etc/trafficserver/records.config
  ```
  CONFIG proxy.config.http.cache.http INT 0
@@ -257,11 +260,11 @@ Once the process was finished, the traffic server will be installed in the "/opt
     tunnel_route: 192.168.0.3:6651
  ```
  
- For a more detailed description of the configuration file, please refer to the official [documents](https://docs.trafficserver.apache.org/en/9.0.x/admin-guide/configuring-traffic-server.en.html).
+ For a more details of the configurations, please refer to the official [documents](https://docs.trafficserver.apache.org/en/9.0.x/admin-guide/configuring-traffic-server.en.html).
  
  2. Start the service
  
-Copy the certificate, private key, and CA certificate generated for ATS in the previous step (under the "proxy.fate.org" directory) to the host's "/opt/proxy" directory, and use the following command to start ATS:
+Copy the certificate, private key, and CA certificate generated for ATS in the previous steps (under the "proxy.fate.org" directory) to the host's "/opt/proxy" directory, and use the following command to start ATS:
 
 ``` bash
 /opt/ts/bin/trafficserver start
@@ -269,7 +272,7 @@ Copy the certificate, private key, and CA certificate generated for ATS in the p
 
 #### Deploy Pulsar
 
-The deployment of Pulsar is described in detail in [pulsar_deployment_guide.md](https://github.com/FederatedAI/FATE/blob/develop-1.6-pulsar/cluster-deploy/doc/fate_on_spark/pulsar_deployment_guide.md). A user only need to add a certificate for the broker and open the security service port. The specific operations are as follows:
+ The details of how Pulsar deploy can be find in [pulsar_deployment_guide.md](https://github.com/FederatedAI/FATE/blob/develop-1.6-pulsar/cluster-deploy/doc/fate_on_spark/pulsar_deployment_guide.md). A user only need to add a certificate for the broker and open the security service port. The specific operations are as follows:
 1. Log in to the corresponding host and copy the certificate, private key, and CA certificate generated for 10000.fate.org to the "/opt/pulsar/certs" directory
 2. Modify the conf/standalone.conf file in the pulsar installation directory and append the following content
 
@@ -290,12 +293,12 @@ bookkeeperTLSTrustCertsFilePath=/opt/pulsar/certs/ca.cert.pem
 $ pulsar standalone -nss
 ```
 
-The pulsar service on the host 9999.fate.org is also started with the same procedure.
+Start the Pulsar on the host 9999.fate.org with the same procedure.
 
 
 #### Update FATE's Route Table
 
-- Update the default field in `conf/pulsar_route_table.yaml` of 10000 as follows:
+- Update the `default field` in `conf/pulsar_route_table.yaml` of 10000 as follows:
 
 ``` yml
 10000:
@@ -320,7 +323,7 @@ default:
 
 ```
 
-FATE will automatically fill in the host and proxy parameters of the cluster according to the content of the default field. For example, the Pulsar cluster used for synchronization with party 9999 will be:
+FATE will fill in the host and proxy parameters of the cluster according to the content of the default field. For example, the Pulsar cluster used for synchronization with party 9999 is as follow:
 
 ``` json
 
@@ -335,4 +338,4 @@ FATE will automatically fill in the host and proxy parameters of the cluster acc
 }
 ```
 
-At this point, the star deployment is complete. If a user needs to add more participants, it can be done by issuing a new certificate for the participants and updating the routing table.
+At this point, the star deployment of FATE with Pulsar is complete. If a user needs to add more participants, it can be done by issuing a new certificate for the participants and updating the routing table.
