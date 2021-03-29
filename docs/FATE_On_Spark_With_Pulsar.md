@@ -301,7 +301,7 @@ Start the Pulsar on the host 9999.fate.org with the same procedure.
 
 #### Update FATE's Route Table
 
-- Update the `default field` in `conf/pulsar_route_table.yaml` of 10000 as follows:
+- Update the "default" field in `conf/pulsar_route_table.yaml` of 10000 as follows:
 
 ``` yml
 10000:
@@ -313,7 +313,7 @@ default:
   domain: "fate.org"
 ```
 
-- Update the default field in `conf/pulsar_route_table.yaml` of 9999 as follows:
+- Update the "default" field in `conf/pulsar_route_table.yaml` of 9999 as follows:
 
 ``` yml
 9999:
@@ -326,7 +326,7 @@ default:
 
 ```
 
-FATE will fill in the host and proxy parameters of the cluster according to the content of the default field. For example, the Pulsar cluster used for synchronization with party 9999 is as follow:
+FATE will fill in the host and proxy parameters of the cluster according to the content of the "default" field. For example, the Pulsar cluster used for synchronization with party 9999 is as follow:
 
 ``` json
 
