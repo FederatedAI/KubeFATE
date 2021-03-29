@@ -142,6 +142,21 @@ services:
     networks:
       - fate-network
 
+  pulsar:
+    image: "apachepulsar/pulsar:2.7.0"
+    ports:
+      - "6650:6650"
+      - "6651:6651"
+      - "8000:8080"
+    deploy:
+      restart_policy:
+        condition: any
+    volumes:
+      - ./confs/pulsar/standalone.conf:/pulsar/conf/standalone.conf
+      - ./shared_dir/data/pulsar:/pulsar/data
+    command:
+      ["/bin/bash", "-c", "bin/pulsar standalone -nss"]
+
   mysql:
     image: "mysql:8"
     expose:
