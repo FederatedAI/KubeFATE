@@ -26,6 +26,21 @@ data:
     {{ $key }}: 
 {{ toYaml . | indent 6 }}
 {{- end }}
+  pulsar_route_table.yaml: |
+    default:
+      proxy: "proxy.fate.org:443"
+      domain: "fate.org"
+      brokerPort: 6650
+      brokerSslPort: 6651
+    {{ .Values.partyId }}:
+      host: pulsar
+      port: 6650
+      sslPort: 6651
+      proxy: ""
+{{- range $key, $val := .Values.modules.pulsar.route_table }}
+    {{ $key }}: 
+{{ toYaml . | indent 6 }}
+{{- end }}
   spark-defaults.conf: |
     spark.master                      {{  .Values.modules.python.spark.master | default "local[4]"}}
     #spark.eventLog.enabled           true
@@ -51,7 +66,8 @@ data:
       #   name: fateflow
       #   host: xx
       #   http_port: xx
-      #   grpc_port: xx {{- if eq .Values.modules.python.backend  "spark" }}
+      #   grpc_port: xx 
+      {{- if eq .Values.modules.python.backend  "spark" }}
       proxy: nginx
       {{- else }}
       proxy: rollsite
@@ -96,6 +112,12 @@ data:
         password: {{ .Values.modules.python.rabbitmq.password }}
         # default conf/rabbitmq_route_table.yaml
         route_table: {{ .Values.modules.python.rabbitmq.route_table }}
+      pulsar:
+        host: {{ .Values.modules.python.pulsar.host }}
+        port: {{ .Values.modules.python.pulsar.port }}
+        mng_port: {{ .Values.modules.python.pulsar.mng_port }}
+        # default conf/pulsar_route_table.yaml
+        route_table: {{ .Values.modules.python.pulsar.route_table }}
       nginx:
         host: {{ .Values.modules.python.nginx.host }}
         http_port: {{ .Values.modules.python.nginx.http_port }}
@@ -263,6 +285,9 @@ spec:
             - mountPath: /data/projects/fate/conf/rabbitmq_route_table.yaml
               name: python-confs
               subPath: rabbitmq_route_table.yaml
+            - mountPath: /data/projects/fate/conf/pulsar_route_table.yaml
+              name: python-confs
+              subPath: pulsar_route_table.yaml
             - mountPath: /data/projects/fate/conf/
               name: shared-dir-conf
             - mountPath: /data/projects/fate/examples-shared-for-client
