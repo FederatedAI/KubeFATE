@@ -107,11 +107,11 @@ func (e *HelmChart) Insert() (id int, err error) {
 
 func (e *HelmChart) Upload() (err error) {
 	var count int64
-	if err = DB.Model(&HelmChart{}).Where("version = ?", e.Version).Count(&count).Error; err != nil {
+	if err = DB.Model(&HelmChart{}).Where("version = ?", e.Version).Where("name = ?", e.Name).Count(&count).Error; err != nil {
 		return
 	}
 	if count > 0 {
-		DB.Delete(&HelmChart{}, "version = ?", e.Version)
+		DB.Delete(&HelmChart{}, "version = ?", e.Version, "name = ?", e.Name)
 	}
 	if err = DB.Model(&HelmChart{}).Create(&e).Error; err != nil {
 		return
