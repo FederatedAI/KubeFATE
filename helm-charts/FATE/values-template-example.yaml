@@ -184,6 +184,9 @@ backend: eggroll
   # type: ClusterIP
   # httpNodePort: 30094
   # httpsNodePort: 30099
+  # exchange:
+    # ip: 192.168.10.1
+    # port: 30000
   # route_table:
     # 10000:
       # host: 192.168.10.1

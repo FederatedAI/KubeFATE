@@ -315,7 +315,6 @@ modules:
     httpsNodePort: {{ .httpsNodePort }}
     {{- with .exchange }}
     exchange:
-      proxy: {{ .proxy }}
       ip: {{ .ip }}
       port: {{ .port }}
     {{- end }}

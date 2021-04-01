@@ -27,11 +27,11 @@ data:
 {{ toYaml . | indent 6 }}
 {{- end }}
   pulsar_route_table.yaml: |
+    {{- with .Values.modules.pulsar.exchange }}
     default:
-      proxy: "proxy.fate.org:443"
+      proxy: "{{ .ip }}:{{ .port }}"
       domain: "fate.org"
-      brokerPort: 6650
-      brokerSslPort: 6651
+    {{- end }}
     {{ .Values.partyId }}:
       host: pulsar
       port: 6650

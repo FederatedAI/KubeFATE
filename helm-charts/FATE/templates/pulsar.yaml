@@ -40,6 +40,11 @@ data:
     
     ### --- General broker settings --- ###
     
+    {{- if .Values.modules.pulsar.exchange }}
+    brokerClientTlsEnabled=true
+    {{- else }}
+    {{- end }}
+    
     # Message Size
     maxMessageSize=134217728
     
@@ -50,10 +55,11 @@ data:
     configurationStoreServers=
     
     brokerServicePort=6650
-    
+    brokerServicePortTls=6651
     
     # Port to use to server HTTP request
     webServicePort=8080
+    webServicePortTls=8081
     
     # Hostname or IP address the service binds on, default is 0.0.0.0.
     bindAddress=0.0.0.0
@@ -287,42 +293,38 @@ data:
     # Use 0 or negative number to disable the check
     maxNumPartitionsPerPartitionedTopic=0
     
-    
-    {{ if .Values.modules.pulsar.exchange }}
-    tlsEnabled=true
-    tlsAllowInsecureConnection=true
-    tlsCertificateFilePath=/opt/pulsar/certs/broker.cert.pem
-    tlsKeyFilePath=/opt/pulsar/certs/broker.key-pk8.pem
-    tlsTrustCertsFilePath=/opt/pulsar/certs/ca.cert.pem
-    bookkeeperTLSTrustCertsFilePath=/opt/pulsar/certs/ca.cert.pem
-    {{ else }}
     ### --- TLS --- ###
     # Deprecated - Use webServicePortTls and brokerServicePortTls instead
+    {{- if .Values.modules.pulsar.exchange }}
+    tlsEnabled=true
+    {{- else }}
     tlsEnabled=false
+    {{- end }}
     
     # Tls cert refresh duration in seconds (set 0 to check on every new connection)
     tlsCertRefreshCheckDurationSec=300
         
     # Path for the TLS certificate file
-    tlsCertificateFilePath=
+    tlsCertificateFilePath=/opt/pulsar/certs/broker.cert.pem
     
     # Path for the TLS private key file
-    tlsKeyFilePath=
+    tlsKeyFilePath=/opt/pulsar/certs/broker.key-pk8.pem
     
     # Path for the trusted TLS certificate file.
     # This cert is used to verify that any certs presented by connecting clients
     # are signed by a certificate authority. If this verification
     # fails, then the certs are untrusted and the connections are dropped.
-    tlsTrustCertsFilePath=
+    tlsTrustCertsFilePath=/opt/pulsar/certs/ca.cert.pem
     
     # Accept untrusted TLS certificate from client.
     # If true, a client with a cert which cannot be verified with the
     # 'tlsTrustCertsFilePath' cert will allowed to connect to the server,
     # though the cert will not be used for client authentication.
+    {{- if .Values.modules.pulsar.exchange }}
+    tlsAllowInsecureConnection=true
+    {{- else }}
     tlsAllowInsecureConnection=false
-    
-    
-    {{ end }}
+    {{- end }}
     
     # Specify the tls protocols the broker will use to negotiate during TLS handshake
     # (a comma-separated list of protocol names).
@@ -550,7 +552,7 @@ data:
     bookkeeperTLSCertificateFilePath=
 
     # Path for the trusted TLS certificate file
-    bookkeeperTLSTrustCertsFilePath=
+    bookkeeperTLSTrustCertsFilePath=/opt/pulsar/certs/ca.cert.pem
 
     # Enable/disable disk weight based placement. Default is false
     bookkeeperDiskWeightBasedPlacementEnabled=false
@@ -966,15 +968,17 @@ spec:
             - containerPort: 6650
             - containerPort: 6651
             - containerPort: 8080
+            - containerPort: 8081
           volumeMounts:
             - mountPath: /pulsar/conf/standalone.conf
               name: pulsar-confs
               subPath: standalone.conf
             - mountPath: /pulsar/data
               name: pulsar-data
+            {{- with .Values.modules.pulsar.exchange }}
             - mountPath: /opt/pulsar/certs/
               name: pulsar-cert
-            
+            {{- end }}
       {{- with .Values.modules.pulsar.nodeSelector }}
       nodeSelector: 
 {{ toYaml . | indent 8 }}
@@ -988,9 +992,11 @@ spec:
         - name: pulsar-confs
           configMap:
             name: pulsar-config
+        {{- with .Values.modules.pulsar.exchange }}
         - name: pulsar-cert
-          configMap:
-            name: pulsar-cert
+          secret:
+            secretName: pulsar-cert
+        {{- end }}
         - name: pulsar-data
           emptyDir: {}
 ---
@@ -1020,6 +1026,10 @@ spec:
   - name: "mng-port"
     port: 8080
     targetPort: 8080
+    protocol: TCP
+  - name: "mngs-port"
+    port: 8081
+    targetPort: 8081
     protocol: TCP
   type: {{ .Values.modules.pulsar.type }}
   selector:

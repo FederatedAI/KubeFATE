@@ -1,0 +1,96 @@
+
+image:
+  registry: federatedai
+  isThridParty: false
+  tag: 1.6.0-release
+  pullPolicy: IfNotPresent
+  imagePullSecrets:
+  - name: myregistrykey
+  
+partyId: 9999
+partyName: fate-9999
+host:
+  fateboard: 9999.fateboard.kubefate.net
+  client: 9999.notebook.kubefate.net
+  sparkUI: 9999.spark.kubefate.net
+  rabbitmqUI: 9999.rabbitmq.kubefate.net
+  pulsarUI: 9999.pulsar.kubefate.net
+istio:
+  enabled: false
+
+exchange:
+
+exchangeList:
+
+partyList:
+
+persistence:
+  enabled: false
+
+modules:
+  rollsite: 
+    include: true
+
+
+  lbrollsite:
+    include: false
+
+
+  python: 
+    include: true
+    backend: eggroll
+
+
+  clustermanager: 
+    include: true
+
+
+  nodemanager:  
+    include: true
+
+
+  client: 
+    include: true
+
+
+  mysql: 
+    include: true
+
+
+  serving:
+    ip: 
+    port: 
+
+
+  fateboard:
+    include: true
+
+
+  spark:
+    include: false
+
+
+  hdfs:
+    include: false
+
+
+  nginx:
+    include: false
+
+
+  rabbitmq:
+    include: false
+
+
+  pulsar:
+    include: false
+    type: ClusterIP
+    httpNodePort: 30094
+    httpsNodePort: 30099
+    route_table:
+      10000: 
+        host: 192.168.10.1
+        port: 30105
+        proxy: ""
+        sslPort: 30109
+    

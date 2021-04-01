@@ -1,0 +1,25 @@
+partyId: 1
+partyName: fate-exchange
+
+image:
+  registry: federatedai
+  isThridParty: false
+  tag: 1.6.0-release
+  pullPolicy: IfNotPresent
+  imagePullSecrets: 
+#  - name: 
+
+modules:
+  rollsite: 
+    include: false
+  trafficServer:
+    include: true
+    type: ClusterIP
+    httpNodePort: 30097
+    grpcNodePort: 30092
+    route_table: 
+      sni:
+      - fqdn: 10000.fate.org
+        tunnelRoute: 192.168.0.2:6651
+      - fqdn: 9999.fate.org
+        tunnelRoute: 192.168.0.3:6651

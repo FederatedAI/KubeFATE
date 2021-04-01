@@ -198,7 +198,6 @@ modules:
     httpNodePort: 30094
     httpsNodePort: 30099
     # exchange:
-      # proxy: "proxy.fate.org"
       # ip: 192.168.10.1
       # port: 30000
     route_table: 
