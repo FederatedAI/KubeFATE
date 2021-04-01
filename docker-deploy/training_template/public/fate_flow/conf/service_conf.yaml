@@ -55,8 +55,9 @@ fate_on_spark:
     password: fate
   pulsar:
     host: pulsar
-    mng_port: 8000
+    mng_port: 8080
     port: 6650
+    topic_ttl: 3 
   nginx:
     host: nginx 
     http_port: 9300
