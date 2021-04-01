@@ -28,12 +28,13 @@ import (
 
 func MapToConfig(m map[string]interface{}, templates string) (string, error) {
 	// Create a new template and parse the letter into it.
-	t := template.Must(template.New("fate-values-templates").Funcs(funcMap()).Option("missingkey=zero").Parse(string(templates)))
-
-	// Execute the template for each recipient.
+	t, err := template.New("fate-values-templates").Funcs(funcMap()).Option("missingkey=zero").Parse(string(templates))
+	if err != nil {
+		return "", err
+	}
 
 	var buf strings.Builder
-	err := t.Execute(&buf, m)
+	err = t.Execute(&buf, m)
 	if err != nil {
 		log.Error().Msg("executing template:" + err.Error())
 		return "", err
