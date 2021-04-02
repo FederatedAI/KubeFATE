@@ -1,7 +1,7 @@
 name: fate-9999
 namespace: fate-9999
 chartName: fate
-chartVersion: v1.5.1
+chartVersion: v1.6.0
 partyId: 9999
 registry: ""
 imageTag: ""
@@ -32,7 +32,8 @@ backend: eggroll
   # client: 9999.notebook.kubefate.net
   # sparkUI: 9999.spark.kubefate.net
   # rabbitmqUI: 9999.rabbitmq.kubefate.net
-
+  # pulsarUI: 9999.pulsar.kubefate.net
+  
 # rollsite: 
   # type: NodePort
   # nodePort: 30091
@@ -93,6 +94,11 @@ backend: eggroll
     # password: fate
     # # default conf/rabbitmq_route_table.yaml
     # route_table: 
+  # pulsar:
+    # host: pulsar
+    # mng_port: 8080
+    # port: 6650
+    # route_table:
   # nginx:
     # host: nginx
     # http_port: 9300
@@ -172,3 +178,18 @@ backend: eggroll
     # 10000:
       # host: 192.168.0.1
       # port: 30104
+
+# pulsar:
+  # nodeSelector: 
+  # type: ClusterIP
+  # httpNodePort: 30094
+  # httpsNodePort: 30099
+  # exchange:
+    # ip: 192.168.10.1
+    # port: 30000
+  # route_table:
+    # 10000:
+      # host: 192.168.10.1
+      # port: 30105
+      # sslPort: 30109
+      # proxy: ""

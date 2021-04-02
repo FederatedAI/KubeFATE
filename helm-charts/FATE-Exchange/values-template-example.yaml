@@ -1,0 +1,23 @@
+name: fate-exchange
+namespace: fate-exchange
+chartName: fate-exchange
+chartVersion: v1.6.0
+partyId: 1
+registry: ""
+imageTag: ""
+pullPolicy: 
+persistence: false
+istio:
+  enabled: false
+modules:
+  - trafficServer
+
+trafficServer:
+  type: ClusterIP
+  nodePort: 30097
+  route_table: 
+    sni:
+    - fqdn: 10000.fate.org
+      tunnelRoute: 192.168.0.2:6651
+    - fqdn: 9999.fate.org
+      tunnelRoute: 192.168.0.3:6651

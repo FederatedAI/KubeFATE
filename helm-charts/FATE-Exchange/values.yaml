@@ -1,0 +1,36 @@
+image:
+  registry: federatedai
+  isThridParty:
+  tag: 1.6.0-release
+  pullPolicy: IfNotPresent
+  imagePullSecrets: 
+#  - name: 
+  
+partyId: 9999
+partyName: fate-9999
+
+modules:
+  rollsite: 
+    include: false
+    ip: rollsite
+    type: ClusterIP
+    nodePort: 30000
+    nodeSelector: 
+    partyList:
+    # - partyId: 8888
+      # partyIp: 192.168.8.1
+      # partyPort: 30081
+    # - partyId: 10000
+      # partyIp: 192.168.10.1
+      # partyPort: 30101
+  trafficServer:
+    include: false
+    type: ClusterIP
+    nodePort: 30000
+    nodeSelector: 
+    route_table: 
+      # sni:
+      # - fqdn: 10000.fate.org
+        # tunnel_route: 192.168.0.2:6651
+      # - fqdn: 9999.fate.org
+        # tunnel_route: 192.168.0.3:6651

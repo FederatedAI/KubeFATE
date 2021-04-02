@@ -2,7 +2,7 @@
 image:
   registry: {{ .registry | default "federatedai" }}
   isThridParty: {{ empty .registry | ternary  "false" "true" }}
-  tag: {{ .imageTag | default "1.5.1-release" }}
+  tag: {{ .imageTag | default "1.6.0-release" }}
   pullPolicy: {{ .pullPolicy | default "IfNotPresent" }}
   {{- with .imagePullSecrets }}
   imagePullSecrets:
@@ -19,12 +19,14 @@ host:
   client: {{ .client | default (printf "%v.notebook.kubefate.net" $partyId) }}
   sparkUI: {{ .sparkUI | default (printf "%v.spark.kubefate.net" $partyId) }}
   rabbitmqUI: {{ .rabbitmqUI | default (printf "%v.rabbitmq.kubefate.net" $partyId) }}
+  pulsarUI: {{ .pulsarUI | default (printf "%v.pulsar.kubefate.net" $partyId) }}
 {{- else }}
 host:
   fateboard: {{ .partyId }}.fateboard.kubefate.net
   client: {{ .partyId }}.notebook.kubefate.net
   sparkUI: {{ .partyId }}.spark.kubefate.net
   rabbitmqUI: {{ .partyId }}.rabbitmq.kubefate.net
+  pulsarUI: {{ .partyId }}.pulsar.kubefate.net
 {{- end }}
 
 {{- with .istio }}
@@ -112,6 +114,13 @@ modules:
     hdfs:
       name_node: {{ .name_node }}
       path_prefix: {{ .path_prefix }}
+    {{- end }}
+    {{- with .pulsar }}
+    pulsar:
+      host: {{ .host }}
+      mng_port: {{ .mng_port }}
+      port: {{ .port }}
+      route_table: {{ .route_table }}
     {{- end }}
     {{- with .rabbitmq }}
     rabbitmq:
@@ -292,3 +301,27 @@ modules:
 {{ toYaml $val | indent 8 }}
       {{- end }}
     {{- end }}
+
+
+  pulsar:
+    include: {{ has "pulsar" .modules }}
+    {{- with .pulsar }}
+    {{- with .nodeSelector }}
+    nodeSelector: 
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    type: {{ .type }}
+    httpNodePort: {{ .httpNodePort }}
+    httpsNodePort: {{ .httpsNodePort }}
+    {{- with .exchange }}
+    exchange:
+      ip: {{ .ip }}
+      port: {{ .port }}
+    {{- end }}
+    route_table: 
+      {{- range $key, $val := .route_table }}
+      {{ $key }}: 
+{{ toYaml $val | indent 8 }}
+      {{- end }}
+    {{- end }}
+    

@@ -89,4 +89,24 @@ spec:
           servicePort: 15672
 ---
 {{ end }}
+
+{{ if .Values.modules.pulsar.include }}
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: pulsar
+  labels:
+    fateMoudle: pulsar
+{{ include "fate.labels" . | indent 4 }}
+spec:
+  rules:
+  - host: {{ .Values.host.pulsarUI }}
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: pulsar
+          servicePort: 8080
+---
+{{ end }}
 {{ end }}
