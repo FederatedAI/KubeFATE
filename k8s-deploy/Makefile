@@ -1,5 +1,5 @@
 NAME ?= federatedai/kubefate
-VERSION ?= v1.4.0
+VERSION ?= v1.4.1
 IMG ?= ${NAME}:${VERSION}
 
 ifeq (,$(shell go env GOBIN))
