@@ -16,7 +16,7 @@
 package modules
 
 import (
-	"errors"
+	"fmt"
 )
 
 func (e *HelmChart) DropTable() {
@@ -91,9 +91,9 @@ func (e *HelmChart) Insert() (id int, err error) {
 
 	// check name namespace
 	var count int64
-	DB.Model(&HelmChart{}).Where("version = ?", e.Version).Count(&count)
+	DB.Model(&HelmChart{}).Where("name = ? and version = ?", e.Name, e.Version).Count(&count)
 	if count > 0 {
-		err = errors.New("helmChart already exists, version = " + e.Version)
+		err = fmt.Errorf("helmChart already exists, name = %s, version = %s", e.Name, e.Version)
 		return
 	}
 
@@ -107,11 +107,11 @@ func (e *HelmChart) Insert() (id int, err error) {
 
 func (e *HelmChart) Upload() (err error) {
 	var count int64
-	if err = DB.Model(&HelmChart{}).Where("version = ?", e.Version).Count(&count).Error; err != nil {
+	if err = DB.Model(&HelmChart{}).Where("name = ? and version = ?", e.Name, e.Version).Count(&count).Error; err != nil {
 		return
 	}
 	if count > 0 {
-		DB.Delete(&HelmChart{}, "version = ?", e.Version)
+		DB.Delete(&HelmChart{}, "name = ? and version = ?", e.Name, e.Version)
 	}
 	if err = DB.Model(&HelmChart{}).Create(&e).Error; err != nil {
 		return
