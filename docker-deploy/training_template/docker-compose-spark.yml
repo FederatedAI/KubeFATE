@@ -147,7 +147,7 @@ services:
     ports:
       - "6650:6650"
       - "6651:6651"
-      - "8000:8080"
+      - "8001:8080"
     deploy:
       restart_policy:
         condition: any
