@@ -54,12 +54,18 @@ data:
     # Configuration Store connection string
     configurationStoreServers=
     
-    brokerServicePort=6650
+    {{- if .Values.modules.pulsar.exchange }}
     brokerServicePortTls=6651
+    {{- else }}
+    brokerServicePort=6650
+    {{- end }}
     
     # Port to use to server HTTP request
-    webServicePort=8080
+    {{- if .Values.modules.pulsar.exchange }}
     webServicePortTls=8081
+    {{- else }}
+    webServicePort=8080
+    {{- end }}
     
     # Hostname or IP address the service binds on, default is 0.0.0.0.
     bindAddress=0.0.0.0
@@ -957,7 +963,7 @@ spec:
     spec:
       containers:
         - name: pulsar
-          image: apachepulsar/pulsar:2.7.0
+          image: {{ .Values.image.registry }}/pulsar:2.7.0
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command:
             - /bin/bash
