@@ -156,6 +156,8 @@ services:
       - ./shared_dir/data/pulsar:/pulsar/data
     command:
       ["/bin/bash", "-c", "bin/pulsar standalone -nss"]
+    networks:
+      - fate-network
 
   mysql:
     image: "mysql:8"
