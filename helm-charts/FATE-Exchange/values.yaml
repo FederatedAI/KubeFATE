@@ -9,6 +9,14 @@ image:
 partyId: 9999
 partyName: fate-9999
 
+partyList:
+- partyId: 8888
+  partyIp: 192.168.8.1
+  partyPort: 30081
+- partyId: 10000
+  partyIp: 192.168.10.1
+  partyPort: 30101
+
 modules:
   rollsite: 
     include: false
