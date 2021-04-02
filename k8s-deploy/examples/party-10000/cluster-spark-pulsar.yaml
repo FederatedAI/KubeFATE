@@ -1,0 +1,67 @@
+name: fate-10000
+namespace: fate-10000
+chartName: fate
+chartVersion: v1.6.0
+partyId: 10000
+registry: ""
+imageTag: "1.6.0-release"
+pullPolicy: 
+imagePullSecrets: 
+- name: myregistrykey
+persistence: false
+istio:
+  enabled: false
+modules:
+  - python
+  - mysql
+  - fateboard
+  - client
+  - spark
+  - hdfs
+  - nginx
+  - pulsar
+
+backend: spark
+
+host:
+  fateboard: 10000.fateboard.vmware.com
+  client: 10000.notebook.vmware.com
+  sparkUI: 10000.spark.vmware.com
+  rabbitmqUI: 10000.rabbitmq.vmware.com
+  pulsarUI: 10000.pulsar.vmware.com
+
+python:
+  type: NodePort
+  httpNodePort: 30107
+  grpcNodePort: 30102
+
+servingIp: 192.168.10.1
+servingPort: 30105
+
+nginx:
+  type: NodePort
+  http_port: 30103
+  grpc_port: 30108 
+  route_table: 
+    9999: 
+      proxy: 
+        - host: 192.168.9.1
+          http_port: 30093
+          grpc_port: 30098
+      fateflow: 
+        - host: 192.168.9.1
+          http_port: 30097
+          grpc_port: 30092
+pulsar:
+  type: NodePort
+  httpNodePort: 30104
+  httpsNodePort: 30109
+  # exchange:
+    # ip: 192.168.0.1
+    # port: 30000
+  route_table:
+    9999:
+      host: 192.168.9.1
+      port: 30094
+      sslPort: 30099
+      proxy: ""

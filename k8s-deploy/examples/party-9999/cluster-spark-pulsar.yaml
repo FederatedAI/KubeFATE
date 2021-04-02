@@ -19,7 +19,7 @@ modules:
   - spark
   - hdfs
   - nginx
-  - rabbitmq
+  - pulsar
 
 backend: spark
 
@@ -42,13 +42,19 @@ nginx:
           http_port: 30103
           grpc_port: 30108 
       fateflow: 
-        - host: 192.168.10.1
+        - host: 192.168.10.1 
           http_port: 30107
           grpc_port: 30102
-rabbitmq:
+pulsar:
   type: NodePort
-  nodePort: 30094
+  httpNodePort: 30094
+  httpsNodePort: 30099
+  # exchange:
+    # ip: 192.168.0.1
+    # port: 30000
   route_table:
     10000:
       host: 192.168.10.1
       port: 30104
+      sslPort: 30109
+      proxy: ""

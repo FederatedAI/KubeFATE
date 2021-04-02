@@ -1,0 +1,26 @@
+name: fate-exchange
+namespace: fate-exchange
+chartName: fate-exchange
+chartVersion: v1.6.0
+partyId: 1
+registry: ""
+imageTag: "1.6.0-release"
+pullPolicy: 
+imagePullSecrets: 
+- name: myregistrykey
+persistence: false
+istio:
+  enabled: false
+modules:
+  - rollsite
+
+rollsite: 
+  type: NodePort
+  nodePort: 30000
+  partyList:
+  - partyId: 10000
+    partyIp: 192.168.10.1
+    partyPort: 30101
+  - partyId: 9999
+    partyIp: 192.168.9.1
+    partyPort: 30091
