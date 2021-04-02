@@ -12,6 +12,18 @@ istio:
 modules:
   - trafficServer
 
+rollsite: 
+  type: NodePort
+  nodePort: 30091
+  exchange:
+    ip: 192.168.0.1
+    port: 30000
+  partyList:
+  - partyId: 10000
+    partyIp: 192.168.0.1
+    partyPort: 30101
+  nodeSelector: 
+
 trafficServer:
   type: ClusterIP
   nodePort: 30097

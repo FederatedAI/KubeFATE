@@ -9,10 +9,27 @@ image:
   imagePullSecrets: 
 #  - name: 
 
+exchange:
+{{- with .rollsite }}
+{{- with .exchange }}
+  partyIp: {{ .ip }}
+  partyPort: {{ .port }}
+{{- end }}
+{{- end }}
+
+partyList:
+{{- with .rollsite }}
+{{- range .partyList }}
+  - partyId: {{ .partyId }}
+    partyIp: {{ .partyIp }}
+    partyPort: {{ .partyPort }}
+{{- end }}
+{{- end }}
+
 modules:
   rollsite: 
     include: {{ has "rollsite" .modules }}
-    {{- with .rabbitmq }}
+    {{- with .rollsite }}
     {{- with .nodeSelector }}
     nodeSelector: 
 {{ toYaml . | indent 6 }}
