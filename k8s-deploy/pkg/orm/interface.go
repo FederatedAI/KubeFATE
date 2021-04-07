@@ -17,6 +17,7 @@ package orm
 
 import (
 	"fmt"
+	"gorm.io/gorm/logger"
 
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
@@ -24,7 +25,7 @@ import (
 )
 
 type Database interface {
-	Open() (db *gorm.DB, err error)
+	Open(logLevel logger.LogLevel) (db *gorm.DB, err error)
 }
 
 func getDbType(Type string) (Database, error) {
@@ -42,12 +43,22 @@ func getDbType(Type string) (Database, error) {
 	return database, nil
 }
 
+func getLogLevel(Type string) logger.LogLevel {
+	switch Type {
+	case "debug":
+		return logger.Info
+	default:
+		return logger.Silent
+	}
+}
+
 func Setup() (*gorm.DB, error) {
 	database, err := getDbType(viper.GetString("db.type"))
 	if err != nil {
 		return nil, err
 	}
-	return database.Open()
+	logLevel := getLogLevel(viper.GetString("log.level"))
+	return database.Open(logLevel)
 }
 
 var DB *gorm.DB
