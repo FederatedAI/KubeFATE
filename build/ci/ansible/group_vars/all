@@ -16,3 +16,5 @@ docker_registry: docker.io
 kube_create_timeout: 1800
 check_interval: 60
 fate_create_timeout: 1800
+retries: 3
+delay: 5

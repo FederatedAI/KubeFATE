@@ -1,0 +1,140 @@
+# Copyright 2019-2020 VMware, Inc.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+{{ if .Values.modules.trafficServer.include }}
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: traffic-server-config
+  labels:
+    fateMoudle: traffic-server
+    name: {{ .Values.partyName | quote  }}
+    partyId: {{ .Values.partyId | quote }}
+    owner: kubefate
+    cluster: fate-exchange
+data:
+  sni.yaml: |
+    sni:
+    {{- range .Values.modules.trafficServer.route_table.sni }}
+      - fqdn: {{ .fqdn }}
+        tunnel_route: {{ .tunnelRoute }}
+    {{- end }}
+  ssl_multicert.config: |
+    dest_ip=* ssl_cert_name=proxy.cert.pem ssl_key_name=proxy.key.pem
+  records.config: |
+    CONFIG proxy.config.http.cache.http INT 0
+    CONFIG proxy.config.reverse_proxy.enabled INT 0
+    CONFIG proxy.config.url_remap.remap_required INT 0
+    CONFIG proxy.config.url_remap.pristine_host_hdr INT 0
+    CONFIG proxy.config.http.response_server_enabled INT 0
+    
+    CONFIG proxy.config.http.server_ports STRING 8080 8080:ipv6 443:ssl
+    
+    CONFIG proxy.config.http.connect_ports STRING 443 30000-33000
+    
+    CONFIG proxy.config.ssl.CA.cert.filename STRING ca.cert.pem
+    CONFIG proxy.config.ssl.CA.cert.path STRING /opt/proxy
+    
+    CONFIG proxy.config.ssl.server.cert.path STRING /opt/proxy
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: traffic-server
+  labels:
+    fateMoudle: traffic-server
+    name: {{ .Values.partyName  | quote  }}
+    partyId: {{ .Values.partyId | quote  }}
+    owner: kubefate
+    cluster: fate-exchange
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      fateMoudle: traffic-server
+      name: {{ .Values.partyName  | quote }}
+      partyId: {{ .Values.partyId | quote  }}
+  template:
+    metadata:
+      labels:
+        fateMoudle: traffic-server
+        name: {{ .Values.partyName | quote  }}
+        partyId: {{ .Values.partyId | quote  }}
+        owner: kubefate
+        cluster: fate-exchange
+    spec:
+      containers:
+        - image: {{ .Values.image.registry }}/trafficserver
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          name: traffic-server
+          ports:
+            - containerPort: 8080
+            - containerPort: 443
+          volumeMounts:
+            - mountPath: /etc/trafficserver/records.config
+              name: traffic-server-confs
+              subPath: records.config
+            - mountPath: /etc/trafficserver/ssl_multicert.config
+              name: traffic-server-confs
+              subPath: ssl_multicert.config
+            - mountPath: /opt/trafficserver/etc/trafficserver/sni.yaml
+              name: traffic-server-confs
+              subPath: sni.yaml
+            - mountPath: /opt/proxy
+              name: traffic-server-cert-file
+            - mountPath: /opt/trafficserver/etc/trafficserver/proxy.cert.pem
+              name: traffic-server-cert-file
+              subPath: proxy.cert.pem
+            - mountPath: /opt/trafficserver/etc/trafficserver/proxy.key.pem
+              name: traffic-server-cert-file
+              subPath: proxy.key.pem
+      {{- with .Values.modules.trafficServer.nodeSelector }}
+      nodeSelector:
+      {{- range $k,$v := . }}
+        {{ $k }}: {{ $v }}
+      {{- end }}
+      {{- end }}
+      restartPolicy: Always
+      volumes:
+        - name: traffic-server-confs
+          configMap:
+            name: traffic-server-config
+        - name: traffic-server-cert-file
+          secret:
+            secretName: traffic-server-cert
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    fateMoudle: traffic-server
+    name: {{ .Values.partyName | quote  }}
+    partyId: {{ .Values.partyId | quote }}
+    owner: kubefate
+    cluster: fate-exchange
+  name: traffic-server
+spec:
+  ports:
+    - name: "443"
+      port: 443
+      targetPort: 443
+      nodePort: {{ .Values.modules.trafficServer.nodePort }}
+      protocol: TCP
+  type: {{ .Values.modules.trafficServer.type }}
+  selector:
+    fateMoudle: traffic-server
+    name: {{ .Values.partyName | quote }}
+    partyId: {{ .Values.partyId | quote  }}
+---
+{{ end }}

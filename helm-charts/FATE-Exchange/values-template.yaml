@@ -1,0 +1,61 @@
+partyId: {{ .partyId }}
+partyName: {{ .name }}
+
+image:
+  registry: {{ .registry | default "federatedai" }}
+  isThridParty: {{ empty .registry | ternary  "false" "true" }}
+  tag: {{ .imageTag | default "1.6.0-release" }}
+  pullPolicy: {{ .pullPolicy | default "IfNotPresent" }}
+  imagePullSecrets: 
+#  - name: 
+
+exchange:
+{{- with .rollsite }}
+{{- with .exchange }}
+  partyIp: {{ .ip }}
+  partyPort: {{ .port }}
+{{- end }}
+{{- end }}
+
+partyList:
+{{- with .rollsite }}
+{{- range .partyList }}
+  - partyId: {{ .partyId }}
+    partyIp: {{ .partyIp }}
+    partyPort: {{ .partyPort }}
+{{- end }}
+{{- end }}
+
+modules:
+  rollsite: 
+    include: {{ has "rollsite" .modules }}
+    {{- with .rollsite }}
+    {{- with .nodeSelector }}
+    nodeSelector: 
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    type: {{ .type }}
+    nodePort: {{ .nodePort }}
+    partyList:
+    {{- range .partyList }}
+      - partyId: {{ .partyId }}
+        partyIp: {{ .partyIp }}
+        partyPort: {{ .partyPort }}
+    {{- end }}
+    {{- end }}
+  trafficServer:
+    include: {{ has "trafficServer" .modules }}
+    {{- with .trafficServer }}
+    {{- with .nodeSelector }}
+    nodeSelector: 
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    type: {{ .type }}
+    nodePort: {{ .nodePort }}
+    route_table: 
+      sni:
+    {{- range .route_table.sni }}
+      - fqdn: {{ .fqdn }}
+        tunnelRoute: {{ .tunnelRoute }}
+    {{- end }}
+    {{- end }}

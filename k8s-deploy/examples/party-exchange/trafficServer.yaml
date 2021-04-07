@@ -1,0 +1,25 @@
+name: fate-exchange
+namespace: fate-exchange
+chartName: fate-exchange
+chartVersion: v1.6.0
+partyId: 1
+registry: ""
+imageTag: "1.6.0-release"
+pullPolicy: 
+imagePullSecrets: 
+- name: myregistrykey
+persistence: false
+istio:
+  enabled: false
+modules:
+  - trafficServer
+
+trafficServer:
+  type: NodePort
+  nodePort: 30000
+  route_table: 
+    sni:
+    - fqdn: 10000.fate.org
+      tunnelRoute: 192.168.10.1:30109
+    - fqdn: 9999.fate.org
+      tunnelRoute: 192.168.9.1:30099
