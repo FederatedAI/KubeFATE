@@ -123,7 +123,11 @@ spec:
     spec:
       containers:
         - name: {{ $nodemanager.name }}-eggrollpair
-          image: fluent/fluentd:v1.11-debian-1
+        {{- if .Values.image.isThridParty }}
+          image: {{ .Values.image.registry }}/fluentd:v1.12
+        {{- else }}
+          image: fluent/fluentd:v1.12
+        {{- end }}
           volumeMounts:
           - name: eggroll-log
             mountPath: /data/projects/fate/eggroll/logs/

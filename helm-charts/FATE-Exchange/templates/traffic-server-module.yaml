@@ -75,7 +75,7 @@ spec:
         cluster: fate-exchange
     spec:
       containers:
-        - image: shaker/trafficserver
+        - image: {{ .Values.image.registry }}/trafficserver
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           name: traffic-server
           ports:
