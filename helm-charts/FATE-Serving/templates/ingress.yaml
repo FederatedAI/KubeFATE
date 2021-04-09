@@ -31,3 +31,26 @@ spec:
           servicePort: 8059
 ---
 {{ end }}
+
+{{ if .Values.servingAdmin.include }}
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: serving-admin
+  labels:
+    fateMoudle: serving-admin
+    name: {{ .Values.partyName | quote  }}
+    partyId: {{ .Values.partyId | quote  }}
+    owner: kubefate
+    cluster: fate
+spec:
+  rules:
+    - host: {{ .Values.servingAdmin.ingerssHost }}
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: serving-admin
+              servicePort: 8350
+---
+{{ end }}

@@ -67,7 +67,7 @@ data:
     # model transfer
     model.transfer.url=http://{{ .Values.servingServer.fateflow.ip }}:{{ .Values.servingServer.fateflow.port }}/v1/model/transfer
     # zk router
-    zk.url=localhost:2181,localhost:2182,localhost:2183
+    zk.url=serving-zookeeper:2181
     useRegister=false
     useZkRouter=false
     # zk acl

@@ -70,5 +70,13 @@ servingAdmin:
   accessMode: ReadWriteOnce
   size: 1Gi
 
+servingZookeeper:
+  include: true
+  storageClassName: "managed-nfs-storage"
+
+servingAdmin:
+  include: true
+  ingerssHost: 9999.serving-admin.kubefate.net
+
 istio:
   enabled: false
