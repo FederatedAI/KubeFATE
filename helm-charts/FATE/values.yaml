@@ -21,7 +21,7 @@ host:
   pulsarUI: 9999.pulsar.kubefate.net
 exchange:
   partyIp: 192.168.1.1
-  partyPort: 30000
+  partyPort: 30001
 
 exchangeList:
 - id: 9991
@@ -168,6 +168,10 @@ modules:
     type: ClusterIP
     httpNodePort: 30093
     grpcNodePort: 30098
+    exchange:
+      ip: 192.168.10.1
+      httpPort: 30003
+      grpcPort: 30008
     route_table: 
 #      10000: 
 #        proxy: 

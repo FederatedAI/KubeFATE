@@ -21,9 +21,9 @@ data:
   route_table.yaml: |
     default:
       proxy:
-        - host: {{ .Values.modules.nginx.exchange.ip }}
-          http_port: {{ .Values.modules.nginx.exchange.httpPort }}
-          grpc_port: {{ .Values.modules.nginx.exchange.grpcPort }}
+        - host: nginx 
+          http_port: 9300
+          grpc_port: 9310
     {{ .Values.partyId }}:
       proxy:
         - host: nginx 
@@ -79,12 +79,12 @@ data:
         init_worker_by_lua_file 'lua/initialize.lua';
     
         upstream http_cluster {
-            server fateflow:9380;   # just an invalid address as a place holder
+            server 127.0.0.1:9300;   # just an invalid address as a place holder
             balancer_by_lua_file 'lua/balancer.lua';
         }
     
         upstream grpc_cluster {
-            server fateflow:9360;   # just an invalid address as a place holder
+            server 127.0.0.1:9310;   # just an invalid address as a place holder
             balancer_by_lua_file 'lua/balancer.lua';
         }
     
