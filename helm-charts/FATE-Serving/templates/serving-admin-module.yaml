@@ -75,7 +75,7 @@ spec:
             - sh
             - -c
             - |
-              java -Dspring.config.location=config/application.properties -cp conf/:lib/*:fate-serving-admin-2.0.0.jar com.webank.ai.fate.serving.admin.Bootstrap
+              java -cp conf/:lib/*:fate-serving-admin.jar com.webank.ai.fate.serving.admin.Bootstrap -c conf/application.properties
           volumeMounts:
             - mountPath: /data/projects/fate/serving-admin/conf/application.properties
               name: serving-admin-confs
