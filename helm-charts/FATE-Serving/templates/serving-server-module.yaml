@@ -151,8 +151,8 @@ spec:
     - name: "8000"
       port: 8000
       targetPort: 8000
-      {{- with .Values.servingServer.nodePort }}
-      nodePort: {{ . }}
+      {{- if eq .Values.servingServer.type "NodePort" "LoadBalancer" }}
+      nodePort: {{ .Values.servingServer.nodePort }}
       {{- end }}
       protocol: TCP
   type: {{ .Values.servingServer.type }}
