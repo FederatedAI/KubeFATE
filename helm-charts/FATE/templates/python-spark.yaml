@@ -48,7 +48,7 @@ data:
     spark.driver.host                 fateflow
   service_conf.yaml: |
     work_mode: 1
-    use_registry: false
+    use_registry: {{ .Values.modules.serving.useRegistry | default false }}
     use_deserialize_safe_module: false
     fateflow:
       # you must set real ip address, 127.0.0.1 and 0.0.0.0 is not supported
@@ -136,6 +136,11 @@ data:
       {{- if .Values.modules.serving }}
         - {{ .Values.modules.serving.ip }}:{{ .Values.modules.serving.port }}
       {{- end }}
+    {{- if .Values.modules.serving.useRegistry }}
+    zookeeper:
+{{ toYaml .Values.modules.serving.zookeeper | indent 6 }}
+    {{- end }}
+
   transfer_conf.yaml: |
     paths: # dir or path
       - "python/federatedml/transfer_variable/auth_conf"

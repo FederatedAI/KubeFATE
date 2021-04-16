@@ -217,6 +217,9 @@ modules:
   serving:
     ip: {{ .servingIp }}
     port: {{ .servingPort }}
+    useRegistry: {{ .serving.useRegistry | default false }}
+    zookeeper:
+{{ toYaml .serving.zookeeper | indent 6 }}
 
 
   fateboard:
