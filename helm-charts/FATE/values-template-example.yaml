@@ -44,7 +44,14 @@ backend: eggroll
   # - partyId: 10000
     # partyIp: 192.168.0.1
     # partyPort: 30101
-  # nodeSelector: 
+  # nodeSelector:
+  # - disktype: ssd
+  # tolerations:
+  # - key: "key"
+  #   operator: "Equal"
+  #   value: "value"
+  #   effect: "NoSchedule"
+  # affinity:
 
 # lbrollsite:
   # type: NodePort
@@ -55,6 +62,8 @@ backend: eggroll
     # ip: 192.168.0.1
     # port: 30910
   # nodeSelector:
+  # tolerations:
+  # affinity:
 
 # nodemanager:
   # count: 3
@@ -64,7 +73,9 @@ backend: eggroll
   # size: 2Gi
   # list:
   # - name: nodemanager
-    # nodeSelector: 
+    # nodeSelector:
+    # tolerations:
+    # affinity:
     # sessionProcessorsPerNode: 4
     # subPath: "nodemanager"
     # existingClaim: ""
@@ -77,6 +88,8 @@ backend: eggroll
   # httpNodePort: 30097
   # grpcNodePort: 30092
   # nodeSelector:
+  # tolerations:
+  # affinity:
   # enabledNN: false
   # spark: 
     # master: spark://spark-master:7077
@@ -104,7 +117,9 @@ backend: eggroll
     # http_port: 9300
     # grpc_port: 9310
 # mysql: 
-  # nodeSelector: 
+  # nodeSelector:
+  # tolerations:
+  # affinity:
   # ip: mysql
   # port: 3306
   # database: eggroll_meta
@@ -141,7 +156,9 @@ backend: eggroll
     # replicas: 1
     # cpu: "100m"
     # memory: "512Mi"
-    # nodeSelector: 
+    # nodeSelector:
+    # tolerations:
+    # affinity:
     # type: ClusterIP
   # worker:
     # Image: "federatedai/spark-worker"
@@ -149,17 +166,25 @@ backend: eggroll
     # replicas: 2
     # cpu: "1000m"
     # memory: "512Mi"
-    # nodeSelector: 
+    # nodeSelector:
+    # tolerations:
+    # affinity:
     # type: ClusterIP
 # hdfs:
   # namenode:
-    # nodeSelector: 
+    # nodeSelector:
+    # tolerations:
+    # affinity:
     # type: ClusterIP
   # datanode:
-    # nodeSelector: 
+    # nodeSelector:
+    # tolerations:
+    # affinity:
     # type: ClusterIP
 # nginx:
-  # nodeSelector: 
+  # nodeSelector:
+  # tolerations:
+  # affinity:
   # type: ClusterIP
   # httpNodePort: 30093
   # grpcNodePort: 30098
@@ -174,7 +199,9 @@ backend: eggroll
           # http_port: 30107
           # grpc_port: 30102
 # rabbitmq:
-  # nodeSelector: 
+  # nodeSelector:
+  # tolerations:
+  # affinity:
   # type: ClusterIP
   # nodePort: 30094
   # default_user: fate
@@ -186,8 +213,11 @@ backend: eggroll
       # host: 192.168.0.1
       # port: 30104
 
+
 # pulsar:
-  # nodeSelector: 
+  # nodeSelector:
+  # tolerations:
+  # affinity:
   # type: ClusterIP
   # httpNodePort: 30094
   # httpsNodePort: 30099
