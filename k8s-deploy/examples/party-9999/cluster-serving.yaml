@@ -12,6 +12,8 @@ modules:
   - servingProxy
   - servingRedis
   - servingServer
+  - servingZookeeper
+  - servingAdmin
 
 servingProxy: 
   nodePort: 30096
@@ -23,7 +25,7 @@ servingProxy:
   nodeSelector: {}
 
 servingServer:
-  type: NodePort
+  type: ClusterIP
   nodePort: 30095
   fateflow:
     ip: 192.168.9.1
@@ -43,3 +45,9 @@ servingRedis:
   storageClass: "serving-redis"
   accessMode: ReadWriteOnce
   size: 1Gi
+
+servingZookeeper:
+  storageClassName: "managed-nfs-storage"
+
+servingAdmin:
+  ingerssHost: "9999.serving-admin.kubefate.net"
