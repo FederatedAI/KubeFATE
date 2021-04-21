@@ -25,7 +25,7 @@ servingProxy:
   nodeSelector: {}
 
 servingServer:
-  type: ClusterIP
+  type: NodePort
   nodePort: 30095
   fateflow:
     ip: 192.168.9.1
