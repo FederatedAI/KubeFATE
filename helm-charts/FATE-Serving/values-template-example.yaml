@@ -13,6 +13,11 @@ modules:
   - servingProxy
   - servingRedis
   - servingServer
+  - servingZookeeper
+  - servingAdmin
+
+servingAdmin:
+  ingressHost: 10000.serving-admin.kubefate.net
 
 servingProxy: 
   nodePort: 30310
@@ -51,3 +56,9 @@ externalRedisIp: serving-redis
 externalRedisPort: 6379
 externalRedisDatabase: 0
 externalRedisPassword: fate_dev
+
+servingZookeeper:
+  storageClassName: "managed-nfs-storage"
+
+servingAdmin:
+  ingerssHost: 9999.serving-admin.kubefate.net

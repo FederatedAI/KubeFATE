@@ -126,6 +126,13 @@ backend: eggroll
 
 # servingIp: 192.168.0.1
 # servingPort: 30095
+# serving:
+  # useRegistry: false
+  # zookeeper:
+    # hosts:
+    # - serving-zookeeper.fate-serving-9999:2181
+    # use_acl: false
+
 
 # spark:
   # master:

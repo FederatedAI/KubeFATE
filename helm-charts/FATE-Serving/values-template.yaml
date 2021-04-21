@@ -132,5 +132,13 @@ servingServer:
   size: 1Gi
 {{- end }}
 
+servingZookeeper:
+  include: {{ has "servingZookeeper" .modules }}
+  storageClassName: {{ .servingZookeeper.storageClassName | default "managed-nfs-storage" }}
+
+servingAdmin:
+  include: {{ has "servingAdmin" .modules }}
+  ingerssHost: {{ .servingAdmin.ingerssHost | default "{{ .partyId }}.serving-admin.kubefate.net" }}
+
 istio:
   enabled: {{ .istio.enabled | default "false" }}

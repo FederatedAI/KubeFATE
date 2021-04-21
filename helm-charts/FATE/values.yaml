@@ -133,6 +133,11 @@ modules:
   serving:
     ip: 192.168.9.1
     port: 30095
+    useRegistry: false
+    zookeeper:
+      hosts:
+        - serving-zookeeper.fate-serving-9999:2181
+      use_acl: false
   fateboard:
     include: true
     type: ClusterIP
