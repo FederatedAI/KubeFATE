@@ -23,7 +23,9 @@ modules:
     ip: rollsite
     type: ClusterIP
     nodePort: 30000
-    nodeSelector: 
+    nodeSelector:
+    tolerations:
+    affinity:
     partyList:
     # - partyId: 8888
       # partyIp: 192.168.8.1
@@ -35,7 +37,9 @@ modules:
     include: false
     type: ClusterIP
     nodePort: 30000
-    nodeSelector: 
+    nodeSelector:
+    tolerations:
+    affinity:
     route_table: 
       # sni:
       # - fqdn: 10000.fate.org

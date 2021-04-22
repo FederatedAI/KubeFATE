@@ -22,7 +22,9 @@ rollsite:
   - partyId: 10000
     partyIp: 192.168.0.1
     partyPort: 30101
-  nodeSelector: 
+  nodeSelector:
+  tolerations:
+  affinity:
 
 trafficServer:
   type: ClusterIP
@@ -33,3 +35,6 @@ trafficServer:
       tunnelRoute: 192.168.0.2:6651
     - fqdn: 9999.fate.org
       tunnelRoute: 192.168.0.3:6651
+  nodeSelector:
+  tolerations:
+  affinity:
