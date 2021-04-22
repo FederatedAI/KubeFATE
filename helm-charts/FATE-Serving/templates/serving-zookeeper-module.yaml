@@ -157,6 +157,27 @@ spec:
             - name: data
               mountPath: /bitnami/zookeeper
       volumes:
+        {{- if and .Values.persistence.enabled (not .Values.servingZookeeper.existingClaim) }}
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ printf "%s" (tpl .Values.servingZookeeper.existingClaim .) }}
+        {{- else if not .Values.persistence.enabled}}
+        - name: data
+          emptyDir: {}
+        {{- end}}
+      {{- with .Values.servingServer.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.servingServer.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.servingServer.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+{{- if and .Values.persistence.enabled (not .Values.servingZookeeper.existingClaim) }}
   volumeClaimTemplates:
     - metadata:
         name: data
@@ -173,4 +194,5 @@ spec:
         resources:
           requests:
             storage: 1Gi
+{{- end }}
 {{- end }}

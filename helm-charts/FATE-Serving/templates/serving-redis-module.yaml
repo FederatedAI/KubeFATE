@@ -79,9 +79,15 @@ spec:
               subPath: {{ .Values.servingRedis.subPath }}
       {{- with .Values.servingRedis.nodeSelector }}
       nodeSelector:
-      {{- range $k,$v := . }}
-        {{ $k }}: {{ $v }}
+{{ toYaml . | indent 8 }}
       {{- end }}
+      {{- with .Values.servingRedis.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.servingRedis.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
       {{- end }}
       restartPolicy: Always
       volumes:

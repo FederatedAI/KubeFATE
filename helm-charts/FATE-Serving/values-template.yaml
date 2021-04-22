@@ -32,13 +32,17 @@ servingProxy:
     partyIp: {{ .ip }}
     partyPort: {{ .port }}
     {{- end }}
-  {{- with .servingProxy }}
-  {{- with .nodeSelector }}
-  nodeSelector: 
-  {{- range $k, $v := . }}
-    {{ $k }}: {{ $v }}
+  {{- with .servingServer.nodeSelector }}
+  nodeSelector:
+{{ toYaml . | indent 4 }}
   {{- end }}
+  {{- with .servingServer.tolerations }}
+  tolerations:
+{{ toYaml . | indent 4 }}
   {{- end }}
+  {{- with .servingServer.affinity }}
+  affinity:
+{{ toYaml . | indent 4 }}
   {{- end }}
 {{- else }}
 servingProxy: 
@@ -53,10 +57,12 @@ servingProxy:
     - partyId: 9999
       partyIp: 192.168.9.1
       partyPort: 30109
-  nodeSelector: {}
+  nodeSelector:
+  tolerations:
+  affinity:
 {{- end }}
 
-{{ if .servingProxy }}
+{{ if .servingRedis }}
 servingRedis:
   include: {{ has "servingRedis" .modules }}
   ip: serving-redis
@@ -70,10 +76,16 @@ servingRedis:
   accessMode: {{ .accessMode | default "ReadWriteOnce" }}
   size: {{ .size | default "1Gi" }}
   {{- with .nodeSelector }}
-  nodeSelector: 
-  {{- range $k, $v := . }}
-    {{ $k }}: {{ $v }}
+  nodeSelector:
+{{ toYaml . | indent 4 }}
   {{- end }}
+  {{- with .tolerations }}
+  tolerations:
+{{ toYaml . | indent 4 }}
+  {{- end }}
+  {{- with .affinity}}
+  affinity:
+{{ toYaml . | indent 4 }}
   {{- end }}
   {{- end }}
 {{- else }}
@@ -88,8 +100,11 @@ servingRedis:
   storageClass: {{ .storageClass | default "serving-redis" }}
   accessMode: {{ .accessMode | default "ReadWriteOnce" }}
   size: {{ .size | default "1Gi" }}
-  nodeSelector: {}
+  nodeSelector:
+  tolerations:
+  affinity:
 {{- end }}
+
 {{- if .servingServer }}
 servingServer:
   include: {{ has "servingServer" .modules }}
@@ -109,10 +124,16 @@ servingServer:
   accessMode: {{ .accessMode | default "ReadWriteOnce" }}
   size: {{ .size | default "1Gi" }}
   {{- with .nodeSelector }}
-  nodeSelector: 
-  {{- range $k, $v := . }}
-    {{ $k }}: {{ $v }}
+  nodeSelector:
+{{ toYaml . | indent 4 }}
   {{- end }}
+  {{- with .tolerations }}
+  tolerations:
+{{ toYaml . | indent 4 }}
+  {{- end }}
+  {{- with .affinity }}
+  affinity:
+{{ toYaml . | indent 4 }}
   {{- end }}
   {{- end }}
 {{- else }}
@@ -135,10 +156,33 @@ servingServer:
 servingZookeeper:
   include: {{ has "servingZookeeper" .modules }}
   storageClassName: {{ .servingZookeeper.storageClassName | default "managed-nfs-storage" }}
+  {{- with .servingZookeeper.nodeSelector }}
+  nodeSelector:
+{{ toYaml . | indent 4 }}
+  {{- end }}
+  {{- with .servingZookeeper.tolerations }}
+  tolerations:
+{{ toYaml . | indent 4 }}
+  {{- end }}
+  {{- with .servingZookeeper.affinity }}
+  affinity:
+{{ toYaml . | indent 4 }}
+  {{- end }}
 
 servingAdmin:
   include: {{ has "servingAdmin" .modules }}
   ingerssHost: {{ .servingAdmin.ingerssHost | default "{{ .partyId }}.serving-admin.kubefate.net" }}
-
+  {{- with .servingAdmin.nodeSelector }}
+  nodeSelector:
+{{ toYaml . | indent 4 }}
+  {{- end }}
+  {{- with .servingAdmin.tolerations }}
+  tolerations:
+{{ toYaml . | indent 4 }}
+  {{- end }}
+  {{- with .servingAdmin.affinity }}
+  affinity:
+{{ toYaml . | indent 4 }}
+  {{- end }}
 istio:
   enabled: {{ .istio.enabled | default "false" }}
