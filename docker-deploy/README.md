@@ -92,7 +92,7 @@ After completing the above configuration file, use the following commands to gen
 
 ```bash
 $ cd docker-deploy
-$ bash generate_config.sh
+$ ./generate_config.sh
 ```
 
 Now, tar files have been generated for each party including the exchange node (party). They are named as ```confs-<party-id>.tar ``` and ```serving-<party-id>.tar```.
@@ -106,7 +106,7 @@ Now, tar files have been generated for each party including the exchange node (p
 
 To deploy FATE to all configured target hosts, use the below command:
 ```bash
-$ bash docker_deploy.sh all
+$ ./docker_deploy.sh all
 ```
 
 The script copies tar files (e.g. `confs-<party-id>.tar` or `serving-<party-id>.tar`) to corresponding target hosts. It then launches a FATE cluster on each host using `docker-compose` commands.
@@ -115,22 +115,22 @@ By Default, the script will start the training and serving cluster simultaneousl
 
 (Optional) To deploy all parties training cluster, use the below command:
 ```bash
-$ bash docker_deploy.sh all --training
+$ ./docker_deploy.sh all --training
 ```
 
 (Optional) To deploy all parties serving cluster, use the below command:
 ```bash
-$ bash docker_deploy.sh all --serving
+$ ./docker_deploy.sh all --serving
 ```
 
 (Optional) To deploy FATE to a single target host, use the below command with the party's id (10000 in the below example):
 ```bash
-$ bash docker_deploy.sh 10000
+$ ./docker_deploy.sh 10000
 ```
 
 (Optional) To deploy the exchange node to a target host, use the below command:
 ```bash
-$ bash docker_deploy.sh exchange
+$ ./docker_deploy.sh exchange
 ```
 
 
@@ -514,7 +514,7 @@ output:
 ### Deleting cluster
 Use this command to stop all cluster:
 ```
-bash docker_deploy.sh --delete all
+./docker_deploy.sh --delete all
 ```
 
 To delete the cluster completely, log in to each host and run the commands as follows:
