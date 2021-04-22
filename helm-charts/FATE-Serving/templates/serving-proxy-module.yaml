@@ -1,4 +1,4 @@
-# Copyright 2019-2020 VMware, Inc.
+# Copyright 2019-2021 VMware, Inc.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -160,9 +160,11 @@ spec:
               subPath: route_table.json
       {{- with .Values.servingProxy.nodeSelector }}
       nodeSelector:
-      {{- range $k,$v := . }}
-        {{ $k }}: {{ $v }}
+{{ toYaml . | indent 8 }}
       {{- end }}
+      {{- with .Values.image.imagePullSecrets }}
+      imagePullSecrets:
+{{ toYaml . | indent 6 }}
       {{- end }}
       restartPolicy: Always
       volumes:
@@ -189,7 +191,9 @@ spec:
     - name: "8869"
       port: 8869
       targetPort: 8869
+      {{- if eq .Values.servingProxy.type "NodePort" "LoadBalancer" }}
       nodePort: {{ .Values.servingProxy.nodePort }}
+      {{- end }}
       protocol: TCP
     - name: "8879"
       port: 8879

@@ -1,11 +1,13 @@
 name: fate-serving-10000
 namespace: fate-serving-10000
 chartName: fate-serving
-chartVersion: v2.0.0
+chartVersion: v2.0.4
 partyId: 10000
 registry: ""
 imageTag: ""
 pullPolicy: 
+imagePullSecrets: 
+- name: myregistrykey
 persistence: false
 istio:
   enabled: false
@@ -16,49 +18,56 @@ modules:
   - servingZookeeper
   - servingAdmin
 
-servingAdmin:
-  ingressHost: 10000.serving-admin.kubefate.net
+# servingAdmin:
+  # nodeSelector: 
+  # ingressHost: 10000.serving-admin.kubefate.net123
+  # username: admin
+  # password: admin
 
-servingProxy: 
-  nodePort: 30310
-  ingerssHost: 10000.serving-proxy.kubefate.net
-  partyList:
-  - partyId: 9999
-    partyIp: 10.186.216.97
-    partyPort: 30309
-  exchange:
-    ip: 192.168.1.1
-    port: 30100
+# servingProxy: 
+  # nodePort: 30310
+  # type: NodePort
+  # ingerssHost: 10000.serving-proxy.kubefate.net123
+  # nodeSelector: 
+  # partyList:
+  # # - partyId: 9999
+    # # partyIp: 192.168.9.1
+    # # partyPort: 30309
+  # exchange:
+    # ip: 192.168.1.1
+    # port: 30100
 
-servingServer:
-  type: NodePort
-  nodePort: 30210
-  fateflow:
-    ip: 10.186.212.217
-    port: 30110
-  subPath: ""
-  existingClaim: ""
-  storageClass: "serving-server"
-  accessMode: ReadWriteOnce
-  size: 1Gi
+# servingServer:
+  # type: NodePort
+  # nodePort: 30210
+  # nodeSelector: 
+  # fateflow:
+    # ip: 192.168.10.1
+    # port: 30110
+  # subPath: ""
+  # existingClaim: ""
+  # storageClass: "serving-server"
+  # accessMode: ReadWriteOnce
+  # size: 1Gi
 
-servingRedis:
-  password: fate_dev
-  nodeSelector: {}
-  subPath: ""
-  existingClaim: ""
-  storageClass: "serving-redis"
-  accessMode: ReadWriteOnce
-  size: 1Gi
-  
-# 如果不安装Redis的时候配置
-externalRedisIp: serving-redis
-externalRedisPort: 6379
-externalRedisDatabase: 0
-externalRedisPassword: fate_dev
+# servingRedis:
+  # password: fate_dev
+  # nodeSelector: 
+  # subPath: ""
+  # existingClaim: ""
+  # storageClass: "serving-redis"
+  # accessMode: ReadWriteOnce
+  # size: 1Gi
 
-servingZookeeper:
-  storageClassName: "managed-nfs-storage"
+# externalRedisIp: ""
+# externalRedisPort: ""
+# externalRedisPassword: ""
 
-servingAdmin:
-  ingerssHost: 9999.serving-admin.kubefate.net
+
+# servingZookeeper:
+  # nodeSelector: 
+  # subPath: ""
+  # existingClaim: ""
+  # storageClass: "serving-zookeeper"
+  # accessMode: ReadWriteOnce
+  # size: 1Gi

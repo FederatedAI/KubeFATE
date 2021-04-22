@@ -1,3 +1,14 @@
+# Copyright 2019-2021 VMware, Inc.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 {{ if .Values.servingZookeeper.include }}
 ---
 apiVersion: v1
@@ -64,8 +75,12 @@ spec:
         fsGroup: 1001
       containers:
         - name: zookeeper
-          image: docker.io/bitnami/zookeeper:3.7.0-debian-10-r0
-          imagePullPolicy: "IfNotPresent"
+          {{- if .Values.image.isThridParty }}
+          image: {{ .Values.image.registry }}/zookeeper:3.7.0
+          {{- else }}
+          image: bitnami/zookeeper:3.7.0
+          {{- end }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           securityContext:
             runAsUser: 1001
           command:
@@ -156,8 +171,25 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /bitnami/zookeeper
+      {{- with .Values.servingZookeeper.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.image.imagePullSecrets }}
+      imagePullSecrets:
+{{ toYaml . | indent 6 }}
+      {{- end }}
       volumes:
+      {{- if not .Values.persistence.enabled }}
+        - name: data
+          emptyDir: {}
+        {{- else if .Values.servingZookeeper.existingClaim }}
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ .Values.servingZookeeper.existingClaim | default  "serving-redis-data" }}
+        {{- end }}
   volumeClaimTemplates:
+    {{- if and .Values.persistence.enabled (not .Values.servingRedis.existingClaim) }}
     - metadata:
         name: data
         labels:
@@ -167,10 +199,18 @@ spec:
           owner: kubefate
           cluster: fate-serving
       spec:
-        storageClassName: {{ .Values.servingZookeeper.storageClassName | default "managed-nfs-storage" }}
-        accessModes:
-          - ReadWriteOnce
+        {{- if .Values.servingZookeeper.storageClass }}
+          {{- if eq "-" .Values.servingZookeeper.storageClass }}
+        storageClassName: ""
+          {{- else }}
+        storageClassName: {{ .Values.servingZookeeper.storageClass }}
+          {{- end }}
+        {{- end }}
+        accessModes: 
+        - {{ .Values.servingZookeeper.accessMode }}
         resources:
           requests:
-            storage: 1Gi
+            storage: {{ .Values.servingZookeeper.size }}
+          
+    {{- end }}
 {{- end }}

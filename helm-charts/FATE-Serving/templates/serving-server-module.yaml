@@ -1,4 +1,4 @@
-# Copyright 2019-2020 VMware, Inc.
+# Copyright 2019-2021 VMware, Inc.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -34,12 +34,14 @@ data:
     #local.cache.expire=30
     #local.cache.interval=3
     # external cache
-    redis.ip={{ .Values.servingRedis.ip }}
-    redis.port={{ .Values.servingRedis.port }}
+    
+    redis.ip={{ .Values.externalRedisIp | default "serving-redis" }}
+    redis.port={{ .Values.externalRedisPort | default "6379" }}
     ### configure this parameter to use cluster mode
     #redis.cluster.nodes=127.0.0.1:6379,127.0.0.1:6380,127.0.0.1:6381,127.0.0.1:6382,127.0.0.1:6383,127.0.0.1:6384
     ### this password is common in stand-alone mode and cluster mode
-    redis.password={{ .Values.servingRedis.password }}
+    redis.password={{ .Values.externalRedisPassword | default .Values.servingRedis.password | default "fate_dev" }}
+    
     #redis.timeout=10
     #redis.expire=3000
     #redis.maxTotal=100
@@ -103,9 +105,11 @@ spec:
               subPath: {{ .Values.servingServer.subPath }}
       {{- with .Values.servingServer.nodeSelector }}
       nodeSelector:
-      {{- range $k,$v := . }}
-        {{ $k }}: {{ $v }}
+{{ toYaml . | indent 8 }}
       {{- end }}
+      {{- with .Values.image.imagePullSecrets }}
+      imagePullSecrets:
+{{ toYaml . | indent 6 }}
       {{- end }}
       restartPolicy: Always
       volumes:
