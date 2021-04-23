@@ -138,8 +138,8 @@ drwxr-xr-x. 2 fate docker 6 May 27 00:51 fate
 进入目录`kubeFATE\docker-deploy`，然后运行：
 
 ```bash
-$ bash generate_config.sh          # 生成部署文件
-$ bash docker_deploy.sh all        # 在各个party上部署FATE
+$ ./generate_config.sh          # 生成部署文件
+$ ./docker_deploy.sh all        # 在各个party上部署FATE
 ```
 脚本将会生成10000、9999两个组织(Party)的部署文件，然后打包成tar文件。接着把tar文件`confs-<party-id>.tar`、`serving-<party-id>.tar`分别复制到party对应的主机上并解包，解包后的文件默认在`/data/projects/fate`目录下。然后脚本将远程登录到这些主机并使用docker compose命令启动FATE实例。
 
@@ -539,7 +539,7 @@ output:
 ### 删除部署
 在部署机器上运行以下命令可以停止所有FATE集群：
 ```bash
-bash docker_deploy.sh --delete all
+./docker_deploy.sh --delete all
 ```
 
 如果想要彻底删除在运行机器上部署的FATE，可以分别登录节点，然后运行命令：
@@ -568,7 +568,7 @@ $ docker exec -it confs-10000_python_1 bash
 
 解决办法：可以自己构建镜像，自己构建镜像参考[这里](https://github.com/FederatedAI/FATE/tree/master/docker-build)。
 
-#### 运行脚本`bash docker_deploy.sh all`的时候提示需要输入密码
+#### 运行脚本`./docker_deploy.sh all`的时候提示需要输入密码
 
 解决办法：检查免密登陆是否正常。ps:直接输入对应主机的用户密码也可以继续运行。
 
