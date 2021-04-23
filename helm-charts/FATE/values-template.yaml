@@ -240,14 +240,10 @@ modules:
     type: {{ .type }}
     nodeSelector: 
 {{ toYaml .nodeSelector | indent 6 }}
-    {{- end }}
-    {{- with .tolerations }}
     tolerations:
-{{toYaml . | indent 6 }}
-    {{- end }}
-    {{- with .affinity }}
+{{ toYaml .tolerations | indent 6 }}
     affinity:
-{{ toYaml . | indent 6 }}
+{{ toYaml .affinity | indent 6 }}
     {{- end }}
 
 
@@ -284,15 +280,15 @@ modules:
 
   fateboard:
     include: {{ has "fateboard" .modules }}
-    {{- with .spark }}
+    {{- with .fateboard }}
     type: {{ .type }}
-    {{- end }}
     nodeSelector:
 {{ toYaml .nodeSelector | indent 6 }}
     tolerations:
 {{ toYaml .tolerations | indent 6 }}
     affinity:
 {{ toYaml .affinity | indent 6 }}
+    {{- end}}
 
   spark:
     include: {{ has "spark" .modules }}
