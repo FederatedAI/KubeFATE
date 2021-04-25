@@ -27,6 +27,7 @@ modules:
     type: ClusterIP
     nodePort: 30001
     nodeSelector: 
+    # This is used to configure the cluster information of all parties that join in the exchange deployment mode. (When eggroll was used as the calculation engine at the time)
     partyList:
     # - partyId: 8888
       # partyIp: 192.168.8.1
@@ -39,6 +40,7 @@ modules:
     type: NodePort
     httpNodePort:  30003
     grpcNodePort:  30008
+    # This is used to configure the cluster information of all parties that join in the exchange deployment mode. (When Spark was used as the calculation engine at the time)
     route_table:
       # 10000: 
         # fateflow:
@@ -63,6 +65,7 @@ modules:
     type: ClusterIP
     nodePort: 30007
     nodeSelector: 
+    # This is used to configure the cluster information of all parties that join in the exchange deployment mode. (When Spark was used as the calculation engine at the time)
     route_table: 
       # sni:
       # - fqdn: 10000.fate.org
