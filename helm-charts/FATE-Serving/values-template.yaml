@@ -171,6 +171,8 @@ servingZookeeper:
 
 servingAdmin:
   include: {{ has "servingAdmin" .modules }}
+  type: {{.servingAdmin.type}}
+  port: {{.servingAdmin.nodePort}}
   ingerssHost: {{ .servingAdmin.ingerssHost | default "{{ .partyId }}.serving-admin.kubefate.net" }}
   {{- with .servingAdmin.nodeSelector }}
   nodeSelector:
