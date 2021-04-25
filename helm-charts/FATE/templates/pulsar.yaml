@@ -989,6 +989,14 @@ spec:
       nodeSelector: 
 {{ toYaml . | indent 8 }}
       {{- end }}
+      {{- with .Values.modules.pulsar.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.modules.pulsar.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+      {{- end }}
       {{- with .Values.image.imagePullSecrets }}
       imagePullSecrets:
 {{ toYaml . | indent 6 }}

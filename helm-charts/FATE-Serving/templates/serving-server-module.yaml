@@ -103,9 +103,15 @@ spec:
               subPath: {{ .Values.servingServer.subPath }}
       {{- with .Values.servingServer.nodeSelector }}
       nodeSelector:
-      {{- range $k,$v := . }}
-        {{ $k }}: {{ $v }}
+{{ toYaml . | indent 8 }}
       {{- end }}
+      {{- with .Values.servingServer.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.servingServer.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
       {{- end }}
       restartPolicy: Always
       volumes:
