@@ -37,3 +37,9 @@ python:
 
 servingIp: 192.168.10.1
 servingPort: 30105
+serving:
+  useRegistry: true
+  zookeeper:
+    hosts:
+    - serving-zookeeper.fate-serving-10000:2181
+    use_acl: false

@@ -12,6 +12,8 @@ modules:
   - servingProxy
   - servingRedis
   - servingServer
+  - servingZookeeper
+  - servingAdmin
 
 servingProxy: 
   nodePort: 30106
@@ -43,3 +45,9 @@ servingRedis:
   storageClass: "serving-redis"
   accessMode: ReadWriteOnce
   size: 1Gi
+
+servingZookeeper:
+  storageClassName: "managed-nfs-storage"
+
+servingAdmin:
+  ingerssHost: "10000.serving-admin.kubefate.net"
