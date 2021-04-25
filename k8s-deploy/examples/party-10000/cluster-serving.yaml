@@ -51,3 +51,5 @@ servingZookeeper:
 
 servingAdmin:
   ingerssHost: "10000.serving-admin.kubefate.net"
+  type: NodePort
+  nodePort: 30210
