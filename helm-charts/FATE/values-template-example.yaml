@@ -74,8 +74,30 @@ backend: eggroll
   # list:
   # - name: nodemanager
     # nodeSelector:
+      # kubernetes.io/hostname: localhost.localdomain
     # tolerations:
+      # - key: "swapenable"
+      #  operator: "Equal"
+      #  value: "true"
+      #  effect: "PreferNoSchedule"
     # affinity:
+      # nodeAffinity:
+      #   requiredDuringSchedulingIgnoredDuringExecution:
+      #     nodeSelectorTerms:
+      #       - matchExpressions:
+      #           - key: kubernetes.io/hostname
+      #             operator: In
+      #             values:
+      #               - localhost.localdomain
+      # podAntiAffinity:
+      #   requiredDuringSchedulingIgnoredDuringExecution:
+      #     - labelSelector:
+      #         matchExpressions:
+      #           - key: app
+      #             operator: In
+      #             values:
+      #               - nodemanager
+      #       topologyKey: kubernetes.io/hostname
     # sessionProcessorsPerNode: 4
     # subPath: "nodemanager"
     # existingClaim: ""

@@ -106,6 +106,7 @@ metadata:
   name: {{ $nodemanager.name }}
   labels:
     fateMoudle: {{ $nodemanager.name }}
+    app: nodemanager
 {{ include "fate.labels" $root | indent 4 }}
 spec:
   replicas: 1
@@ -119,6 +120,7 @@ spec:
     metadata:
       labels:
         fateMoudle: {{ $nodemanager.name }}
+        app: nodemanager
 {{ include "fate.labels" $root | indent 8 }}
     spec:
       containers:
