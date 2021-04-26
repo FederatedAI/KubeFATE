@@ -101,6 +101,7 @@ services:
       - ./confs/fate_flow/conf:/data/projects/fate/conf
       - ./confs/eggroll/conf:/data/projects/fate/eggroll/conf
       - fate_flow_logs:/data/projects/fate/logs
+      - ./shared_dir/data/model_local_cache:/data/projects/fate/model_local_cache
     depends_on:
       - mysql
       - rollsite
