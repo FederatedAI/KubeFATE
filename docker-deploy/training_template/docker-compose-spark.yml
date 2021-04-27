@@ -65,6 +65,7 @@ services:
       - shared_dir_examples:/data/projects/fate/examples
       - download_dir:/data/projects/fate/python/download_dir
       - fate_flow_logs:/data/projects/fate/logs
+      - ./shared_dir/data/model_local_cache:/data/projects/fate/model_local_cache
     networks:
       fate-network:
         ipv4_address: 192.167.0.100
