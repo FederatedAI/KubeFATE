@@ -1,4 +1,4 @@
-# Copyright 2019-2021 VMware, Inc.
+# Copyright 2019-2020 VMware, Inc.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -98,13 +98,13 @@ data:
             {{ .Values.partyId | quote }}: {
                 "default": [
                     {
-                        "ip": {{ .Values.servingProxy.ip | quote }},
+                        "ip": "serving-proxy",
                         "port": 8059
                     }
                 ],
                 "serving": [
                     {
-                        "ip": {{ .Values.servingServer.ip | quote }},
+                        "ip": "serving-server",
                         "port": 8000
                     }
                 ]
@@ -162,9 +162,13 @@ spec:
       nodeSelector:
 {{ toYaml . | indent 8 }}
       {{- end }}
-      {{- with .Values.image.imagePullSecrets }}
-      imagePullSecrets:
-{{ toYaml . | indent 6 }}
+      {{- with .Values.servingProxy.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.servingProxy.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
       {{- end }}
       restartPolicy: Always
       volumes:
@@ -191,9 +195,7 @@ spec:
     - name: "8869"
       port: 8869
       targetPort: 8869
-      {{- if eq .Values.servingProxy.type "NodePort" "LoadBalancer" }}
       nodePort: {{ .Values.servingProxy.nodePort }}
-      {{- end }}
       protocol: TCP
     - name: "8879"
       port: 8879
