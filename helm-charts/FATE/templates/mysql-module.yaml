@@ -219,6 +219,7 @@ spec:
       imagePullSecrets:
 {{ toYaml . | indent 6 }}
       {{- end }}
+      serviceAccountName: {{ .Values.partyName }}
       volumes:
         - name: mysql-confs
           configMap:

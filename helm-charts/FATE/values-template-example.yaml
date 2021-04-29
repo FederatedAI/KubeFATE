@@ -11,6 +11,8 @@ imagePullSecrets:
 persistence: false
 istio:
   enabled: false
+podSecurityPolicy:
+  enabled: false
 modules:
   - rollsite
   - clustermanager

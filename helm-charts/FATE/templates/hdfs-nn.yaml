@@ -132,6 +132,7 @@ spec:
       imagePullSecrets:
 {{ toYaml . | indent 6 }}
       {{- end }}
+      serviceAccountName: {{ .Values.partyName }}
       restartPolicy: Always
       volumes:
         - name: namenode-confs
