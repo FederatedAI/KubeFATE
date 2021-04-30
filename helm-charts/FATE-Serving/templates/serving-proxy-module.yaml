@@ -98,13 +98,13 @@ data:
             {{ .Values.partyId | quote }}: {
                 "default": [
                     {
-                        "ip": {{ .Values.servingProxy.ip | quote }},
+                        "ip": "serving-proxy",
                         "port": 8059
                     }
                 ],
                 "serving": [
                     {
-                        "ip": {{ .Values.servingServer.ip | quote }},
+                        "ip": "serving-server",
                         "port": 8000
                     }
                 ]
@@ -169,6 +169,10 @@ spec:
       {{- with .Values.servingProxy.affinity }}
       affinity:
 {{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.image.imagePullSecrets }}
+      imagePullSecrets:
+{{ toYaml . | indent 6 }}
       {{- end }}
       restartPolicy: Always
       volumes:
