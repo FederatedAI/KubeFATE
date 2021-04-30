@@ -171,7 +171,7 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /bitnami/zookeeper
-              subPath: {{ .Values.modules.mysql.subPath }}
+              subPath: {{ .Values.servingZookeeper.subPath }}
       {{- with .Values.servingZookeeper.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}

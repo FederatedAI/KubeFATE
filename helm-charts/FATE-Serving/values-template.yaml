@@ -16,8 +16,15 @@ image:
 persistence:
   enabled: {{ .persistence | default "false" }}
   
+{{- with .istio }}
 istio:
-  enabled: {{ .istio.enabled | default "false" }}
+  enabled: {{ .enabled | default false }}
+{{- end }}
+
+{{- with .podSecurityPolicy }}
+podSecurityPolicy:
+  enabled: {{ .enabled | default false }}
+{{- end }}
 
 servingProxy: 
   include: {{ has "servingProxy" .modules }}

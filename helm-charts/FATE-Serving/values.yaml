@@ -15,6 +15,9 @@ persistence:
 istio:
   enabled: false
 
+podSecurityPolicy:
+  enabled: false
+
 servingProxy: 
   include: true
   ip: serving-proxy
