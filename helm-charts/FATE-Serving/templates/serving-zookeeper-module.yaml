@@ -188,6 +188,8 @@ spec:
       imagePullSecrets:
 {{ toYaml . | indent 6 }}
       {{- end }}
+      serviceAccountName: {{ .Values.partyName }}
+      restartPolicy: Always
       volumes:
         {{- if not .Values.persistence.enabled }}
         - name: data
