@@ -2,25 +2,26 @@
 `cluster-serving.yaml` declares information about the FATE-Serving cluster to be deployed, which KubeFATE CLI uses to deploy the FATE-Serving cluster.
 
 ## cluster-exchange.yaml
-| Name                  | Type      | Description                                                  |
-| --------------------- | --------- | ------------------------------------------------------------ |
-| name                  | scalars   | FATE-Exchange cluster name.                                  |
-| namespace             | scalars   | Kubernetes namespace for FATE-Exchange cluster.              |
-| chartName             | scalars   | FATE chart name. (fate/fate-serving/fate-exchange)           |
-| chartVersion          | scalars   | FATE chart corresponding version.                            |
-| partyId               | scalars   | FATE-Exchange cluster party id.                              |
-| registry              | scalars   | Other fate images sources.                                   |
-| imageTag              | scalars   | Image TAG                                                    |
-| pullPolicy            | scalars   | Kubernetes images pull policy.                               |
-| persistence           | bool      | Redis and servingServer data persistence.                    |
-| modules               | sequences | Modules to be deployed in the FATE-Serving cluster.          |
-| rollsite              | mappings  | Configuration of FATE cluster `rollsite` module.             |
-| trafficServer         | mappings  | Configuration of FATE cluster `nodemanager` module.          |
-| nginx                 | mappings  | Configuration of FATE cluster `python` module.<br />If you use your own redis, please delete this item. |
-| externalRedisIp       | mappings  | Access your own Redis.                                       |
-| externalRedisPort     | scalars   | Access your own Redis.                                       |
-| externalRedisDatabase | scalars   | Access your own Redis.                                       |
-| externalRedisPassword | scalars   | Access your own Redis.                                       |
+| Name                      | Type      | Description                                                  |
+| ------------------------- | --------- | ------------------------------------------------------------ |
+| name                      | scalars   | FATE-Exchange cluster name.                                  |
+| namespace                 | scalars   | Kubernetes namespace for FATE-Exchange cluster.              |
+| chartName                 | scalars   | FATE chart name. (fate/fate-serving/fate-exchange)           |
+| chartVersion              | scalars   | FATE chart corresponding version.                            |
+| partyId                   | scalars   | FATE-Exchange cluster party id.                              |
+| registry                  | scalars   | Other fate images sources.                                   |
+| imageTag                  | scalars   | Image TAG                                                    |
+| pullPolicy                | scalars   | Kubernetes images pull policy.                               |
+| persistence               | bool      | Redis and servingServer data persistence.                    |
+| podSecurityPolicy.enabled | bool      | if `true`, create & use Pod Security Policy resources        |
+| modules                   | sequences | Modules to be deployed in the FATE-Serving cluster.          |
+| rollsite                  | mappings  | Configuration of FATE cluster `rollsite` module.             |
+| trafficServer             | mappings  | Configuration of FATE cluster `nodemanager` module.          |
+| nginx                     | mappings  | Configuration of FATE cluster `python` module.<br />If you use your own redis, please delete this item. |
+| externalRedisIp           | mappings  | Access your own Redis.                                       |
+| externalRedisPort         | scalars   | Access your own Redis.                                       |
+| externalRedisDatabase     | scalars   | Access your own Redis.                                       |
+| externalRedisPassword     | scalars   | Access your own Redis.                                       |
 
 ### rollsite mappings
 It is used to declare the `servingProxy` module in the FATE cluster to be deployed.

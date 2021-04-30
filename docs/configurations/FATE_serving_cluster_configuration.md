@@ -2,27 +2,28 @@
 `cluster-serving.yaml` declares information about the FATE-Serving cluster to be deployed, which KubeFATE CLI uses to deploy the FATE-Serving cluster.
 
 ## cluster-serving.yaml
-| Name                  | Type      | Description                                                  |
-| --------------------- | --------- | ------------------------------------------------------------ |
-| name                  | scalars   | FATE-Serving cluster name.                                   |
-| namespace             | scalars   | Kubernetes namespace for FATE-Serving cluster.               |
-| chartName             | scalars   | FATE chart name. (fate/fate-serving)                         |
-| chartVersion          | scalars   | FATE chart corresponding version.                            |
-| partyId               | scalars   | FATE-Serving cluster party id.                               |
-| registry              | scalars   | Other fate images sources.                                   |
-| pullPolicy            | scalars   | Kubernetes images pull policy.                               |
-| imagePullSecrets      | slice     | An **imagePullSecrets** is an authorization token, also known as a secret, that stores Docker credentials that are used for accessing a registry. |
-| persistence           | bool      | Redis and servingServer data persistence.                    |
-| istio                 | mappings  | Whether to open istio                                        |
-| modules               | sequences | Modules to be deployed in the FATE-Serving cluster.          |
-| servingAdmin          | mappings  | Configuration of FATE cluster `servingAdmin` module.         |
-| servingZookeeper      | mappings  | Configuration of FATE cluster `servingZookeeper` module.     |
-| servingProxy          | mappings  | Configuration of FATE cluster `rollsite` module.             |
-| servingServer         | mappings  | Configuration of FATE cluster `nodemanager` module.          |
-| servingRedis          | mappings  | Configuration of FATE cluster `python` module.<br />If you use your own redis, please delete this item. |
-| externalRedisIp       | scalars   | Access your own Redis.                                       |
-| externalRedisPort     | scalars   | Access your own Redis.                                       |
-| externalRedisPassword | scalars   | Access your own Redis.                                       |
+| Name                      | Type      | Description                                                  |
+| ------------------------- | --------- | ------------------------------------------------------------ |
+| name                      | scalars   | FATE-Serving cluster name.                                   |
+| namespace                 | scalars   | Kubernetes namespace for FATE-Serving cluster.               |
+| chartName                 | scalars   | FATE chart name. (fate/fate-serving)                         |
+| chartVersion              | scalars   | FATE chart corresponding version.                            |
+| partyId                   | scalars   | FATE-Serving cluster party id.                               |
+| registry                  | scalars   | Other fate images sources.                                   |
+| pullPolicy                | scalars   | Kubernetes images pull policy.                               |
+| imagePullSecrets          | slice     | An **imagePullSecrets** is an authorization token, also known as a secret, that stores Docker credentials that are used for accessing a registry. |
+| persistence               | bool      | Redis and servingServer data persistence.                    |
+| istio                     | mappings  | Whether to open istio                                        |
+| podSecurityPolicy.enabled | bool      | if `true`, create & use Pod Security Policy resources        |
+| modules                   | sequences | Modules to be deployed in the FATE-Serving cluster.          |
+| servingAdmin              | mappings  | Configuration of FATE cluster `servingAdmin` module.         |
+| servingZookeeper          | mappings  | Configuration of FATE cluster `servingZookeeper` module.     |
+| servingProxy              | mappings  | Configuration of FATE cluster `rollsite` module.             |
+| servingServer             | mappings  | Configuration of FATE cluster `nodemanager` module.          |
+| servingRedis              | mappings  | Configuration of FATE cluster `python` module.<br />If you use your own redis, please delete this item. |
+| externalRedisIp           | scalars   | Access your own Redis.                                       |
+| externalRedisPort         | scalars   | Access your own Redis.                                       |
+| externalRedisPassword     | scalars   | Access your own Redis.                                       |
 
 ### servingAdmin mappings
 
