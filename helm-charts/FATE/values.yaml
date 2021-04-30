@@ -45,7 +45,9 @@ modules:
     ip: rollsite
     type: ClusterIP
     nodePort: 30091
-    nodeSelector: 
+    nodeSelector:
+    tolerations:
+    affinity:
   lbrollsite:
     include: true
     ip: rollsite
@@ -53,12 +55,16 @@ modules:
     nodePort: 30091
     size: "2M"
     nodeSelector:
+    tolerations:
+    affinity:
   python: 
     include: true
     type: ClusterIP
     httpNodePort: 30097
     grpcNodePort: 30092
-    nodeSelector: 
+    nodeSelector:
+    tolerations:
+    affinity:
     backend: eggroll
     enabledNN: false
     spark: 
@@ -90,12 +96,16 @@ modules:
     include: true
     ip: clustermanager
     type: ClusterIP
-    nodeSelector: 
+    nodeSelector:
+    tolerations:
+    affinity:
   nodemanager:  
     include: true
     list:
     - name: nodemanager-0
-      nodeSelector: 
+      nodeSelector:
+      tolerations:
+      affinity:
       sessionProcessorsPerNode: 2
       subPath: "nodemanager-0"
       existingClaim: ""
@@ -103,7 +113,9 @@ modules:
       accessMode: ReadWriteOnce
       size: 1Gi
     - name: nodemanager-1
-      nodeSelector: 
+      nodeSelector:
+      tolerations:
+      affinity:
       sessionProcessorsPerNode: 2
       subPath: "nodemanager-1"
       existingClaim: ""
@@ -114,11 +126,15 @@ modules:
     include: true
     ip: client
     type: ClusterIP
-    nodeSelector: 
+    nodeSelector:
+    tolerations:
+    affinity:
   mysql: 
     include: true
     type: ClusterIP
-    nodeSelector: 
+    nodeSelector:
+    tolerations:
+    affinity:
     ip: mysql
     port: 3306
     database: eggroll_meta
@@ -133,9 +149,17 @@ modules:
   serving:
     ip: 192.168.9.1
     port: 30095
+    useRegistry: false
+    zookeeper:
+      hosts:
+        - serving-zookeeper.fate-serving-9999:2181
+      use_acl: false
   fateboard:
     include: true
     type: ClusterIP
+    nodeSelector:
+    tolerations:
+    affinity:
   spark:
     include: true
     master:
@@ -144,7 +168,9 @@ modules:
       replicas: 1
       cpu: "100m"
       memory: "512Mi"
-      nodeSelector: 
+      nodeSelector:
+      tolerations:
+      affinity:
       type: ClusterIP
     worker:
       Image: ""
@@ -152,19 +178,27 @@ modules:
       replicas: 2
       cpu: "1000m"
       memory: "512Mi"
-      nodeSelector: 
+      nodeSelector:
+      tolerations:
+      affinity:
       type: ClusterIP
   hdfs:
     include: true
     namenode:
-      nodeSelector: 
+      nodeSelector:
+      tolerations:
+      affinity:
       type: ClusterIP
     datanode:
-      nodeSelector: 
+      nodeSelector:
+      tolerations:
+      affinity:
       type: ClusterIP
   nginx:
     include: true
-    nodeSelector: 
+    nodeSelector:
+    tolerations:
+    affinity:
     type: ClusterIP
     httpNodePort: 30093
     grpcNodePort: 30098
@@ -184,7 +218,9 @@ modules:
 #          grpc_port: 30102
   rabbitmq:
     include: true
-    nodeSelector: 
+    nodeSelector:
+    tolerations:
+    affinity:
     type: ClusterIP
     nodePort: 30094
     default_user: fate
@@ -195,9 +231,12 @@ modules:
 #      10000:
 #        host: 192.168.10.1 
 #        port: 30104
+
   pulsar:
     include: true
-    nodeSelector: 
+    nodeSelector:
+    tolerations:
+    affinity:
     type: ClusterIP
     httpNodePort: 30094
     httpsNodePort: 30099

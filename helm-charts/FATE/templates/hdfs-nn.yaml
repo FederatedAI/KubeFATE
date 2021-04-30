@@ -120,6 +120,14 @@ spec:
       nodeSelector: 
 {{ toYaml . | indent 8 }}
       {{- end }}
+      {{- with .Values.modules.hdfs.namenode.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.modules.hdfs.namenode.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+      {{- end }}
       {{- with .Values.image.imagePullSecrets }}
       imagePullSecrets:
 {{ toYaml . | indent 6 }}

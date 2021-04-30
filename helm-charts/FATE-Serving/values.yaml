@@ -19,7 +19,9 @@ servingProxy:
   type: NodePort
   nodePort: 30109
   ingerssHost: 9999.serving-proxy.kubefate.net
-  nodeSelector: {}
+  nodeSelector:
+  tolerations:
+  affinity:
   partyList:
   - partyId: 10000
     partyIp: 192.168.10.1
@@ -31,7 +33,9 @@ servingRedis:
   port: 6379                # required
   type: ClusterIP           
   password: fate_dev     # required
-  nodeSelector: {}
+  nodeSelector:
+  tolerations:
+  affinity:
   subPath: ""
   existingClaim: ""
   storageClass: "serving-redis"
@@ -47,7 +51,9 @@ servingServer:
   fateflow:
     ip: fateflow
     port: 9380
-  nodeSelector:  {}
+  nodeSelector:
+  tolerations:
+  affinity:
   subPath: ""
   existingClaim: ""
   storageClass: "serving-server"
@@ -63,12 +69,22 @@ servingAdmin:
   fateflow:
     ip: fateflow
     port: 9380
-  nodeSelector:  {}
+  nodeSelector:
+  tolerations:
+  affinity:
   subPath: ""
   existingClaim: ""
   storageClass: "serving-server"
   accessMode: ReadWriteOnce
+  ingerssHost: 9999.serving-admin.kubefate.net
   size: 1Gi
+
+servingZookeeper:
+  include: true
+  storageClassName: "managed-nfs-storage"
+  nodeSelector:
+  tolerations:
+  affinity:
 
 istio:
   enabled: false

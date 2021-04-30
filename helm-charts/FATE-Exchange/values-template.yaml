@@ -34,6 +34,14 @@ modules:
     nodeSelector: 
 {{ toYaml . | indent 6 }}
     {{- end }}
+    {{- with .tolerations }}
+    tolerations:
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    {{- with .affinity }}
+    affinity:
+{{ toYaml . | indent 6 }}
+    {{- end }}
     type: {{ .type }}
     nodePort: {{ .nodePort }}
     partyList:
@@ -64,6 +72,14 @@ modules:
     {{- with .trafficServer }}
     {{- with .nodeSelector }}
     nodeSelector: 
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    {{- with .tolerations }}
+    tolerations:
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    {{- with .affinity }}
+    affinity:
 {{ toYaml . | indent 6 }}
     {{- end }}
     type: {{ .type }}

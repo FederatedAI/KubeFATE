@@ -21,9 +21,14 @@ rollsite:
   - partyId: 10000
     partyIp: 192.168.0.1
     partyPort: 30101
-  nodeSelector: 
+  nodeSelector:
+  tolerations:
+  affinity:
 
 trafficServer:
+  nodeSelector:
+  tolerations:
+  affinity:
   type: NodePort
   nodePort: 30007
   route_table: 
@@ -34,7 +39,9 @@ trafficServer:
       tunnelRoute: 192.168.0.3:30099
 
 nginx:
-  nodeSelector: 
+  nodeSelector:
+  tolerations:
+  affinity:
   type: NodePort
   httpNodePort: 30003
   grpcNodePort: 30008

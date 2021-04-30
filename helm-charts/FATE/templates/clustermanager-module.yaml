@@ -57,8 +57,16 @@ spec:
             - mountPath: /data/projects/fate/eggroll/conf/eggroll.properties
               name: eggroll-confs
               subPath: eggroll.properties
-      {{- with .Values.modules.mysql.nodeSelector }}
+      {{- with .Values.modules.clustermanager.nodeSelector }}
       nodeSelector: 
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.modules.clustermanager.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.modules.clustermanager.affinity }}
+      affinity:
 {{ toYaml . | indent 8 }}
       {{- end }}
       {{- with .Values.image.imagePullSecrets }}

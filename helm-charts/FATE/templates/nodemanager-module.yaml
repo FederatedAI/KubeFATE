@@ -106,6 +106,7 @@ metadata:
   name: {{ $nodemanager.name }}
   labels:
     fateMoudle: {{ $nodemanager.name }}
+    app: nodemanager
 {{ include "fate.labels" $root | indent 4 }}
 spec:
   replicas: 1
@@ -119,6 +120,7 @@ spec:
     metadata:
       labels:
         fateMoudle: {{ $nodemanager.name }}
+        app: nodemanager
 {{ include "fate.labels" $root | indent 8 }}
     spec:
       containers:
@@ -165,6 +167,14 @@ spec:
               subPath: {{ $nodemanager.subPath }}
       {{- with $nodemanager.nodeSelector }}
       nodeSelector: 
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with $nodemanager.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with $nodemanager.affinity }}
+      affinity:
 {{ toYaml . | indent 8 }}
       {{- end }}
       {{- with $root.Values.image.imagePullSecrets }}

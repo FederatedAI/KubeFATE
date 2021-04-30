@@ -74,6 +74,14 @@ modules:
     nodeSelector: 
 {{ toYaml . | indent 6 }}
     {{- end }}
+    {{- with .tolerations }}
+    tolerations:
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    {{- with .affinity }}
+    affinity:
+{{ toYaml . | indent 6 }}
+    {{- end }}
     {{- end }}
 
 
@@ -88,6 +96,14 @@ modules:
     nodeSelector:
 {{ toYaml . | indent 6 }}
     {{- end }}
+    {{- with .tolerations }}
+    tolerations:
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    {{- with .affinity }}
+    affinity:
+{{ toYaml . | indent 6 }}
+    {{- end }}
     {{- end }}
 
 
@@ -100,6 +116,14 @@ modules:
     grpcNodePort: {{ .grpcNodePort }}
     {{- with .nodeSelector }}
     nodeSelector: 
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    {{- with .tolerations }}
+    tolerations:
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    {{- with .affinity }}
+    affinity:
 {{ toYaml . | indent 6 }}
     {{- end }}
     enabledNN: {{ .enabledNN | default false }}
@@ -150,6 +174,14 @@ modules:
     nodeSelector: 
 {{ toYaml . | indent 6 }}
     {{- end }}
+    {{- with .tolerations }}
+    tolerations:
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    {{- with .affinity }}
+    affinity:
+{{ toYaml . | indent 6 }}
+    {{- end }}
     {{- end }}
 
 
@@ -161,6 +193,14 @@ modules:
     {{- range .count | int | until }}
     - name: nodemanager-{{ . }}
       nodeSelector: {}
+      {{- with $nodemanager.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+      {{- end}}
+      {{- with $nodemanager.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+      {{- end}}
       sessionProcessorsPerNode: {{ $nodemanager.sessionProcessorsPerNode }}
       subPath: "nodemanager-{{ . }}"
       existingClaim: ""
@@ -173,6 +213,14 @@ modules:
     - name: {{ .name }}
       {{- with .nodeSelector }}
       nodeSelector: 
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .affinity }}
+      affinity:
 {{ toYaml . | indent 8 }}
       {{- end }}
       sessionProcessorsPerNode: {{ .sessionProcessorsPerNode }}
@@ -192,6 +240,10 @@ modules:
     type: {{ .type }}
     nodeSelector: 
 {{ toYaml .nodeSelector | indent 6 }}
+    tolerations:
+{{ toYaml .tolerations | indent 6 }}
+    affinity:
+{{ toYaml .affinity | indent 6 }}
     {{- end }}
 
 
@@ -201,6 +253,10 @@ modules:
     type: {{ .type }}
     nodeSelector: 
 {{ toYaml .nodeSelector | indent 6 }}
+    tolerations:
+{{ toYaml .tolerations | indent 6 }}
+    affinity:
+{{ toYaml .affinity | indent 6 }}
     ip: {{ .ip | default "mysql" }}
     port: {{ .port | default "3306" }}
     database: {{ .database | default "eggroll_meta" }}
@@ -217,14 +273,22 @@ modules:
   serving:
     ip: {{ .servingIp }}
     port: {{ .servingPort }}
+    useRegistry: {{ .serving.useRegistry | default false }}
+    zookeeper:
+{{ toYaml .serving.zookeeper | indent 6 }}
 
 
   fateboard:
     include: {{ has "fateboard" .modules }}
-    {{- with .spark }}
+    {{- with .fateboard }}
     type: {{ .type }}
-    {{- end }}
-
+    nodeSelector:
+{{ toYaml .nodeSelector | indent 6 }}
+    tolerations:
+{{ toYaml .tolerations | indent 6 }}
+    affinity:
+{{ toYaml .affinity | indent 6 }}
+    {{- end}}
 
   spark:
     include: {{ has "spark" .modules }}
@@ -237,6 +301,10 @@ modules:
       memory: "{{ .master.memory }}"
       nodeSelector: 
 {{ toYaml .master.nodeSelector | indent 8 }}
+      tolerations:
+{{ toYaml .master.tolerations | indent 8 }}
+      affinity:
+{{ toYaml .master.affinity | indent 8 }}
       type: {{ .type }}
     worker:
       Image: "{{ .worker.Image }}"
@@ -246,6 +314,10 @@ modules:
       memory: "{{ .worker.memory }}"
       nodeSelector: 
 {{ toYaml .worker.nodeSelector | indent 8 }}
+      tolerations:
+{{ toYaml .worker.tolerations | indent 8 }}
+      affinity:
+{{ toYaml .worker.affinity | indent 8 }}
       type: {{ .type }}
     {{- end }}
 
@@ -256,10 +328,18 @@ modules:
     namenode:
       nodeSelector: 
 {{ toYaml .namenode.nodeSelector | indent 8 }}
+      tolerations:
+{{ toYaml .namenode.tolerations | indent 8 }}
+      affinity:
+{{ toYaml .namenode.affinity | indent 8 }}
       type: ClusterIP
     datanode:
       nodeSelector: 
 {{ toYaml .datanode.nodeSelector | indent 8 }}
+      tolerations:
+{{ toYaml .datanode.tolerations | indent 8 }}
+      affinity:
+{{ toYaml .datanode.affinity | indent 8 }}
       type: ClusterIP
     {{- end }}
 
@@ -269,6 +349,14 @@ modules:
     {{- with .nginx }}
     {{- with .nodeSelector }}
     nodeSelector: 
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    {{- with .tolerations }}
+    tolerations:
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    {{- with .affinity }}
+    affinity:
 {{ toYaml . | indent 6 }}
     {{- end }}
     type: {{ .type }}
@@ -292,7 +380,15 @@ modules:
     include: {{ has "rabbitmq" .modules }}
     {{- with .rabbitmq }}
     {{- with .nodeSelector }}
-    nodeSelector: 
+    nodeSelector:
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    {{- with .tolerations }}
+    tolerations:
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    {{- with .affinity }}
+    affinity:
 {{ toYaml . | indent 6 }}
     {{- end }}
     type: {{ .type }}
@@ -313,7 +409,15 @@ modules:
     include: {{ has "pulsar" .modules }}
     {{- with .pulsar }}
     {{- with .nodeSelector }}
-    nodeSelector: 
+    nodeSelector:
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    {{- with .tolerations }}
+    tolerations:
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    {{- with .affinity }}
+    affinity:
 {{ toYaml . | indent 6 }}
     {{- end }}
     type: {{ .type }}

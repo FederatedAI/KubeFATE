@@ -13,6 +13,8 @@ modules:
   - servingProxy
   - servingRedis
   - servingServer
+  - servingZookeeper
+  - servingAdmin
 
 servingProxy: 
   nodePort: 30310
@@ -24,6 +26,9 @@ servingProxy:
   exchange:
     ip: 192.168.1.1
     port: 30100
+  nodeSelector:
+  tolerations:
+  affinity:
 
 servingServer:
   type: NodePort
@@ -36,10 +41,15 @@ servingServer:
   storageClass: "serving-server"
   accessMode: ReadWriteOnce
   size: 1Gi
+  nodeSelector:
+  tolerations:
+  affinity:
 
 servingRedis:
   password: fate_dev
-  nodeSelector: {}
+  nodeSelector:
+  tolerations:
+  affinity:
   subPath: ""
   existingClaim: ""
   storageClass: "serving-redis"
@@ -51,3 +61,17 @@ externalRedisIp: serving-redis
 externalRedisPort: 6379
 externalRedisDatabase: 0
 externalRedisPassword: fate_dev
+
+servingZookeeper:
+  storageClassName: "managed-nfs-storage"
+  nodeSelector:
+  tolerations:
+  affinity:
+
+servingAdmin:
+  ingerssHost: 10000.serving-admin.kubefate.net
+  type: NodePort
+  nodePort: 30209
+  nodeSelector:
+  tolerations:
+  affinity:
