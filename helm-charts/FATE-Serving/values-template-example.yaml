@@ -21,7 +21,7 @@ servingProxy:
   ingerssHost: 10000.serving-proxy.kubefate.net
   partyList:
   - partyId: 9999
-    partyIp: 10.186.216.97
+    partyIp: 192.168.09.1
     partyPort: 30309
   exchange:
     ip: 192.168.1.1
@@ -34,7 +34,7 @@ servingServer:
   type: NodePort
   nodePort: 30210
   fateflow:
-    ip: 10.186.212.217
+    ip: 192.168.10.1
     port: 30110
   subPath: ""
   existingClaim: ""
@@ -56,7 +56,7 @@ servingRedis:
   accessMode: ReadWriteOnce
   size: 1Gi
   
-# 如果不安装Redis的时候配置
+
 externalRedisIp: serving-redis
 externalRedisPort: 6379
 externalRedisDatabase: 0

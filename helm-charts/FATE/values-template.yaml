@@ -391,6 +391,12 @@ modules:
     type: {{ .type }}
     httpNodePort:  {{ .httpNodePort }}
     grpcNodePort:  {{ .grpcNodePort }}
+    {{- with .exchange }}
+    exchange:
+      ip: {{ .ip }}
+      httpPort: {{ .httpPort }}
+      grpcPort: {{ .grpcPort }}
+    {{- end }}
     route_table: 
       {{- range $key, $val := .route_table }}
       {{ $key }}: 
