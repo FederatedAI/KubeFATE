@@ -10,14 +10,13 @@ persistence: false
 istio:
   enabled: false
 modules:
+  - rollsite
   - trafficServer
+  - nginx
 
 rollsite: 
   type: NodePort
-  nodePort: 30091
-  exchange:
-    ip: 192.168.0.1
-    port: 30000
+  nodePort: 30001
   partyList:
   - partyId: 10000
     partyIp: 192.168.0.1
@@ -27,14 +26,41 @@ rollsite:
   affinity:
 
 trafficServer:
-  type: ClusterIP
-  nodePort: 30097
-  route_table: 
-    sni:
-    - fqdn: 10000.fate.org
-      tunnelRoute: 192.168.0.2:6651
-    - fqdn: 9999.fate.org
-      tunnelRoute: 192.168.0.3:6651
   nodeSelector:
   tolerations:
   affinity:
+  type: NodePort
+  nodePort: 30007
+  route_table: 
+    sni:
+    - fqdn: 10000.fate.org
+      tunnelRoute: 192.168.0.2:30109
+    - fqdn: 9999.fate.org
+      tunnelRoute: 192.168.0.3:30099
+
+nginx:
+  nodeSelector:
+  tolerations:
+  affinity:
+  type: NodePort
+  httpNodePort: 30003
+  grpcNodePort: 30008
+  route_table: 
+    9999: 
+      proxy: 
+        - host: 192.168.9.1 
+          http_port: 30093
+          grpc_port: 30098 
+      fateflow: 
+        - host: 192.168.9.1
+          http_port: 30097
+          grpc_port: 30092
+    10000: 
+      proxy: 
+        - host: 192.168.10.1 
+          http_port: 30103
+          grpc_port: 30108 
+      fateflow: 
+        - host: 192.168.10.1
+          http_port: 30107
+          grpc_port: 30102

@@ -131,7 +131,7 @@ data:
     ttlDurationDefaultInSeconds=0
     
     # Enable the deletion of inactive topics
-    brokerDeleteInactiveTopicsEnabled=false
+    brokerDeleteInactiveTopicsEnabled=true
     
     # How often to check for inactive topics
     brokerDeleteInactiveTopicsFrequencySeconds=60

@@ -116,6 +116,7 @@ data:
         host: {{ .Values.modules.python.pulsar.host }}
         port: {{ .Values.modules.python.pulsar.port }}
         mng_port: {{ .Values.modules.python.pulsar.mng_port }}
+        topic_ttl: 3
         # default conf/pulsar_route_table.yaml
         route_table: {{ .Values.modules.python.pulsar.route_table }}
       nginx:
