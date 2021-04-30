@@ -111,6 +111,7 @@ spec:
       affinity:
 {{ toYaml . | indent 8 }}
       {{- end }}
+      serviceAccountName: {{ .Values.partyName }}
       restartPolicy: Always
       volumes:
         - name: traffic-server-confs

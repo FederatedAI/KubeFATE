@@ -12,6 +12,9 @@ image:
 partyId: 9999
 partyName: fate-9999
 
+podSecurityPolicy:
+  enabled: false
+  
 partyList:
 - partyId: 8888
   partyIp: 192.168.8.1
