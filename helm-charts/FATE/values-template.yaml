@@ -464,3 +464,9 @@ modules:
       {{- end }}
     {{- end }}
     
+
+externalMysqlIp: {{ .externalMysqlIp }}
+externalMysqlPort: {{ .externalMysqlPort }}
+externalMysqlDatabase: {{ .externalMysqlDatabase }}
+externalMysqlUser: {{ .externalMysqlUser }}
+externalMysqlPassword: {{ .externalMysqlPassword }}

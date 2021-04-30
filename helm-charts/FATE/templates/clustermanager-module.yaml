@@ -73,7 +73,7 @@ spec:
       imagePullSecrets:
 {{ toYaml . | indent 6 }}
       {{- end }}
-      serviceAccountName: {{ .Values.partyName }}
+      serviceAccountName: {{ template "serviceAccountName" . }}
       restartPolicy: Always
       volumes:
         - name: eggroll-confs

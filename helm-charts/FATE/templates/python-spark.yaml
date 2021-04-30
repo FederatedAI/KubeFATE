@@ -80,11 +80,11 @@ data:
       host: fateboard
       port: 8080
     database:
-      name: '{{ .Values.modules.mysql.database }}'
-      user: '{{ .Values.modules.mysql.user }}'
-      passwd: '{{ .Values.modules.mysql.password }}'
-      host: '{{ .Values.modules.mysql.ip }}'
-      port: {{ .Values.modules.mysql.port }}
+      name: '{{ .Values.externalMysqlDatabase | default .Values.modules.mysql.database | default "eggroll_meta" }}'
+      user: '{{ .Values.externalMysqlUser | default .Values.modules.mysql.user | default "fate" }}'
+      passwd: '{{ .Values.externalMysqlPassword | default .Values.modules.mysql.password | default "fate_dev" }}'
+      host: '{{ .Values.externalMysqlIp | default .Values.modules.mysql.ip | default "mysql" }}'
+      port: {{ .Values.externalMysqlPort | default .Values.modules.mysql.port | default "3306" }}
       max_connections: 100
       stale_timeout: 30
     fate_on_eggroll:
@@ -125,11 +125,11 @@ data:
         grpc_port: {{ .Values.modules.python.nginx.grpc_port }}
     model_store_address:
       storage: mysql
-      name: model
-      host: '{{ .Values.modules.mysql.ip }}'
-      port: {{ .Values.modules.mysql.port }}
-      user: '{{ .Values.modules.mysql.user }}'
-      passwd: '{{ .Values.modules.mysql.password }}'
+      name: {{ .Values.externalMysqlDatabase | default .Values.modules.mysql.database | default "eggroll_meta" }}
+      host: '{{ .Values.externalMysqlIp | default .Values.modules.mysql.ip | default "mysql" }}'
+      port: {{ .Values.externalMysqlPort | default .Values.modules.mysql.port | default "3306" }}
+      user: '{{ .Values.externalMysqlUser | default .Values.modules.mysql.user | default "fate" }}'
+      passwd: '{{ .Values.externalMysqlPassword | default .Values.modules.mysql.password | default "fate_dev" }}'
       max_connections: 10
       stale_timeout: 10
     servings:
@@ -165,9 +165,9 @@ data:
     spring.http.encoding.charset=UTF-8
     spring.http.encoding.enabled=true
     server.tomcat.uri-encoding=UTF-8
-    fateboard.datasource.jdbc-url=jdbc:mysql://{{ .Values.modules.mysql.ip }}:{{ .Values.modules.mysql.port }}/{{ .Values.modules.mysql.database }}?characterEncoding=utf8&characterSetResults=utf8&autoReconnect=true&failOverReadOnly=false&serverTimezone=GMT%2B8
-    fateboard.datasource.username={{ .Values.modules.mysql.user }}
-    fateboard.datasource.password={{ .Values.modules.mysql.password }}
+    fateboard.datasource.jdbc-url=jdbc:mysql://{{ .Values.externalMysqlIp | default .Values.modules.mysql.ip | default "mysql" }}:{{ .Values.externalMysqlPort | default .Values.modules.mysql.port | default "3306" }}/{{ .Values.externalMysqlDatabase | default .Values.modules.mysql.database | default "eggroll_meta" }}?characterEncoding=utf8&characterSetResults=utf8&autoReconnect=true&failOverReadOnly=false&serverTimezone=GMT%2B8
+    fateboard.datasource.username={{ .Values.externalMysqlUser | default .Values.modules.mysql.user | default "fate" }}
+    fateboard.datasource.password={{ .Values.externalMysqlPassword | default .Values.modules.mysql.password | default "fate_dev" }}
     server.tomcat.max-threads=1000
     server.tomcat.max-connections=20000
     spring.servlet.multipart.max-file-size=10MB
@@ -211,15 +211,15 @@ spec:
         name: ping-mysql
         env:
         - name: MYSQL_DATABASE
-          value: {{ .Values.modules.mysql.database }}
+          value: "{{ .Values.externalMysqlDatabase | default .Values.modules.mysql.database | default "eggroll_meta" }}"
         - name: MYSQL_USER
-          value: {{ .Values.modules.mysql.user }}
+          value: "{{ .Values.externalMysqlUser | default .Values.modules.mysql.user | default "fate" }}"
         - name: MYSQL_PASSWORD
-          value: {{ .Values.modules.mysql.password }}
+          value: "{{ .Values.externalMysqlPassword | default .Values.modules.mysql.password | default "fate_dev" }}"
         - name: MYSQL_HOST
-          value: {{ .Values.modules.mysql.ip }}
+          value: "{{ .Values.externalMysqlIp | default .Values.modules.mysql.ip | default "mysql" }}"
         - name: MYSQL_PORT
-          value: {{ .Values.modules.mysql.port  | quote }}
+          value: "{{ .Values.externalMysqlPort | default .Values.modules.mysql.port | default "3306" | }}"
         command:
         - /bin/bash
         - -c
@@ -349,7 +349,7 @@ spec:
       imagePullSecrets:
 {{ toYaml . | indent 6 }}
       {{- end }}
-      serviceAccountName: {{ .Values.partyName }}
+      serviceAccountName: {{ template "serviceAccountName" . }}
       restartPolicy: Always
       volumes:
         - name: eggroll-confs
