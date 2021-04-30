@@ -82,13 +82,13 @@ GenerateConfig() {
 		if [ "$backend" == "spark_rabbitmq" ]; then
 			cp -r training_template/backends/spark/* confs-$party_id/confs/
 			cp training_template/docker-compose-spark.yml confs-$party_id/docker-compose.yml
-			sed -i '144,159d' confs-$party_id/docker-compose.yml
+			sed -i '146,162d' confs-$party_id/docker-compose.yml
 		fi
 
 		if [ "$backend" == "spark_pulsar" ]; then
 			cp -r training_template/backends/spark/* confs-$party_id/confs/
 			cp training_template/docker-compose-spark.yml confs-$party_id/docker-compose.yml
-			sed -i '127,144d' confs-$party_id/docker-compose.yml
+			sed -i '129,145d' confs-$party_id/docker-compose.yml
 		fi
 
 		if [ "$backend" == "eggroll" ]; then
