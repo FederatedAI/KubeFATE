@@ -34,6 +34,11 @@ istio:
   enabled: {{ .enabled | default false }}
 {{- end }}
 
+{{- with .podSecurityPolicy }}
+podSecurityPolicy:
+  enabled: {{ .enabled | default false }}
+{{- end }}
+
 exchange:
 {{- with .rollsite }}
 {{- with .exchange }}
@@ -192,7 +197,10 @@ modules:
     {{- $nodemanager := . }}
     {{- range .count | int | until }}
     - name: nodemanager-{{ . }}
-      nodeSelector: {}
+      {{- with $nodemanager.nodeSelector }}
+      nodeSelector: 
+{{ toYaml . | indent 8 }}
+      {{- end}}
       {{- with $nodemanager.tolerations }}
       tolerations:
 {{ toYaml . | indent 8 }}
@@ -208,28 +216,6 @@ modules:
       accessMode: {{ $nodemanager.accessMode }}
       size: {{ $nodemanager.size }}
     {{- end }}
-
-    {{- range  $nodemanager.list }}
-    - name: {{ .name }}
-      {{- with .nodeSelector }}
-      nodeSelector: 
-{{ toYaml . | indent 8 }}
-      {{- end }}
-      {{- with .tolerations }}
-      tolerations:
-{{ toYaml . | indent 8 }}
-      {{- end }}
-      {{- with .affinity }}
-      affinity:
-{{ toYaml . | indent 8 }}
-      {{- end }}
-      sessionProcessorsPerNode: {{ .sessionProcessorsPerNode }}
-      subPath: {{ .subPath }}
-      existingClaim: {{ .existingClaim }}
-      storageClass: {{ .storageClass }}
-      accessMode: {{ .accessMode }}
-      size: {{ .size }}
-    {{- end }}
     {{- end }}
 
 
@@ -238,12 +224,18 @@ modules:
     {{- with .client }}
     ip: {{ .ip }}
     type: {{ .type }}
+    {{- with .nodeSelector }}
     nodeSelector: 
-{{ toYaml .nodeSelector | indent 6 }}
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    {{- with .tolerations }}
     tolerations:
-{{ toYaml .tolerations | indent 6 }}
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    {{- with .affinity }}
     affinity:
-{{ toYaml .affinity | indent 6 }}
+{{ toYaml . | indent 6 }}
+    {{- end }}
     {{- end }}
 
 
@@ -251,12 +243,18 @@ modules:
     include: {{ has "mysql" .modules }}
     {{- with .mysql }}
     type: {{ .type }}
+    {{- with .nodeSelector }}
     nodeSelector: 
-{{ toYaml .nodeSelector | indent 6 }}
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    {{- with .tolerations }}
     tolerations:
-{{ toYaml .tolerations | indent 6 }}
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    {{- with .affinity }}
     affinity:
-{{ toYaml .affinity | indent 6 }}
+{{ toYaml . | indent 6 }}
+    {{- end }}
     ip: {{ .ip | default "mysql" }}
     port: {{ .port | default "3306" }}
     database: {{ .database | default "eggroll_meta" }}
@@ -273,21 +271,28 @@ modules:
   serving:
     ip: {{ .servingIp }}
     port: {{ .servingPort }}
-    useRegistry: {{ .serving.useRegistry | default false }}
+    {{- with .serving }}
+    useRegistry: {{ .useRegistry | default false }}
     zookeeper:
-{{ toYaml .serving.zookeeper | indent 6 }}
-
+{{ toYaml .zookeeper | indent 6 }}
+    {{- end}}
 
   fateboard:
     include: {{ has "fateboard" .modules }}
     {{- with .fateboard }}
     type: {{ .type }}
-    nodeSelector:
-{{ toYaml .nodeSelector | indent 6 }}
+    {{- with .nodeSelector }}
+    nodeSelector: 
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    {{- with .tolerations }}
     tolerations:
-{{ toYaml .tolerations | indent 6 }}
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    {{- with .affinity }}
     affinity:
-{{ toYaml .affinity | indent 6 }}
+{{ toYaml . | indent 6 }}
+    {{- end }}
     {{- end}}
 
   spark:
@@ -299,12 +304,18 @@ modules:
       replicas: {{ .master.replicas }}
       cpu: "{{ .master.cpu }}"
       memory: "{{ .master.memory }}"
+      {{- with .master.nodeSelector }}
       nodeSelector: 
-{{ toYaml .master.nodeSelector | indent 8 }}
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .master.tolerations }}
       tolerations:
-{{ toYaml .master.tolerations | indent 8 }}
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .master.affinity }}
       affinity:
-{{ toYaml .master.affinity | indent 8 }}
+{{ toYaml . | indent 8 }}
+      {{- end }}
       type: {{ .type }}
     worker:
       Image: "{{ .worker.Image }}"
@@ -312,12 +323,18 @@ modules:
       replicas: {{ .worker.replicas }}
       cpu: "{{ .worker.cpu }}"
       memory: "{{ .worker.memory }}"
+      {{- with .worker.nodeSelector }}
       nodeSelector: 
-{{ toYaml .worker.nodeSelector | indent 8 }}
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .worker.tolerations }}
       tolerations:
-{{ toYaml .worker.tolerations | indent 8 }}
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .worker.affinity }}
       affinity:
-{{ toYaml .worker.affinity | indent 8 }}
+{{ toYaml . | indent 8 }}
+      {{- end }}
       type: {{ .type }}
     {{- end }}
 
@@ -326,20 +343,32 @@ modules:
     include: {{ has "hdfs" .modules }}
     {{- with .hdfs }}
     namenode:
+      {{- with .namenode.nodeSelector }}
       nodeSelector: 
-{{ toYaml .namenode.nodeSelector | indent 8 }}
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .namenode.tolerations }}
       tolerations:
-{{ toYaml .namenode.tolerations | indent 8 }}
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .namenode.affinity }}
       affinity:
-{{ toYaml .namenode.affinity | indent 8 }}
+{{ toYaml . | indent 8 }}
+      {{- end }}
       type: ClusterIP
     datanode:
+      {{- with .datanode.nodeSelector }}
       nodeSelector: 
-{{ toYaml .datanode.nodeSelector | indent 8 }}
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .datanode.tolerations }}
       tolerations:
-{{ toYaml .datanode.tolerations | indent 8 }}
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .datanode.affinity }}
       affinity:
-{{ toYaml .datanode.affinity | indent 8 }}
+{{ toYaml . | indent 8 }}
+      {{- end }}
       type: ClusterIP
     {{- end }}
 
@@ -362,6 +391,12 @@ modules:
     type: {{ .type }}
     httpNodePort:  {{ .httpNodePort }}
     grpcNodePort:  {{ .grpcNodePort }}
+    {{- with .exchange }}
+    exchange:
+      ip: {{ .ip }}
+      httpPort: {{ .httpPort }}
+      grpcPort: {{ .grpcPort }}
+    {{- end }}
     route_table: 
       {{- range $key, $val := .route_table }}
       {{ $key }}: 
@@ -429,3 +464,9 @@ modules:
       {{- end }}
     {{- end }}
     
+
+externalMysqlIp: {{ .externalMysqlIp }}
+externalMysqlPort: {{ .externalMysqlPort }}
+externalMysqlDatabase: {{ .externalMysqlDatabase }}
+externalMysqlUser: {{ .externalMysqlUser }}
+externalMysqlPassword: {{ .externalMysqlPassword }}

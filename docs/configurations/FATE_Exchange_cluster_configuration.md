@@ -1,43 +1,29 @@
-# FATE cluster configuration
+# FATE Exchange Cluster Configuration
 `cluster-serving.yaml` declares information about the FATE-Serving cluster to be deployed, which KubeFATE CLI uses to deploy the FATE-Serving cluster.
 
-## cluster-serving.yaml
+## cluster-exchange.yaml
 | Name                      | Type      | Description                                                  |
 | ------------------------- | --------- | ------------------------------------------------------------ |
-| name                      | scalars   | FATE-Serving cluster name.                                   |
-| namespace                 | scalars   | Kubernetes namespace for FATE-Serving cluster.               |
-| chartName                 | scalars   | FATE chart name. (fate/fate-serving)                         |
+| name                      | scalars   | FATE-Exchange cluster name.                                  |
+| namespace                 | scalars   | Kubernetes namespace for FATE-Exchange cluster.              |
+| chartName                 | scalars   | FATE chart name. (fate/fate-serving/fate-exchange)           |
 | chartVersion              | scalars   | FATE chart corresponding version.                            |
-| partyId                   | scalars   | FATE-Serving cluster party id.                               |
+| partyId                   | scalars   | FATE-Exchange cluster party id.                              |
 | registry                  | scalars   | Other fate images sources.                                   |
+| imageTag                  | scalars   | Image TAG                                                    |
 | pullPolicy                | scalars   | Kubernetes images pull policy.                               |
-| imagePullSecrets          | slice     | An **imagePullSecrets** is an authorization token, also known as a secret, that stores Docker credentials that are used for accessing a registry. |
 | persistence               | bool      | Redis and servingServer data persistence.                    |
-| istio                     | mappings  | Whether to open istio                                        |
 | podSecurityPolicy.enabled | bool      | if `true`, create & use Pod Security Policy resources        |
 | modules                   | sequences | Modules to be deployed in the FATE-Serving cluster.          |
-| servingAdmin              | mappings  | Configuration of FATE cluster `servingAdmin` module.         |
-| servingZookeeper          | mappings  | Configuration of FATE cluster `servingZookeeper` module.     |
-| servingProxy              | mappings  | Configuration of FATE cluster `rollsite` module.             |
-| servingServer             | mappings  | Configuration of FATE cluster `nodemanager` module.          |
-| servingRedis              | mappings  | Configuration of FATE cluster `python` module.<br />If you use your own redis, please delete this item. |
-| externalRedisIp           | scalars   | Access your own Redis.                                       |
+| rollsite                  | mappings  | Configuration of FATE cluster `rollsite` module.             |
+| trafficServer             | mappings  | Configuration of FATE cluster `nodemanager` module.          |
+| nginx                     | mappings  | Configuration of FATE cluster `python` module.<br />If you use your own redis, please delete this item. |
+| externalRedisIp           | mappings  | Access your own Redis.                                       |
 | externalRedisPort         | scalars   | Access your own Redis.                                       |
+| externalRedisDatabase     | scalars   | Access your own Redis.                                       |
 | externalRedisPassword     | scalars   | Access your own Redis.                                       |
 
-### servingAdmin mappings
-
-This is the UI display component of FATE-Serving.
-
-| Name         | subitem | Type     | Description                              |
-| ------------ | ------- | -------- | ---------------------------------------- |
-| nodeSelector |         | mappings | kubernetes nodeSelector.                 |
-| ingressHost  |         | scalars  | Define the host of the ingress of the UI |
-| username     |         | scalars  | username                                 |
-| password     |         | scalars  | password                                 |
-
-### servingProxy mappings
-
+### rollsite mappings
 It is used to declare the `servingProxy` module in the FATE cluster to be deployed.
 
 | Name         | subitem   | Type      | Description                                                  |
@@ -81,18 +67,3 @@ Configuration of kubernetes deployment redis.
 | storageClass  | scalars  | Specify the "storageClass" used to provision the volume. Or the default. StorageClass will be used(the default). Set it to "-" to disable dynamic provisioning. |
 | accessMode    | scalars  | Kubernetes Persistent Volume Access Modes: <br />ReadWriteOnce<br />ReadOnlyMany <br />ReadWriteMany. |
 | size          | scalars  | Match the volume size of PVC.                                |
-
-### servingZookeeper mappings
-
-Configuration of kubernetes deployment zookeeper.
-
-| Name          | Type     | Description                                                  |
-| ------------- | -------- | ------------------------------------------------------------ |
-| nodeSelector  | mappings | kubernetes nodeSelector.                                     |
-| subPath       | scalars  | Path of data persistence, specify the "subPath" if the PVC is shared with other components. |
-| existingClaim | scalars  | Use the existing PVC which must be created manually before bound. |
-| storageClass  | scalars  | Specify the "storageClass" used to provision the volume. Or the default. StorageClass will be used(the default). Set it to "-" to disable dynamic provisioning. |
-| accessMode    | scalars  | Kubernetes Persistent Volume Access Modes: <br />ReadWriteOnce<br />ReadOnlyMany <br />ReadWriteMany. |
-| size          | scalars  | Match the volume size of PVC.                                |
-
-### 

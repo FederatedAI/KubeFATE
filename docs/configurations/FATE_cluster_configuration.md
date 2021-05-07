@@ -2,34 +2,35 @@
 `cluster.yaml` declares information about the FATE cluster to be deployed, which KubeFATE CLI uses to deploy the FATE cluster.
 
 ## cluster.yaml
-| Name                  | Type               | Description                                                  |
-| --------------------- | ------------------ | ------------------------------------------------------------ |
-| * name                | scalars            | FATE cluster name.                                           |
-| * namespace           | scalars            | Kubernetes namespace for FATE cluster.                       |
-| * chartName           | scalars            | FATE chart name. (fate/fate-serving)                         |
-| * chartVersion        | scalars            | FATE chart corresponding version.                            |
-| * partyId             | scalars            | FATE cluster party id.                                       |
-| registry              | scalars            | Other fate images sources.                                   |
-| pullPolicy            | scalars            | kubernetes images pull policy                                |
-| * persistence         | bool               | mysql and nodemanager data persistence.                      |
-| * modules             | sequences          | Modules to be deployed in the FATE cluster.                  |
-| backend               | set(eggroll,spark) | Configure cluster computing engine( eggroll or spark)        |
-| host                  | mappings           | Custom domain of FATE UI component                           |
-| rollsite              | mappings           | Configuration of FATE cluster `rollsite` module.             |
-| nodemanager           | mappings           | Configuration of FATE cluster `nodemanager` module.          |
-| python                | mappings           | Configuration of FATE cluster `python` module.               |
-| mysql                 | mappings           | Configuration of FATE cluster `mysql` module.<br />If you use your own redis, please delete this item. |
-| externalMysqlIp       | scalars            | Access your own MySQL.                                       |
-| externalMysqlPort     | scalars            | Access your own MySQL.                                       |
-| externalMysqlDatabase | scalars            | Access your own MySQL.                                       |
-| externalMysqlUser     | scalars            | Access your own MySQL.                                       |
-| externalMysqlPassword | scalars            | Access your own MySQL.                                       |
-| servingIp             | scalars            | Serving cluster connected to fate.                           |
-| servingPort           | scalars            | Serving cluster connected to fate.                           |
-| spark                 | mappings           | Configuration of FATE cluster `spark` module.                |
-| hdfs                  | mappings           | Configuration of FATE cluster `hdfs` module.                 |
-| nginx                 | mappings           | Configuration of FATE cluster `nginx` module.                |
-| rabbitmq              | mappings           | Configuration of FATE cluster `rabbitmq` module.             |
+| Name                      | Type               | Description                                                  |
+| ------------------------- | ------------------ | ------------------------------------------------------------ |
+| * name                    | scalars            | FATE cluster name.                                           |
+| * namespace               | scalars            | Kubernetes namespace for FATE cluster.                       |
+| * chartName               | scalars            | FATE chart name. (fate/fate-serving)                         |
+| * chartVersion            | scalars            | FATE chart corresponding version.                            |
+| * partyId                 | scalars            | FATE cluster party id.                                       |
+| registry                  | scalars            | Other fate images sources.                                   |
+| pullPolicy                | scalars            | kubernetes images pull policy                                |
+| * persistence             | bool               | mysql and nodemanager data persistence.                      |
+| podSecurityPolicy.enabled | bool               | if `true`, create & use Pod Security Policy resources        |
+| * modules                 | sequences          | Modules to be deployed in the FATE cluster.                  |
+| backend                   | set(eggroll,spark) | Configure cluster computing engine( eggroll or spark)        |
+| host                      | mappings           | Custom domain of FATE UI component                           |
+| rollsite                  | mappings           | Configuration of FATE cluster `rollsite` module.             |
+| nodemanager               | mappings           | Configuration of FATE cluster `nodemanager` module.          |
+| python                    | mappings           | Configuration of FATE cluster `python` module.               |
+| mysql                     | mappings           | Configuration of FATE cluster `mysql` module.<br />If you use your own redis, please delete this item. |
+| externalMysqlIp           | scalars            | Access your own MySQL.                                       |
+| externalMysqlPort         | scalars            | Access your own MySQL.                                       |
+| externalMysqlDatabase     | scalars            | Access your own MySQL.                                       |
+| externalMysqlUser         | scalars            | Access your own MySQL.                                       |
+| externalMysqlPassword     | scalars            | Access your own MySQL.                                       |
+| servingIp                 | scalars            | Serving cluster connected to fate.                           |
+| servingPort               | scalars            | Serving cluster connected to fate.                           |
+| spark                     | mappings           | Configuration of FATE cluster `spark` module.                |
+| hdfs                      | mappings           | Configuration of FATE cluster `hdfs` module.                 |
+| nginx                     | mappings           | Configuration of FATE cluster `nginx` module.                |
+| rabbitmq                  | mappings           | Configuration of FATE cluster `rabbitmq` module.             |
 
 
 

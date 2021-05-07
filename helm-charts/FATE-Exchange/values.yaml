@@ -1,3 +1,6 @@
+partyId: 1
+partyName: fate-exchange
+
 image:
   registry: federatedai
   isThridParty:
@@ -9,6 +12,9 @@ image:
 partyId: 9999
 partyName: fate-9999
 
+podSecurityPolicy:
+  enabled: false
+  
 partyList:
 - partyId: 8888
   partyIp: 192.168.8.1
@@ -22,10 +28,11 @@ modules:
     include: false
     ip: rollsite
     type: ClusterIP
-    nodePort: 30000
+    nodePort: 30001
     nodeSelector:
     tolerations:
     affinity:
+    # partyList is used to configure the cluster information of all parties that join in the exchange deployment mode. (When eggroll was used as the calculation engine at the time)
     partyList:
     # - partyId: 8888
       # partyIp: 192.168.8.1
@@ -33,16 +40,42 @@ modules:
     # - partyId: 10000
       # partyIp: 192.168.10.1
       # partyPort: 30101
+  nginx:
+    include: false
+    type: NodePort
+    httpNodePort:  30003
+    grpcNodePort:  30008
+    # route_table is used to configure the cluster information of all parties that join in the exchange deployment mode. (When Spark was used as the calculation engine at the time)
+    route_table:
+      # 10000: 
+        # fateflow:
+        # - grpc_port: 30102
+          # host: 192.168.10.1
+          # http_port: 30107
+        # proxy:
+        # - grpc_port: 30108
+          # host: 192.168.10.1
+          # http_port: 30103
+      # 9999: 
+        # fateflow:
+        # - grpc_port: 30092
+          # host: 192.168.9.1
+          # http_port: 30097
+        # proxy:
+        # - grpc_port: 30098
+          # host: 192.168.9.1
+          # http_port: 30093
   trafficServer:
     include: false
     type: ClusterIP
-    nodePort: 30000
-    nodeSelector:
+    nodePort: 30007
+    nodeSelector: 
     tolerations:
     affinity:
+    # route_table is used to configure the cluster information of all parties that join in the exchange deployment mode. (When Spark was used as the calculation engine at the time)
     route_table: 
       # sni:
       # - fqdn: 10000.fate.org
-        # tunnel_route: 192.168.0.2:6651
+        # tunnelRoute: 192.168.0.2:30109
       # - fqdn: 9999.fate.org
-        # tunnel_route: 192.168.0.3:6651
+        # tunnelRoute: 192.168.0.3:30099

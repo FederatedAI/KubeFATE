@@ -1,7 +1,7 @@
 name: fate-9999
 namespace: fate-9999
 chartName: fate
-chartVersion: v1.6.0
+chartVersion: v1.6.0-a
 partyId: 9999
 registry: ""
 imageTag: ""

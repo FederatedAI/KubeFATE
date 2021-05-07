@@ -14,3 +14,14 @@ chart: {{ .Chart.Name }}
 name: {{ .Values.partyName | quote  }}
 partyId: {{ .Values.partyId | quote  }}
 {{- end -}}
+
+{{/*
+Create the name of the controller service account to use
+*/}}
+{{- define "serviceAccountName" -}}
+{{- if .Values.podSecurityPolicy.enabled -}}
+    {{ default .Values.partyName }}
+{{- else -}}
+    {{ default "default" }}
+{{- end -}}
+{{- end -}}

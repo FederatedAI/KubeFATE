@@ -13,6 +13,9 @@ partyName: fate-9999
 istio:
   enabled: false
 
+podSecurityPolicy:
+  enabled: false
+
 host:
   fateboard: 9999.fateboard.kubefate.net
   client: 9999.notebook.kubefate.net
@@ -21,7 +24,7 @@ host:
   pulsarUI: 9999.pulsar.kubefate.net
 exchange:
   partyIp: 192.168.1.1
-  partyPort: 30000
+  partyPort: 30001
 
 exchangeList:
 - id: 9991
@@ -202,6 +205,10 @@ modules:
     type: ClusterIP
     httpNodePort: 30093
     grpcNodePort: 30098
+    exchange:
+      ip: 192.168.10.1
+      httpPort: 30003
+      grpcPort: 30008
     route_table: 
 #      10000: 
 #        proxy: 
@@ -246,3 +253,9 @@ modules:
 #        sslPort: 30109
 #        proxy: ""
 #   
+
+# externalMysqlIp: mysql
+# externalMysqlPort: 3306
+# externalMysqlDatabase: eggroll_meta
+# externalMysqlUser: fate
+# externalMysqlPassword: fate_dev

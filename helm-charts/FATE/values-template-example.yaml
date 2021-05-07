@@ -11,6 +11,8 @@ imagePullSecrets:
 persistence: false
 istio:
   enabled: false
+podSecurityPolicy:
+  enabled: false
 modules:
   - rollsite
   - clustermanager
@@ -153,12 +155,12 @@ backend: eggroll
   # accessMode: ReadWriteOnce
   # size: 1Gi
 
-# #
-# #externalMysqlIp: mysql
-# #externalMysqlPort: 3306
-# #externalMysqlDatabase: eggroll_meta
-# #externalMysqlUser: fate
-# #externalMysqlPassword: fate_dev
+
+externalMysqlIp: mysql1
+externalMysqlPort: 33060
+externalMysqlDatabase: eggroll_meta1
+externalMysqlUser: fate1
+externalMysqlPassword: fate_dev1
 
 
 # servingIp: 192.168.0.1
@@ -210,6 +212,10 @@ backend: eggroll
   # type: ClusterIP
   # httpNodePort: 30093
   # grpcNodePort: 30098
+  # exchange:
+    # ip: 192.168.10.1
+    # httpPort: 30003
+    # grpcPort: 30008
   # route_table: 
     # 10000: 
       # proxy: 

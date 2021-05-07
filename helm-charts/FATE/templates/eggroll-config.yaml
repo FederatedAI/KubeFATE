@@ -23,9 +23,9 @@ data:
   eggroll.properties: |
     [eggroll]
     eggroll.resourcemanager.clustermanager.jdbc.driver.class.name=com.mysql.cj.jdbc.Driver
-    eggroll.resourcemanager.clustermanager.jdbc.url=jdbc:mysql://{{ .Values.modules.mysql.ip }}:{{ .Values.modules.mysql.port }}/{{ .Values.modules.mysql.database }}?useSSL=false&serverTimezone=UTC&characterEncoding=utf8&allowPublicKeyRetrieval=true
-    eggroll.resourcemanager.clustermanager.jdbc.username={{ .Values.modules.mysql.user }}
-    eggroll.resourcemanager.clustermanager.jdbc.password={{ .Values.modules.mysql.password }}
+    eggroll.resourcemanager.clustermanager.jdbc.url=jdbc:mysql://{{ .Values.externalMysqlIp | default .Values.modules.mysql.ip | default "mysql" }}:{{ .Values.externalMysqlPort | default .Values.modules.mysql.port | default "3306" }}/{{ .Values.externalMysqlDatabase | default .Values.modules.mysql.database | default "eggroll_meta" }}?useSSL=false&serverTimezone=UTC&characterEncoding=utf8&allowPublicKeyRetrieval=true
+    eggroll.resourcemanager.clustermanager.jdbc.username={{ .Values.externalMysqlUser | default .Values.modules.mysql.user | default "fate" }}
+    eggroll.resourcemanager.clustermanager.jdbc.password={{ .Values.externalMysqlPassword | default .Values.modules.mysql.password | default "fate_dev" }}
     
     eggroll.data.dir=data/
     eggroll.logs.dir=logs/

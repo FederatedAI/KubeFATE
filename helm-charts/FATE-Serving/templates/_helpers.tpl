@@ -3,7 +3,7 @@
 name: {{ .Values.partyName | quote  }}
 partyId: {{ .Values.partyId | quote  }}
 owner: kubefate
-cluster: fate-exchange
+cluster: fate-serving
 heritage: {{ .Release.Service }}
 release: {{ .Release.Name }}
 chart: {{ .Chart.Name }}

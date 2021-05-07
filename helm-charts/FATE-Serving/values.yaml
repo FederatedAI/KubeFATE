@@ -1,51 +1,55 @@
-
-partyId: 9999     # required
-partyName: fate-serving-9999     # required
+partyId: 9999
+partyName: fate-serving-9999
 
 # containers images 
 image:
-  registry: federatedai     # required
+  registry: federatedai
   isThridParty:
-  tag: 2.0.0-release        # required
-  pullPolicy: IfNotPresent  # required
-
+  tag: 2.0.4-release
+  pullPolicy: IfNotPresent
+  imagePullSecrets: 
+#  - name: 
 persistence:
+  enabled: false
+  
+istio:
+  enabled: false
+
+podSecurityPolicy:
   enabled: false
 
 servingProxy: 
-  include: true             # required
-  ip: serving-proxy                 # required
-  port: 6379                # required
+  include: true
+  ip: serving-proxy
+  port: 6379
   type: NodePort
   nodePort: 30109
   ingerssHost: 9999.serving-proxy.kubefate.net
   nodeSelector:
   tolerations:
   affinity:
+  exchange:
+    partyIp: 192.168.0.1
+    partyPort: 30100
   partyList:
-  - partyId: 10000
-    partyIp: 192.168.10.1
-    partyPort: 30110
+  # - partyId: 10000
+    # partyIp: 192.168.10.1
+    # partyPort: 30110
 
 servingRedis:
-  include: true             # required
-  ip: serving-redis                 # required
-  port: 6379                # required
-  type: ClusterIP           
-  password: fate_dev     # required
-  nodeSelector:
-  tolerations:
-  affinity:
+  include: true
+  password: fate_dev
   subPath: ""
   existingClaim: ""
   storageClass: "serving-redis"
   accessMode: ReadWriteOnce
   size: 1Gi
-
+  nodeSelector:
+  tolerations:
+  affinity:
+  
 servingServer:
-  include: true             # required
-  ip: serving-server        # required
-  port: 8000                # required
+  include: true
   type: NodePort
   nodePort: 30209
   fateflow:
@@ -60,31 +64,29 @@ servingServer:
   accessMode: ReadWriteOnce
   size: 1Gi
 
-servingAdmin:
-  include: true             # required
-  ip: serving-server        # required
-  port: 8000                # required
-  type: NodePort
-  nodePort: 30209
-  fateflow:
-    ip: fateflow
-    port: 9380
-  nodeSelector:
+
+servingZookeeper:
+  include: true
+  nodeSelector: 
   tolerations:
   affinity:
   subPath: ""
   existingClaim: ""
-  storageClass: "serving-server"
+  storageClass: "serving-zookeeper"
   accessMode: ReadWriteOnce
   ingerssHost: 9999.serving-admin.kubefate.net
   size: 1Gi
 
-servingZookeeper:
+
+servingAdmin:
   include: true
-  storageClassName: "managed-nfs-storage"
-  nodeSelector:
+  ingerssHost: 9999.serving-admin.kubefate.net
+  username: admin
+  password: admin
+  nodeSelector: 
   tolerations:
   affinity:
 
-istio:
-  enabled: false
+# externalRedisIp: "redis"
+# externalRedisPort: 6379
+# externalRedisPassword: "fate_dev"
