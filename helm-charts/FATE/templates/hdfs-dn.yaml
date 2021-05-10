@@ -113,6 +113,7 @@ spec:
       imagePullSecrets:
 {{ toYaml . | indent 6 }}
       {{- end }}
+      serviceAccountName: {{ template "serviceAccountName" . }}
       restartPolicy: Always
       volumes:
       - name: dfs

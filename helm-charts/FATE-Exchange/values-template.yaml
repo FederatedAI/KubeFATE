@@ -17,6 +17,11 @@ exchange:
 {{- end }}
 {{- end }}
 
+{{- with .podSecurityPolicy }}
+podSecurityPolicy:
+  enabled: {{ .enabled | default false }}
+{{- end }}
+
 partyList:
 {{- with .rollsite }}
 {{- range .partyList }}

@@ -1,54 +1,85 @@
 name: fate-serving-9999
 namespace: fate-serving-9999
 chartName: fate-serving
-chartVersion: v2.0.0
+chartVersion: v2.0.4
 partyId: 9999
 registry: ""
 imageTag: ""
 pullPolicy: 
 persistence: false
+imagePullSecrets: 
+- name: myregistrykey
 istio:
+  enabled: false
+podSecurityPolicy:
   enabled: false
 modules:
   - servingProxy
   - servingRedis
   - servingServer
+  - servingZookeeper
+  - servingAdmin
+  
+# servingAdmin:
+  # nodeSelector:
+  # tolerations:
+  # affinity:
+  # ingressHost: 10000.serving-admin.kubefate.net123
+  # username: admin
+  # password: admin
 
-servingProxy: 
-  nodePort: 30309
-  ingerssHost: 9999.serving-proxy.kubefate.net
-  partyList:
-  - partyId: 10000
-    partyIp: 192.168.10.1
-    partyPort: 30310
-  exchange:
-    ip: 192.168.1.1
-    port: 30100
-  nodeSelector: {}
+# servingProxy: 
+  # nodePort: 30310
+  # type: NodePort
+  # ingerssHost: 10000.serving-proxy.kubefate.net123
+  # nodeSelector:
+  # tolerations:
+  # affinity:
+  # partyList:
+  # # - partyId: 9999
+    # # partyIp: 192.168.9.1
+    # # partyPort: 30309
+  # exchange:
+    # ip: 192.168.1.1
+    # port: 30100
 
-servingServer:
-  type: NodePort
-  nodePort: 30209
-  fateflow:
-    ip: 192.168.9.1
-    port: 30109
-  subPath: ""
-  existingClaim: ""
-  storageClass: "serving-server"
-  accessMode: ReadWriteOnce
-  size: 1Gi
-  nodeSelector: {}
+# servingServer:
+  # type: NodePort
+  # nodePort: 30210
+  # nodeSelector:
+  # tolerations:
+  # affinity:
+  # fateflow:
+    # ip: 192.168.10.1
+    # port: 30110
+  # subPath: ""
+  # existingClaim: ""
+  # storageClass: "serving-server"
+  # accessMode: ReadWriteOnce
+  # size: 1Gi
 
-servingRedis:
-  password: fate_dev
-  nodeSelector: {}
-  subPath: ""
-  existingClaim: ""
-  storageClass: "serving-redis"
-  accessMode: ReadWriteOnce
-  size: 1Gi
+# servingRedis:
+  # password: fate_dev
+  # nodeSelector:
+  # tolerations:
+  # affinity:
+  # subPath: ""
+  # existingClaim: ""
+  # storageClass: "serving-redis"
+  # accessMode: ReadWriteOnce
+  # size: 1Gi
 
-# externalRedisIp: serving-redis
-# externalRedisPort: 6379
-# externalRedisDatabase: 0
-# externalRedisPassword: fate_dev
+# externalRedisIp: ""
+# externalRedisPort: ""
+# externalRedisPassword: ""
+
+
+# servingZookeeper:
+  # nodeSelector:
+  # tolerations:
+  # affinity:
+  # subPath: ""
+  # existingClaim: ""
+  # storageClass: "serving-zookeeper"
+  # accessMode: ReadWriteOnce
+  # size: 1Gi

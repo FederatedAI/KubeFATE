@@ -9,6 +9,8 @@ pullPolicy:
 persistence: false
 istio:
   enabled: false
+podSecurityPolicy:
+  enabled: false
 modules:
   - rollsite
   - trafficServer

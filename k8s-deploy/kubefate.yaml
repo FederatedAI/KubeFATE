@@ -86,6 +86,7 @@ spec:
       labels:
         fate: mariadb
     spec:
+      serviceAccountName: kubefate-admin
       containers:
         - image: mariadb:10
           imagePullPolicy: IfNotPresent

@@ -1,128 +1,54 @@
-
-partyId: {{ .partyId }}
+{{- $partyId := (.partyId | int64 | toString) }}
+partyId: {{ .partyId | int64 | toString }}
 partyName: {{ .name }}
 
 # containers images 
 image:
   registry: {{ .registry | default "federatedai" }}
   isThridParty: {{ empty .registry | ternary  "false" "true" }}
-  tag: {{ .imageTag | default "2.0.0-release" }}
+  tag: {{ .imageTag | default "2.0.4-release" }}
   pullPolicy: {{ .pullPolicy | default "IfNotPresent" }}
-
+  {{- with .imagePullSecrets }}
+  imagePullSecrets:
+{{ toYaml . | indent 2 }}
+  {{- end }}
+  
 persistence:
   enabled: {{ .persistence | default "false" }}
+  
+{{- with .istio }}
+istio:
+  enabled: {{ .enabled | default false }}
+{{- end }}
 
-{{ if .servingProxy }}
+{{- with .podSecurityPolicy }}
+podSecurityPolicy:
+  enabled: {{ .enabled | default false }}
+{{- end }}
+
 servingProxy: 
   include: {{ has "servingProxy" .modules }}
+  {{- with .servingProxy }}
   ip: serving-proxy
-  intraPort: 8879
-  interPort: 8869
-  type: NodePort
-  nodePort: {{ .servingProxy.nodePort }}
-  ingerssHost: {{ .servingProxy.ingerssHost | default "{{ .partyId }}.serving-proxy.kubefate.net" }}
+  type: {{ .type }}
+  nodePort: {{ .nodePort }}
+  ingerssHost: {{ .ingressHost | default (printf "%s.serving-admin.kubefate.net" $partyId) }}
+  
+  {{- with .partyList }}
   partyList:
-    {{- range .servingProxy.partyList }}
-    - partyId: {{ .partyId }}
-      partyIp: {{ .partyIp }}
-      partyPort: {{ .partyPort }}
-    {{- end }}
+  {{- range . }}
+  - partyId: {{ .partyId }}
+    partyIp: {{ .partyIp }}
+    partyPort: {{ .partyPort }}
+  {{- end }}
+  {{- end }}
+  
+  {{- with .exchange }}
   exchange:
-    {{- with .servingProxy.exchange }}
     partyIp: {{ .ip }}
     partyPort: {{ .port }}
-    {{- end }}
-  {{- with .servingServer.nodeSelector }}
-  nodeSelector:
-{{ toYaml . | indent 4 }}
   {{- end }}
-  {{- with .servingServer.tolerations }}
-  tolerations:
-{{ toYaml . | indent 4 }}
-  {{- end }}
-  {{- with .servingServer.affinity }}
-  affinity:
-{{ toYaml . | indent 4 }}
-  {{- end }}
-{{- else }}
-servingProxy: 
-  include: true
-  ip: serving-proxy
-  intraPort: 8879
-  interPort: 8869
-  type: NodePort
-  nodePort: 30110
-  ingerssHost: {{ .partyId }}.serving-proxy.kubefate.net
-  partyList:
-    - partyId: 9999
-      partyIp: 192.168.9.1
-      partyPort: 30109
-  nodeSelector:
-  tolerations:
-  affinity:
-{{- end }}
-
-{{ if .servingRedis }}
-servingRedis:
-  include: {{ has "servingRedis" .modules }}
-  ip: serving-redis
-  port: 6379 
-  type: ClusterIP
-  {{- with .servingRedis }}
-  password: {{ .password | default "fate_dev" }}
-  subPath: {{ .subPath | default "fate_dev" }}
-  existingClaim: {{ .existingClaim }}
-  storageClass: {{ .storageClass | default "serving-redis" }}
-  accessMode: {{ .accessMode | default "ReadWriteOnce" }}
-  size: {{ .size | default "1Gi" }}
-  {{- with .nodeSelector }}
-  nodeSelector:
-{{ toYaml . | indent 4 }}
-  {{- end }}
-  {{- with .tolerations }}
-  tolerations:
-{{ toYaml . | indent 4 }}
-  {{- end }}
-  {{- with .affinity}}
-  affinity:
-{{ toYaml . | indent 4 }}
-  {{- end }}
-  {{- end }}
-{{- else }}
-servingRedis:
-  include: {{ has "servingRedis" .modules }}
-  ip: {{ .externalRedisIp | default "serving-redis" }}
-  port: {{ .externalRedisPort | default "6379" }} 
-  type: ClusterIP
-  password: {{ .externalRedisPassword | default "fate_dev" }}
-  subPath: {{ .subPath | default "fate_dev" }}
-  existingClaim: {{ .existingClaim }}
-  storageClass: {{ .storageClass | default "serving-redis" }}
-  accessMode: {{ .accessMode | default "ReadWriteOnce" }}
-  size: {{ .size | default "1Gi" }}
-  nodeSelector:
-  tolerations:
-  affinity:
-{{- end }}
-
-{{- if .servingServer }}
-servingServer:
-  include: {{ has "servingServer" .modules }}
-  ip: serving-server
-  port: 8000
-  nodePort: {{ .servingServer.nodePort }}
-  type: {{ .servingServer.type | default "ClusterIP" }}
-  fateflow:
-    {{- with .servingServer.fateflow }}
-    ip: {{ .ip }}
-    port: {{ .port }}
-    {{- end }}
-  {{- with .servingServer }}
-  subPath: {{ .subPath | default "fate_dev" }}
-  existingClaim: {{ .existingClaim }}
-  storageClass: {{ .storageClass | default "serving-redis" }}
-  accessMode: {{ .accessMode | default "ReadWriteOnce" }}
-  size: {{ .size | default "1Gi" }}
+  
   {{- with .nodeSelector }}
   nodeSelector:
 {{ toYaml . | indent 4 }}
@@ -135,56 +61,121 @@ servingServer:
   affinity:
 {{ toYaml . | indent 4 }}
   {{- end }}
+
   {{- end }}
-{{- else }}
+
+servingRedis:
+  include: {{ has "servingRedis" .modules }}
+  
+  {{- with .servingRedis }}
+
+  password: {{ .password | default "fate_dev" }}
+  
+  subPath: {{ .subPath }}
+  existingClaim: {{ .existingClaim }}
+  storageClass: {{ .storageClass | default "serving-redis" }}
+  accessMode: {{ .accessMode | default "ReadWriteOnce" }}
+  size: {{ .size | default "1Gi" }}
+  
+  {{- with .nodeSelector }}
+  nodeSelector:
+{{ toYaml . | indent 4 }}
+  {{- end }}
+  {{- with .tolerations }}
+  tolerations:
+{{ toYaml . | indent 4 }}
+  {{- end }}
+  {{- with .affinity }}
+  affinity:
+{{ toYaml . | indent 4 }}
+  {{- end }}
+  
+  {{- end }}
+
+
 servingServer:
-  include: true
-  ip: serving-server
-  port: 8000
-  type: ClusterIP
+  include: {{ has "servingServer" .modules }}
+  
+  {{- with .servingServer }}
+  nodePort: {{ .nodePort }}
+  type: {{ .type | default "ClusterIP" }}
+  
+  {{- with .fateflow }}
   fateflow:
-    ip: fateflow.fate-10000
-    port: 9380
-  nodeSelector:  {}
-  subPath: ""
-  existingClaim: ""
-  storageClass: "serving-server"
-  accessMode: ReadWriteOnce
-  size: 1Gi
-{{- end }}
+    ip: {{ .ip }}
+    port: {{ .port }}
+  {{- end }}
+  
+  subPath: {{ .subPath }}
+  existingClaim: {{ .existingClaim }}
+  storageClass: {{ .storageClass | default "serving-redis" }}
+  accessMode: {{ .accessMode | default "ReadWriteOnce" }}
+  size: {{ .size | default "1Gi" }}
+  
+  {{- with .nodeSelector }}
+  nodeSelector:
+{{ toYaml . | indent 4 }}
+  {{- end }}
+  {{- with .tolerations }}
+  tolerations:
+{{ toYaml . | indent 4 }}
+  {{- end }}
+  {{- with .affinity }}
+  affinity:
+{{ toYaml . | indent 4 }}
+  {{- end }}
+  
+  {{- end }}
 
 servingZookeeper:
   include: {{ has "servingZookeeper" .modules }}
-  storageClassName: {{ .servingZookeeper.storageClassName | default "managed-nfs-storage" }}
-  {{- with .servingZookeeper.nodeSelector }}
+  {{- with .python }}
+  
+  {{- with .nodeSelector }}
   nodeSelector:
 {{ toYaml . | indent 4 }}
   {{- end }}
-  {{- with .servingZookeeper.tolerations }}
+  {{- with .tolerations }}
   tolerations:
 {{ toYaml . | indent 4 }}
   {{- end }}
-  {{- with .servingZookeeper.affinity }}
+  {{- with .affinity }}
   affinity:
 {{ toYaml . | indent 4 }}
   {{- end }}
 
+  subPath: {{ .subPath }}
+  storageClassName: {{ .servingZookeeper.storageClassName | default "managed-nfs-storage" }}
+  existingClaim: {{ .existingClaim }}
+  storageClass: {{ .storageClass }}
+  accessMode: {{ .accessMode | default "ReadWriteOnce" }}
+  size: {{ .size | default "1Gi" }}
+  
+  {{- end }}
+  
 servingAdmin:
   include: {{ has "servingAdmin" .modules }}
-  type: {{ .servingAdmin.type  | default "ClusterIP" }}
-  nodePort: {{ .servingAdmin.nodePort }}
-  ingerssHost: {{ .servingAdmin.ingerssHost | default "{{ .partyId }}.serving-admin.kubefate.net" }}
-  {{- with .servingAdmin.nodeSelector }}
+  {{- with .servingAdmin }}
+  
+  ingerssHost: {{ .ingressHost | default (printf "%s.serving-admin.kubefate.net" $partyId) }}
+  username: {{ .username }}
+  password: {{ .password }}
+  
+  {{- with .nodeSelector }}
   nodeSelector:
 {{ toYaml . | indent 4 }}
   {{- end }}
-  {{- with .servingAdmin.tolerations }}
+  {{- with .tolerations }}
   tolerations:
 {{ toYaml . | indent 4 }}
   {{- end }}
-  {{- with .servingAdmin.affinity }}
+  {{- with .affinity }}
   affinity:
 {{ toYaml . | indent 4 }}
   {{- end }}
-istio:
-  enabled: {{ .istio.enabled | default "false" }}
+  
+  {{- end }}
+
+externalRedisIp: {{ .externalRedisIp }}
+externalRedisPort: {{ .externalRedisPort }}
+externalRedisPassword: {{ .externalRedisPassword }}
