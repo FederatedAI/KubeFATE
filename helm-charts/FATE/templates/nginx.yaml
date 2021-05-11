@@ -21,9 +21,9 @@ data:
   route_table.yaml: |
     default:
       proxy:
-        - host: nginx 
-          http_port: 9300
-          grpc_port: 9310
+        - host: {{ .Values.modules.nginx.exchange.ip }}
+          http_port: {{ .Values.modules.nginx.exchange.httpPort }}
+          grpc_port: {{ .Values.modules.nginx.exchange.grpcPort }}
     {{ .Values.partyId }}:
       proxy:
         - host: nginx 
