@@ -75,6 +75,7 @@ modules:
     ip: rollsite
     type: {{ .type | default "ClusterIP" }}
     nodePort: {{ .nodePort }}
+    loadBalancerIP: {{ .loadBalancerIP }}
     {{- with .nodeSelector }}
     nodeSelector: 
 {{ toYaml . | indent 6 }}
@@ -95,6 +96,7 @@ modules:
     {{- with .lbrollsite }}
     ip: rollsite
     type: {{ .type | default "ClusterIP" }}
+    loadBalancerIP: {{ .loadBalancerIP }}
     nodePort: {{ .nodePort }}
     size: {{ .size | default "2M" }}
     {{- with .nodeSelector }}
@@ -119,6 +121,7 @@ modules:
     type: {{ .type }}
     httpNodePort: {{ .httpNodePort }}
     grpcNodePort: {{ .grpcNodePort }}
+    loadBalancerIP: {{ .loadBalancerIP }}
     {{- with .nodeSelector }}
     nodeSelector: 
 {{ toYaml . | indent 6 }}
@@ -391,6 +394,7 @@ modules:
     type: {{ .type }}
     httpNodePort:  {{ .httpNodePort }}
     grpcNodePort:  {{ .grpcNodePort }}
+    loadBalancerIP: {{ .loadBalancerIP }}
     {{- with .exchange }}
     exchange:
       ip: {{ .ip }}
@@ -424,6 +428,7 @@ modules:
     nodePort: {{ .nodePort }}
     default_user: {{ .default_user }}
     default_pass: {{ .default_pass }}
+    loadBalancerIP: {{ .loadBalancerIP }}
     user: {{ .user }}
     password: {{ .password }}
     route_table:
@@ -452,6 +457,7 @@ modules:
     type: {{ .type }}
     httpNodePort: {{ .httpNodePort }}
     httpsNodePort: {{ .httpsNodePort }}
+    loadBalancerIP: {{ .loadBalancerIP }}
     {{- with .exchange }}
     exchange:
       ip: {{ .ip }}

@@ -1047,6 +1047,11 @@ spec:
     targetPort: 8081
     protocol: TCP
   type: {{ .Values.modules.pulsar.type }}
+  
+  {{- if .Values.modules.pulsar.loadBalancerIP }}
+  loadBalancerIP: "{{ .Values.modules.pulsar.loadBalancerIP }}"
+  {{- end }}
+  
   selector:
     fateMoudle: pulsar
 {{ include "fate.matchLabels" . | indent 4 }}

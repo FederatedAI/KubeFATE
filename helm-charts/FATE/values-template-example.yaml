@@ -39,6 +39,7 @@ backend: eggroll
 # rollsite: 
   # type: NodePort
   # nodePort: 30091
+  # loadBalancerIP: 
   # exchange:
     # ip: 192.168.0.1
     # port: 30000
@@ -58,6 +59,7 @@ backend: eggroll
 # lbrollsite:
   # type: NodePort
   # nodePort: 30091
+  # loadBalancerIP:
   # size: "2M"
   # exchangeList:
   # - id: 9991
@@ -111,6 +113,7 @@ backend: eggroll
   # type: NodePort
   # httpNodePort: 30097
   # grpcNodePort: 30092
+  # loadBalancerIP:
   # nodeSelector:
   # tolerations:
   # affinity:
@@ -210,6 +213,7 @@ externalMysqlPassword: fate_dev1
   # tolerations:
   # affinity:
   # type: ClusterIP
+  # loadBalancerIP:
   # httpNodePort: 30093
   # grpcNodePort: 30098
   # exchange:
@@ -232,6 +236,7 @@ externalMysqlPassword: fate_dev1
   # affinity:
   # type: ClusterIP
   # nodePort: 30094
+  # loadBalancerIP:
   # default_user: fate
   # default_pass: fate
   # user: fate
@@ -249,6 +254,7 @@ externalMysqlPassword: fate_dev1
   # type: ClusterIP
   # httpNodePort: 30094
   # httpsNodePort: 30099
+  # loadBalancerIP:
   # exchange:
     # ip: 192.168.10.1
     # port: 30000
