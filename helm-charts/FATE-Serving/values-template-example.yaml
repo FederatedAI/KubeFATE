@@ -31,6 +31,7 @@ modules:
 # servingProxy: 
   # nodePort: 30310
   # type: NodePort
+  # loadBalancerIP: 
   # ingerssHost: 10000.serving-proxy.kubefate.net123
   # nodeSelector:
   # tolerations:
@@ -46,6 +47,7 @@ modules:
 # servingServer:
   # type: NodePort
   # nodePort: 30210
+  # loadBalancerIP: 
   # nodeSelector:
   # tolerations:
   # affinity:

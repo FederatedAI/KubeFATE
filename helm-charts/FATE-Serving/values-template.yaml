@@ -32,6 +32,7 @@ servingProxy:
   ip: serving-proxy
   type: {{ .type }}
   nodePort: {{ .nodePort }}
+  loadBalancerIP: {{ .loadBalancerIP }}
   ingerssHost: {{ .ingressHost | default (printf "%s.serving-admin.kubefate.net" $partyId) }}
   
   {{- with .partyList }}
@@ -99,7 +100,7 @@ servingServer:
   {{- with .servingServer }}
   nodePort: {{ .nodePort }}
   type: {{ .type | default "ClusterIP" }}
-  
+  loadBalancerIP: {{ .loadBalancerIP }}
   {{- with .fateflow }}
   fateflow:
     ip: {{ .ip }}

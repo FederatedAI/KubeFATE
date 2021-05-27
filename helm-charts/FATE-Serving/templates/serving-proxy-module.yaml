@@ -207,6 +207,9 @@ spec:
       targetPort: 8879
       protocol: TCP
   type: {{ .Values.servingProxy.type }}
+  {{- if .Values.servingProxy.loadBalancerIP }}
+  loadBalancerIP: "{{ .Values.servingProxy.loadBalancerIP }}"
+  {{- end }}
   selector:
     fateMoudle: serving-proxy
     name: {{ .Values.partyName | quote }}
