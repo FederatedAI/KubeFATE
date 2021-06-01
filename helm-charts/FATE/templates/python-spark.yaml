@@ -18,29 +18,6 @@ metadata:
     fateMoudle: python
 {{ include "fate.labels" . | indent 4 }}
 data:
-  rabbitmq_route_table.yaml: |
-    {{ .Values.partyId }}:
-      host: rabbitmq
-      port: 5672
-{{- range $key, $val := .Values.modules.rabbitmq.route_table }}
-    {{ $key }}: 
-{{ toYaml . | indent 6 }}
-{{- end }}
-  pulsar_route_table.yaml: |
-    {{- with .Values.modules.pulsar.exchange }}
-    default:
-      proxy: "{{ .ip }}:{{ .port }}"
-      domain: "fate.org"
-    {{- end }}
-    {{ .Values.partyId }}:
-      host: pulsar
-      port: 6650
-      sslPort: 6651
-      proxy: ""
-{{- range $key, $val := .Values.modules.pulsar.route_table }}
-    {{ $key }}: 
-{{ toYaml . | indent 6 }}
-{{- end }}
   spark-defaults.conf: |
     spark.master                      {{  .Values.modules.python.spark.master | default "local[4]"}}
     #spark.eventLog.enabled           true
@@ -111,14 +88,14 @@ data:
         user: {{ .Values.modules.python.rabbitmq.user }}
         password: {{ .Values.modules.python.rabbitmq.password }}
         # default conf/rabbitmq_route_table.yaml
-        route_table: {{ .Values.modules.python.rabbitmq.route_table }}
+        route_table: conf/rabbitmq_route_table/rabbitmq_route_table.yaml
       pulsar:
         host: {{ .Values.modules.python.pulsar.host }}
         port: {{ .Values.modules.python.pulsar.port }}
         mng_port: {{ .Values.modules.python.pulsar.mng_port }}
         topic_ttl: 3
         # default conf/pulsar_route_table.yaml
-        route_table: {{ .Values.modules.python.pulsar.route_table }}
+        route_table: conf/pulsar_route_table/pulsar_route_table.yaml
       nginx:
         host: {{ .Values.modules.python.nginx.host }}
         http_port: {{ .Values.modules.python.nginx.http_port }}
@@ -177,6 +154,47 @@ data:
     spring.datasource.druid.stat-view-servlet.enabled=false
     server.compression.enabled=true
     server.compression.mime-types=application/json,application/xml,text/html,text/xml,text/plain
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: pulsar-route-table
+  labels:
+    fateMoudle: python
+{{ include "fate.labels" . | indent 4 }}
+data:
+  pulsar_route_table.yaml: |
+    {{- with .Values.modules.pulsar.exchange }}
+    default:
+      proxy: "{{ .ip }}:{{ .port }}"
+      domain: "fate.org"
+    {{- end }}
+    {{ .Values.partyId }}:
+      host: pulsar
+      port: 6650
+      sslPort: 6651
+      proxy: ""
+{{- range $key, $val := .Values.modules.pulsar.route_table }}
+    {{ $key }}: 
+{{ toYaml . | indent 6 }}
+{{- end }}
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: rabbitmq-route-table
+  labels:
+    fateMoudle: python
+{{ include "fate.labels" . | indent 4 }}
+data:
+  rabbitmq_route_table.yaml: |
+    {{ .Values.partyId }}:
+      host: rabbitmq
+      port: 5672
+{{- range $key, $val := .Values.modules.rabbitmq.route_table }}
+    {{ $key }}: 
+{{ toYaml . | indent 6 }}
+{{- end }}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -288,12 +306,10 @@ spec:
             - mountPath: /data/projects/spark-2.4.1-bin-hadoop2.7/conf/spark-defaults.conf
               name: python-confs
               subPath: spark-defaults.conf
-            - mountPath: /data/projects/fate/conf/rabbitmq_route_table.yaml
-              name: python-confs
-              subPath: rabbitmq_route_table.yaml
-            - mountPath: /data/projects/fate/conf/pulsar_route_table.yaml
-              name: python-confs
-              subPath: pulsar_route_table.yaml
+            - mountPath: /data/projects/fate/conf/rabbitmq_route_table
+              name: rabbitmq-route-table
+            - mountPath: /data/projects/fate/conf/pulsar_route_table
+              name: pulsar-route-table
             - mountPath: /data/projects/fate/conf/
               name: shared-dir-conf
             - mountPath: /data/projects/fate/examples-shared-for-client
@@ -358,6 +374,12 @@ spec:
         - name: python-confs
           configMap:
             name: python-config
+        - name: rabbitmq-route-table
+          configMap:
+            name: rabbitmq-route-table
+        - name: pulsar-route-table
+          configMap:
+            name: pulsar-route-table
         - name: fateboard-confs
           configMap:
             name: fateboard-config
