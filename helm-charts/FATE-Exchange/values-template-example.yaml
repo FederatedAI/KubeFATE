@@ -19,9 +19,10 @@ modules:
 rollsite: 
   type: NodePort
   nodePort: 30001
+  loadBalancerIP: 192.168.0.1
   partyList:
   - partyId: 10000
-    partyIp: 192.168.0.1
+    partyIp: 192.168.10.1
     partyPort: 30101
   nodeSelector:
   tolerations:
@@ -33,6 +34,7 @@ trafficServer:
   affinity:
   type: NodePort
   nodePort: 30007
+  loadBalancerIP: 192.168.0.1
   route_table: 
     sni:
     - fqdn: 10000.fate.org
@@ -47,6 +49,7 @@ nginx:
   type: NodePort
   httpNodePort: 30003
   grpcNodePort: 30008
+  loadBalancerIP: 192.168.0.1
   route_table: 
     9999: 
       proxy: 
