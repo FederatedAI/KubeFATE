@@ -237,12 +237,17 @@ externalMysqlPassword: fate_dev1
   # user: fate
   # password: fate
   # route_table:
-    # 10000:
-      # host: 192.168.0.1
-      # port: 30104
-
+    # 9999:
+      # host: rabbitmq 
+      # port: 5672
 
 # pulsar:
+  #  route_table:
+  #    9999:
+  #      host: pulsar
+  #      port: 6650
+  #      sslPort: 6651
+  #      proxy: ""
   # nodeSelector:
   # tolerations:
   # affinity:
@@ -252,9 +257,3 @@ externalMysqlPassword: fate_dev1
   # exchange:
     # ip: 192.168.10.1
     # port: 30000
-  # route_table:
-    # 10000:
-      # host: 192.168.10.1
-      # port: 30105
-      # sslPort: 30109
-      # proxy: ""

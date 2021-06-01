@@ -169,11 +169,6 @@ data:
       proxy: "{{ .ip }}:{{ .port }}"
       domain: "fate.org"
     {{- end }}
-    {{ .Values.partyId }}:
-      host: pulsar
-      port: 6650
-      sslPort: 6651
-      proxy: ""
 {{- range $key, $val := .Values.modules.pulsar.route_table }}
     {{ $key }}: 
 {{ toYaml . | indent 6 }}
@@ -188,9 +183,6 @@ metadata:
 {{ include "fate.labels" . | indent 4 }}
 data:
   rabbitmq_route_table.yaml: |
-    {{ .Values.partyId }}:
-      host: rabbitmq
-      port: 5672
 {{- range $key, $val := .Values.modules.rabbitmq.route_table }}
     {{ $key }}: 
 {{ toYaml . | indent 6 }}
