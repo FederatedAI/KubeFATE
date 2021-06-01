@@ -1,7 +1,7 @@
 name: fate-exchange
 namespace: fate-exchange
 chartName: fate-exchange
-chartVersion: v1.6.0
+chartVersion: v1.6.0-a
 partyId: 1
 registry: ""
 imageTag: "1.6.0-release"
@@ -10,6 +10,8 @@ imagePullSecrets:
 - name: myregistrykey
 persistence: false
 istio:
+  enabled: false
+podSecurityPolicy:
   enabled: false
 modules:
   - rollsite
