@@ -11,6 +11,8 @@ imagePullSecrets:
 persistence: false
 istio:
   enabled: false
+podSecurityPolicy:
+  enabled: false
 modules:
   - rollsite
   - clustermanager
@@ -31,6 +33,7 @@ backend: eggroll
   # client: 9999.notebook.kubefate.net
   # sparkUI: 9999.spark.kubefate.net
   # rabbitmqUI: 9999.rabbitmq.kubefate.net
+  # pulsarUI: 9999.pulsar.kubefate.net
   
 # rollsite: 
   # type: NodePort

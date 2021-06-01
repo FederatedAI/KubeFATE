@@ -1,12 +1,17 @@
 name: fate-serving-9999
 namespace: fate-serving-9999
 chartName: fate-serving
-chartVersion: v2.0.0
+chartVersion: v2.0.4
 partyId: 9999
 registry: ""
+imageTag: ""
 pullPolicy: 
+imagePullSecrets: 
+- name: myregistrykey
 persistence: false
 istio:
+  enabled: false
+podSecurityPolicy:
   enabled: false
 modules:
   - servingProxy
