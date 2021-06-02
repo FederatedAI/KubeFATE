@@ -21,12 +21,6 @@ metadata:
     owner: kubefate
     cluster: fate-exchange
 data:
-  sni.yaml: |
-    sni:
-    {{- range .Values.modules.trafficServer.route_table.sni }}
-      - fqdn: {{ .fqdn }}
-        tunnel_route: {{ .tunnelRoute }}
-    {{- end }}
   ssl_multicert.config: |
     dest_ip=* ssl_cert_name=proxy.cert.pem ssl_key_name=proxy.key.pem
   records.config: |
@@ -44,7 +38,26 @@ data:
     CONFIG proxy.config.ssl.CA.cert.path STRING /opt/proxy
     
     CONFIG proxy.config.ssl.server.cert.path STRING /opt/proxy
-
+    
+    CONFIG proxy.config.ssl.servername.filename STRING sni/sni.yaml
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: traffic-server-sni
+  labels:
+    fateMoudle: traffic-server
+    name: {{ .Values.partyName | quote  }}
+    partyId: {{ .Values.partyId | quote }}
+    owner: kubefate
+    cluster: fate-exchange
+data:
+  sni.yaml: |
+    sni:
+    {{- range .Values.modules.trafficServer.route_table.sni }}
+      - fqdn: {{ .fqdn }}
+        tunnel_route: {{ .tunnelRoute }}
+    {{- end }}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -88,9 +101,8 @@ spec:
             - mountPath: /etc/trafficserver/ssl_multicert.config
               name: traffic-server-confs
               subPath: ssl_multicert.config
-            - mountPath: /opt/trafficserver/etc/trafficserver/sni.yaml
-              name: traffic-server-confs
-              subPath: sni.yaml
+            - mountPath: /opt/trafficserver/etc/trafficserver/sni
+              name: traffic-server-sni
             - mountPath: /opt/proxy
               name: traffic-server-cert-file
             - mountPath: /opt/trafficserver/etc/trafficserver/proxy.cert.pem
@@ -117,6 +129,9 @@ spec:
         - name: traffic-server-confs
           configMap:
             name: traffic-server-config
+        - name: traffic-server-sni
+          configMap:
+            name: traffic-server-sni
         - name: traffic-server-cert-file
           secret:
             secretName: traffic-server-cert

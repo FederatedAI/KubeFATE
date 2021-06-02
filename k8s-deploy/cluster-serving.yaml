@@ -6,9 +6,9 @@ partyId: 9999
 registry: ""
 imageTag: ""
 pullPolicy: 
-persistence: false
 imagePullSecrets: 
 - name: myregistrykey
+persistence: false
 istio:
   enabled: false
 podSecurityPolicy:

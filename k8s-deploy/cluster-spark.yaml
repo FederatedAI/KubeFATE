@@ -6,8 +6,12 @@ partyId: 9999
 registry: ""
 imageTag: ""
 pullPolicy: 
+imagePullSecrets: 
+- name: myregistrykey
 persistence: false
 istio:
+  enabled: false
+podSecurityPolicy:
   enabled: false
 modules:
   # - rollsite
@@ -23,6 +27,13 @@ modules:
   - rabbitmq
 
 backend: spark
+
+# host:
+  # fateboard: 9999.fateboard.kubefate.net
+  # client: 9999.notebook.kubefate.net
+  # sparkUI: 9999.spark.kubefate.net
+  # rabbitmqUI: 9999.rabbitmq.kubefate.net
+  # pulsarUI: 9999.pulsar.kubefate.net
 
 # rollsite: 
   # type: NodePort

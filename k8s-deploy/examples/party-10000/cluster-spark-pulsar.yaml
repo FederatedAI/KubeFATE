@@ -1,7 +1,7 @@
 name: fate-10000
 namespace: fate-10000
 chartName: fate
-chartVersion: v1.6.0
+chartVersion: v1.6.0-a
 partyId: 10000
 registry: ""
 imageTag: "1.6.0-release"
@@ -10,6 +10,8 @@ imagePullSecrets:
 - name: myregistrykey
 persistence: false
 istio:
+  enabled: false
+podSecurityPolicy:
   enabled: false
 modules:
   - python
@@ -23,12 +25,12 @@ modules:
 
 backend: spark
 
-host:
-  fateboard: 10000.fateboard.vmware.com
-  client: 10000.notebook.vmware.com
-  sparkUI: 10000.spark.vmware.com
-  rabbitmqUI: 10000.rabbitmq.vmware.com
-  pulsarUI: 10000.pulsar.vmware.com
+# host:
+  # fateboard: 10000.fateboard.kubefate.net
+  # client: 10000.notebook.kubefate.net
+  # sparkUI: 10000.spark.kubefate.net
+  # rabbitmqUI: 10000.rabbitmq.kubefate.net
+  # pulsarUI: 10000.pulsar.kubefate.net
 
 python:
   type: NodePort
