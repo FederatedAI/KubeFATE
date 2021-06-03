@@ -1,8 +1,8 @@
-name: fate-9999
-namespace: fate-9999
+name: fate-10000
+namespace: fate-10000
 chartName: fate
-chartVersion: v1.6.0-a
-partyId: 9999
+chartVersion: v1.6.0-pulsar
+partyId: 10000
 registry: ""
 imageTag: ""
 pullPolicy: 
@@ -14,26 +14,38 @@ istio:
 podSecurityPolicy:
   enabled: false
 modules:
-  # - rollsite
-  # - clustermanager
-  # - nodemanager
   - mysql
   - python
   - fateboard
-  # - client
   - spark
   - hdfs
   - nginx
-  - rabbitmq
 
 backend: spark
 
+python:
+  type: NodePort
+  httpNodePort: 30090
+  grpcNodePort: 30092
+  pulsar:
+    host: pulsar-mini-broker
+    port: 6650
+    mng_port: 8080
+
+pulsar:
+  route_table:
+    10000:
+      host: pulsar-mini-broker
+      port: 6650
+      sslPort: 6651
+      proxy: ""
+
 # host:
-  # fateboard: 9999.fateboard.kubefate.net
-  # client: 9999.notebook.kubefate.net
-  # sparkUI: 9999.spark.kubefate.net
-  # rabbitmqUI: 9999.rabbitmq.kubefate.net
-  # pulsarUI: 9999.pulsar.kubefate.net
+  # fateboard: 10000.fateboard.kubefate.net
+  # client: 10000.notebook.kubefate.net
+  # sparkUI: 10000.spark.kubefate.net
+  # rabbitmqUI: 10000.rabbitmq.kubefate.net
+  # pulsarUI: 10000.pulsar.kubefate.net
 
 # rollsite: 
   # type: NodePort
