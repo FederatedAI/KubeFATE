@@ -64,6 +64,7 @@ modules:
 {{ toYaml . | indent 6 }}
     {{- end }}
     type: {{ .type }}
+    replicas: {{ .replicas }}
     httpNodePort:  {{ .httpNodePort }}
     grpcNodePort:  {{ .grpcNodePort }}
     route_table: 
@@ -88,6 +89,7 @@ modules:
 {{ toYaml . | indent 6 }}
     {{- end }}
     type: {{ .type }}
+    replicas: {{ .replicas }}
     nodePort: {{ .nodePort }}
     route_table: 
       sni:

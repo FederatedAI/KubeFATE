@@ -70,7 +70,7 @@ metadata:
     owner: kubefate
     cluster: fate-exchange
 spec:
-  replicas: 1
+  replicas: {{ default 1 .Values.modules.trafficServer.replicas }}
   strategy:
     type: Recreate
   selector:
