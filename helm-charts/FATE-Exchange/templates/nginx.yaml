@@ -21,20 +21,20 @@ data:
   route_table.yaml: |
     default:
       proxy:
-        - host: nginx 
+        - host: nginx
           http_port: 9300
           grpc_port: 9310
     {{ .Values.partyId }}:
       proxy:
-        - host: nginx 
+        - host: nginx
           http_port: 9300
           grpc_port: 9310
       fateflow:
-        - host: fateflow 
+        - host: fateflow
           http_port: 9380
           grpc_port: 9360
 {{- range $key, $val := .Values.modules.nginx.route_table }}
-    {{ $key }}: 
+    {{ $key }}:
 {{ toYaml . | indent 6 }}
 {{- end }}
   nginx.conf: |
@@ -116,7 +116,7 @@ metadata:
     fateMoudle: nginx
 {{ include "fate.labels" . | indent 4 }}
 spec:
-  replicas: 1
+  replicas: {{ default 1 .Values.modules.nginx.replicas }}
   strategy:
     type: Recreate
   selector:

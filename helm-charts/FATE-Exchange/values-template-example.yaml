@@ -28,6 +28,7 @@ rollsite:
   affinity:
 
 trafficServer:
+  replicas: 3
   nodeSelector:
   tolerations:
   affinity:
@@ -41,6 +42,7 @@ trafficServer:
       tunnelRoute: 192.168.0.3:30099
 
 nginx:
+  replicas: 3
   nodeSelector:
   tolerations:
   affinity:
