@@ -133,11 +133,21 @@ spec:
         - name: nginx
           image: {{ .Values.image.registry }}/nginx:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - /bin/bash
+            - -c
+            - |
+              sed -i "s#conf/route_table.yaml#conf/modifiable/route_table.yaml#g" nginx/lua/route_table.lua;
+              echo "change path of route_table.yaml success!"
+              openresty -g 'daemon off;'
           ports:
             - containerPort: 9300
             - containerPort: 9310
           volumeMounts:
-            - mountPath: /data/projects/fate/proxy/nginx/conf
+            - mountPath: /data/projects/fate/proxy/nginx/conf/nginx.conf
+              name: nginx-confs
+              subPath: nginx.conf
+            - mountPath: /data/projects/fate/proxy/nginx/conf/modifiable/
               name: nginx-confs
       {{- with .Values.modules.nginx.nodeSelector }}
       nodeSelector: 
