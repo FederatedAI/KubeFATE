@@ -169,15 +169,18 @@ data:
       proxy: "{{ .ip }}:{{ .port }}"
       domain: "fate.org"
     {{- end }}
+{{- if .Values.modules.pulsar.route_table }}
+{{- range $key, $val := .Values.modules.pulsar.route_table }}
+    {{ $key }}:
+{{ toYaml . | indent 6 }}
+{{- end }}
+{{- else }}
     {{ .Values.partyId }}:
       host: pulsar
       port: 6650
       sslPort: 6651
       proxy: ""
-{{- range $key, $val := .Values.modules.pulsar.route_table }}
-    {{ $key }}: 
-{{ toYaml . | indent 6 }}
-{{- end }}
+{{- end}}
 ---
 kind: ConfigMap
 apiVersion: v1
@@ -188,13 +191,16 @@ metadata:
 {{ include "fate.labels" . | indent 4 }}
 data:
   rabbitmq_route_table.yaml: |
+{{- if .Values.modules.rabbitmq.route_table }}
+{{- range $key, $val := .Values.modules.rabbitmq.route_table }}
+    {{ $key }}:
+{{ toYaml . | indent 6 }}
+{{- end }}
+{{- else }}
     {{ .Values.partyId }}:
       host: rabbitmq
       port: 5672
-{{- range $key, $val := .Values.modules.rabbitmq.route_table }}
-    {{ $key }}: 
-{{ toYaml . | indent 6 }}
-{{- end }}
+{{- end}}
 ---
 apiVersion: apps/v1
 kind: Deployment
