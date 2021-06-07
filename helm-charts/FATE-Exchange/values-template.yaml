@@ -63,6 +63,14 @@ modules:
     nodeSelector: 
 {{ toYaml . | indent 6 }}
     {{- end }}
+    {{- with .tolerations }}
+    tolerations:
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    {{- with .affinity }}
+    affinity:
+{{ toYaml . | indent 6 }}
+    {{- end }}
     type: {{ .type }}
     replicas: {{ .replicas }}
     httpNodePort:  {{ .httpNodePort }}

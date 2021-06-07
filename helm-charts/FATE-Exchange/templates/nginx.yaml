@@ -153,6 +153,14 @@ spec:
       nodeSelector: 
 {{ toYaml . | indent 8 }}
       {{- end }}
+      {{- with .Values.modules.nginx.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.modules.nginx.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+      {{- end }}
       {{- with .Values.image.imagePullSecrets }}
       imagePullSecrets:
 {{ toYaml . | indent 6 }}
