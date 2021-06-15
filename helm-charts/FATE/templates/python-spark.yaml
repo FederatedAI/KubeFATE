@@ -118,14 +118,9 @@ data:
     zookeeper:
 {{ toYaml .Values.modules.serving.zookeeper | indent 6 }}
     {{- end }}
-
   transfer_conf.yaml: |
     paths: # dir or path
       - "python/federatedml/transfer_variable/auth_conf"
-  pipeline_conf.yaml: |
-    ip: {{ if .Values.istio.enabled }}127.0.0.1{{ else }}fateflow{{ end }}
-    port: 9380
-    log_directory: /fml_manager/Examples/Pipeline/logs
 ---
 kind: ConfigMap
 apiVersion: v1
@@ -295,20 +290,17 @@ spec:
                 sed -i "s/host: fateflow/host: ${POD_IP}/g" /data/projects/fate/conf/service_conf.yaml
                 # fix pipeline conf must use IP
                 sed -i "s/ip: fateflow/ip: ${POD_IP}/g" /data/projects/fate/conf/pipeline_conf.yaml
-                # shared examples 
-                cp -r /data/projects/fate/examples /data/projects/fate/examples-shared-for-client
                 sleep 5;
                 python ./fate_flow/fate_flow_server.py
           volumeMounts:
             - mountPath: /data/projects/fate/eggroll/conf/eggroll.properties
               name: eggroll-confs
               subPath: eggroll.properties
-            - name: logs
+            - name: python-data
               mountPath: /data/projects/fate/logs
+              subPath: logs
             - mountPath: /data/projects/fate/conf1/
               name: python-confs
-            - name: download-dir
-              mountPath: /data/projects/fate/python/download_dir
             - mountPath: /data/projects/spark-2.4.1-bin-hadoop2.7/conf/spark-defaults.conf
               name: python-confs
               subPath: spark-defaults.conf
@@ -316,32 +308,13 @@ spec:
               name: rabbitmq-route-table
             - mountPath: /data/projects/fate/conf/pulsar_route_table
               name: pulsar-route-table
-            - mountPath: /data/projects/fate/conf/
-              name: shared-dir-conf
-            - mountPath: /data/projects/fate/examples-shared-for-client
-              name: shared-dir-examples
-        {{- if .Values.modules.client.include }}
-        - image: {{ .Values.image.registry }}/client:{{ .Values.image.tag }}
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
-          name: client
-          env:
-            - name: partyId
-              value: {{ .Values.partyId | quote  }}
-            - name: FATE_FLOW_HOST
-              value: "{{ if .Values.istio.enabled }}127.0.0.1{{ else }}fateflow{{ end }}:9380"
-            - name: FATE_SERVING_HOST
-              value: "{{.Values.modules.serving.ip}}:{{.Values.modules.serving.port}}"
-          ports:
-            - containerPort: 20000
-          volumeMounts:
-            - mountPath: /data/projects/fate/conf/
-              name: shared-dir-conf
-            - mountPath: /data/projects/fate/examples
-              name: shared-dir-examples
-              subPath: examples
-            - name: download-dir
-              mountPath: /fml_manager/Examples/download_dir
-        {{- end }}
+            # TODO add mountPath of job and model-cache 
+            - mountPath: /data/projects/fate/jobs
+              name: python-data
+              subPath: jobs
+            - mountPath: /data/projects/fate/model_local_cache
+              name: python-data
+              subPath: model-local-cache
         {{- if .Values.modules.fateboard.include }}
         - image: {{ .Values.image.registry }}/fateboard:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -352,8 +325,9 @@ spec:
             - mountPath: /data/projects/fate/fateboard/conf/application.properties
               name: fateboard-confs
               subPath: application.properties
-            - name: logs
+            - name: python-data
               mountPath: /data/projects/fate/logs
+              subPath: logs
         {{- end }}
       {{- with .Values.modules.python.nodeSelector }}
       nodeSelector:
@@ -389,14 +363,14 @@ spec:
         - name: fateboard-confs
           configMap:
             name: fateboard-config
-        - name: logs
+        {{- if not .Values.persistence.enabled }}
+        - name: python-data
           emptyDir: {}
-        - name: download-dir
-          emptyDir: {}
-        - name: shared-dir-conf
-          emptyDir: {}
-        - name: shared-dir-examples
-          emptyDir: {}
+        {{- else }}
+        - name: python-data
+          persistentVolumeClaim:
+            claimName: {{ .Values.modules.python.existingClaim | default  "python-data" }}
+        {{- end }}
 ---
 apiVersion: v1
 kind: Service
@@ -469,24 +443,26 @@ spec:
 {{ include "fate.matchLabels" . | indent 4 }}
 ---
 {{- end }}
-{{- if .Values.modules.client.include }}
+{{- if and .Values.persistence.enabled (not .Values.modules.python.existingClaim) }}
+kind: PersistentVolumeClaim
 apiVersion: v1
-kind: Service
 metadata:
-  name: notebook
+  name: python-data
   labels:
     fateMoudle: python
 {{ include "fate.labels" . | indent 4 }}
 spec:
-  ports:
-    - name: "tcp-notebook"
-      port: 20000
-      targetPort: 20000
-      protocol: TCP
-  type: {{ .Values.modules.client.type }}
-  selector:
-    fateMoudle: python
-{{ include "fate.matchLabels" . | indent 4 }}
----
+  accessModes: 
+    - {{ .Values.modules.python.accessMode }}
+  resources:
+    requests:
+      storage: {{ .Values.modules.python.size }}
+  {{- if .Values.modules.python.storageClass }}
+    {{- if eq "-" .Values.modules.python.storageClass }}
+  storageClassName: ""
+    {{- else }}
+  storageClassName: {{ .Values.modules.python.storageClass }}
+    {{- end }}
+  {{- end }}
 {{- end }}
 {{ end }}

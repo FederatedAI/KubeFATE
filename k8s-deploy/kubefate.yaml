@@ -114,9 +114,26 @@ spec:
       restartPolicy: Always
       volumes:
         - name: mariadb-data
-          hostPath:
-            path: /data/kubefate/mysql/db
-            type: DirectoryOrCreate
+          # If you want persistence, please modify it to the PV you want to use.
+          emptyDir: {}
+          # hostPath:
+            # path: /data/kubefate/mysql/db
+            # type: DirectoryOrCreate
+          # persistentVolumeClaim:
+            # claimName: "mariadb-data"
+# ---
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+  # name: mariadb-data
+  # namespace: kube-fate
+# spec:
+  # accessModes:
+    # - ReadWriteOnce
+  # storageClassName: <MyStorageClassName>
+  # resources:
+    # requests:
+      # storage: 1Gi
 ---
 apiVersion: v1
 kind: Service

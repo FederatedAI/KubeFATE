@@ -8,7 +8,7 @@ imageTag: ""
 pullPolicy: 
 imagePullSecrets: 
 - name: myregistrykey
-persistence: false
+persistence: true
 istio:
   enabled: false
 podSecurityPolicy:
@@ -115,6 +115,10 @@ backend: eggroll
   # tolerations:
   # affinity:
   # enabledNN: false
+  # existingClaim: ""
+  # storageClass: "python"
+  # accessMode: ReadWriteMany
+  # size: 1Gi
   # spark: 
     # master: spark://spark-master:7077
     # home: 
@@ -140,6 +144,15 @@ backend: eggroll
     # host: nginx
     # http_port: 9300
     # grpc_port: 9310
+
+# client:
+  # nodeSelector: 
+  # subPath: ""
+  # existingClaim: ""
+  # storageClass: "client"
+  # accessMode: ReadWriteOnce
+  # size: 1Gi
+
 # mysql: 
   # nodeSelector:
   # tolerations:

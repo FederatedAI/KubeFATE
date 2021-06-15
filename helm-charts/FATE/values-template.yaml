@@ -132,6 +132,11 @@ modules:
 {{ toYaml . | indent 6 }}
     {{- end }}
     enabledNN: {{ .enabledNN | default false }}
+    existingClaim: {{ .existingClaim  }}
+    claimName: {{ .claimName | default "python-data" }}
+    storageClass: {{ .storageClass | default "python" }}
+    accessMode: {{ .accessMode | default "ReadWriteOnce" }}
+    size: {{ .size | default "1Gi" }}
     {{- with .spark }}
     spark: 
       master: {{ .master }}
@@ -222,8 +227,11 @@ modules:
   client: 
     include: {{ has "client" .modules }}
     {{- with .client }}
-    ip: {{ .ip }}
-    type: {{ .type }}
+    subPath: {{ .subPath }}
+    existingClaim: {{ .existingClaim }}
+    storageClass: {{ .storageClass  | default "client" }}
+    accessMode: {{ .accessMode  | default "ReadWriteOnce" }}
+    size: {{ .size  | default "1Gi" }}
     {{- with .nodeSelector }}
     nodeSelector: 
 {{ toYaml . | indent 6 }}
@@ -275,24 +283,6 @@ modules:
     useRegistry: {{ .useRegistry | default false }}
     zookeeper:
 {{ toYaml .zookeeper | indent 6 }}
-    {{- end}}
-
-  fateboard:
-    include: {{ has "fateboard" .modules }}
-    {{- with .fateboard }}
-    type: {{ .type }}
-    {{- with .nodeSelector }}
-    nodeSelector: 
-{{ toYaml . | indent 6 }}
-    {{- end }}
-    {{- with .tolerations }}
-    tolerations:
-{{ toYaml . | indent 6 }}
-    {{- end }}
-    {{- with .affinity }}
-    affinity:
-{{ toYaml . | indent 6 }}
-    {{- end }}
     {{- end}}
 
   spark:
