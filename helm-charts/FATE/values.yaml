@@ -70,6 +70,12 @@ modules:
     affinity:
     backend: eggroll
     enabledNN: false
+    # subPath: ""
+    existingClaim: ""
+    claimName: python-data
+    storageClass: "python"
+    accessMode: ReadWriteOnce
+    size: 1Gi
     spark: 
       master: spark://spark-master:7077
       home: 
@@ -95,6 +101,15 @@ modules:
       host: nginx
       http_port: 9300
       grpc_port: 9310
+  client:
+    nodeSelector:
+    tolerations:
+    affinity:
+    subPath: "client"
+    existingClaim: ""
+    storageClass: "nodemanager-0"
+    accessMode: ReadWriteOnce
+    size: 1Gi
   clustermanager: 
     include: true
     ip: clustermanager
