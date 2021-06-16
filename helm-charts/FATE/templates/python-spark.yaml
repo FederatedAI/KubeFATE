@@ -290,6 +290,10 @@ spec:
                 sed -i "s/host: fateflow/host: ${POD_IP}/g" /data/projects/fate/conf/service_conf.yaml
                 # fix pipeline conf must use IP
                 sed -i "s/ip: fateflow/ip: ${POD_IP}/g" /data/projects/fate/conf/pipeline_conf.yaml
+                
+                cp /data/projects/spark-2.4.1-bin-hadoop2.7/conf/spark-defaults-template.conf /data/projects/spark-2.4.1-bin-hadoop2.7/conf/spark-defaults.conf
+                sed -i "s/fateflow/${POD_IP}/g" /data/projects/spark-2.4.1-bin-hadoop2.7/conf/spark-defaults.conf
+                
                 sleep 5;
                 python ./fate_flow/fate_flow_server.py
           volumeMounts:
@@ -301,7 +305,7 @@ spec:
               subPath: logs
             - mountPath: /data/projects/fate/conf1/
               name: python-confs
-            - mountPath: /data/projects/spark-2.4.1-bin-hadoop2.7/conf/spark-defaults.conf
+            - mountPath: /data/projects/spark-2.4.1-bin-hadoop2.7/conf/spark-defaults-template.conf
               name: python-confs
               subPath: spark-defaults.conf
             - mountPath: /data/projects/fate/conf/rabbitmq_route_table
@@ -390,7 +394,6 @@ spec:
       targetPort: 9380
       protocol: TCP
   type: ClusterIP
-  clusterIP: None
   selector:
     fateMoudle: python
 {{ include "fate.matchLabels" . | indent 4 }}
