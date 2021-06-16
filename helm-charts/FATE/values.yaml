@@ -65,6 +65,7 @@ modules:
     type: ClusterIP
     httpNodePort: 30097
     grpcNodePort: 30092
+    serviceAccountName: 
     nodeSelector:
     tolerations:
     affinity:
