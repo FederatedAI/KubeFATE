@@ -18,13 +18,33 @@ istio:
 podSecurityPolicy:
   enabled: false
 
+
+ingress:
+  servingProxy: 
+    # annotations: 
+    hosts:
+    - name: serving-proxy.kubefate.net
+      path: /
+    tls: []
+    # - secretName: my-tls-secret
+      # hosts:
+        # - serving-proxy.kubefate.net
+  servingServer: 
+    # annotations: 
+    hosts:
+    - name: serving-server.kubefate.net
+      path: /
+    tls: []
+    # - secretName: my-tls-secret
+      # hosts:
+        # - serving-server.kubefate.net
+
 servingProxy: 
   include: true
   ip: serving-proxy
   port: 6379
   type: NodePort
   nodePort: 30109
-  ingerssHost: 9999.serving-proxy.kubefate.net
   nodeSelector:
   tolerations:
   affinity:
@@ -80,7 +100,6 @@ servingZookeeper:
 
 servingAdmin:
   include: true
-  ingerssHost: 9999.serving-admin.kubefate.net
   username: admin
   password: admin
   nodeSelector: 

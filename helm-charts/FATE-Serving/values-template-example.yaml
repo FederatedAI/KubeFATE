@@ -20,18 +20,36 @@ modules:
   - servingZookeeper
   - servingAdmin
 
+ingress:
+  servingProxy: 
+    # annotations: 
+    hosts:
+    - name: serving-proxy.kubefate.net
+      path: /
+    tls: []
+    # - secretName: my-tls-secret
+      # hosts:
+        # - serving-proxy.kubefate.net
+  servingServer: 
+    # annotations: 
+    hosts:
+    - name: serving-server.kubefate.net
+      path: /
+    tls: []
+    # - secretName: my-tls-secret
+      # hosts:
+        # - serving-server.kubefate.net
+
 # servingAdmin:
   # nodeSelector:
   # tolerations:
   # affinity:
-  # ingressHost: 10000.serving-admin.kubefate.net123
   # username: admin
   # password: admin
 
 # servingProxy: 
   # nodePort: 30310
   # type: NodePort
-  # ingerssHost: 10000.serving-proxy.kubefate.net123
   # nodeSelector:
   # tolerations:
   # affinity:
