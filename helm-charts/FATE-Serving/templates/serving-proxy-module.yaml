@@ -43,8 +43,8 @@ data:
     #inference.service.name=serving
     #random, consistent
     #routeType=random
-    #route.table=/data/projects/fate-serving/serving-proxy/conf/route_table/route_table.json
-    #auth.file=/data/projects/fate-serving/serving-proxy/conf/auth_config.json
+    route.table=/data/projects/fate/serving-proxy/conf/route_table/route_table.json
+    #auth.file=/data/projects/fate/serving-proxy/conf/auth_config.json
     # zk router
     useZkRouter=true
     useRegister=true
