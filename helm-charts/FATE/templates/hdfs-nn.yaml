@@ -96,7 +96,7 @@ spec:
         fateMoudle: namenode
 {{ include "fate.labels" . | indent 8 }}
     spec:
-    {{ if and .Values.persistence.enabled }}
+    {{ if .Values.persistence.enabled }}
       initContainers:
         - name: delete-lost-found
           image: busybox
