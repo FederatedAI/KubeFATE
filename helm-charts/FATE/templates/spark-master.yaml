@@ -35,10 +35,13 @@ spec:
         - name: spark-master
           image: {{ if .Values.modules.spark.master.Image }}{{ .Values.modules.spark.master.Image }}{{ else }}{{ .Values.image.registry }}/spark-master{{ end }}:{{ default .Values.image.tag .Values.modules.spark.master.ImageTag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if .Values.modules.spark.master.resources}}
           resources:
-            requests:
-              cpu: "{{ .Values.modules.spark.worker.cpu }}"
-              memory: "{{ .Values.modules.spark.worker.memory }}"
+          {{- range $key, $val := .Values.modules.spark.master.resources }}
+          {{ $key }}:
+{{ toYaml $val | indent 14 }}
+          {{- end }}
+          {{- end }}
           ports:
             - containerPort: 8080
             - containerPort: 7077
