@@ -162,7 +162,7 @@ data:
     {{- with .Values.modules.pulsar.exchange }}
     default:
       proxy: "{{ .ip }}:{{ .port }}"
-      domain: "fate.org"
+      domain: "{{ .domain }}"
     {{- end }}
 {{- if .Values.modules.pulsar.route_table }}
 {{- range $key, $val := .Values.modules.pulsar.route_table }}
