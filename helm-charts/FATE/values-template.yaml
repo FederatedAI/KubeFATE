@@ -455,10 +455,15 @@ modules:
     type: {{ .type }}
     httpNodePort: {{ .httpNodePort }}
     httpsNodePort: {{ .httpsNodePort }}
+    {{- with .publicLB}}
+    publicLB:
+      enabled: {{ .enabled | default false }}
+    {{- end }}
     {{- with .exchange }}
     exchange:
       ip: {{ .ip }}
       port: {{ .port }}
+      domain: {{ .domain | default "fate.org" }}
     {{- end }}
     route_table: 
       {{- range $key, $val := .route_table }}
