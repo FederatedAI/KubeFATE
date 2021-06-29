@@ -1013,7 +1013,12 @@ spec:
             secretName: pulsar-cert
         {{- end }}
         - name: pulsar-data
+        {{ if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.modules.pulsar.existingClaim | default  "pulsar-data" }}
+        {{ else }}
           emptyDir: {}
+        {{ end }}
 ---
 apiVersion: v1
 kind: Service
@@ -1051,4 +1056,26 @@ spec:
     fateMoudle: pulsar
 {{ include "fate.matchLabels" . | indent 4 }}
 ---
+{{ if and .Values.persistence.enabled (not .Values.modules.pulsar.existingClaim) }}
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: pulsar-data
+  labels:
+    fateMoudle: pulsar
+{{ include "fate.labels" . | indent 4 }}
+spec:
+  accessModes:
+    - {{ .Values.modules.pulsar.accessMode }}
+  resources:
+    requests:
+      storage: {{ .Values.modules.pulsar.size }}
+  {{ if .Values.modules.pulsar.storageClass }}
+    {{ if eq "-" .Values.modules.pulsar.storageClass }}
+  storageClassName: ""
+    {{ else }}
+  storageClassName: {{ .Values.modules.pulsar.storageClass }}
+    {{ end }}
+  {{ end }}
+{{ end }}
 {{ end }}

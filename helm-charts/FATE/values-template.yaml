@@ -293,8 +293,10 @@ modules:
       Image: "{{ .master.Image }}"
       ImageTag: "{{ .master.ImageTag }}"
       replicas: {{ .master.replicas }}
-      cpu: "{{ .master.cpu }}"
-      memory: "{{ .master.memory }}"
+      {{- with .master.resources }}
+      resources:
+{{ toYaml . | indent 8 }}
+      {{- end }}
       {{- with .master.nodeSelector }}
       nodeSelector: 
 {{ toYaml . | indent 8 }}
@@ -312,8 +314,10 @@ modules:
       Image: "{{ .worker.Image }}"
       ImageTag: "{{ .worker.ImageTag }}"
       replicas: {{ .worker.replicas }}
-      cpu: "{{ .worker.cpu }}"
-      memory: "{{ .worker.memory }}"
+      {{- with .worker.resources }}
+      resources:
+{{ toYaml . | indent 8 }}
+      {{- end }}
       {{- with .worker.nodeSelector }}
       nodeSelector: 
 {{ toYaml . | indent 8 }}
@@ -347,6 +351,10 @@ modules:
 {{ toYaml . | indent 8 }}
       {{- end }}
       type: ClusterIP
+      existingClaim: {{ .namenode.existingClaim }}
+      storageClass: {{ .namenode.storageClass | default "" }}
+      accessMode: {{ .namenode.accessMode  | default "ReadWriteOnce"  }}
+      size: {{ .namenode.size }}
     datanode:
       {{- with .datanode.nodeSelector }}
       nodeSelector: 
@@ -361,6 +369,10 @@ modules:
 {{ toYaml . | indent 8 }}
       {{- end }}
       type: ClusterIP
+      existingClaim: {{ .datanode.existingClaim }}
+      storageClass: {{ .datanode.storageClass | default "" }}
+      accessMode: {{ .datanode.accessMode  | default "ReadWriteOnce"  }}
+      size: {{ .datanode.size }}
     {{- end }}
 
 
@@ -453,9 +465,12 @@ modules:
       {{ $key }}: 
 {{ toYaml $val | indent 8 }}
       {{- end }}
+    existingClaim: {{ .existingClaim }}
+    storageClass: {{ .storageClass | default "" }}
+    accessMode: {{ .accessMode  | default "ReadWriteOnce"  }}
+    size: {{ .size }}
     {{- end }}
     
-
 externalMysqlIp: {{ .externalMysqlIp }}
 externalMysqlPort: {{ .externalMysqlPort }}
 externalMysqlDatabase: {{ .externalMysqlDatabase }}

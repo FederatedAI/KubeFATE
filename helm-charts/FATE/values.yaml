@@ -185,8 +185,6 @@ modules:
       Image: ""
       ImageTag: ""
       replicas: 1
-      cpu: "100m"
-      memory: "512Mi"
       nodeSelector:
       tolerations:
       affinity:
@@ -195,8 +193,13 @@ modules:
       Image: ""
       ImageTag: ""
       replicas: 2
-      cpu: "1000m"
-      memory: "512Mi"
+      resources:
+        requests:
+          cpu: "1000m"
+          memory: "1Gi"
+        limits:
+          cpu: "1000m"
+          memory: "1Gi"
       nodeSelector:
       tolerations:
       affinity:
