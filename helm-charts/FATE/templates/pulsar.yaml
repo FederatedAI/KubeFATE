@@ -1056,6 +1056,26 @@ spec:
     fateMoudle: pulsar
 {{ include "fate.matchLabels" . | indent 4 }}
 ---
+{{ if .Values.modules.pulsar.publicLB.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: pulsar-public-tls
+  labels:
+    fateMoudle: pulsar
+{{ include "fate.labels" . | indent 4 }}
+spec:
+  ports:
+  - name: "tls-port"
+    port: 6651
+    targetPort: 6651
+    protocol: TCP
+  type: LoadBalancer
+  selector:
+    fateMoudle: pulsar
+{{ include "fate.matchLabels" . | indent 4 }}
+---
+{{ end }}
 {{ if and .Values.persistence.enabled (not .Values.modules.pulsar.existingClaim) }}
 kind: PersistentVolumeClaim
 apiVersion: v1
