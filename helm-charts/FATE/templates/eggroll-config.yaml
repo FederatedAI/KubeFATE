@@ -82,3 +82,16 @@ data:
     eggroll.rollsite.push.long.retry=2
     eggroll.rollsite.push.batches.per.stream=10
     eggroll.rollsite.adapter.sendbuf.size=100000
+    
+    # polling
+    # {{ .Values.modules.rollsite.polling.enabled }}
+    # {{ .Values.modules.rollsite.polling.type }}
+    # 
+    {{- if and .Values.modules.rollsite.polling.enabled ( eq .Values.modules.rollsite.polling.type "client" )  }}
+    eggroll.rollsite.polling.client.enabled=true
+    {{- end }}
+    
+    {{- if and .Values.modules.rollsite.polling.enabled ( eq .Values.modules.rollsite.polling.type "server" )  }}
+    eggroll.rollsite.polling.server.enabled=true
+    eggroll.rollsite.polling.concurrency= {{ .Values.modules.rollsite.polling.concurrency | default 50 }}
+    {{- end }}

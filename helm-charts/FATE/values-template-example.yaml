@@ -36,7 +36,7 @@ backend: eggroll
   # rabbitmqUI: 9999.rabbitmq.kubefate.net
   # pulsarUI: 9999.pulsar.kubefate.net
   
-# rollsite: 
+rollsite: 
   # type: NodePort
   # nodePort: 30091
   # exchange:
@@ -54,6 +54,16 @@ backend: eggroll
   #   value: "value"
   #   effect: "NoSchedule"
   # affinity:
+  polling:
+    enabled: true
+    type: server
+    # server:
+      # ip: 192.168.100.1
+      # port: 9370
+    clientList:
+    - partID: 9999
+    concurrency: 49
+
 
 # lbrollsite:
   # type: NodePort

@@ -51,6 +51,15 @@ modules:
     nodeSelector:
     tolerations:
     affinity:
+    polling:
+      enabled: false
+      type: client
+      server:
+        ip: 192.168.9.1
+        port: 9370
+    # clientList:
+    # - partID: 9999
+    # concurrency: 50
   lbrollsite:
     include: true
     ip: rollsite
@@ -147,6 +156,11 @@ modules:
     nodeSelector:
     tolerations:
     affinity:
+    subPath: "client"
+    existingClaim: ""
+    storageClass: "client"
+    accessMode: ReadWriteOnce
+    size: 1Gi
   mysql: 
     include: true
     type: ClusterIP
