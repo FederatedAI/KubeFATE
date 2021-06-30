@@ -38,7 +38,7 @@ spec:
           {{- if .Values.modules.spark.master.resources}}
           resources:
           {{- range $key, $val := .Values.modules.spark.master.resources }}
-          {{ $key }}:
+            {{ $key }}:
 {{ toYaml $val | indent 14 }}
           {{- end }}
           {{- end }}
