@@ -117,7 +117,7 @@ modules:
     backend: {{ default "eggroll" .backend }}
     {{- with .python }}
     type: {{ .type }}
-    {{- with .python.resources }}
+    {{- with .resources }}
     resources:
 {{ toYaml . | indent 6 }}
     {{- end }}
