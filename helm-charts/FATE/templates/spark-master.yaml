@@ -86,10 +86,39 @@ spec:
     protocol: TCP
     port: 6066
     targetPort: 6066
-  type: {{ .Values.modules.spark.master.type }}
+  type: ClusterIP
   clusterIP: None
   selector:
     fateMoudle: spark-master
 {{ include "fate.matchLabels" . | indent 4 }}
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: spark-client
+  labels:
+    fateMoudle: spark-master
+{{ include "fate.labels" . | indent 4 }}
+spec:
+  ports:
+  - name: web-ui
+    protocol: TCP
+    port: 8080
+    targetPort: 8080
+  - name: master
+    protocol: TCP
+    port: 7077
+    targetPort: 7077
+    {{- if eq .Values.modules.spark.master.type "NodePort" "LoadBalancer" }}
+    nodePort: {{ .Values.modules.spark.master.nodePort }}
+    {{- end }}
+  - name: master-rest
+    protocol: TCP
+    port: 6066
+    targetPort: 6066
+  type: {{ .Values.modules.spark.master.type }}
+  # clusterIP: None
+  selector:
+    fateMoudle: spark-master
+{{ include "fate.matchLabels" . | indent 4 }}
 {{ end }}
