@@ -134,12 +134,17 @@ backend: eggroll
     # cores_per_node: 16
     # nodes: 2
   # spark: 
-    # master: spark://spark-master:7077
-    # home: 
     # cores_per_node: 20
     # nodes: 2
+    # existingSpark: spark://192.168.99.1:7077
+    # driverHost: fateflow
+    # driverHostType: NodePort
+    # portMaxRetries: 16
+    # driverStartPort: 30997
+    # blockManagerStartPort: 31107
+    # pysparkPython: 
   # hdfs:
-    # name_node: hdfs://namenode:9000
+    # existingHdfs: hdfs://namenode:9000
     # path_prefix:
   # rabbitmq:
     # host: rabbitmq
@@ -147,13 +152,10 @@ backend: eggroll
     # port: 5672
     # user: fate
     # password: fate
-    # # default conf/rabbitmq_route_table.yaml
-    # route_table: 
   # pulsar:
     # host: pulsar
     # mng_port: 8080
     # port: 6650
-    # route_table:
   # nginx:
     # host: nginx
     # http_port: 9300
@@ -203,20 +205,31 @@ backend: eggroll
 # spark:
   # master:
     # Image: "federatedai/spark-master"
-    # ImageTag: "1.5.0-release"
+    # ImageTag: "1.6.0-release"
     # replicas: 1
-    # cpu: "100m"
-    # memory: "512Mi"
+    # resources:
+      # requests:
+        # cpu: "1"
+        # memory: "2Gi"
+      # limits:
+        # cpu: "1"
+        # memory: "2Gi"
     # nodeSelector:
     # tolerations:
     # affinity:
     # type: ClusterIP
+    # nodePort: 30977
   # worker:
     # Image: "federatedai/spark-worker"
-    # ImageTag: "1.5.0-release"
+    # ImageTag: "1.6.0-release"
     # replicas: 2
-    # cpu: "1000m"
-    # memory: "512Mi"
+    # resources:
+      # requests:
+        # cpu: "2"
+        # memory: "4Gi"
+      # limits:
+        # cpu: "4"
+        # memory: "8Gi"
     # nodeSelector:
     # tolerations:
     # affinity:
@@ -227,6 +240,7 @@ backend: eggroll
     # tolerations:
     # affinity:
     # type: ClusterIP
+    # nodePort: 30900
   # datanode:
     # nodeSelector:
     # tolerations:

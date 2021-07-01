@@ -113,20 +113,25 @@ The parties are directly connected.
 
 ### python mappings
 
-| Name                 | Type     | Description                                                  |
-| -------------------- | -------- | ------------------------------------------------------------ |
-| type                 | scalars  | Kubernetes ServiceTypes, default is NodePort.<br />Other modules can connect to the fateflow |
-| nodePort             | scalars  | The port used by `proxy` module's kubernetes service, default range: 30000-32767. |
-| nodeSelector         | mappings | kubernetes nodeSelector.                                     |
-| enabledNN            | bool     | If or not neural network workflow is required                |
-| spark                | mappings | If you use your own spark, modify the configuration          |
-| spark.master         | scalars  | If you do not need to use the spark configuration, you can use the spark configuration |
-| spark.home           | scalars  | configuration of FATE fateflow module                        |
-| spark.cores_per_node | scalars  | configuration of FATE fateflow module                        |
-| spark.nodes          | scalars  | configuration of FATE fateflow module                        |
-| hdfs                 | mappings | If you do not need to use the spark configuration, you can use the spark configuration |
-| rabbitmq             | mappings | If you do not need to use the spark configuration, you can use the spark configuration |
-| nginx                | mappings | If you do not need to use the spark configuration, you can use the spark configuration |
+| Name                  | Type     | Description                                                  |
+| --------------------- | -------- | ------------------------------------------------------------ |
+| type                  | scalars  | Kubernetes ServiceTypes, default is NodePort.<br />Other modules can connect to the fateflow |
+| nodePort              | scalars  | The port used by `proxy` module's kubernetes service, default range: 30000-32767. |
+| nodeSelector          | mappings | kubernetes nodeSelector.                                     |
+| enabledNN             | bool     | If or not neural network workflow is required                |
+| spark                 | mappings | If you use your own spark, modify the configuration          |
+| spark.cores_per_node  | scalars  | configuration of FATE fateflow module                        |
+| spark.nodes           | scalars  | configuration of FATE fateflow module                        |
+| spark.existingSpark   | scalars  | If you need to use the existing spark , you can set this configuration |
+| spark.driverHost      | scalars  | call back IP of spark executor                               |
+| spark.driverHostType  | scalars  | service type of spark driver                                 |
+| spark.portMaxRetries  | scalars  | spark driver's configuration                                 |
+| driverStartPort       | scalars  | spark driver start port                                      |
+| blockManagerStartPort | scalars  | spark driver blockManager start port                         |
+| pysparkPython         | scalars  | spark worker node python PATH                                |
+| hdfs                  | mappings | If you do not need to use the spark configuration, you can use the spark configuration |
+| rabbitmq              | mappings | If you do not need to use the spark configuration, you can use the spark configuration |
+| nginx                 | mappings | If you do not need to use the spark configuration, you can use the spark configuration |
 
 
 
@@ -158,9 +163,8 @@ Configuration of kubernetes deployment spark.
 | ----------------- | ------------ | -------- | ---------------------------- |
 | master/<br>worker | Image        | scalars  | Image of spark components    |
 |                   | ImageTag     | scalars  | ImageTag of spark components |
-|                   | replicas     |          | Number of copies of pod      |
-|                   | cpu          | scalars  | Requested CPU resources      |
-|                   | memory       | scalars  | Requested memory resources   |
+|                   | replicas     | scalars  | Number of copies of pod      |
+|                   | resources    | mappings | resources of Kubernetes      |
 |                   | nodeSelector | mappings | kubernetes nodeSelector.     |
 |                   | type         | scalars  | Kubernetes ServiceTypes.     |
 

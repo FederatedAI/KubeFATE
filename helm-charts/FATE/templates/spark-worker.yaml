@@ -10,6 +10,25 @@
 # limitations under the License.
 
 {{ if .Values.modules.spark.include }}
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: spark-worker-config
+  labels:
+    fateMoudle: spark-worker
+{{ include "fate.labels" . | indent 4 }}
+data:
+  service_conf.yaml: |
+    work_mode: 1
+    database:
+      name: fate_flow
+      user: fate
+      passwd: fate
+      host: 127.0.0.1
+      port: 3306
+      max_connections: 100
+      stale_timeout: 30
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -44,7 +63,7 @@ spec:
           {{- end }}
           volumeMounts:
             - mountPath: /data/projects/fate/conf/
-              name: python-confs
+              name: spark-worker-confs
           ports:
             - containerPort: 8081
       {{- with .Values.modules.spark.worker.nodeSelector }}
@@ -66,9 +85,9 @@ spec:
       serviceAccountName: {{ template "serviceAccountName" . }}
       restartPolicy: Always
       volumes:
-        - name: python-confs
+        - name: spark-worker-confs
           configMap:
-            name: python-config
+            name: spark-worker-config
 ---
 apiVersion: v1
 kind: Service
