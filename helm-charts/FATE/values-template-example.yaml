@@ -36,7 +36,7 @@ backend: eggroll
   # rabbitmqUI: 9999.rabbitmq.kubefate.net
   # pulsarUI: 9999.pulsar.kubefate.net
   
-rollsite: 
+# rollsite: 
   # type: NodePort
   # nodePort: 30091
   # exchange:
@@ -54,15 +54,15 @@ rollsite:
   #   value: "value"
   #   effect: "NoSchedule"
   # affinity:
-  polling:
-    enabled: true
-    type: server
-    # server:
-      # ip: 192.168.100.1
-      # port: 9370
-    clientList:
-    - partID: 9999
-    concurrency: 49
+  # polling:
+    # enabled: true
+    # type: server
+    # # server:
+      # # ip: 192.168.100.1
+      # # port: 9370
+    # clientList:
+    # - partID: 9999
+    # concurrency: 49
 
 
 # lbrollsite:
@@ -179,11 +179,11 @@ rollsite:
   # size: 1Gi
 
 
-externalMysqlIp: mysql1
-externalMysqlPort: 33060
-externalMysqlDatabase: eggroll_meta1
-externalMysqlUser: fate1
-externalMysqlPassword: fate_dev1
+# externalMysqlIp: mysql1
+# externalMysqlPort: 33060
+# externalMysqlDatabase: eggroll_meta1
+# externalMysqlUser: fate1
+# externalMysqlPassword: fate_dev1
 
 
 # servingIp: 192.168.0.1
