@@ -6,6 +6,8 @@ partyId: 1
 registry: ""
 imageTag: ""
 pullPolicy: 
+imagePullSecrets: 
+- name: myregistrykey
 persistence: false
 istio:
   enabled: false
