@@ -126,12 +126,12 @@ The parties are directly connected.
 | spark.driverHost      | scalars  | call back IP of spark executor                               |
 | spark.driverHostType  | scalars  | service type of spark driver                                 |
 | spark.portMaxRetries  | scalars  | spark driver's configuration                                 |
-| driverStartPort       | scalars  | spark driver start port                                      |
-| blockManagerStartPort | scalars  | spark driver blockManager start port                         |
-| pysparkPython         | scalars  | spark worker node python PATH                                |
-| hdfs                  | mappings | If you do not need to use the spark configuration, you can use the spark configuration |
-| rabbitmq              | mappings | If you do not need to use the spark configuration, you can use the spark configuration |
-| nginx                 | mappings | If you do not need to use the spark configuration, you can use the spark configuration |
+| spark.driverStartPort       | scalars  | spark driver start port                                      |
+| spark.blockManagerStartPort | scalars  | spark driver blockManager start port                         |
+| spark.pysparkPython         | scalars  | spark worker node python PATH                                |
+| hdfs                  | mappings | If you use the existing hdfs, you can set this configuration |
+| rabbitmq              | mappings | If you use the existing rabbitmq, you can set this configuration |
+| nginx                 | mappings | If you use the existing nginx, you can set this configuration |
 
 
 
@@ -164,7 +164,7 @@ Configuration of kubernetes deployment spark.
 | master/<br>worker | Image        | scalars  | Image of spark components    |
 |                   | ImageTag     | scalars  | ImageTag of spark components |
 |                   | replicas     | scalars  | Number of copies of pod      |
-|                   | resources    | mappings | resources of Kubernetes      |
+|                   | resources    | mappings | resources of Pod      |
 |                   | nodeSelector | mappings | kubernetes nodeSelector.     |
 |                   | type         | scalars  | Kubernetes ServiceTypes.     |
 
