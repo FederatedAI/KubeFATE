@@ -141,9 +141,9 @@ modules:
     spark: 
       cores_per_node: {{ .cores_per_node }}
       nodes: {{ .nodes }}
-      existingSpark: {{ .existingSpark }}
-      driverHost: {{ .driverHost  | default "fateflow" }}
-      driverHostType: {{ .driverHostType  | default "ClusterIP" }}
+      master: {{ .master }}
+      driverHost: {{ .driverHost | default "fateflow" }}
+      driverHostType: {{ .driverHostType }}
       portMaxRetries: {{ .portMaxRetries | int }}
       driverStartPort: {{ .driverStartPort }}
       blockManagerStartPort: {{ .blockManagerStartPort }}
@@ -151,7 +151,7 @@ modules:
     {{- end }}
     {{- with .hdfs }}
     hdfs:
-      existingHdfs: {{ .existingHdfs }}
+      name_node: {{ .name_node }}
       path_prefix: {{ .path_prefix }}
     {{- end }}
     {{- with .pulsar }}

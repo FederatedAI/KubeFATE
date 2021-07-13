@@ -19,14 +19,24 @@ metadata:
 {{ include "fate.labels" . | indent 4 }}
 data:
   spark-defaults.conf: |
-    spark.master                      {{  .Values.modules.python.spark.existingSpark | default "spark://spark-master:7077"}}
+    spark.master                      {{  .Values.modules.python.spark.master | default "spark://spark-master:7077"}}
     spark.driver.host                 {{  .Values.modules.python.spark.driverHost | default "fateflow" }}
-    {{- if .Values.modules.python.spark.existingSpark }}
+    {{- if .Values.modules.python.spark.driverStartPort }}
     spark.driver.port                 {{  .Values.modules.python.spark.driverStartPort }}
+    {{- end }}
+    
+    {{- if .Values.modules.python.spark.portMaxRetries }}
     spark.port.maxRetries             {{  .Values.modules.python.spark.portMaxRetries }}
+    {{- end }}
+    
+    {{- if .Values.modules.python.spark.blockManagerStartPort }}
     spark.blockManager.port           {{  .Values.modules.python.spark.blockManagerStartPort }}
+    {{- end }}
+    
+    {{- if .Values.modules.python.spark.blockManagerStartPort }}
     spark.driver.bindAddress          0.0.0.0
     {{- end }}
+    
     {{- if .Values.modules.python.spark.pysparkPython }}
     spark.pyspark.python              {{  .Values.modules.python.spark.pysparkPython }}
     spark.pyspark.driver.python       python
@@ -86,7 +96,7 @@ data:
         cores_per_node: {{ .Values.modules.python.spark.cores_per_node }}
         nodes: {{ .Values.modules.python.spark.nodes }}
       hdfs:
-        name_node: {{ .Values.modules.python.hdfs.existingHdfs | default "hdfs://namenode:9000" }}
+        name_node: {{ .Values.modules.python.hdfs.name_node | default "hdfs://namenode:9000" }}
         # default /
         path_prefix: {{ .Values.modules.python.hdfs.path_prefix }}
       rabbitmq:
@@ -434,7 +444,7 @@ spec:
     fateMoudle: python
 {{ include "fate.matchLabels" . | indent 4 }}
 ---
-{{- if .Values.modules.python.spark.existingSpark }}
+{{- if and .Values.modules.python.spark.portMaxRetries (ne (print .Values.modules.python.spark.driverHost) "fateflow") }}
 apiVersion: v1
 kind: Service
 metadata:
