@@ -349,7 +349,11 @@ spec:
       imagePullSecrets:
 {{ toYaml . | indent 6 }}
       {{- end }}
+{{- if .Values.modules.python.serviceAccountName }}
+      serviceAccountName: {{ .Values.modules.python.serviceAccountName }}
+{{- else -}}
       serviceAccountName: {{ template "serviceAccountName" . }}
+{{- end -}}
       restartPolicy: Always
       volumes:
         - name: eggroll-confs
