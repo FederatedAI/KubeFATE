@@ -136,15 +136,15 @@ backend: eggroll
   # spark: 
     # cores_per_node: 20
     # nodes: 2
-    # existingSpark: spark://192.168.99.1:7077
-    # driverHost: fateflow
-    # driverHostType: NodePort
-    # portMaxRetries: 16
-    # driverStartPort: 30997
-    # blockManagerStartPort: 31107
+    # master: spark://spark-master:7077
+    # driverHost: 
+    # driverHostType: 
+    # portMaxRetries: 
+    # driverStartPort: 
+    # blockManagerStartPort: 
     # pysparkPython: 
   # hdfs:
-    # existingHdfs: hdfs://namenode:9000
+    # name_node: hdfs://namenode:9000
     # path_prefix:
   # rabbitmq:
     # host: rabbitmq
