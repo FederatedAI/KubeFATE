@@ -6,8 +6,10 @@ image:
   isThridParty: {{ empty .registry | ternary  "false" "true" }}
   tag: {{ .imageTag | default "1.6.0-release" }}
   pullPolicy: {{ .pullPolicy | default "IfNotPresent" }}
-  imagePullSecrets: 
-#  - name: 
+  {{- with .imagePullSecrets }}
+  imagePullSecrets:
+{{ toYaml . | indent 2 }}
+  {{- end }}
 
 exchange:
 {{- with .rollsite }}

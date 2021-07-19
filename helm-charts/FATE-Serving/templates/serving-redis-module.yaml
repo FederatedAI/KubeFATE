@@ -102,7 +102,7 @@ spec:
         {{- if not .Values.persistence.enabled }}
         - name: data
           emptyDir: {}
-        {{- else if .Values.servingRedis.existingClaim }}
+        {{- else }}
         - name: data
           persistentVolumeClaim:
             claimName: {{ .Values.servingRedis.existingClaim | default  "serving-redis-data" }}

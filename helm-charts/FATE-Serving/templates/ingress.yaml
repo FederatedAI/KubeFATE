@@ -22,7 +22,7 @@ metadata:
     cluster: fate
 spec:
   rules:
-  - host: {{ .Values.servingProxy.ingerssHost }}
+  - host: {{ .Values.servingProxy.ingressHost }}
     http:
       paths:
       - path: /
@@ -45,7 +45,7 @@ metadata:
     cluster: fate
 spec:
   rules:
-    - host: {{ .Values.servingAdmin.ingerssHost }}
+    - host: {{ .Values.servingAdmin.ingressHost }}
       http:
         paths:
           - path: /
