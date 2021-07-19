@@ -123,6 +123,7 @@ modules:
     {{- end }}
     httpNodePort: {{ .httpNodePort }}
     grpcNodePort: {{ .grpcNodePort }}
+    serviceAccountName: {{ .serviceAccountName }}
     {{- with .nodeSelector }}
     nodeSelector: 
 {{ toYaml . | indent 6 }}

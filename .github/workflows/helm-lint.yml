@@ -1,0 +1,24 @@
+name: helm-lint
+
+on: 
+  pull_request:
+    paths:
+    - "helm-charts/**"
+
+jobs:
+  helm-lint:
+    name: Check helm lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        
+      - uses: azure/setup-helm@v1
+        with:
+          version: 'v3.4.2'
+        id: install
+        
+      - name: lint
+        run: |
+          cd helm-charts
+          make lint 
