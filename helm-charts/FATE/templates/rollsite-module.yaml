@@ -29,7 +29,7 @@ data:
                         "port": {{ .Values.exchange.partyPort }}
                       {{- else }}
                       
-                        {{- if and .Values.modules.rollsite.polling.enabled ( eq .Values.modules.rollsite.polling.type "client" ) }}
+                        {{- if and .Values.modules.rollsite.polling.enabled ( eq (print .Values.modules.rollsite.polling.type) "client" ) }}
                         
                         {{- with .Values.modules.rollsite.polling.server }}
                         "ip": "{{ .ip }}",
@@ -56,7 +56,7 @@ data:
             },
             {{- end }}
             
-            {{- if and .Values.modules.rollsite.polling.enabled ( eq .Values.modules.rollsite.polling.type "server" ) }}
+            {{- if and .Values.modules.rollsite.polling.enabled ( eq (print .Values.modules.rollsite.polling.type) "server" ) }}
             
             {{- range .Values.modules.rollsite.polling.clientList}}
             "{{ .partID }}": 
