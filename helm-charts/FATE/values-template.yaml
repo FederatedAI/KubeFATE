@@ -8,7 +8,7 @@ image:
   imagePullSecrets:
 {{ toYaml . | indent 2 }}
   {{- end }}
-  
+
 partyId: {{ .partyId | int64 | toString }}
 partyName: {{ .name }}
 
@@ -139,7 +139,7 @@ modules:
     accessMode: {{ .accessMode | default "ReadWriteOnce" }}
     size: {{ .size | default "1Gi" }}
     {{- with .spark }}
-    spark: 
+    spark:
       master: {{ .master }}
       home: {{ .home }}
       cores_per_node: {{ .cores_per_node }}
@@ -289,6 +289,7 @@ modules:
   spark:
     include: {{ has "spark" .modules }}
     {{- with .spark }}
+    {{- if .master }}
     master:
       Image: "{{ .master.Image }}"
       ImageTag: "{{ .master.ImageTag }}"
@@ -310,6 +311,8 @@ modules:
 {{ toYaml . | indent 8 }}
       {{- end }}
       type: {{ .type }}
+    {{- end }}
+    {{- if .worker }}
     worker:
       Image: "{{ .worker.Image }}"
       ImageTag: "{{ .worker.ImageTag }}"
@@ -331,6 +334,7 @@ modules:
 {{ toYaml . | indent 8 }}
       {{- end }}
       type: {{ .type }}
+    {{- end }}
     {{- end }}
 
 
