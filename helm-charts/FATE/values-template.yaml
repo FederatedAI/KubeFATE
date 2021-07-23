@@ -138,6 +138,11 @@ modules:
     storageClass: {{ .storageClass | default "python" }}
     accessMode: {{ .accessMode | default "ReadWriteOnce" }}
     size: {{ .size | default "1Gi" }}
+    {{- with .clustermanager }}
+    clustermanager:
+      cores_per_node: {{ .cores_per_node }}
+      nodes: {{ .nodes }}
+    {{- end }}
     {{- with .spark }}
     spark: 
       master: {{ .master }}
