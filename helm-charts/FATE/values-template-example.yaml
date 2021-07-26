@@ -130,6 +130,9 @@ backend: eggroll
   # storageClass: "python"
   # accessMode: ReadWriteMany
   # size: 1Gi
+  # clustermanager:
+    # cores_per_node: 16
+    # nodes: 2
   # spark: 
     # master: spark://spark-master:7077
     # home: 
