@@ -358,9 +358,9 @@ spec:
       {{- end }}
 {{- if .Values.modules.python.serviceAccountName }}
       serviceAccountName: {{ .Values.modules.python.serviceAccountName }}
-{{- else -}}
+{{- else }}
       serviceAccountName: {{ template "serviceAccountName" . }}
-{{- end -}}
+{{- end }}
       restartPolicy: Always
       volumes:
         - name: eggroll-confs
