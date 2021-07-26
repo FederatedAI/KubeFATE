@@ -269,6 +269,13 @@ spec:
           image: {{ .Values.image.registry }}/{{ if .Values.modules.python.enabledNN }}python-nn{{ else }}python{{ end }}:{{ .Values.image.tag }}
           {{- end }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if .Values.modules.python.resources}}
+          resources:
+          {{- range $key, $val := .Values.modules.python.resources }}
+            {{ $key }}:
+{{ toYaml $val | indent 14 }}
+          {{- end }}
+          {{- end }}
           env:
           - name: POD_IP
             valueFrom:

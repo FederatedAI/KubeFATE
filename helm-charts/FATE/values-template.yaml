@@ -132,6 +132,10 @@ modules:
     backend: {{ default "eggroll" .backend }}
     {{- with .python }}
     type: {{ .type }}
+    {{- with .resources }}
+    resources:
+{{ toYaml . | indent 6 }}
+    {{- end }}
     httpNodePort: {{ .httpNodePort }}
     grpcNodePort: {{ .grpcNodePort }}
     serviceAccountName: {{ .serviceAccountName }}
