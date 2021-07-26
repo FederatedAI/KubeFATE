@@ -65,18 +65,24 @@
 ### rollsite mappings
 It is used to declare the `rollsite ` module in the FATE cluster to be deployed.
 
-| Name         | subitem   | Type      | Description                                                  |
-| ------------ | --------- | --------- | ------------------------------------------------------------ |
-| type         |           | scalars   | Kubernetes ServiceTypes, default is NodePort.                |
-| nodePort     |           | scalars   | The port used by `proxy` module's kubernetes service, default range: 30000-32767. |
-| partyList    |           | sequences | If this FATE cluster is exchange cluster, partyList is all party's sequences of all parties proxy address. If this FATE cluster is one of participants, delete this configuration item. |
-| partyList    | partyId   | scalars   | Participant FATE cluster party ID.                           |
-| partyList    | partyIp   | scalars   | Participant FATE cluster IP.                                 |
-| partyList    | partyPort | scalars   | Participant FATE cluster port.                               |
-| exchange     |           | mappings  | FATE cluster `exchange` module's ip and port.                |
-| exchange     | ip        | mappings  | FATE cluster `exchange` module's ip. .                       |
-| exchange     | port      | mappings  | FATE cluster `exchange` module's port.                       |
-| nodeSelector |           | mappings  | kubernetes nodeSelector.                                     |
+| Name         | subitem     | Type      | Description                                                  |
+| ------------ | ----------- | --------- | ------------------------------------------------------------ |
+| type         |             | scalars   | Kubernetes ServiceTypes, default is NodePort.                |
+| nodePort     |             | scalars   | The port used by `proxy` module's kubernetes service, default range: 30000-32767. |
+| partyList    |             | sequences | If this FATE cluster is exchange cluster, partyList is all party's sequences of all parties proxy address. If this FATE cluster is one of participants, delete this configuration item. |
+| partyList    | partyId     | scalars   | Participant FATE cluster party ID.                           |
+| partyList    | partyIp     | scalars   | Participant FATE cluster IP.                                 |
+| partyList    | partyPort   | scalars   | Participant FATE cluster port.                               |
+| exchange     |             | mappings  | FATE cluster `exchange` module's ip and port.                |
+| exchange     | ip          | mappings  | FATE cluster `exchange` module's ip. .                       |
+| exchange     | port        | mappings  | FATE cluster `exchange` module's port.                       |
+| nodeSelector |             | mappings  | kubernetes nodeSelector.                                     |
+| polling      |             |           | rollsite support polling                                     |
+| polling      | enabled     |           | enable polling                                               |
+| polling      | type        |           | polling type (server/client)                                 |
+| polling      | server      |           | if type choose client, you need a polling server.            |
+| polling      | clientList  |           | if type choose server, this rollsite serve for clientList.   |
+| polling      | concurrency |           | if type choose server, polling client concurrency.           |
 
 FATE cluster has two deployment modes: with exchange and without exchange.
 #### Exchange mode:
