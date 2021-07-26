@@ -21,13 +21,10 @@ modules:
   - python
   - fateboard
   - client
-  # - spark
-  # - hdfs
-  # - nginx
-  # - rabbitmq
 
 backend: eggroll
 
+ # Specify domain name for service
 # host:
   # fateboard: 9999.fateboard.kubefate.net
   # client: 9999.notebook.kubefate.net
@@ -35,6 +32,7 @@ backend: eggroll
   # rabbitmqUI: 9999.rabbitmq.kubefate.net
   # pulsarUI: 9999.pulsar.kubefate.net
   
+# Specify rollsite properties
 # rollsite: 
   # type: NodePort
   # nodePort: 30091
@@ -47,6 +45,7 @@ backend: eggroll
     # partyPort: 30101
   # nodeSelector: 
 
+# Specify nodemanager properties
 # nodemanager:
   # count: 3
   # sessionProcessorsPerNode: 4
@@ -63,6 +62,7 @@ backend: eggroll
     # accessMode: ReadWriteOnce
     # size: 1Gi
 
+# Specify the fateflow service's properties
 # python:
   # type: NodePort
   # httpNodePort: 30097
@@ -94,6 +94,8 @@ backend: eggroll
     # host: nginx
     # http_port: 9300
     # grpc_port: 9310
+
+# Specify the mysql properties
 # mysql: 
   # nodeSelector: 
   # ip: mysql
@@ -114,65 +116,6 @@ backend: eggroll
 # #externalMysqlUser: fate
 # #externalMysqlPassword: fate_dev
 
-
+# Specify serving configuration
 # servingIp: 192.168.0.1
 # servingPort: 30095
-
-# spark:
-  # master:
-    # Image: "federatedai/spark-master"
-    # ImageTag: "1.6.0-release"
-    # replicas: 1
-    # resources:
-      # requests:
-        # cpu: "1"
-        # memory: "2Gi"
-      # limits:
-        # cpu: "1"
-        # memory: "2Gi"
-    # nodeSelector: 
-    # type: ClusterIP
-  # worker:
-    # Image: "federatedai/spark-worker"
-    # ImageTag: "1.6.0-release"
-    # replicas: 2
-    # resources:
-      # requests:
-        # cpu: "2"
-        # memory: "4Gi"
-      # limits:
-        # cpu: "4"
-        # memory: "8Gi"
-    # nodeSelector: 
-    # type: ClusterIP
-# hdfs:
-  # namenode:
-    # nodeSelector: 
-    # type: ClusterIP
-  # datanode:
-    # nodeSelector: 
-    # type: ClusterIP
-# nginx:
-  # nodeSelector: 
-  # type: ClusterIP
-  # nodePort: 30093
-  # route_table: 
-    # 10000: 
-      # proxy: 
-        # - host: 192.168.0.1 
-          # port: 30103
-      # fateflow: 
-        # - host: 192.168.0.1
-          # port: 30102
-# rabbitmq:
-  # nodeSelector: 
-  # type: ClusterIP
-  # nodePort: 30094
-  # default_user: fate
-  # default_pass: fate
-  # user: fate
-  # password: fate
-  # route_table:
-    # 10000:
-      # host: 192.168.0.1
-      # port: 30104

@@ -164,15 +164,7 @@ modules:
     {{- end }}
     {{- with .spark }}
     spark: 
-      cores_per_node: {{ .cores_per_node }}
-      nodes: {{ .nodes }}
-      master: {{ .master }}
-      driverHost: {{ .driverHost | default "fateflow" }}
-      driverHostType: {{ .driverHostType }}
-      portMaxRetries: {{ .portMaxRetries | int }}
-      driverStartPort: {{ .driverStartPort }}
-      blockManagerStartPort: {{ .blockManagerStartPort }}
-      pysparkPython: {{ .pysparkPython }}
+{{ toYaml . | indent 6}}
     {{- end }}
     {{- with .hdfs }}
     hdfs:

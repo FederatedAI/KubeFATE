@@ -14,20 +14,18 @@ istio:
 podSecurityPolicy:
   enabled: false
 modules:
-  # - rollsite
-  # - clustermanager
-  # - nodemanager
   - mysql
   - python
   - fateboard
-  # - client
+  - client
   - spark
   - hdfs
   - nginx
-  - rabbitmq
+  - pulsar
 
 backend: spark
 
+# Specify domain name for service
 # host:
   # fateboard: 9999.fateboard.kubefate.net
   # client: 9999.notebook.kubefate.net
@@ -35,6 +33,7 @@ backend: spark
   # rabbitmqUI: 9999.rabbitmq.kubefate.net
   # pulsarUI: 9999.pulsar.kubefate.net
 
+# Specify rollsite properties
 # rollsite: 
   # type: NodePort
   # nodePort: 30091
@@ -47,22 +46,7 @@ backend: spark
     # partyPort: 30101
   # nodeSelector: 
 
-# nodemanager:
-  # count: 3
-  # sessionProcessorsPerNode: 4
-  # storageClass: "nodemanagers"
-  # accessMode: ReadWriteOnce
-  # size: 2Gi
-  # list:
-  # - name: nodemanager
-    # nodeSelector: 
-    # sessionProcessorsPerNode: 4
-    # subPath: "nodemanager"
-    # existingClaim: ""
-    # storageClass: "nodemanager"
-    # accessMode: ReadWriteOnce
-    # size: 1Gi
-
+# Specify the fateflow service's properties
 # python:
   # type: NodePort
   # nodePort: 30102
@@ -71,27 +55,26 @@ backend: spark
     # cores_per_node: 20
     # nodes: 2
     # master: spark://spark-master:7077
-    # driverHost: 
-    # driverHostType: 
-    # portMaxRetries: 
-    # driverStartPort: 
-    # blockManagerStartPort: 
-    # pysparkPython: 
+    # Only for using external Spark
+    ## driverHost:
+    ## driverHostType:
+    ## portMaxRetries:
+    ## driverStartPort:
+    ## blockManagerStartPort:
+    ## pysparkPython:
   # hdfs:
     # name_node: hdfs://namenode:9000
     # path_prefix:
-  # rabbitmq:
-    # host: rabbitmq
-    # mng_port: 15672
-    # port: 5672
-    # user: fate
-    # password: fate
-    # # default conf/rabbitmq_route_table.yaml
-    # route_table: 
+  # pulsar:
+    # host: pulsar
+    # port: 6650
+    # mng_port: 8080
   # nginx:
     # host: nginx
     # http_port: 9300
     # grpc_port: 9310
+    
+# Specify the mysql properties
 # mysql: 
   # nodeSelector: 
   # ip: mysql
@@ -105,7 +88,7 @@ backend: spark
   # accessMode: ReadWriteOnce
   # size: 1Gi
 
-# #
+# 
 # #externalMysqlIp: mysql
 # #externalMysqlPort: 3306
 # #externalMysqlDatabase: eggroll_meta
@@ -116,8 +99,7 @@ backend: spark
 # servingIp: 192.168.0.1
 # servingPort: 30095
 
-## cluster of FATE on spark configuration
-
+# FATE on spark configuration
 # spark:
   # master:
     # Image: "federatedai/spark-master"
@@ -167,15 +149,16 @@ backend: spark
         # - host: 192.168.0.1
           # http_port: 30107
           # grpc_port: 30102
-# rabbitmq:
-  # nodeSelector: 
+# pulsar:
   # type: ClusterIP
   # nodePort: 30094
-  # default_user: fate
-  # default_pass: fate
-  # user: fate
-  # password: fate
   # route_table:
     # 10000:
       # host: 192.168.0.1
-      # port: 30104
+      # port: 6650 
+      # sslPort:6651
+      # proxy: ""
+    # 9999:
+      # host: pulsar
+      # port: 6650
+      # sslPort:6651
