@@ -24,12 +24,23 @@ data:
             "default": {
                 "default": [
                     {
-                      {{- with .Values.exchange }}
-                        "ip": "{{ .partyIp }}",
-                        "port": {{ .partyPort }}
+                      {{- if .Values.exchange }}
+                        "ip": "{{ .Values.exchange.partyIp }}",
+                        "port": {{ .Values.exchange.partyPort }}
                       {{- else }}
+                      
+                        {{- if and .Values.modules.rollsite.polling.enabled ( eq (print .Values.modules.rollsite.polling.type) "client" ) }}
+                        
+                        {{- with .Values.modules.rollsite.polling.server }}
+                        "ip": "{{ .ip }}",
+                        "port": {{ .port }}
+                        {{- end }}
+                        
+                        {{- else }}
                         "ip": "rollsite",
                         "port": 9370
+                        {{- end }}
+                        
                       {{- end }}
                     }
                 ]
@@ -43,6 +54,23 @@ data:
                     }
                 ]
             },
+            {{- end }}
+            
+            {{- if and .Values.modules.rollsite.polling.enabled ( eq (print .Values.modules.rollsite.polling.type) "server" ) }}
+            
+            {{- range .Values.modules.rollsite.polling.clientList}}
+            "{{ .partID }}": 
+            {
+                "default": [
+                    {
+                        "port": -1,
+                        "ip": "",
+                        "is_polling": true
+                    }
+                ]
+            },
+            {{- end }}
+            
             {{- end }}
             "{{ .Values.partyId }}": {
                 "fateflow": [

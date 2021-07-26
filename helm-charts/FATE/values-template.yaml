@@ -87,6 +87,21 @@ modules:
     affinity:
 {{ toYaml . | indent 6 }}
     {{- end }}
+    {{- with .polling }}
+    polling:
+      enabled: {{ .enabled }}
+      type: {{ .type }}
+      {{- with .server }}
+      server:
+        ip: {{ .ip }}
+        port: {{ .port }}
+      {{- end }}
+      {{- with .clientList }}
+      clientList:
+{{ toYaml . | indent 6 }}
+      {{- end }}
+      concurrency: {{ .concurrency }}
+    {{- end }}
     {{- end }}
 
 
