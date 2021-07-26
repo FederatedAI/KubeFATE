@@ -51,6 +51,19 @@ modules:
     nodeSelector:
     tolerations:
     affinity:
+    polling:
+      enabled: false
+      
+      # type: client
+      # server:
+        # ip: 192.168.9.1
+        # port: 9370
+      
+      # type: server
+      # clientList:
+      # - partID: 9999
+      # concurrency: 50
+      
   lbrollsite:
     include: true
     ip: rollsite
@@ -77,6 +90,9 @@ modules:
     storageClass: "python"
     accessMode: ReadWriteOnce
     size: 1Gi
+    clustermanager:
+      cores_per_node: 16
+      nodes: 2
     spark: 
       master: spark://spark-master:7077
       home: 
@@ -148,6 +164,11 @@ modules:
     nodeSelector:
     tolerations:
     affinity:
+    subPath: "client"
+    existingClaim: ""
+    storageClass: "client"
+    accessMode: ReadWriteOnce
+    size: 1Gi
   mysql: 
     include: true
     type: ClusterIP

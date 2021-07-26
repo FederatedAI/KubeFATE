@@ -66,8 +66,8 @@ data:
       stale_timeout: 30
     fate_on_eggroll:
       clustermanager:
-        cores_per_node: 20
-        nodes: 1
+        cores_per_node: {{ .Values.modules.python.clustermanager.cores_per_node | default 16 }}
+        nodes: {{ .Values.modules.python.clustermanager.nodes | default 2 }}
       rollsite:
         host: {{ .Values.modules.rollsite.ip }}
         port: 9370
@@ -351,9 +351,9 @@ spec:
       {{- end }}
 {{- if .Values.modules.python.serviceAccountName }}
       serviceAccountName: {{ .Values.modules.python.serviceAccountName }}
-{{- else -}}
+{{- else }}
       serviceAccountName: {{ template "serviceAccountName" . }}
-{{- end -}}
+{{- end }}
       restartPolicy: Always
       volumes:
         - name: eggroll-confs
