@@ -37,7 +37,7 @@ metadata:
     fateMoudle: spark-worker
 {{ include "fate.labels" . | indent 4 }}
 spec:
-  replicas: {{ default 1 .Values.modules.spark.worker.replicas }}
+  replicas: {{ default 2 .Values.modules.spark.worker.replicas }}
   strategy:
     type: Recreate
   selector:

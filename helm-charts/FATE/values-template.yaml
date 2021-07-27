@@ -8,7 +8,7 @@ image:
   imagePullSecrets:
 {{ toYaml . | indent 2 }}
   {{- end }}
-  
+
 partyId: {{ .partyId | int64 | toString }}
 partyName: {{ .name }}
 
@@ -163,6 +163,7 @@ modules:
       nodes: {{ .nodes }}
     {{- end }}
     {{- with .spark }}
+
     spark: 
 {{ toYaml . | indent 6}}
     {{- end }}
@@ -310,6 +311,7 @@ modules:
   spark:
     include: {{ has "spark" .modules }}
     {{- with .spark }}
+    {{- if .master }}
     master:
       Image: "{{ .master.Image }}"
       ImageTag: "{{ .master.ImageTag }}"
@@ -330,8 +332,9 @@ modules:
       affinity:
 {{ toYaml . | indent 8 }}
       {{- end }}
-      type: {{ .master.type | default "ClusterIP" }}
-      nodePort: {{ .master.nodePort }}
+      type: {{ .type }}
+    {{- end }}
+    {{- if .worker }}
     worker:
       Image: "{{ .worker.Image }}"
       ImageTag: "{{ .worker.ImageTag }}"
@@ -353,6 +356,7 @@ modules:
 {{ toYaml . | indent 8 }}
       {{- end }}
       type: {{ .worker.type | default "ClusterIP" }}
+    {{- end }}
     {{- end }}
 
 
