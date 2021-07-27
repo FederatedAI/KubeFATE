@@ -168,6 +168,9 @@ spec:
       port: 9000
       targetPort: 9000
       protocol: TCP
+      {{- if eq .Values.modules.hdfs.namenode.type "NodePort" "LoadBalancer" }}
+      nodePort: {{ .Values.modules.hdfs.namenode.nodePort }}
+      {{- end }}
     - name: "tcp-9870"
       port: 9870
       targetPort: 9870
