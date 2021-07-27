@@ -131,11 +131,11 @@ modules:
     include: {{ has "python" .modules }}
     backend: {{ default "eggroll" .backend }}
     {{- with .python }}
-    type: {{ .type }}
     {{- with .resources }}
     resources:
 {{ toYaml . | indent 6 }}
     {{- end }}
+    type: {{ .type | default "ClusterIP" }}
     httpNodePort: {{ .httpNodePort }}
     grpcNodePort: {{ .grpcNodePort }}
     serviceAccountName: {{ .serviceAccountName }}
@@ -164,10 +164,7 @@ modules:
     {{- end }}
     {{- with .spark }}
     spark: 
-      master: {{ .master }}
-      home: {{ .home }}
-      cores_per_node: {{ .cores_per_node }}
-      nodes: {{ .nodes }}
+{{ toYaml . | indent 6}}
     {{- end }}
     {{- with .hdfs }}
     hdfs:
@@ -179,7 +176,6 @@ modules:
       host: {{ .host }}
       mng_port: {{ .mng_port }}
       port: {{ .port }}
-      route_table: {{ .route_table }}
     {{- end }}
     {{- with .rabbitmq }}
     rabbitmq:
@@ -188,8 +184,6 @@ modules:
       port: {{ .port }}
       user: {{ .user }}
       password: {{ .password }}
-      # default conf/rabbitmq_route_table.yaml
-      route_table: {{ .route_table }}
     {{- end }}
     {{- with .nginx }}
     nginx:
@@ -204,7 +198,7 @@ modules:
     include: {{ has "clustermanager" .modules }}
     {{- with .clustermanager }}
     ip: clustermanager
-    type: ClusterIP
+    type: "ClusterIP"
     {{- with .nodeSelector }}
     nodeSelector: 
 {{ toYaml . | indent 6 }}
@@ -275,7 +269,7 @@ modules:
   mysql: 
     include: {{ has "mysql" .modules }}
     {{- with .mysql }}
-    type: {{ .type }}
+    type: {{ .type  | default "ClusterIP" }}
     {{- with .nodeSelector }}
     nodeSelector: 
 {{ toYaml . | indent 6 }}
@@ -310,6 +304,9 @@ modules:
 {{ toYaml .zookeeper | indent 6 }}
     {{- end}}
 
+  fateboard:
+    include: {{ has "fateboard" .modules }}
+
   spark:
     include: {{ has "spark" .modules }}
     {{- with .spark }}
@@ -333,7 +330,8 @@ modules:
       affinity:
 {{ toYaml . | indent 8 }}
       {{- end }}
-      type: {{ .type }}
+      type: {{ .master.type | default "ClusterIP" }}
+      nodePort: {{ .master.nodePort }}
     worker:
       Image: "{{ .worker.Image }}"
       ImageTag: "{{ .worker.ImageTag }}"
@@ -354,7 +352,7 @@ modules:
       affinity:
 {{ toYaml . | indent 8 }}
       {{- end }}
-      type: {{ .type }}
+      type: {{ .worker.type | default "ClusterIP" }}
     {{- end }}
 
 
@@ -374,7 +372,8 @@ modules:
       affinity:
 {{ toYaml . | indent 8 }}
       {{- end }}
-      type: ClusterIP
+      type: {{ .namenode.type | default "ClusterIP" }}
+      nodePort: {{ .namenode.nodePort }}
       existingClaim: {{ .namenode.existingClaim }}
       storageClass: {{ .namenode.storageClass | default "" }}
       accessMode: {{ .namenode.accessMode  | default "ReadWriteOnce"  }}
@@ -392,7 +391,7 @@ modules:
       affinity:
 {{ toYaml . | indent 8 }}
       {{- end }}
-      type: ClusterIP
+      type: {{ .datanode.type | default "ClusterIP" }}
       existingClaim: {{ .datanode.existingClaim }}
       storageClass: {{ .datanode.storageClass | default "" }}
       accessMode: {{ .datanode.accessMode  | default "ReadWriteOnce"  }}
@@ -415,7 +414,7 @@ modules:
     affinity:
 {{ toYaml . | indent 6 }}
     {{- end }}
-    type: {{ .type }}
+    type: {{ .type | default "ClusterIP" }}
     httpNodePort:  {{ .httpNodePort }}
     grpcNodePort:  {{ .grpcNodePort }}
     {{- with .exchange }}
@@ -447,7 +446,7 @@ modules:
     affinity:
 {{ toYaml . | indent 6 }}
     {{- end }}
-    type: {{ .type }}
+    type: {{ .type | default "ClusterIP" }}
     nodePort: {{ .nodePort }}
     default_user: {{ .default_user }}
     default_pass: {{ .default_pass }}
@@ -476,7 +475,7 @@ modules:
     affinity:
 {{ toYaml . | indent 6 }}
     {{- end }}
-    type: {{ .type }}
+    type: {{ .type | default "ClusterIP" }}
     httpNodePort: {{ .httpNodePort }}
     httpsNodePort: {{ .httpsNodePort }}
     {{- with .publicLB}}
