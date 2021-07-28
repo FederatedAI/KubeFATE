@@ -25,19 +25,19 @@ ingress:
     hosts:
     - name: serving-proxy.kubefate.net
       path: /
-    tls: []
-    # - secretName: my-tls-secret
-      # hosts:
-        # - serving-proxy.kubefate.net
+  # tls:
+      # - secretName: my-tls-secret
+        # hosts:
+          # - serving-proxy.kubefate.net
   servingServer: 
     # annotations: 
     hosts:
     - name: serving-server.kubefate.net
       path: /
-    tls: []
-    # - secretName: my-tls-secret
-      # hosts:
-        # - serving-server.kubefate.net
+  # tls:
+     # - secretName: my-tls-secret
+       # hosts:
+         # - serving-server.kubefate.net
 
 servingProxy: 
   include: true
@@ -94,7 +94,6 @@ servingZookeeper:
   existingClaim: ""
   storageClass: "serving-zookeeper"
   accessMode: ReadWriteOnce
-  ingerssHost: 9999.serving-admin.kubefate.net
   size: 1Gi
 
 

@@ -73,18 +73,24 @@
 ### rollsite mappings
 It is used to declare the `rollsite ` module in the FATE cluster to be deployed.
 
-| Name         | subitem   | Type      | Description                                                  |
-| ------------ | --------- | --------- | ------------------------------------------------------------ |
-| type         |           | scalars   | Kubernetes ServiceTypes, default is NodePort.                |
-| nodePort     |           | scalars   | The port used by `proxy` module's kubernetes service, default range: 30000-32767. |
-| partyList    |           | sequences | If this FATE cluster is exchange cluster, partyList is all party's sequences of all parties proxy address. If this FATE cluster is one of participants, delete this configuration item. |
-| partyList    | partyId   | scalars   | Participant FATE cluster party ID.                           |
-| partyList    | partyIp   | scalars   | Participant FATE cluster IP.                                 |
-| partyList    | partyPort | scalars   | Participant FATE cluster port.                               |
-| exchange     |           | mappings  | FATE cluster `exchange` module's ip and port.                |
-| exchange     | ip        | mappings  | FATE cluster `exchange` module's ip. .                       |
-| exchange     | port      | mappings  | FATE cluster `exchange` module's port.                       |
-| nodeSelector |           | mappings  | kubernetes nodeSelector.                                     |
+| Name         | subitem     | Type      | Description                                                  |
+| ------------ | ----------- | --------- | ------------------------------------------------------------ |
+| type         |             | scalars   | Kubernetes ServiceTypes, default is NodePort.                |
+| nodePort     |             | scalars   | The port used by `proxy` module's kubernetes service, default range: 30000-32767. |
+| partyList    |             | sequences | If this FATE cluster is exchange cluster, partyList is all party's sequences of all parties proxy address. If this FATE cluster is one of participants, delete this configuration item. |
+| partyList    | partyId     | scalars   | Participant FATE cluster party ID.                           |
+| partyList    | partyIp     | scalars   | Participant FATE cluster IP.                                 |
+| partyList    | partyPort   | scalars   | Participant FATE cluster port.                               |
+| exchange     |             | mappings  | FATE cluster `exchange` module's ip and port.                |
+| exchange     | ip          | mappings  | FATE cluster `exchange` module's ip. .                       |
+| exchange     | port        | mappings  | FATE cluster `exchange` module's port.                       |
+| nodeSelector |             | mappings  | kubernetes nodeSelector.                                     |
+| polling      |             |           | rollsite support polling                                     |
+| polling      | enabled     |           | enable polling                                               |
+| polling      | type        |           | polling type (server/client)                                 |
+| polling      | server      |           | if type choose client, you need a polling server.            |
+| polling      | clientList  |           | if type choose server, this rollsite serve for clientList.   |
+| polling      | concurrency |           | if type choose server, polling client concurrency.           |
 
 FATE cluster has two deployment modes: with exchange and without exchange.
 #### Exchange mode:
@@ -115,20 +121,25 @@ The parties are directly connected.
 
 ### python mappings
 
-| Name                 | Type     | Description                                                  |
-| -------------------- | -------- | ------------------------------------------------------------ |
-| type                 | scalars  | Kubernetes ServiceTypes, default is NodePort.<br />Other modules can connect to the fateflow |
-| nodePort             | scalars  | The port used by `proxy` module's kubernetes service, default range: 30000-32767. |
-| nodeSelector         | mappings | kubernetes nodeSelector.                                     |
-| enabledNN            | bool     | If or not neural network workflow is required                |
-| spark                | mappings | If you use your own spark, modify the configuration          |
-| spark.master         | scalars  | If you do not need to use the spark configuration, you can use the spark configuration |
-| spark.home           | scalars  | configuration of FATE fateflow module                        |
-| spark.cores_per_node | scalars  | configuration of FATE fateflow module                        |
-| spark.nodes          | scalars  | configuration of FATE fateflow module                        |
-| hdfs                 | mappings | If you do not need to use the spark configuration, you can use the spark configuration |
-| rabbitmq             | mappings | If you do not need to use the spark configuration, you can use the spark configuration |
-| nginx                | mappings | If you do not need to use the spark configuration, you can use the spark configuration |
+| Name                  | Type     | Description                                                  |
+| --------------------- | -------- | ------------------------------------------------------------ |
+| type                  | scalars  | Kubernetes ServiceTypes, default is NodePort.<br />Other modules can connect to the fateflow |
+| nodePort              | scalars  | The port used by `proxy` module's kubernetes service, default range: 30000-32767. |
+| nodeSelector          | mappings | kubernetes nodeSelector.                                     |
+| enabledNN             | bool     | If or not neural network workflow is required                |
+| spark                 | mappings | If you use your own spark, modify the configuration          |
+| spark.cores_per_node  | scalars  | configuration of FATE fateflow module                        |
+| spark.nodes           | scalars  | configuration of FATE fateflow module                        |
+| spark.existingSpark   | scalars  | If you need to use the existing spark , you can set this configuration |
+| spark.driverHost      | scalars  | call back IP of spark executor                               |
+| spark.driverHostType  | scalars  | service type of spark driver                                 |
+| spark.portMaxRetries  | scalars  | spark driver's configuration                                 |
+| spark.driverStartPort       | scalars  | spark driver start port                                      |
+| spark.blockManagerStartPort | scalars  | spark driver blockManager start port                         |
+| spark.pysparkPython         | scalars  | spark worker node python PATH                                |
+| hdfs                  | mappings | If you use the existing hdfs, you can set this configuration |
+| rabbitmq              | mappings | If you use the existing rabbitmq, you can set this configuration |
+| nginx                 | mappings | If you use the existing nginx, you can set this configuration |
 
 
 
@@ -160,9 +171,8 @@ Configuration of kubernetes deployment spark.
 | ----------------- | ------------ | -------- | ---------------------------- |
 | master/<br>worker | Image        | scalars  | Image of spark components    |
 |                   | ImageTag     | scalars  | ImageTag of spark components |
-|                   | replicas     |          | Number of copies of pod      |
-|                   | cpu          | scalars  | Requested CPU resources      |
-|                   | memory       | scalars  | Requested memory resources   |
+|                   | replicas     | scalars  | Number of copies of pod      |
+|                   | resources    | mappings | resources of Pod      |
 |                   | nodeSelector | mappings | kubernetes nodeSelector.     |
 |                   | type         | scalars  | Kubernetes ServiceTypes.     |
 

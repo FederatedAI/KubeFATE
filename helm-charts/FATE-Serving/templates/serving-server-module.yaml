@@ -120,7 +120,7 @@ spec:
       imagePullSecrets:
 {{ toYaml . | indent 6 }}
       {{- end }}
-      serviceAccountName: {{ .Values.partyName }}
+      serviceAccountName:  {{ template "serviceAccountName" . }}
       restartPolicy: Always
       volumes:
         - name: serving-server-confs
@@ -129,7 +129,7 @@ spec:
         {{- if not .Values.persistence.enabled }}
         - name: data
           emptyDir: {}
-        {{- else if .Values.servingServer.existingClaim }}
+        {{- else }}
         - name: data
           persistentVolumeClaim:
             claimName: {{ .Values.servingServer.existingClaim | default  "serving-server-data" }}

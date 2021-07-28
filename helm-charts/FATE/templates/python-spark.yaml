@@ -19,10 +19,28 @@ metadata:
 {{ include "fate.labels" . | indent 4 }}
 data:
   spark-defaults.conf: |
-    spark.master                      {{  .Values.modules.python.spark.master | default "local[4]"}}
-    #spark.eventLog.enabled           true
-    #spark.eventLog.dir               hdfs://namenode:9000/spark/logs
-    spark.driver.host                 fateflow
+    spark.master                      {{  .Values.modules.python.spark.master | default "spark://spark-master:7077"}}
+    spark.driver.host                 {{  .Values.modules.python.spark.driverHost | default "fateflow" }}
+    {{- if .Values.modules.python.spark.driverStartPort }}
+    spark.driver.port                 {{  .Values.modules.python.spark.driverStartPort }}
+    {{- end }}
+    
+    {{- if .Values.modules.python.spark.portMaxRetries }}
+    spark.port.maxRetries             {{  .Values.modules.python.spark.portMaxRetries }}
+    {{- end }}
+    
+    {{- if .Values.modules.python.spark.blockManagerStartPort }}
+    spark.blockManager.port           {{  .Values.modules.python.spark.blockManagerStartPort }}
+    {{- end }}
+    
+    {{- if .Values.modules.python.spark.blockManagerStartPort }}
+    spark.driver.bindAddress          0.0.0.0
+    {{- end }}
+    
+    {{- if .Values.modules.python.spark.pysparkPython }}
+    spark.pyspark.python              {{  .Values.modules.python.spark.pysparkPython }}
+    spark.pyspark.driver.python       python
+    {{- end }}
   service_conf.yaml: |
     work_mode: 1
     use_registry: {{ .Values.modules.serving.useRegistry | default false }}
@@ -66,8 +84,8 @@ data:
       stale_timeout: 30
     fate_on_eggroll:
       clustermanager:
-        cores_per_node: 20
-        nodes: 1
+        cores_per_node: {{ .Values.modules.python.clustermanager.cores_per_node | default 16 }}
+        nodes: {{ .Values.modules.python.clustermanager.nodes | default 2 }}
       rollsite:
         host: {{ .Values.modules.rollsite.ip }}
         port: 9370
@@ -78,7 +96,7 @@ data:
         cores_per_node: {{ .Values.modules.python.spark.cores_per_node }}
         nodes: {{ .Values.modules.python.spark.nodes }}
       hdfs:
-        name_node: {{ .Values.modules.python.hdfs.name_node }}
+        name_node: {{ .Values.modules.python.hdfs.name_node | default "hdfs://namenode:9000" }}
         # default /
         path_prefix: {{ .Values.modules.python.hdfs.path_prefix }}
       rabbitmq:
@@ -162,7 +180,7 @@ data:
     {{- with .Values.modules.pulsar.exchange }}
     default:
       proxy: "{{ .ip }}:{{ .port }}"
-      domain: "fate.org"
+      domain: "{{ .domain }}"
     {{- end }}
 {{- if .Values.modules.pulsar.route_table }}
 {{- range $key, $val := .Values.modules.pulsar.route_table }}
@@ -269,6 +287,13 @@ spec:
           image: {{ .Values.image.registry }}/{{ if .Values.modules.python.enabledNN }}python-nn{{ else }}python{{ end }}:{{ .Values.image.tag }}
           {{- end }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if .Values.modules.python.resources}}
+          resources:
+          {{- range $key, $val := .Values.modules.python.resources }}
+            {{ $key }}:
+{{ toYaml $val | indent 14 }}
+          {{- end }}
+          {{- end }}
           env:
           - name: POD_IP
             valueFrom:
@@ -285,11 +310,11 @@ spec:
                 mkdir -p /data/projects/fate/conf/
                 cp /data/projects/fate/conf1/transfer_conf.yaml /data/projects/fate/conf/transfer_conf.yaml
                 cp /data/projects/fate/conf1/service_conf.yaml /data/projects/fate/conf/service_conf.yaml
-                cp /data/projects/fate/conf1/pipeline_conf.yaml /data/projects/fate/conf/pipeline_conf.yaml
+                # cp /data/projects/fate/conf1/pipeline_conf.yaml /data/projects/fate/conf/pipeline_conf.yaml
                 # fix fateflow conf must use IP
                 sed -i "s/host: fateflow/host: ${POD_IP}/g" /data/projects/fate/conf/service_conf.yaml
                 # fix pipeline conf must use IP
-                sed -i "s/ip: fateflow/ip: ${POD_IP}/g" /data/projects/fate/conf/pipeline_conf.yaml
+                # sed -i "s/ip: fateflow/ip: ${POD_IP}/g" /data/projects/fate/conf/pipeline_conf.yaml
                 
                 cp /data/projects/spark-2.4.1-bin-hadoop2.7/conf/spark-defaults-template.conf /data/projects/spark-2.4.1-bin-hadoop2.7/conf/spark-defaults.conf
                 sed -i "s/fateflow/${POD_IP}/g" /data/projects/spark-2.4.1-bin-hadoop2.7/conf/spark-defaults.conf
@@ -349,7 +374,11 @@ spec:
       imagePullSecrets:
 {{ toYaml . | indent 6 }}
       {{- end }}
+{{- if .Values.modules.python.serviceAccountName }}
+      serviceAccountName: {{ .Values.modules.python.serviceAccountName }}
+{{- else }}
       serviceAccountName: {{ template "serviceAccountName" . }}
+{{- end }}
       restartPolicy: Always
       volumes:
         - name: eggroll-confs
@@ -426,6 +455,40 @@ spec:
     fateMoudle: python
 {{ include "fate.matchLabels" . | indent 4 }}
 ---
+{{- if and .Values.modules.python.spark.portMaxRetries (ne (print .Values.modules.python.spark.driverHost) "fateflow") }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: fateflow-sparkdriver
+  labels:
+    fateMoudle: python
+{{ include "fate.labels" . | indent 4 }}
+spec:
+  ports:
+    {{ $spark := .Values.modules.python.spark }}
+    {{- range .Values.modules.python.spark.portMaxRetries | int | until }}
+    - name: "spark-driver-port-{{ . }}"
+      port: {{ $spark.driverStartPort | int | add . }}
+      targetPort: {{ $spark.driverStartPort | int | add .  }}
+      {{- if eq $spark.driverHostType "NodePort" "LoadBalancer" }}
+      nodePort: {{ $spark.driverStartPort | int | add .  }}
+      {{- end }}
+      protocol: TCP
+    - name: "spark-block-manager-port-{{ . }}"
+      port: {{ $spark.blockManagerStartPort  | int | add . }}
+      targetPort: {{ $spark.blockManagerStartPort  | int | add . }}
+      {{- if eq $spark.driverHostType "NodePort" "LoadBalancer" }}
+      nodePort: {{ $spark.blockManagerStartPort  | int | add . }}
+      {{- end }}
+      protocol: TCP
+    {{- end }}
+  type: {{ .Values.modules.python.spark.driverHostType }}
+  selector:
+    fateMoudle: python
+{{ include "fate.matchLabels" . | indent 4 }}
+---
+{{- end }}
+
 {{- if .Values.modules.fateboard.include }}
 apiVersion: v1
 kind: Service
