@@ -45,8 +45,8 @@ ingress:
     {{- end }}
   {{- end }}
   
-  {{- with .servingServer }}
-  servingServer: 
+  {{- with .servingAdmin }}
+  servingAdmin: 
     {{- with .annotations }}
     annotations: 
 {{ toYaml . | indent 6 }}

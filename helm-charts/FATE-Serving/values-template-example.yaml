@@ -30,15 +30,15 @@ ingress:
     # - secretName: my-tls-secret
       # hosts:
         # - serving-proxy.kubefate.net
-  servingServer: 
+  servingAdmin: 
     # annotations: 
     hosts:
-    - name: serving-server.kubefate.net
+    - name: serving-admin.kubefate.net
       path: /
   # tls:
     # - secretName: my-tls-secret
       # hosts:
-         # - serving-server.kubefate.net
+         # - serving-admin.kubefate.net
 
 # servingAdmin:
   # nodeSelector:
