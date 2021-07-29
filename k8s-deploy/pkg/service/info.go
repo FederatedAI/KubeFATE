@@ -25,7 +25,13 @@ func GetClusterInfo(name, namespace string) (map[string]interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	podList, err := GetPodList(name, getDefaultNamespace(namespace))
+
+	containerList, err := GetPodContainersStatus(name, getDefaultNamespace(namespace))
+	if err != nil {
+		return nil, err
+	}
+
+	deploymentList, err := GetClusterDeployStatus(name, getDefaultNamespace(namespace))
 	if err != nil {
 		return nil, err
 	}
@@ -43,9 +49,26 @@ func GetClusterInfo(name, namespace string) (map[string]interface{}, error) {
 	if port != 0 {
 		info["port"] = port
 	}
-	info["pod"] = podList
+	info["containes"] = containerList
+
+	info["deployment"] = deploymentList
 
 	info["dashboard"] = ingressURLList
 
 	return info, nil
+}
+
+//GetClusterStatus GetClusterStatus
+func GetClusterStatus(name, namespace string) (map[string]string, error) {
+	return GetClusterDeployStatus(name, namespace)
+}
+
+// CheckClusterStatus_new CheckClusterStatus_new
+func CheckClusterStatus_new(name, namespace string) (bool, error) {
+	deploymentList, err := GetDeployList(name, namespace)
+	if err != nil {
+		return false, err
+	}
+
+	return CheckDeploys(deploymentList), nil
 }

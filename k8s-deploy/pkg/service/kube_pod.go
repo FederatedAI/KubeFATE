@@ -126,3 +126,18 @@ func getPodContainerList(name, namespace, container string) (map[string]string, 
 	}
 	return podContainerList, nil
 }
+
+//GetPodContainersStatus GetPodContainersStatus
+func GetPodContainersStatus(ClusterName, namespace string) (map[string]string, error) {
+	list, err := KubeClient.GetPods(namespace, getLabelSelector(namespace, ClusterName))
+	if err != nil {
+		return nil, err
+	}
+	var podContainerList = make(map[string]string)
+	for _, v := range list.Items {
+		for _, vv := range v.Spec.Containers {
+			podContainerList[vv.Name] = fmt.Sprintf("%s", v.Status.Phase)
+		}
+	}
+	return podContainerList, nil
+}
