@@ -49,20 +49,6 @@ func GetPodStatus(pods *corev1.PodList) map[string]string {
 	return status
 }
 
-// CheckClusterStatus CheckClusterStatus
-func CheckClusterStatus(ClusterStatus map[string]string) bool {
-	if len(ClusterStatus) == 0 {
-		return false
-	}
-	var clusterStatusOk = true
-	for _, v := range ClusterStatus {
-		if v != "Running" {
-			clusterStatusOk = false
-		}
-	}
-	return clusterStatusOk
-}
-
 // GetPodList GetPodList
 func GetPodList(name, namespace string) ([]string, error) {
 

@@ -15,6 +15,8 @@
 
 package service
 
+import "github.com/rs/zerolog/log"
+
 // GetClusterInfo GetClusterInfo
 func GetClusterInfo(name, namespace string) (map[string]interface{}, error) {
 	ip, err := GetNodeIP()
@@ -36,6 +38,11 @@ func GetClusterInfo(name, namespace string) (map[string]interface{}, error) {
 		return nil, err
 	}
 
+	status := make(map[string]interface{})
+
+	status["containers"] = containerList
+	status["deployments"] = deploymentList
+
 	ingressURLList, err := GetIngressURLList(name, getDefaultNamespace(namespace))
 	if err != nil {
 		return nil, err
@@ -49,11 +56,12 @@ func GetClusterInfo(name, namespace string) (map[string]interface{}, error) {
 	if port != 0 {
 		info["port"] = port
 	}
-	info["containes"] = containerList
 
-	info["deployment"] = deploymentList
+	info["status"] = status
 
 	info["dashboard"] = ingressURLList
+
+	log.Debug().Interface("cluster-info", info).Msg("show the cluster info real-time status")
 
 	return info, nil
 }
@@ -63,12 +71,42 @@ func GetClusterStatus(name, namespace string) (map[string]string, error) {
 	return GetClusterDeployStatus(name, namespace)
 }
 
-// CheckClusterStatus_new CheckClusterStatus_new
-func CheckClusterStatus_new(name, namespace string) (bool, error) {
-	deploymentList, err := GetDeployList(name, namespace)
-	if err != nil {
-		return false, err
+// CheckClusterStatus CheckClusterStatus
+func CheckClusterStatus(ClusterStatus map[string]string) bool {
+	if len(ClusterStatus) == 0 {
+		return false
+	}
+	var clusterStatusOk = true
+	for _, v := range ClusterStatus {
+		if !CheckStatus(v) {
+			clusterStatusOk = false
+		}
+	}
+	return clusterStatusOk
+}
+
+// CheckClusterStatus CheckClusterStatus
+func CheckClusterInfoStatus(ClusterInfoStatus map[string]interface{}) bool {
+	Status, ok := ClusterInfoStatus["status"]
+	if !ok {
+		return false
 	}
 
-	return CheckDeploys(deploymentList), nil
+	deployments, ok := Status.(map[string]interface{})["deployments"]
+	if !ok {
+		return false
+	}
+
+	ClusterStatus := deployments.(map[string]string)
+
+	if len(ClusterStatus) == 0 {
+		return false
+	}
+	var clusterStatusOk = true
+	for _, v := range ClusterStatus {
+		if !CheckStatus(v) {
+			clusterStatusOk = false
+		}
+	}
+	return clusterStatusOk
 }

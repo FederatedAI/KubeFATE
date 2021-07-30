@@ -78,18 +78,22 @@ func GetDeployStatus(deploy *v1.Deployment) (string, string, error) {
 		if v.Type == v1.DeploymentAvailable && v.Status == corev1.ConditionTrue {
 			return fmt.Sprint(v1.DeploymentAvailable), v.Message, nil
 		}
+	}
+	for _, v := range deploy.Status.Conditions {
 		if v.Type == v1.DeploymentProgressing && v.Status == corev1.ConditionTrue {
 			return fmt.Sprint(v1.DeploymentProgressing), v.Message, nil
 		}
+	}
+	for _, v := range deploy.Status.Conditions {
 		if v.Type == v1.DeploymentReplicaFailure && v.Status == corev1.ConditionTrue {
 			return fmt.Sprint(v1.DeploymentReplicaFailure), v.Message, nil
 		}
 	}
-	return "", "", fmt.Errorf("Deployment of '%s' not type", deploy.Name)
+	return "", "", fmt.Errorf("Deployment of '%s' not type, please try again", deploy.Name)
 }
 
 //GetDeploymentStatus GetDeploymentStatus
-func GetDeploymentStatus(deploys *v1.DeploymentList) (map[string]string, error) {
+func GetDeploymentStatusInfo(deploys *v1.DeploymentList) (map[string]string, error) {
 	status := make(map[string]string)
 	for _, v := range deploys.Items {
 		Type, message, err := GetDeployStatus(&v)
@@ -101,6 +105,18 @@ func GetDeploymentStatus(deploys *v1.DeploymentList) (map[string]string, error) 
 	return status, nil
 }
 
+func GetDeploymentStatus(deploys *v1.DeploymentList) (map[string]string, error) {
+	status := make(map[string]string)
+	for _, v := range deploys.Items {
+		Type, _, err := GetDeployStatus(&v)
+		if err != nil {
+			return nil, err
+		}
+		status[v.Name] = fmt.Sprintf("%s", Type)
+	}
+	return status, nil
+}
+
 //GetClusterDeployStatus GetClusterDeployStatus
 func GetClusterDeployStatus(name, namespace string) (map[string]string, error) {
 	deploymentList, err := GetDeployList(name, namespace)
@@ -108,4 +124,8 @@ func GetClusterDeployStatus(name, namespace string) (map[string]string, error) {
 		return nil, err
 	}
 	return GetDeploymentStatus(deploymentList)
+}
+
+func CheckStatus(status string) bool {
+	return status == "Available"
 }

@@ -198,8 +198,8 @@ func TestGetPodContainersStatus(t *testing.T) {
 	}{
 		// TODO: Add test cases.
 		{
-			name:    "",
-			args:    args{
+			name: "",
+			args: args{
 				ClusterName: "fate-4000",
 				namespace:   "fate-4000",
 			},
