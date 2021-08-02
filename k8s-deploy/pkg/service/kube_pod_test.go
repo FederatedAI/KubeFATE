@@ -184,39 +184,3 @@ func TestGetPodList(t *testing.T) {
 		})
 	}
 }
-
-func TestGetPodContainersStatus(t *testing.T) {
-	type args struct {
-		ClusterName string
-		namespace   string
-	}
-	tests := []struct {
-		name    string
-		args    args
-		want    map[string]string
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-		{
-			name: "",
-			args: args{
-				ClusterName: "fate-4000",
-				namespace:   "fate-4000",
-			},
-			want:    map[string]string{},
-			wantErr: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := GetPodContainersStatus(tt.args.ClusterName, tt.args.namespace)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("GetPodContainersStatus() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("GetPodContainersStatus() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
