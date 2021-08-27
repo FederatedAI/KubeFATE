@@ -5,7 +5,7 @@ FROM ${SOURCE_PREFIX}/python:${SOURCE_TAG} as data
 FROM python:3.7
 
 COPY Examples /Examples
-RUN pip install notebook fate-client
+RUN pip install notebook fate-client pandas sklearn
 RUN mkdir /Examples/Pipeline/logs
 copy --from=data /data/projects/fate/examples /Examples/examples
 
