@@ -70,7 +70,9 @@ services:
       fate-network:
         ipv4_address: 192.167.0.100
     command: ["/bin/bash", "-c", "sleep 5 && python ./fate_flow/fate_flow_server.py"]
-
+    environment:
+      FATE_FLOW_UPLOAD_MAX_NUM: 1000000
+      FATE_FLOW_UPLOAD_MAX_BYTES: 104868093952
 
   namenode:
     image: federatedai/hadoop-namenode:2.0.0-hadoop2.7.4-java8
