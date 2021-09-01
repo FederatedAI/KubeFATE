@@ -38,7 +38,8 @@ buildModule() {
     echo "Image: "${PREFIX}/spark-worker:${IMG_TAG}" Build Successful"
 
     # client
-    docker build -t ${PREFIX}/client:${IMG_TAG} client
+    docker build --build-arg SOURCE_PREFIX=${PREFIX} --build-arg SOURCE_TAG=${IMG_TAG} -t ${PREFIX}/client:${IMG_TAG} client
+    echo "Image: "${PREFIX}/client:${IMG_TAG}" Build Successful"
 }
 
 pushImage() {
