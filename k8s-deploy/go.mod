@@ -7,7 +7,7 @@ require (
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 	github.com/appleboy/gin-jwt/v2 v2.6.3
 	github.com/gin-contrib/logger v0.0.2
-	github.com/gin-gonic/gin v1.6.3
+	github.com/gin-gonic/gin v1.7.0
 	github.com/gofrs/flock v0.8.0
 	github.com/gosuri/uitable v0.0.4
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
