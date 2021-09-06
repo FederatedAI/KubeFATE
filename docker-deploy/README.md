@@ -17,7 +17,7 @@ First, on a Linux host, download KubeFATE from [releases pages](https://github.c
 
 By default, the installation script pulls the images from Docker Hub during the deployment. If the target node is not connected to Internet, refer to the below section to set up a local registry such as Harbor and use the offline images.
 
-### Set up a local registry Harbor (Optional)
+### Setting up a local registry Harbor (Optional)
 Please refer to [this guide](../registry/README.md) to install Harbor as a local registry. 
 
 After setting up a Harbor registry, update the setting in the `.env` file. Change `RegistryURI` to the hostname or IP address of the Harbor instance. This setting lets the installation script use a local registry instead of Docker Hub.
@@ -64,7 +64,7 @@ enabled_nn=false
 Spark was introduced in FATE v1.5 as the underlying computing backend, for more details
 about FATE on Spark please refer to this [document](../docs/FATE_On_Spark.md).
 
-On the host running FATE, the user is non root and needs`/data/projects/fate` folder permission and docker permission. No other action is required if the user is root.
+On the host running FATE, the non-root user needs the owner permission of `/data/projects/fate` folder and Docker permission. No other action is required if the user is root.
 
 ```bash
 # Create a fate user whose group is docker
@@ -86,9 +86,9 @@ total 0
 drwxr-xr-x. 2 fate docker 6 May 27 00:51 fate
 ```
 
-By default, the exchange node won't be deployed. The exchange service runs on port 9371. If a exchange (co-locates on the host of party or standalone) node is needed, update the value of `exchangeip` to the IP address of the desired host.
+By default, the exchange service is not deployed. The exchange service runs on port 9371. If an exchange (co-locates on the host of the same party or runs standalone) service is needed, update the value of `exchangeip` to the IP address of the desired host.
 
-After completing the above configuration file, use the following commands to generate configuration of target hosts.  
+After editting the above configuration file, use the following commands to generate configuration of target hosts.  
 
 ```bash
 $ cd docker-deploy
@@ -111,7 +111,7 @@ $ ./docker_deploy.sh all
 
 The script copies tar files (e.g. `confs-<party-id>.tar` or `serving-<party-id>.tar`) to corresponding target hosts. It then launches a FATE cluster on each host using `docker-compose` commands.
 
-By Default, the script will start the training and serving cluster simultaneously. If you need to start them separately, add the `--training` or `--serving` to the `docker_deploy.sh` as follows.
+By default, the script starts the training and serving cluster simultaneously. If you need to start them separately, add the `--training` or `--serving` to the `docker_deploy.sh` as follows.
 
 (Optional) To deploy all parties training cluster, use the below command:
 ```bash
@@ -181,14 +181,14 @@ If the test passed, the output may look like the following:
 For more details about the testing result, please refer to `python/examples/toy_example/README.md` .
 
 ### Verifying the serving service
-#### Operations on Host
-##### Log in to the python container
+#### Steps on the host
+##### Logging in to the python container
 `$ docker exec -it confs-10000_python_1 bash`
 
-##### Go to `fate_flow` dir
+##### Going to `fate_flow` directory
 `$ cd fate_flow`
 
-##### Modify examples/upload_host.json 
+##### Modifying examples/upload_host.json 
 `$ vi examples/upload_host.json`
 ```
 {
@@ -201,17 +201,17 @@ For more details about the testing result, please refer to `python/examples/toy_
 }
 ```
 
-##### Upload data
+##### Uploading data
 `$ python fate_flow_client.py -f upload -c examples/upload_host.json `
 
-#### Operations on Guest
-##### Log in to the python container
+#### Steps on the guest
+##### Getting in to the python container
 `$ docker exec -it confs-9999_python_1 bash`
 
-##### Go to `fate_flow` dir
+##### Going to `fate_flow` directory
 `$ cd fate_flow`
 
-##### Modify examples/upload_guest.json 
+##### Modifying examples/upload_guest.json 
 `$ vi examples/upload_guest.json`
 ```
 {
@@ -224,11 +224,11 @@ For more details about the testing result, please refer to `python/examples/toy_
 }
 ```
 
-##### Upload data
+##### Uploading data
 
 `$ python fate_flow_client.py -f upload -c examples/upload_guest.json`
 
-##### Modify examples/test_hetero_lr_job_conf.json
+##### Modifying examples/test_hetero_lr_job_conf.json
 
 **Currently the FATE Serving does not support DSL 2.0, which introduced in FATE 1.5. So please do not use `"dsl_version": "2"` in job configuration while online-serving is required.**
 
@@ -290,7 +290,7 @@ For more details about the testing result, please refer to `python/examples/toy_
 }
 ```
 
-##### Modify examples/test_hetero_lr_job_dsl.json
+##### Modifying examples/test_hetero_lr_job_dsl.json
 `$ vi examples/test_hetero_lr_job_dsl.json`
 
 ```json
@@ -369,7 +369,7 @@ For more details about the testing result, please refer to `python/examples/toy_
 }
 ```
 
-##### Submit job
+##### Submitting a job
 `$ python fate_flow_client.py -f submit_job -d examples/test_hetero_lr_job_dsl.json -c examples/test_hetero_lr_job_conf.json`
 
 output：
@@ -391,7 +391,7 @@ output：
 }
 ```
 
-##### Check status of training jobs
+##### Checking status of training jobs
 `$ python fate_flow_client.py -f query_task -j 202003060553168191842 | grep f_status`
 
 output:
@@ -401,7 +401,7 @@ output:
 
 ```
 
-##### Modify the configuration of loading model
+##### Modifying the configuration of loading model
 `$ vi examples/publish_load_model.json`
 
 ```
@@ -423,7 +423,7 @@ output:
 }
 ```
 
-##### Load model
+##### Loading a model
 `$ python fate_flow_client.py -f load -c examples/publish_load_model.json`
 
 output:
@@ -443,7 +443,7 @@ output:
 }
 ```
 
-##### Modify the configuration of binding model
+##### Modifying the configuration of binding model
 `$ vi examples/bind_model_service.json`
 
 ```
@@ -467,7 +467,7 @@ output:
 ```
 
 
-##### Bind model
+##### Binding a model
 `$ python fate_flow_client.py -f bind -c examples/bind_model_service.json`
 
 output:
@@ -478,7 +478,7 @@ output:
 }
 ```
 
-##### Test the online serving
+##### Testing online serving
 Send the following message to serving interface "{SERVING_SERVICE_IP}:8059/federation/v1/inference" of the "GUEST" party.
 
 ```
@@ -511,7 +511,7 @@ output:
 {"flag":0,"data":{"prob":0.30684422824464636,"retmsg":"success","retcode":0}
 ```
 
-### Deleting cluster
+### Deleting the cluster
 Use this command to stop all cluster:
 ```
 ./docker_deploy.sh --delete all
