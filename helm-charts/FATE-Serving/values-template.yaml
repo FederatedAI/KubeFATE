@@ -34,7 +34,7 @@ servingProxy:
   nodePort: {{ .nodePort }}
   loadBalancerIP: {{ .loadBalancerIP }}
   ingerssHost: {{ .ingressHost | default (printf "%s.serving-admin.kubefate.net" $partyId) }}
-  
+
   {{- with .partyList }}
   partyList:
   {{- range . }}
@@ -130,7 +130,7 @@ servingServer:
 
 servingZookeeper:
   include: {{ has "servingZookeeper" .modules }}
-  {{- with .python }}
+  {{- with .servingZookeeper }}
   
   {{- with .nodeSelector }}
   nodeSelector:
@@ -146,7 +146,7 @@ servingZookeeper:
   {{- end }}
 
   subPath: {{ .subPath }}
-  storageClassName: {{ .servingZookeeper.storageClassName | default "managed-nfs-storage" }}
+  storageClassName: {{ .storageClassName | default "managed-nfs-storage" }}
   existingClaim: {{ .existingClaim }}
   storageClass: {{ .storageClass }}
   accessMode: {{ .accessMode | default "ReadWriteOnce" }}
@@ -158,7 +158,7 @@ servingAdmin:
   include: {{ has "servingAdmin" .modules }}
   {{- with .servingAdmin }}
   
-  ingerssHost: {{ .ingressHost | default (printf "%s.serving-admin.kubefate.net" $partyId) }}
+  ingressHost: {{ .ingressHost | default (printf "%s.serving-admin.kubefate.net" $partyId) }}
   username: {{ .username }}
   password: {{ .password }}
   

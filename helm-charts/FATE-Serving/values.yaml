@@ -26,6 +26,7 @@ servingProxy:
   nodePort: 30109
   loadBalancerIP:  
   ingerssHost: 9999.serving-proxy.kubefate.net
+
   nodeSelector:
   tolerations:
   affinity:
@@ -76,13 +77,12 @@ servingZookeeper:
   existingClaim: ""
   storageClass: "serving-zookeeper"
   accessMode: ReadWriteOnce
-  ingerssHost: 9999.serving-admin.kubefate.net
   size: 1Gi
 
 
 servingAdmin:
   include: true
-  ingerssHost: 9999.serving-admin.kubefate.net
+  ingressHost: 9999.serving-admin.kubefate.net
   username: admin
   password: admin
   nodeSelector: 

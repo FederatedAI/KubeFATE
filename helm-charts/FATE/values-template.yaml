@@ -8,7 +8,7 @@ image:
   imagePullSecrets:
 {{ toYaml . | indent 2 }}
   {{- end }}
-  
+
 partyId: {{ .partyId | int64 | toString }}
 partyName: {{ .name }}
 
@@ -88,6 +88,21 @@ modules:
     affinity:
 {{ toYaml . | indent 6 }}
     {{- end }}
+    {{- with .polling }}
+    polling:
+      enabled: {{ .enabled }}
+      type: {{ .type }}
+      {{- with .server }}
+      server:
+        ip: {{ .ip }}
+        port: {{ .port }}
+      {{- end }}
+      {{- with .clientList }}
+      clientList:
+{{ toYaml . | indent 6 }}
+      {{- end }}
+      concurrency: {{ .concurrency }}
+    {{- end }}
     {{- end }}
 
 
@@ -118,10 +133,15 @@ modules:
     include: {{ has "python" .modules }}
     backend: {{ default "eggroll" .backend }}
     {{- with .python }}
-    type: {{ .type }}
+    {{- with .resources }}
+    resources:
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    type: {{ .type | default "ClusterIP" }}
     httpNodePort: {{ .httpNodePort }}
     grpcNodePort: {{ .grpcNodePort }}
     loadBalancerIP: {{ .loadBalancerIP }}
+    serviceAccountName: {{ .serviceAccountName }}
     {{- with .nodeSelector }}
     nodeSelector: 
 {{ toYaml . | indent 6 }}
@@ -135,12 +155,20 @@ modules:
 {{ toYaml . | indent 6 }}
     {{- end }}
     enabledNN: {{ .enabledNN | default false }}
-    {{- with .spark }}
-    spark: 
-      master: {{ .master }}
-      home: {{ .home }}
+    existingClaim: {{ .existingClaim  }}
+    claimName: {{ .claimName | default "python-data" }}
+    storageClass: {{ .storageClass | default "python" }}
+    accessMode: {{ .accessMode | default "ReadWriteOnce" }}
+    size: {{ .size | default "1Gi" }}
+    {{- with .clustermanager }}
+    clustermanager:
       cores_per_node: {{ .cores_per_node }}
       nodes: {{ .nodes }}
+    {{- end }}
+    {{- with .spark }}
+
+    spark: 
+{{ toYaml . | indent 6}}
     {{- end }}
     {{- with .hdfs }}
     hdfs:
@@ -152,7 +180,6 @@ modules:
       host: {{ .host }}
       mng_port: {{ .mng_port }}
       port: {{ .port }}
-      route_table: {{ .route_table }}
     {{- end }}
     {{- with .rabbitmq }}
     rabbitmq:
@@ -161,8 +188,6 @@ modules:
       port: {{ .port }}
       user: {{ .user }}
       password: {{ .password }}
-      # default conf/rabbitmq_route_table.yaml
-      route_table: {{ .route_table }}
     {{- end }}
     {{- with .nginx }}
     nginx:
@@ -177,7 +202,7 @@ modules:
     include: {{ has "clustermanager" .modules }}
     {{- with .clustermanager }}
     ip: clustermanager
-    type: ClusterIP
+    type: "ClusterIP"
     {{- with .nodeSelector }}
     nodeSelector: 
 {{ toYaml . | indent 6 }}
@@ -225,8 +250,11 @@ modules:
   client: 
     include: {{ has "client" .modules }}
     {{- with .client }}
-    ip: {{ .ip }}
-    type: {{ .type }}
+    subPath: {{ .subPath }}
+    existingClaim: {{ .existingClaim }}
+    storageClass: {{ .storageClass  | default "client" }}
+    accessMode: {{ .accessMode  | default "ReadWriteOnce" }}
+    size: {{ .size  | default "1Gi" }}
     {{- with .nodeSelector }}
     nodeSelector: 
 {{ toYaml . | indent 6 }}
@@ -245,7 +273,7 @@ modules:
   mysql: 
     include: {{ has "mysql" .modules }}
     {{- with .mysql }}
-    type: {{ .type }}
+    type: {{ .type  | default "ClusterIP" }}
     {{- with .nodeSelector }}
     nodeSelector: 
 {{ toYaml . | indent 6 }}
@@ -282,31 +310,19 @@ modules:
 
   fateboard:
     include: {{ has "fateboard" .modules }}
-    {{- with .fateboard }}
-    type: {{ .type }}
-    {{- with .nodeSelector }}
-    nodeSelector: 
-{{ toYaml . | indent 6 }}
-    {{- end }}
-    {{- with .tolerations }}
-    tolerations:
-{{ toYaml . | indent 6 }}
-    {{- end }}
-    {{- with .affinity }}
-    affinity:
-{{ toYaml . | indent 6 }}
-    {{- end }}
-    {{- end}}
 
   spark:
     include: {{ has "spark" .modules }}
     {{- with .spark }}
+    {{- if .master }}
     master:
       Image: "{{ .master.Image }}"
       ImageTag: "{{ .master.ImageTag }}"
       replicas: {{ .master.replicas }}
-      cpu: "{{ .master.cpu }}"
-      memory: "{{ .master.memory }}"
+      {{- with .master.resources }}
+      resources:
+{{ toYaml . | indent 8 }}
+      {{- end }}
       {{- with .master.nodeSelector }}
       nodeSelector: 
 {{ toYaml . | indent 8 }}
@@ -320,12 +336,16 @@ modules:
 {{ toYaml . | indent 8 }}
       {{- end }}
       type: {{ .type }}
+    {{- end }}
+    {{- if .worker }}
     worker:
       Image: "{{ .worker.Image }}"
       ImageTag: "{{ .worker.ImageTag }}"
       replicas: {{ .worker.replicas }}
-      cpu: "{{ .worker.cpu }}"
-      memory: "{{ .worker.memory }}"
+      {{- with .worker.resources }}
+      resources:
+{{ toYaml . | indent 8 }}
+      {{- end }}
       {{- with .worker.nodeSelector }}
       nodeSelector: 
 {{ toYaml . | indent 8 }}
@@ -338,7 +358,8 @@ modules:
       affinity:
 {{ toYaml . | indent 8 }}
       {{- end }}
-      type: {{ .type }}
+      type: {{ .worker.type | default "ClusterIP" }}
+    {{- end }}
     {{- end }}
 
 
@@ -358,7 +379,12 @@ modules:
       affinity:
 {{ toYaml . | indent 8 }}
       {{- end }}
-      type: ClusterIP
+      type: {{ .namenode.type | default "ClusterIP" }}
+      nodePort: {{ .namenode.nodePort }}
+      existingClaim: {{ .namenode.existingClaim }}
+      storageClass: {{ .namenode.storageClass | default "" }}
+      accessMode: {{ .namenode.accessMode  | default "ReadWriteOnce"  }}
+      size: {{ .namenode.size }}
     datanode:
       {{- with .datanode.nodeSelector }}
       nodeSelector: 
@@ -372,7 +398,11 @@ modules:
       affinity:
 {{ toYaml . | indent 8 }}
       {{- end }}
-      type: ClusterIP
+      type: {{ .datanode.type | default "ClusterIP" }}
+      existingClaim: {{ .datanode.existingClaim }}
+      storageClass: {{ .datanode.storageClass | default "" }}
+      accessMode: {{ .datanode.accessMode  | default "ReadWriteOnce"  }}
+      size: {{ .datanode.size }}
     {{- end }}
 
 
@@ -391,7 +421,7 @@ modules:
     affinity:
 {{ toYaml . | indent 6 }}
     {{- end }}
-    type: {{ .type }}
+    type: {{ .type | default "ClusterIP" }}
     httpNodePort:  {{ .httpNodePort }}
     grpcNodePort:  {{ .grpcNodePort }}
     loadBalancerIP: {{ .loadBalancerIP }}
@@ -424,7 +454,7 @@ modules:
     affinity:
 {{ toYaml . | indent 6 }}
     {{- end }}
-    type: {{ .type }}
+    type: {{ .type | default "ClusterIP" }}
     nodePort: {{ .nodePort }}
     default_user: {{ .default_user }}
     default_pass: {{ .default_pass }}
@@ -454,23 +484,31 @@ modules:
     affinity:
 {{ toYaml . | indent 6 }}
     {{- end }}
-    type: {{ .type }}
+    type: {{ .type | default "ClusterIP" }}
     httpNodePort: {{ .httpNodePort }}
     httpsNodePort: {{ .httpsNodePort }}
     loadBalancerIP: {{ .loadBalancerIP }}
+    {{- with .publicLB}}
+    publicLB:
+      enabled: {{ .enabled | default false }}
+    {{- end }}
     {{- with .exchange }}
     exchange:
       ip: {{ .ip }}
       port: {{ .port }}
+      domain: {{ .domain | default "fate.org" }}
     {{- end }}
     route_table: 
       {{- range $key, $val := .route_table }}
       {{ $key }}: 
 {{ toYaml $val | indent 8 }}
       {{- end }}
+    existingClaim: {{ .existingClaim }}
+    storageClass: {{ .storageClass | default "" }}
+    accessMode: {{ .accessMode  | default "ReadWriteOnce"  }}
+    size: {{ .size }}
     {{- end }}
     
-
 externalMysqlIp: {{ .externalMysqlIp }}
 externalMysqlPort: {{ .externalMysqlPort }}
 externalMysqlDatabase: {{ .externalMysqlDatabase }}

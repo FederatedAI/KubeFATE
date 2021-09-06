@@ -21,20 +21,20 @@ data:
   route_table.yaml: |
     default:
       proxy:
-        - host: nginx 
+        - host: nginx
           http_port: 9300
           grpc_port: 9310
     {{ .Values.partyId }}:
       proxy:
-        - host: nginx 
+        - host: nginx
           http_port: 9300
           grpc_port: 9310
       fateflow:
-        - host: fateflow 
+        - host: fateflow
           http_port: 9380
           grpc_port: 9360
 {{- range $key, $val := .Values.modules.nginx.route_table }}
-    {{ $key }}: 
+    {{ $key }}:
 {{ toYaml . | indent 6 }}
 {{- end }}
   nginx.conf: |
@@ -116,7 +116,7 @@ metadata:
     fateMoudle: nginx
 {{ include "fate.labels" . | indent 4 }}
 spec:
-  replicas: 1
+  replicas: {{ default 1 .Values.modules.nginx.replicas }}
   strategy:
     type: Recreate
   selector:
@@ -133,14 +133,32 @@ spec:
         - name: nginx
           image: {{ .Values.image.registry }}/nginx:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - /bin/bash
+            - -c
+            - |
+              sed -i "s#conf/route_table.yaml#conf/modifiable/route_table.yaml#g" nginx/lua/route_table.lua;
+              echo "change path of route_table.yaml success!"
+              openresty -g 'daemon off;'
           ports:
             - containerPort: 9300
             - containerPort: 9310
           volumeMounts:
-            - mountPath: /data/projects/fate/proxy/nginx/conf
+            - mountPath: /data/projects/fate/proxy/nginx/conf/nginx.conf
+              name: nginx-confs
+              subPath: nginx.conf
+            - mountPath: /data/projects/fate/proxy/nginx/conf/modifiable/
               name: nginx-confs
       {{- with .Values.modules.nginx.nodeSelector }}
       nodeSelector: 
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.modules.nginx.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.modules.nginx.affinity }}
+      affinity:
 {{ toYaml . | indent 8 }}
       {{- end }}
       {{- with .Values.image.imagePullSecrets }}

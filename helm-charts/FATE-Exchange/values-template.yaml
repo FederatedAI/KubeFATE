@@ -6,8 +6,10 @@ image:
   isThridParty: {{ empty .registry | ternary  "false" "true" }}
   tag: {{ .imageTag | default "1.6.0-release" }}
   pullPolicy: {{ .pullPolicy | default "IfNotPresent" }}
-  imagePullSecrets: 
-#  - name: 
+  {{- with .imagePullSecrets }}
+  imagePullSecrets:
+{{ toYaml . | indent 2 }}
+  {{- end }}
 
 exchange:
 {{- with .rollsite }}
@@ -63,7 +65,16 @@ modules:
     nodeSelector: 
 {{ toYaml . | indent 6 }}
     {{- end }}
+    {{- with .tolerations }}
+    tolerations:
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    {{- with .affinity }}
+    affinity:
+{{ toYaml . | indent 6 }}
+    {{- end }}
     type: {{ .type }}
+    replicas: {{ .replicas }}
     httpNodePort:  {{ .httpNodePort }}
     grpcNodePort:  {{ .grpcNodePort }}
     route_table: 
@@ -88,6 +99,7 @@ modules:
 {{ toYaml . | indent 6 }}
     {{- end }}
     type: {{ .type }}
+    replicas: {{ .replicas }}
     nodePort: {{ .nodePort }}
     route_table: 
       sni:

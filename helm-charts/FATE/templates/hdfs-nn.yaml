@@ -96,6 +96,15 @@ spec:
         fateMoudle: namenode
 {{ include "fate.labels" . | indent 8 }}
     spec:
+    {{ if .Values.persistence.enabled }}
+      initContainers:
+        - name: delete-lost-found
+          image: busybox
+          command: ["sh", "-c", "rm -rf /hadoop/dfs/name/lost+found"]
+          volumeMounts:
+            - name: dfs
+              mountPath: /hadoop/dfs/name
+    {{ end }}
       containers:
         - name: namenode
           image: {{ .Values.image.registry }}/hadoop-namenode:2.0.0-hadoop2.7.4-java8
@@ -139,7 +148,12 @@ spec:
           configMap:
             name: namenode-config
         - name: dfs
+        {{ if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.modules.hdfs.namenode.existingClaim | default  "namenode-data" }}
+        {{ else }}
           emptyDir: {}
+        {{ end }}
 ---
 apiVersion: v1
 kind: Service
@@ -154,6 +168,9 @@ spec:
       port: 9000
       targetPort: 9000
       protocol: TCP
+      {{- if eq .Values.modules.hdfs.namenode.type "NodePort" "LoadBalancer" }}
+      nodePort: {{ .Values.modules.hdfs.namenode.nodePort }}
+      {{- end }}
     - name: "tcp-9870"
       port: 9870
       targetPort: 9870
@@ -167,4 +184,26 @@ spec:
     fateMoudle: namenode
 {{ include "fate.matchLabels" . | indent 4 }}
 ---
+{{ if and .Values.persistence.enabled (not .Values.modules.hdfs.namenode.existingClaim) }}
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: namenode-data
+  labels:
+    fateMoudle: namenode
+{{ include "fate.labels" . | indent 4 }}
+spec:
+  accessModes:
+    - {{ .Values.modules.hdfs.namenode.accessMode }}
+  resources:
+    requests:
+      storage: {{ .Values.modules.hdfs.namenode.size }}
+  {{ if .Values.modules.hdfs.namenode.storageClass }}
+    {{ if eq "-" .Values.modules.hdfs.namenode.storageClass }}
+  storageClassName: ""
+    {{ else }}
+  storageClassName: {{ .Values.modules.hdfs.namenode.storageClass }}
+    {{ end }}
+  {{ end }}
+{{ end }}
 {{ end }}

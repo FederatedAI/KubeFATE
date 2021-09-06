@@ -19,10 +19,28 @@ metadata:
 {{ include "fate.labels" . | indent 4 }}
 data:
   spark-defaults.conf: |
-    spark.master                      {{  .Values.modules.python.spark.master | default "local[4]"}}
-    #spark.eventLog.enabled           true
-    #spark.eventLog.dir               hdfs://namenode:9000/spark/logs
-    spark.driver.host                 fateflow
+    spark.master                      {{  .Values.modules.python.spark.master | default "spark://spark-master:7077"}}
+    spark.driver.host                 {{  .Values.modules.python.spark.driverHost | default "fateflow" }}
+    {{- if .Values.modules.python.spark.driverStartPort }}
+    spark.driver.port                 {{  .Values.modules.python.spark.driverStartPort }}
+    {{- end }}
+    
+    {{- if .Values.modules.python.spark.portMaxRetries }}
+    spark.port.maxRetries             {{  .Values.modules.python.spark.portMaxRetries }}
+    {{- end }}
+    
+    {{- if .Values.modules.python.spark.blockManagerStartPort }}
+    spark.blockManager.port           {{  .Values.modules.python.spark.blockManagerStartPort }}
+    {{- end }}
+    
+    {{- if .Values.modules.python.spark.blockManagerStartPort }}
+    spark.driver.bindAddress          0.0.0.0
+    {{- end }}
+    
+    {{- if .Values.modules.python.spark.pysparkPython }}
+    spark.pyspark.python              {{  .Values.modules.python.spark.pysparkPython }}
+    spark.pyspark.driver.python       python
+    {{- end }}
   service_conf.yaml: |
     work_mode: 1
     use_registry: {{ .Values.modules.serving.useRegistry | default false }}
@@ -66,8 +84,8 @@ data:
       stale_timeout: 30
     fate_on_eggroll:
       clustermanager:
-        cores_per_node: 20
-        nodes: 1
+        cores_per_node: {{ .Values.modules.python.clustermanager.cores_per_node | default 16 }}
+        nodes: {{ .Values.modules.python.clustermanager.nodes | default 2 }}
       rollsite:
         host: {{ .Values.modules.rollsite.ip }}
         port: 9370
@@ -78,7 +96,7 @@ data:
         cores_per_node: {{ .Values.modules.python.spark.cores_per_node }}
         nodes: {{ .Values.modules.python.spark.nodes }}
       hdfs:
-        name_node: {{ .Values.modules.python.hdfs.name_node }}
+        name_node: {{ .Values.modules.python.hdfs.name_node | default "hdfs://namenode:9000" }}
         # default /
         path_prefix: {{ .Values.modules.python.hdfs.path_prefix }}
       rabbitmq:
@@ -118,14 +136,9 @@ data:
     zookeeper:
 {{ toYaml .Values.modules.serving.zookeeper | indent 6 }}
     {{- end }}
-
   transfer_conf.yaml: |
     paths: # dir or path
       - "python/federatedml/transfer_variable/auth_conf"
-  pipeline_conf.yaml: |
-    ip: {{ if .Values.istio.enabled }}127.0.0.1{{ else }}fateflow{{ end }}
-    port: 9380
-    log_directory: /fml_manager/Examples/Pipeline/logs
 ---
 kind: ConfigMap
 apiVersion: v1
@@ -167,17 +180,20 @@ data:
     {{- with .Values.modules.pulsar.exchange }}
     default:
       proxy: "{{ .ip }}:{{ .port }}"
-      domain: "fate.org"
+      domain: "{{ .domain }}"
     {{- end }}
+{{- if .Values.modules.pulsar.route_table }}
+{{- range $key, $val := .Values.modules.pulsar.route_table }}
+    {{ $key }}:
+{{ toYaml . | indent 6 }}
+{{- end }}
+{{- else }}
     {{ .Values.partyId }}:
       host: pulsar
       port: 6650
       sslPort: 6651
       proxy: ""
-{{- range $key, $val := .Values.modules.pulsar.route_table }}
-    {{ $key }}: 
-{{ toYaml . | indent 6 }}
-{{- end }}
+{{- end}}
 ---
 kind: ConfigMap
 apiVersion: v1
@@ -188,13 +204,16 @@ metadata:
 {{ include "fate.labels" . | indent 4 }}
 data:
   rabbitmq_route_table.yaml: |
+{{- if .Values.modules.rabbitmq.route_table }}
+{{- range $key, $val := .Values.modules.rabbitmq.route_table }}
+    {{ $key }}:
+{{ toYaml . | indent 6 }}
+{{- end }}
+{{- else }}
     {{ .Values.partyId }}:
       host: rabbitmq
       port: 5672
-{{- range $key, $val := .Values.modules.rabbitmq.route_table }}
-    {{ $key }}: 
-{{ toYaml . | indent 6 }}
-{{- end }}
+{{- end}}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -268,11 +287,24 @@ spec:
           image: {{ .Values.image.registry }}/{{ if .Values.modules.python.enabledNN }}python-nn{{ else }}python{{ end }}:{{ .Values.image.tag }}
           {{- end }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if .Values.modules.python.resources}}
+          resources:
+          {{- range $key, $val := .Values.modules.python.resources }}
+            {{ $key }}:
+{{ toYaml $val | indent 14 }}
+          {{- end }}
+          {{- end }}
           env:
           - name: POD_IP
             valueFrom:
               fieldRef:
                 fieldPath: status.podIP
+          {{- if eq .Values.modules.python.backend  "spark" }}
+          - name: FATE_FLOW_UPLOAD_MAX_NUM
+            value: 1000000
+          - name: FATE_FLOW_UPLOAD_MAX_BYTES
+            value: 104868093952
+          {{- end }}
           ports:
             - containerPort: 9360
             - containerPort: 9380
@@ -284,58 +316,40 @@ spec:
                 mkdir -p /data/projects/fate/conf/
                 cp /data/projects/fate/conf1/transfer_conf.yaml /data/projects/fate/conf/transfer_conf.yaml
                 cp /data/projects/fate/conf1/service_conf.yaml /data/projects/fate/conf/service_conf.yaml
-                cp /data/projects/fate/conf1/pipeline_conf.yaml /data/projects/fate/conf/pipeline_conf.yaml
+                # cp /data/projects/fate/conf1/pipeline_conf.yaml /data/projects/fate/conf/pipeline_conf.yaml
                 # fix fateflow conf must use IP
                 sed -i "s/host: fateflow/host: ${POD_IP}/g" /data/projects/fate/conf/service_conf.yaml
                 # fix pipeline conf must use IP
-                sed -i "s/ip: fateflow/ip: ${POD_IP}/g" /data/projects/fate/conf/pipeline_conf.yaml
-                # shared examples 
-                cp -r /data/projects/fate/examples /data/projects/fate/examples-shared-for-client
+                # sed -i "s/ip: fateflow/ip: ${POD_IP}/g" /data/projects/fate/conf/pipeline_conf.yaml
+                
+                cp /data/projects/spark-2.4.1-bin-hadoop2.7/conf/spark-defaults-template.conf /data/projects/spark-2.4.1-bin-hadoop2.7/conf/spark-defaults.conf
+                sed -i "s/fateflow/${POD_IP}/g" /data/projects/spark-2.4.1-bin-hadoop2.7/conf/spark-defaults.conf
+                
                 sleep 5;
                 python ./fate_flow/fate_flow_server.py
           volumeMounts:
             - mountPath: /data/projects/fate/eggroll/conf/eggroll.properties
               name: eggroll-confs
               subPath: eggroll.properties
-            - name: logs
+            - name: python-data
               mountPath: /data/projects/fate/logs
+              subPath: logs
             - mountPath: /data/projects/fate/conf1/
               name: python-confs
-            - name: download-dir
-              mountPath: /data/projects/fate/python/download_dir
-            - mountPath: /data/projects/spark-2.4.1-bin-hadoop2.7/conf/spark-defaults.conf
+            - mountPath: /data/projects/spark-2.4.1-bin-hadoop2.7/conf/spark-defaults-template.conf
               name: python-confs
               subPath: spark-defaults.conf
             - mountPath: /data/projects/fate/conf/rabbitmq_route_table
               name: rabbitmq-route-table
             - mountPath: /data/projects/fate/conf/pulsar_route_table
               name: pulsar-route-table
-            - mountPath: /data/projects/fate/conf/
-              name: shared-dir-conf
-            - mountPath: /data/projects/fate/examples-shared-for-client
-              name: shared-dir-examples
-        {{- if .Values.modules.client.include }}
-        - image: {{ .Values.image.registry }}/client:{{ .Values.image.tag }}
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
-          name: client
-          env:
-            - name: partyId
-              value: {{ .Values.partyId | quote  }}
-            - name: FATE_FLOW_HOST
-              value: "{{ if .Values.istio.enabled }}127.0.0.1{{ else }}fateflow{{ end }}:9380"
-            - name: FATE_SERVING_HOST
-              value: "{{.Values.modules.serving.ip}}:{{.Values.modules.serving.port}}"
-          ports:
-            - containerPort: 20000
-          volumeMounts:
-            - mountPath: /data/projects/fate/conf/
-              name: shared-dir-conf
-            - mountPath: /data/projects/fate/examples
-              name: shared-dir-examples
-              subPath: examples
-            - name: download-dir
-              mountPath: /fml_manager/Examples/download_dir
-        {{- end }}
+            # TODO add mountPath of job and model-cache 
+            - mountPath: /data/projects/fate/jobs
+              name: python-data
+              subPath: jobs
+            - mountPath: /data/projects/fate/model_local_cache
+              name: python-data
+              subPath: model-local-cache
         {{- if .Values.modules.fateboard.include }}
         - image: {{ .Values.image.registry }}/fateboard:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -346,8 +360,9 @@ spec:
             - mountPath: /data/projects/fate/fateboard/conf/application.properties
               name: fateboard-confs
               subPath: application.properties
-            - name: logs
+            - name: python-data
               mountPath: /data/projects/fate/logs
+              subPath: logs
         {{- end }}
       {{- with .Values.modules.python.nodeSelector }}
       nodeSelector:
@@ -365,7 +380,11 @@ spec:
       imagePullSecrets:
 {{ toYaml . | indent 6 }}
       {{- end }}
+{{- if .Values.modules.python.serviceAccountName }}
+      serviceAccountName: {{ .Values.modules.python.serviceAccountName }}
+{{- else }}
       serviceAccountName: {{ template "serviceAccountName" . }}
+{{- end }}
       restartPolicy: Always
       volumes:
         - name: eggroll-confs
@@ -383,14 +402,14 @@ spec:
         - name: fateboard-confs
           configMap:
             name: fateboard-config
-        - name: logs
+        {{- if not .Values.persistence.enabled }}
+        - name: python-data
           emptyDir: {}
-        - name: download-dir
-          emptyDir: {}
-        - name: shared-dir-conf
-          emptyDir: {}
-        - name: shared-dir-examples
-          emptyDir: {}
+        {{- else }}
+        - name: python-data
+          persistentVolumeClaim:
+            claimName: {{ .Values.modules.python.existingClaim | default  "python-data" }}
+        {{- end }}
 ---
 apiVersion: v1
 kind: Service
@@ -410,7 +429,6 @@ spec:
       targetPort: 9380
       protocol: TCP
   type: ClusterIP
-  clusterIP: None
   selector:
     fateMoudle: python
 {{ include "fate.matchLabels" . | indent 4 }}
@@ -448,6 +466,40 @@ spec:
     fateMoudle: python
 {{ include "fate.matchLabels" . | indent 4 }}
 ---
+{{- if and .Values.modules.python.spark.portMaxRetries (ne (print .Values.modules.python.spark.driverHost) "fateflow") }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: fateflow-sparkdriver
+  labels:
+    fateMoudle: python
+{{ include "fate.labels" . | indent 4 }}
+spec:
+  ports:
+    {{ $spark := .Values.modules.python.spark }}
+    {{- range .Values.modules.python.spark.portMaxRetries | int | until }}
+    - name: "spark-driver-port-{{ . }}"
+      port: {{ $spark.driverStartPort | int | add . }}
+      targetPort: {{ $spark.driverStartPort | int | add .  }}
+      {{- if eq $spark.driverHostType "NodePort" "LoadBalancer" }}
+      nodePort: {{ $spark.driverStartPort | int | add .  }}
+      {{- end }}
+      protocol: TCP
+    - name: "spark-block-manager-port-{{ . }}"
+      port: {{ $spark.blockManagerStartPort  | int | add . }}
+      targetPort: {{ $spark.blockManagerStartPort  | int | add . }}
+      {{- if eq $spark.driverHostType "NodePort" "LoadBalancer" }}
+      nodePort: {{ $spark.blockManagerStartPort  | int | add . }}
+      {{- end }}
+      protocol: TCP
+    {{- end }}
+  type: {{ .Values.modules.python.spark.driverHostType }}
+  selector:
+    fateMoudle: python
+{{ include "fate.matchLabels" . | indent 4 }}
+---
+{{- end }}
+
 {{- if .Values.modules.fateboard.include }}
 apiVersion: v1
 kind: Service
@@ -468,24 +520,26 @@ spec:
 {{ include "fate.matchLabels" . | indent 4 }}
 ---
 {{- end }}
-{{- if .Values.modules.client.include }}
+{{- if and .Values.persistence.enabled (not .Values.modules.python.existingClaim) }}
+kind: PersistentVolumeClaim
 apiVersion: v1
-kind: Service
 metadata:
-  name: notebook
+  name: python-data
   labels:
     fateMoudle: python
 {{ include "fate.labels" . | indent 4 }}
 spec:
-  ports:
-    - name: "tcp-notebook"
-      port: 20000
-      targetPort: 20000
-      protocol: TCP
-  type: {{ .Values.modules.client.type }}
-  selector:
-    fateMoudle: python
-{{ include "fate.matchLabels" . | indent 4 }}
----
+  accessModes: 
+    - {{ .Values.modules.python.accessMode }}
+  resources:
+    requests:
+      storage: {{ .Values.modules.python.size }}
+  {{- if .Values.modules.python.storageClass }}
+    {{- if eq "-" .Values.modules.python.storageClass }}
+  storageClassName: ""
+    {{- else }}
+  storageClassName: {{ .Values.modules.python.storageClass }}
+    {{- end }}
+  {{- end }}
 {{- end }}
 {{ end }}

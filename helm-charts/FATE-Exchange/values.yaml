@@ -47,6 +47,9 @@ modules:
     httpNodePort:  30003
     grpcNodePort:  30008
     loadBalancerIP: 
+    nodeSelector: 
+    tolerations:
+    affinity:
     # route_table is used to configure the cluster information of all parties that join in the exchange deployment mode. (When Spark was used as the calculation engine at the time)
     route_table:
       # 10000: 

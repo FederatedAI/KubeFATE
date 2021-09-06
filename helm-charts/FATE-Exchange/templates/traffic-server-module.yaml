@@ -32,7 +32,7 @@ data:
     
     CONFIG proxy.config.http.server_ports STRING 8080 8080:ipv6 443:ssl
     
-    CONFIG proxy.config.http.connect_ports STRING 443 30000-33000
+    CONFIG proxy.config.http.connect_ports STRING 443 6650-6700 30000-33000
     
     CONFIG proxy.config.ssl.CA.cert.filename STRING ca.cert.pem
     CONFIG proxy.config.ssl.CA.cert.path STRING /opt/proxy
@@ -70,7 +70,7 @@ metadata:
     owner: kubefate
     cluster: fate-exchange
 spec:
-  replicas: 1
+  replicas: {{ default 1 .Values.modules.trafficServer.replicas }}
   strategy:
     type: Recreate
   selector:
@@ -91,6 +91,10 @@ spec:
         - image: {{ .Values.image.registry }}/trafficserver
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           name: traffic-server
+          command:
+            - /bin/bash
+            - -c
+            - /opt/trafficserver/bin/traffic_manager
           ports:
             - containerPort: 8080
             - containerPort: 443
@@ -122,6 +126,10 @@ spec:
       {{- with .Values.modules.trafficServer.affinity }}
       affinity:
 {{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.image.imagePullSecrets }}
+      imagePullSecrets:
+{{ toYaml . | indent 6 }}
       {{- end }}
       serviceAccountName: {{ template "serviceAccountName" . }}
       restartPolicy: Always
