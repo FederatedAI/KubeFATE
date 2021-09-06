@@ -24,14 +24,14 @@ modules:
   # nodeSelector:
   # tolerations:
   # affinity:
-  # ingressHost: 10000.serving-admin.kubefate.net123
+  # ingressHost: 10000.serving-admin.kubefate.net
   # username: admin
   # password: admin
 
 # servingProxy: 
   # nodePort: 30310
   # type: NodePort
-  # ingressHost: 10000.serving-proxy.kubefate.net123
+  # ingressHost: 10000.serving-proxy.kubefate.net
   # nodeSelector:
   # tolerations:
   # affinity:

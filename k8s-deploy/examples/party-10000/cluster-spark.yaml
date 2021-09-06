@@ -1,10 +1,10 @@
 name: fate-10000
 namespace: fate-10000
 chartName: fate
-chartVersion: v1.6.0-a
+chartVersion: v1.6.1
 partyId: 10000
 registry: ""
-imageTag: "1.6.0-release"
+imageTag: "1.6.1-release"
 pullPolicy: 
 imagePullSecrets: 
 - name: myregistrykey
@@ -30,7 +30,6 @@ backend: spark
   # client: 10000.notebook.kubefate.net
   # sparkUI: 10000.spark.kubefate.net
   # rabbitmqUI: 10000.rabbitmq.kubefate.net
-  # pulsarUI: 10000.pulsar.kubefate.net
 
 python:
   type: NodePort
@@ -61,3 +60,7 @@ rabbitmq:
     9999:
       host: 192.168.9.1
       port: 30094
+    10000:
+      host: pulsar
+      port: 6650
+      sslPort:6651

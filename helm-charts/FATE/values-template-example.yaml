@@ -283,10 +283,12 @@ backend: eggroll
   # user: fate
   # password: fate
   # route_table:
+    # 9999:
+      # host: rabbitmq
+      # port: 5672
     # 10000:
       # host: 192.168.0.1
       # port: 30104
-
 
 # pulsar:
   # nodeSelector:
@@ -302,8 +304,13 @@ backend: eggroll
     # port: 30000
     # domain: fate.org
   # route_table:
+    # 9999:
+      # host: pulsar
+      # port: 6650
+      # sslPort:6651
     # 10000:
       # host: 192.168.10.1
       # port: 30105
       # sslPort: 30109
       # proxy: ""
+     
