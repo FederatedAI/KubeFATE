@@ -127,14 +127,16 @@ data:
       passwd: '{{ .Values.externalMysqlPassword | default .Values.modules.mysql.password | default "fate_dev" }}'
       max_connections: 10
       stale_timeout: 10
+    {{- with .Values.modules.serving }}
     servings:
       hosts:
-      {{- if .Values.modules.serving }}
-        - {{ .Values.modules.serving.ip }}:{{ .Values.modules.serving.port }}
+      {{- if and .ip .port }}
+      - {{ .ip }}:{{ .port }}
       {{- end }}
-    {{- if .Values.modules.serving.useRegistry }}
+      {{- if and .useRegistry .zookeeper }}
     zookeeper:
-{{ toYaml .Values.modules.serving.zookeeper | indent 6 }}
+{{ toYaml .zookeeper | indent 6 }}
+      {{- end }}
     {{- end }}
   transfer_conf.yaml: |
     paths: # dir or path
