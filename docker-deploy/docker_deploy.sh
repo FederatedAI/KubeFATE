@@ -120,11 +120,11 @@ DeployPartyInternal() {
 	# check configuration files
 	if [ ! -d ${WORKINGDIR}/outputs ]; then
 		echo "Unable to find outputs dir, please generate config files first."
-		exit 1
+		return 1
 	fi
 	if [ ! -f ${WORKINGDIR}/outputs/confs-${target_party_id}.tar ]; then
-		echo "Unable to find deployment file for party $target_party_id, please generate it first."
-		exit 1
+		echo "Unable to find deployment file of training for party $target_party_id, please generate it first."
+		return 0
 	fi
 	# extract the ip address of the target party
 	if [ "$target_party_id" = "exchange" ]; then
@@ -141,7 +141,7 @@ DeployPartyInternal() {
 	# verify the target_party_ip
 	if [ "$target_party_ip" = "127.0.0.1" ]; then
 		echo "Unable to find Party: $target_party_id, please check you input."
-		exit 1
+		return 1
 	fi
 
 	if [ "$3" != "" ]; then
@@ -182,11 +182,11 @@ DeployPartyServing() {
 	# check configuration files
 	if [ ! -d ${WORKINGDIR}/outputs ]; then
 		echo "Unable to find outputs dir, please generate config files first."
-		exit 1
+		return 1
 	fi
 	if [ ! -f ${WORKINGDIR}/outputs/serving-${target_party_id}.tar ]; then
-		echo "Unable to find deployment file for party $target_party_id, please generate it first."
-		exit 1
+		echo "Unable to find deployment file of serving for party $target_party_id, please generate it first."
+		return 0
 	fi
 	# extract the ip address of the target party
 	for ((i = 0; i < ${#party_list[*]}; i++)); do
@@ -197,7 +197,7 @@ DeployPartyServing() {
 	# verify the target_party_ip
 	if [ "$target_party_serving_ip" = "127.0.0.1" ]; then
 		echo "Unable to find Party : $target_party_id serving address, please check you input."
-		exit 1
+		return 1
 	fi
 
 	handleLocally serving

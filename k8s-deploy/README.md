@@ -166,6 +166,24 @@ Info            dashboard:
                     rollsite: Running
 ```
 
+#### Access the UI of FATEBoard and Notebook
+
+If the components of fateboard and client are installed, you can use the information `9999.fateboard.kubefate.net` and `9999.notebook.kubefate.net` obtained in the previous step to access FATEBoard and Notebook UI, and configure the resolution of these two domain names It can be opened in the browser.
+
+##### FATEBoard
+
+ http://9999.fateboard.kubefate.net
+
+Access to FATEBoard UI requires a login user name and password, which can be found in `cluster.yaml` [Configuration](../docs/configurations/FATE_cluster_configuration.md#fateboard mappings).
+
+![fate_board](../docs/tutorials/images/tkg_fate_board.png)
+
+##### Notebook
+
+ http://9999.fateboard.kubefate.net
+
+![notebook](../docs/tutorials/images/tkg_notebook.png)
+
 ### Other user scenarios
 #### [Manage FATE and FATE-Serving Version](../docs/Manage_FATE_and_FATE-Serving_Version.md)
 #### [Update and Delete a FATE Cluster](../docs/Update_and_Delete_a_FATE_Cluster.md)
