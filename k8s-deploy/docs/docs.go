@@ -1921,7 +1921,7 @@ var doc = `{
                 "moduleName": {
                     "type": "string"
                 },
-                "modulesPodStatus": {
+                "modulesStatus": {
                     "type": "string"
                 },
                 "startTime": {

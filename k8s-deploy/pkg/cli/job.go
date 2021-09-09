@@ -151,8 +151,8 @@ func (c *Job) outPutInfo(result interface{}) error {
 
 	var subJobs []string
 	for _, v := range job.SubJobs {
-		subJobs = append(subJobs, fmt.Sprintf("%-20s PodStatus: %s, SubJobStatus: %s, Duration: %6s, StartTime: %s, EndTime: %s",
-			v.ModuleName, v.ModulesPodStatus, v.Status, GetDuration(v.StartTime, v.EndTime), v.StartTime.Format("2006-01-02 15:04:05"), v.EndTime.Format("2006-01-02 15:04:05")))
+		subJobs = append(subJobs, fmt.Sprintf("%-20s ModuleStatus: %s, SubJobStatus: %s, Duration: %6s, StartTime: %s, EndTime: %s",
+			v.ModuleName, v.ModulesStatus, v.Status, GetDuration(v.StartTime, v.EndTime), v.StartTime.Format("2006-01-02 15:04:05"), v.EndTime.Format("2006-01-02 15:04:05")))
 	}
 
 	states, err := yaml.Marshal(job.States)

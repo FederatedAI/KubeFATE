@@ -66,11 +66,11 @@ type ClusterArgs struct {
 type SubJobs map[string]SubJob
 
 type SubJob struct {
-	ModuleName       string
-	Status           string
-	ModulesPodStatus string
-	StartTime        time.Time
-	EndTime          time.Time
+	ModuleName    string
+	Status        string
+	ModulesStatus string
+	StartTime     time.Time
+	EndTime       time.Time
 }
 
 type Jobs []Job

@@ -38,7 +38,7 @@ func stopJob(job *modules.Job, cluster *modules.Cluster) bool {
 	return false
 }
 
-func generateSubJobs(job *modules.Job, ClusterStatus map[string]string) modules.SubJobs {
+func generateSubJobs_b(job *modules.Job, ClusterStatus map[string]string) modules.SubJobs {
 
 	subJobs := make(modules.SubJobs)
 	if job.SubJobs != nil {
@@ -58,15 +58,54 @@ func generateSubJobs(job *modules.Job, ClusterStatus map[string]string) modules.
 		var subJob modules.SubJob
 		if _, ok := subJobs[k]; !ok {
 			subJob = modules.SubJob{
-				ModuleName:       k,
-				Status:           subJobStatus,
-				ModulesPodStatus: v,
-				StartTime:        job.StartTime,
+				ModuleName:    k,
+				Status:        subJobStatus,
+				ModulesStatus: v,
+				StartTime:     job.StartTime,
 			}
 		} else {
 			subJob = subJobs[k]
 			subJob.Status = subJobStatus
-			subJob.ModulesPodStatus = v
+			subJob.ModulesStatus = v
+		}
+
+		if subJobStatus == "Success" && subJob.EndTime.IsZero() {
+			subJob.EndTime = time.Now()
+		}
+
+		subJobs[k] = subJob
+		log.Debug().Interface("subJob", subJob).Msg("generate SubJobs")
+	}
+
+	job.SubJobs = subJobs
+	return subJobs
+}
+
+func generateSubJobs(job *modules.Job, ClusterDeployStatus map[string]string) modules.SubJobs {
+
+	subJobs := make(modules.SubJobs)
+	if job.SubJobs != nil {
+		subJobs = job.SubJobs
+	}
+
+	for k, v := range ClusterDeployStatus {
+		var subJobStatus string = "Running"
+		if service.CheckStatus(v) {
+			subJobStatus = "Success"
+		}
+
+		var subJob modules.SubJob
+		if _, ok := subJobs[k]; !ok {
+			subJob = modules.SubJob{
+				ModuleName:    k,
+				Status:        subJobStatus,
+				ModulesStatus: v,
+				StartTime:     job.StartTime,
+			}
+		} else {
+			subJob = subJobs[k]
+			subJob.Status = subJobStatus
+			subJob.ModulesStatus = v
 		}
 
 		if subJobStatus == "Success" && subJob.EndTime.IsZero() {
@@ -201,9 +240,9 @@ func ClusterUpdate(clusterArgs *modules.ClusterArgs, creator string) (*modules.J
 			}
 
 			// update subJobs
-			ClusterStatus, err := service.GetClusterPodStatus(clusterArgs.Name, clusterArgs.Namespace)
+			ClusterStatus, err := service.GetClusterDeployStatus(clusterArgs.Name, clusterArgs.Namespace)
 			if err != nil {
-				log.Error().Err(err).Msg("GetClusterPodStatus error")
+				log.Error().Err(err).Msg("GetClusterDeployStatus error")
 			}
 
 			subJobs := generateSubJobs(job, ClusterStatus)
@@ -301,12 +340,12 @@ func ClusterUpdate(clusterArgs *modules.ClusterArgs, creator string) (*modules.J
 				}
 
 				// update subJobs
-				ClusterStatus, err := service.GetClusterPodStatus(clusterArgs.Name, clusterArgs.Namespace)
+				ClusterStatus, err := service.GetClusterDeployStatus(clusterArgs.Name, clusterArgs.Namespace)
 				if err != nil {
-					log.Error().Err(err).Msg("GetClusterPodStatus error")
+					log.Error().Err(err).Msg("GetClusterDeployStatus error")
 				}
 
-				log.Debug().Interface("ClusterStatus", ClusterStatus).Msg("GetClusterPodStatus()")
+				log.Debug().Interface("ClusterStatus", ClusterStatus).Msg("GetClusterDeployStatus()")
 
 				subJobs := generateSubJobs(job, ClusterStatus)
 
