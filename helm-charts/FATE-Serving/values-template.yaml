@@ -26,6 +26,43 @@ podSecurityPolicy:
   enabled: {{ .enabled | default false }}
 {{- end }}
 
+
+{{- with .ingress }}
+ingress:
+  {{- with .servingProxy }}
+  servingProxy: 
+    {{- with .annotations }}
+    annotations: 
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    {{- with .hosts }}
+    hosts:
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    {{- with .tls }}
+    tls: 
+{{ toYaml . | indent 6 }}
+    {{- end }}
+  {{- end }}
+  
+  {{- with .servingAdmin }}
+  servingAdmin: 
+    {{- with .annotations }}
+    annotations: 
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    {{- with .hosts }}
+    hosts:
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    {{- with .tls }}
+    tls: 
+{{ toYaml . | indent 6 }}
+    {{- end }}
+  {{- end }}
+  
+{{- end }}
+
 servingProxy: 
   include: {{ has "servingProxy" .modules }}
   {{- with .servingProxy }}

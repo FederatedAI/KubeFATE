@@ -11,11 +11,13 @@
 | * partyId                 | scalars            | FATE cluster party id.                                       |
 | registry                  | scalars            | Other fate images sources.                                   |
 | pullPolicy                | scalars            | kubernetes images pull policy                                |
+| imagePullSecrets          | sequences          | The imagePullSecrets names for all deployments               |
 | * persistence             | bool               | mysql and nodemanager data persistence.                      |
+| istio.enable              | bool               | enable istio                                                 |
 | podSecurityPolicy.enabled | bool               | if `true`, create & use Pod Security Policy resources        |
 | * modules                 | sequences          | Modules to be deployed in the FATE cluster.                  |
 | backend                   | set(eggroll,spark) | Configure cluster computing engine( eggroll or spark)        |
-| host                      | mappings           | Custom domain of FATE UI component                           |
+| ingress                   | mappings           | Custom domain of FATE UI component                           |
 | rollsite                  | mappings           | Configuration of FATE cluster `rollsite` module.             |
 | nodemanager               | mappings           | Configuration of FATE cluster `nodemanager` module.          |
 | python                    | mappings           | Configuration of FATE cluster `python` module.               |
@@ -53,14 +55,20 @@
 
 
 
-### host mappings
+### ingress mappings
 
-| Name       | Type    | Description                          |
-| ---------- | ------- | ------------------------------------ |
-| fateboard  | scalars | Configuration of Fateboard UI domain |
-| client     | scalars | Configuration of Notebook UI domain  |
-| sparkUI    | scalars | Configuration of Spark UI domain     |
-| rabbitmqUI | scalars | Configuration of Rabbitmq UI domain  |
+| Name                    | Type              | Description                                                  |
+| ----------------------- | ----------------- | ------------------------------------------------------------ |
+| `fateboard`             | mappings          | Configuration of Fateboard UI domain                         |
+| `fateboard.annotations` | mappings          | The annotations used commonly for ingresses                  |
+| `fateboard.hosts`       | sequences         | Set hosts list of ingress record                             |
+| `fateboard.tls`         | sequences         | Set this to enable TLS on the ingress record                 |
+| `client`                | mappings          | Configuration of Notebook UI domain                          |
+| `client.annotations`    | mappings          | The annotations used commonly for ingresses                  |
+| `client.hosts`          | sequencesmappings | Set hosts list of ingress recordConfiguration of Spark UI domain |
+| `client.tls`            | sequences         | Set this to enable TLS on the ingress record                 |
+| `spark`                 | mappings          | Configuration of spark UI domain                             |
+| `rabbitmq`              | mappings          | Configuration of Rabbitmq UI domain                          |
 
 
 

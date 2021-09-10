@@ -18,15 +18,25 @@ metadata:
   labels:
     fateMoudle: fateboard
 {{ include "fate.labels" . | indent 4 }}
+{{- if .Values.ingress.fateboard.annotations }}
+  annotations:
+{{ toYaml .Values.ingress.fateboard.annotations | indent 4 }}
+{{- end }}
 spec:
   rules:
-  - host: {{ .Values.host.fateboard }}
+  {{- range .Values.ingress.fateboard.hosts }}
+  - host: {{ .name }}
     http:
       paths:
-      - path: /
+      - path: {{ default "/" .path }}
         backend:
           serviceName: fateboard
           servicePort: 8080
+  {{- end }}
+{{- if .Values.ingress.fateboard.tls }}
+  tls:
+{{ toYaml .Values.ingress.fateboard.tls | indent 4 }}
+{{- end }}
 ---
 {{ end }}
 
@@ -38,15 +48,25 @@ metadata:
   labels:
     fateMoudle: client
 {{ include "fate.labels" . | indent 4 }}
+{{- if .Values.ingress.client.annotations }}
+  annotations:
+{{ toYaml .Values.ingress.client.annotations | indent 4 }}
+{{- end }}
 spec:
   rules:
-  - host: {{ .Values.host.client }}
+  {{- range .Values.ingress.client.hosts }}
+  - host: {{ .name }}
     http:
       paths:
-      - path: /
+      - path: {{ default "/" .path }}
         backend:
           serviceName: notebook
           servicePort: 20000
+  {{- end }}
+{{- if .Values.ingress.client.tls }}
+  tls:
+{{ toYaml .Values.ingress.client.tls | indent 4 }}
+{{- end }}
 ---
 {{ end }}
 
@@ -58,15 +78,25 @@ metadata:
   labels:
     fateMoudle: spark
 {{ include "fate.labels" . | indent 4 }}
+{{- if .Values.ingress.spark.annotations }}
+  annotations:
+{{ toYaml .Values.ingress.spark.annotations | indent 4 }}
+{{- end }}
 spec:
   rules:
-  - host: {{ .Values.host.sparkUI }}
+  {{- range .Values.ingress.spark.hosts }}
+  - host: {{ .name }}
     http:
       paths:
-      - path: /
+      - path: {{ default "/" .path }}
         backend:
           serviceName: spark-master
           servicePort: 8080
+  {{- end }}
+{{- if .Values.ingress.spark.tls }}
+  tls:
+{{ toYaml .Values.ingress.spark.tls | indent 4 }}
+{{- end }}
 ---
 {{ end }}
 
@@ -78,15 +108,25 @@ metadata:
   labels:
     fateMoudle: rabbitmq
 {{ include "fate.labels" . | indent 4 }}
+{{- if .Values.ingress.rabbitmq.annotations }}
+  annotations:
+{{ toYaml .Values.ingress.rabbitmq.annotations | indent 4 }}
+{{- end }}
 spec:
   rules:
-  - host: {{ .Values.host.rabbitmqUI }}
+  {{- range .Values.ingress.rabbitmq.hosts }}
+  - host: {{ .name }}
     http:
       paths:
-      - path: /
+      - path: {{ default "/" .path }}
         backend:
           serviceName: rabbitmq
           servicePort: 15672
+  {{- end }}
+{{- if .Values.ingress.rabbitmq.tls }}
+  tls:
+{{ toYaml .Values.ingress.rabbitmq.tls | indent 4 }}
+{{- end }}
 ---
 {{ end }}
 
@@ -98,15 +138,25 @@ metadata:
   labels:
     fateMoudle: pulsar
 {{ include "fate.labels" . | indent 4 }}
+{{- if .Values.ingress.pulsar.annotations }}
+  annotations:
+{{ toYaml .Values.ingress.pulsar.annotations | indent 4 }}
+{{- end }}
 spec:
   rules:
-  - host: {{ .Values.host.pulsarUI }}
+  {{- range .Values.ingress.pulsar.hosts }}
+  - host: {{ .name }}
     http:
       paths:
-      - path: /
+      - path: {{ default "/" .path }}
         backend:
           serviceName: pulsar
           servicePort: 8080
+  {{- end }}
+{{- if .Values.ingress.pulsar.tls }}
+  tls:
+{{ toYaml .Values.ingress.pulsar.tls | indent 4 }}
+{{- end }}
 ---
 {{ end }}
 {{ end }}

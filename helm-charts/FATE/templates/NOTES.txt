@@ -1,18 +1,21 @@
 Please wait for several minutes for FATE deployment to complete.
-Then you should be able to visit the FateBoard portal at {{ .Values.host.fateboard }} and NoteBook portal at {{ .Values.host.client }}.
 For more details, please visit https://github.com/FederatedAI/KubeFATE.
 
 # optional
 If you have configured ingress or isto, you may need to add "<host_ip/istio_ip> [ <FateBoard>, <NoteBook>...]"to the hosts.
-{{- if .Values.modules.fateboard.include }}
-- FateBoard at http://{{ .Values.host.fateboard }}
+{{- with .Values.ingress.fateboard.hosts }}
+FateBoard
+{{ toYaml . | indent 2 }}
 {{- end }}
-{{- if .Values.modules.client.include  }}
-- NoteBook at http://{{ .Values.host.client }}
+{{- with .Values.ingress.client.hosts  }}
+NoteBook
+{{ toYaml . | indent 2 }}
 {{- end }}
-{{- if .Values.modules.spark.include  }}
-- SparkUI at http://{{ .Values.host.sparkUI }}
+{{- with .Values.ingress.spark.hosts  }}
+SparkUI: 
+{{ toYaml . | indent 2 }}
 {{- end }}
-{{- if .Values.modules.rabbitmq.include  }}
-- RabbitmqUI at http://{{ .Values.host.rabbitmqUI }}
+{{- with .Values.ingress.rabbitmq.hosts  }}
+RabbitmqUI
+{{ toYaml . | indent 2 }}
 {{- end }}
