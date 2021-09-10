@@ -102,6 +102,9 @@ computing_backend=eggroll
 
 # true if you need python-nn else false, the default value will be false
 enabled_nn=false
+
+fateboard_username=admin                    # 访问fateboard的用户名
+fateboard_password=admin                    # 访问fateboard的密码
 ```
 
 FATE 1.5 支持使用Spark作为底层的分布式计算引擎，Spark集群默认会通过容器的方式部署。相关的简介可以参考这个[链接](../docs/FATE_On_Spark.md).

@@ -19,6 +19,8 @@
 | rollsite                  | mappings           | Configuration of FATE cluster `rollsite` module.             |
 | nodemanager               | mappings           | Configuration of FATE cluster `nodemanager` module.          |
 | python                    | mappings           | Configuration of FATE cluster `python` module.               |
+| fateboard                 | mappings           | Configuration of FATE cluster `fateboard` module.            |
+| client                    | mappings           | Configuration of FATE cluster `client` module.               |
 | mysql                     | mappings           | Configuration of FATE cluster `mysql` module.<br />If you use your own redis, please delete this item. |
 | externalMysqlIp           | scalars            | Access your own MySQL.                                       |
 | externalMysqlPort         | scalars            | Access your own MySQL.                                       |
@@ -133,7 +135,28 @@ The parties are directly connected.
 | rabbitmq              | mappings | If you use the existing rabbitmq, you can set this configuration |
 | nginx                 | mappings | If you use the existing nginx, you can set this configuration |
 
+### fateboard mappings
 
+Configuration of kubernetes deployment fateboard.
+
+| Name     | Type     | Description                 |
+| -------- | -------- | --------------------------- |
+| type     | mappings | Kubernetes nodeSelector.    |
+| username | scalars  | Login username of fateboard |
+| password | scalars  | Login password of fateboard |
+
+### client mappings
+
+Configuration of kubernetes deployment client.
+
+| Name          | Type     | Description                                                  |
+| ------------- | -------- | ------------------------------------------------------------ |
+| nodeSelector  | mappings | kubernetes nodeSelector.                                     |
+| subPath       | scalars  | Path of data persistence, specify the "subPath" if the PVC is shared with other components. |
+| existingClaim | scalars  | Use the existing PVC which must be created manually before bound. |
+| storageClass  | scalars  | Specify the "storageClass" used to provision the volume. Or the default. StorageClass will be used(the default). Set it to "-" to disable dynamic provisioning. |
+| accessMode    | scalars  | Kubernetes Persistent Volume Access Modes: <br />ReadWriteOnce<br />ReadOnlyMany <br />ReadWriteMany. |
+| size          | scalars  | Match the volume size of PVC.                                |
 
 ### Mysql mappings
 
@@ -146,7 +169,7 @@ Configuration of kubernetes deployment mysql.
 | port          | scalars  | Mysql port.                                                  |
 | database      | scalars  | Database name of MySQL.                                      |
 | user          | scalars  | User of MySQL.                                               |
-| password      | scalars  | User password of MySQL.                                      |
+| password      | scalars  | Password of MySQL.                                           |
 | subPath       | scalars  | Path of data persistence, specify the "subPath" if the PVC is shared with other components. |
 | existingClaim | scalars  | Use the existing PVC which must be created manually before bound. |
 | storageClass  | scalars  | Specify the "storageClass" used to provision the volume. Or the default. StorageClass will be used(the default). Set it to "-" to disable dynamic provisioning. |

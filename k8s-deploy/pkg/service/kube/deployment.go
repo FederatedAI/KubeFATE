@@ -22,8 +22,20 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+// Deployment Deployment
+type Deployment interface {
+	GetDeployment(namespace, deploymentName string) (*v1.Deployment, error)
+	GetDeploymentList(namespace, LabelSelector string) (*v1.DeploymentList, error)
+}
+
 // GetDeployment is get a Deployment
-func (e *Kube) GetDeployment(deploymentName, namespace string) (*v1.Deployment, error) {
+func (e *Kube) GetDeployment(namespace, deploymentName string) (*v1.Deployment, error) {
 	deployment, err := e.client.AppsV1().Deployments(namespace).Get(context.Background(), deploymentName, metav1.GetOptions{})
 	return deployment, err
+}
+
+// GetDeploymentList is get a GetDeploymentList
+func (e *Kube) GetDeploymentList(namespace, LabelSelector string) (*v1.DeploymentList, error) {
+	deploymentlist, err := e.client.AppsV1().Deployments(namespace).List(context.Background(), metav1.ListOptions{LabelSelector: LabelSelector})
+	return deploymentlist, err
 }

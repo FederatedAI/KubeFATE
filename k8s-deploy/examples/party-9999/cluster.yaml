@@ -1,10 +1,10 @@
 name: fate-9999
 namespace: fate-9999
 chartName: fate
-chartVersion: v1.6.0-a
+chartVersion: v1.6.1
 partyId: 9999
 registry: ""
-imageTag: "1.6.0-release"
+imageTag: "1.6.1-release"
 pullPolicy: 
 imagePullSecrets: 
 - name: myregistrykey
@@ -27,9 +27,6 @@ backend: eggroll
 # host:
   # fateboard: 9999.fateboard.kubefate.net
   # client: 9999.notebook.kubefate.net
-  # sparkUI: 9999.spark.kubefate.net
-  # rabbitmqUI: 9999.rabbitmq.kubefate.net
-  # pulsarUI: 9999.pulsar.kubefate.net
 
 rollsite: 
   type: NodePort
@@ -46,9 +43,3 @@ python:
 
 servingIp: 192.168.9.1
 servingPort: 30095
-serving:
-  useRegistry: true
-  zookeeper:
-    hosts:
-    - serving-zookeeper.fate-serving-9999:2181
-    use_acl: false

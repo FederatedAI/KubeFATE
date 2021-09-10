@@ -165,29 +165,29 @@ func (*Cluster) getCluster(c *gin.Context) {
 		cluster.Spec = make(map[string]interface{})
 	}
 
-	clusterStatus, err := cluster.GetClusterStatus()
-	if err != nil {
-		log.Error().Err(err).Str("Name", cluster.Name).Str("NameSpace", cluster.NameSpace).Msg("GetClusterStatus error")
-		c.JSON(500, gin.H{"error": err.Error()})
-		return
-	}
-	cluster.Info["status"] = clusterStatus
+	// Check the cluster status and update to DB.
+	// If cluster's Status isn't Running or Unavailable, don't check the cluster status.
+	if cluster.Status == modules.ClusterStatusRunning || cluster.Status ==
+		modules.ClusterStatusUnavailable {
 
-	podsStatus, exists := clusterStatus["modules"]
-	if exists && podsStatus != nil {
-		for _, v := range podsStatus {
-			if v == "Pending" {
-				cluster.Status = modules.ClusterStatusPending
-				continue
-			} else if v == "Unknown" {
-				cluster.Status = modules.ClusterStatusUnknown
-				continue
-			} else if v == "Failed" {
-				cluster.Status = modules.ClusterStatusFailed
-				break
+		if service.CheckClusterInfoStatus(cluster.Info) {
+			if cluster.Status != modules.ClusterStatusRunning {
+				dbErr := cluster.SetStatus(modules.ClusterStatusRunning)
+				if dbErr != nil {
+					log.Error().Err(dbErr).Msg("job setStatus error")
+				}
+			}
+
+		} else {
+			if cluster.Status != modules.ClusterStatusUnavailable {
+				dbErr := cluster.SetStatus(modules.ClusterStatusUnavailable)
+				if dbErr != nil {
+					log.Error().Err(dbErr).Msg("job setStatus error")
+				}
 			}
 		}
 	}
+
 	log.Debug().Interface("data", cluster).Msg("getCluster Success")
 	c.JSON(200, gin.H{"msg": "getCluster Success", "data": &cluster})
 }

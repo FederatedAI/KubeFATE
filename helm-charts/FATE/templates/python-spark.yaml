@@ -169,6 +169,12 @@ data:
     spring.datasource.druid.stat-view-servlet.enabled=false
     server.compression.enabled=true
     server.compression.mime-types=application/json,application/xml,text/html,text/xml,text/plain
+    server.board.login.username={{ .Values.modules.fateboard.username }}
+    server.board.login.password={{ .Values.modules.fateboard.password }}
+    #server.ssl.key-store=classpath:
+    #server.ssl.key-store-password=
+    #server.ssl.key-password=
+    #server.ssl.key-alias=
 ---
 kind: ConfigMap
 apiVersion: v1

@@ -324,13 +324,13 @@ func updateLastJobEvent(job *modules.Job, Event string) {
 func checkStatus(job *modules.Job, cluster *modules.Cluster) bool {
 
 	// update subJobs
-	ClusterStatus, err := service.GetClusterPodStatus(cluster.Name, cluster.NameSpace)
+	ClusterStatus, err := service.GetClusterDeployStatus(cluster.Name, cluster.NameSpace)
 	if err != nil {
-		log.Error().Err(err).Msg("GetClusterPodStatus error")
+		log.Error().Err(err).Msg("GetClusterDeployStatus error")
 		return false
 	}
 
-	log.Debug().Interface("ClusterStatus", ClusterStatus).Msg("GetClusterPodStatus()")
+	log.Debug().Interface("ClusterStatus", ClusterStatus).Msg("GetClusterDeployStatus()")
 	subJobs := generateSubJobs(job, ClusterStatus)
 
 	dbErr := job.SetSubJobs(subJobs)

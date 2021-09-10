@@ -214,7 +214,7 @@ definitions:
         type: string
       moduleName:
         type: string
-      modulesPodStatus:
+      modulesStatus:
         type: string
       startTime:
         type: string
