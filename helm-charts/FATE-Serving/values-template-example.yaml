@@ -24,7 +24,7 @@ modules:
   # nodeSelector:
   # tolerations:
   # affinity:
-  # ingressHost: 10000.serving-admin.kubefate.net123
+  # ingressHost: 10000.serving-admin.kubefate.net
   # username: admin
   # password: admin
 
@@ -32,7 +32,6 @@ modules:
   # nodePort: 30310
   # type: NodePort
   # loadBalancerIP: 
-  # ingerssHost: 10000.serving-proxy.kubefate.net123
   # nodeSelector:
   # tolerations:
   # affinity:

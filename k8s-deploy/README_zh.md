@@ -170,6 +170,24 @@ Info            dashboard:
                     rollsite: Running
 ```
 
+#### 访问 FATEBoard 和 Notebook UI
+
+假如安装了fateboard 和client 的组件就可以通过上一步得到的信息`9999.fateboard.kubefate.net` 和`9999.notebook.kubefate.net`来访问 FATEBoard 和 Notebook UI，配置下这两个域名的解析就可以在浏览器打开。
+
+##### FATEBoard
+
+ http://9999.fateboard.kubefate.net
+
+访问FATEBoard UI需要登录用户名和密码，这个可以在`cluster.yaml`里[配置](../docs/configurations/FATE_cluster_configuration.md#fateboard mappings)。
+
+![fate_board](../docs/tutorials/images/tkg_fate_board.png)
+
+##### Notebook
+
+ http://9999.fateboard.kubefate.net
+
+![notebook](../docs/tutorials/images/tkg_notebook.png)
+
 ### 其他常用用户场景
 #### [Manage FATE and FATE-Serving Version](../docs/Manage_FATE_and_FATE-Serving_Version.md)
 #### [Update and Delete a FATE Cluster](../docs/Update_and_Delete_a_FATE_Cluster.md)
@@ -179,3 +197,4 @@ Info            dashboard:
 
 ## KubeFATE服务的API参考
 #### [API Reference](docs/KubeFATE_API_Reference_Swagger.md)
+

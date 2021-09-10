@@ -1,7 +1,7 @@
 name: fate-9999
 namespace: fate-9999
 chartName: fate
-chartVersion: v1.6.0
+chartVersion: v1.6.1
 partyId: 9999
 registry: ""
 imageTag: ""
@@ -164,6 +164,11 @@ backend: eggroll
     # http_port: 9300
     # grpc_port: 9310
 
+# fateboard: 
+  # type: ClusterIP
+  # username: admin
+  # password: admin
+  
 # client:
   # nodeSelector: 
   # subPath: ""
@@ -208,7 +213,7 @@ backend: eggroll
 # spark:
   # master:
     # Image: "federatedai/spark-master"
-    # ImageTag: "1.6.0-release"
+    # ImageTag: "1.6.1-release"
     # replicas: 1
     # resources:
       # requests:
@@ -224,7 +229,7 @@ backend: eggroll
     # nodePort: 30977
   # worker:
     # Image: "federatedai/spark-worker"
-    # ImageTag: "1.6.0-release"
+    # ImageTag: "1.6.1-release"
     # replicas: 2
     # resources:
       # requests:
@@ -283,10 +288,12 @@ backend: eggroll
   # user: fate
   # password: fate
   # route_table:
+    # 9999:
+      # host: rabbitmq
+      # port: 5672
     # 10000:
       # host: 192.168.0.1
       # port: 30104
-
 
 # pulsar:
   # nodeSelector:
@@ -303,8 +310,13 @@ backend: eggroll
     # port: 30000
     # domain: fate.org
   # route_table:
+    # 9999:
+      # host: pulsar
+      # port: 6650
+      # sslPort:6651
     # 10000:
       # host: 192.168.10.1
       # port: 30105
       # sslPort: 30109
       # proxy: ""
+     

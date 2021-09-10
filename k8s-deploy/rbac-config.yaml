@@ -92,6 +92,7 @@ rules:
   - statefulsets
   verbs:
   - get
+  - list
   - create
   - delete
   - update

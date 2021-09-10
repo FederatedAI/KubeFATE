@@ -1,7 +1,7 @@
 name: fate-9999
 namespace: fate-9999
 chartName: fate
-chartVersion: v1.6.0-a
+chartVersion: v1.6.1
 partyId: 9999
 registry: ""
 imageTag: ""
@@ -67,8 +67,18 @@ backend: eggroll
   # type: NodePort
   # httpNodePort: 30097
   # grpcNodePort: 30092
+  # serviceAccountName: ""
   # nodeSelector:
+  # tolerations:
+  # affinity:
   # enabledNN: false
+  # existingClaim: ""
+  # storageClass: "python"
+  # accessMode: ReadWriteMany
+  # size: 1Gi
+  # clustermanager:
+    # cores_per_node: 16
+    # nodes: 2
   # spark: 
     # cores_per_node: 20
     # nodes: 2
@@ -88,12 +98,29 @@ backend: eggroll
     # port: 5672
     # user: fate
     # password: fate
-    # # default conf/rabbitmq_route_table.yaml
-    # route_table: 
+  # pulsar:
+    # host: pulsar
+    # mng_port: 8080
+    # port: 6650
   # nginx:
     # host: nginx
     # http_port: 9300
     # grpc_port: 9310
+
+ # Specify the fateboard service's properties
+# fateboard: 
+  # type: ClusterIP
+  # username: admin
+  # password: admin
+
+ # Specify the client service's properties
+# client:
+  # nodeSelector: 
+  # subPath: ""
+  # existingClaim: ""
+  # storageClass: "client"
+  # accessMode: ReadWriteOnce
+  # size: 1Gi
 
 # Specify the mysql properties
 # mysql: 

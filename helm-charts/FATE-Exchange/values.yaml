@@ -4,7 +4,7 @@ partyName: fate-exchange
 image:
   registry: federatedai
   isThridParty:
-  tag: 1.6.0-release
+  tag: 1.6.1-release
   pullPolicy: IfNotPresent
   imagePullSecrets: 
 #  - name: 

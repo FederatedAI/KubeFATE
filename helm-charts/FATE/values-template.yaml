@@ -2,7 +2,7 @@
 image:
   registry: {{ .registry | default "federatedai" }}
   isThridParty: {{ empty .registry | ternary  "false" "true" }}
-  tag: {{ .imageTag | default "1.6.0-release" }}
+  tag: {{ .imageTag | default "1.6.1-release" }}
   pullPolicy: {{ .pullPolicy | default "IfNotPresent" }}
   {{- with .imagePullSecrets }}
   imagePullSecrets:
@@ -310,6 +310,11 @@ modules:
 
   fateboard:
     include: {{ has "fateboard" .modules }}
+    {{- with .fateboard }}
+    type: {{ .type }}
+    username: {{ .username }}
+    password: {{ .password }}
+    {{- end}}
 
   spark:
     include: {{ has "spark" .modules }}
