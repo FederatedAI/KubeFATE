@@ -20,8 +20,14 @@ modules:
   - servingZookeeper
   - servingAdmin
 
+servingAdmin:
+  ingressHost: 10000.serving-admin.kubefate.net
+  username: admin
+  password: admin
+
 servingProxy: 
   nodePort: 30106
+  type: NodePort
   ingerssHost: 10000.serving-proxy.kubefate.net
   partyList:
   - partyId: 9999
@@ -52,9 +58,8 @@ servingRedis:
   size: 1Gi
 
 servingZookeeper:
-  storageClassName: "managed-nfs-storage"
-
-servingAdmin:
-  ingerssHost: "10000.serving-admin.kubefate.net"
-  type: NodePort
-  nodePort: 30210
+  subPath: ""
+  existingClaim: ""
+  storageClass: "serving-zookeeper"
+  accessMode: ReadWriteOnce
+  size: 1Gi

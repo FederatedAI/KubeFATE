@@ -49,20 +49,6 @@ func GetPodStatus(pods *corev1.PodList) map[string]string {
 	return status
 }
 
-// CheckClusterStatus CheckClusterStatus
-func CheckClusterStatus(ClusterStatus map[string]string) bool {
-	if len(ClusterStatus) == 0 {
-		return false
-	}
-	var clusterStatusOk = true
-	for _, v := range ClusterStatus {
-		if v != "Running" {
-			clusterStatusOk = false
-		}
-	}
-	return clusterStatusOk
-}
-
 // GetPodList GetPodList
 func GetPodList(name, namespace string) ([]string, error) {
 
@@ -123,6 +109,21 @@ func getPodContainerList(name, namespace, container string) (map[string]string, 
 			}
 		}
 
+	}
+	return podContainerList, nil
+}
+
+//GetPodContainersStatus GetPodContainersStatus
+func GetPodContainersStatus(ClusterName, namespace string) (map[string]string, error) {
+	list, err := KubeClient.GetPods(namespace, getLabelSelector(namespace, ClusterName))
+	if err != nil {
+		return nil, err
+	}
+	var podContainerList = make(map[string]string)
+	for _, v := range list.Items {
+		for _, vv := range v.Spec.Containers {
+			podContainerList[vv.Name] = fmt.Sprintf("%s", v.Status.Phase)
+		}
 	}
 	return podContainerList, nil
 }

@@ -1,5 +1,9 @@
 name: A workflow for k8s-deploy
-on: pull_request
+on:  
+  pull_request:
+    paths:
+    - "k8s-deploy/**"
+    - "!k8s-deploy/**.md"
 jobs:
   Unit-test:
     name: Unit Test
@@ -8,10 +12,12 @@ jobs:
       - name: Setup
         uses: actions/setup-go@v1
         with:
-          go-version: 1.14
+          go-version: 1.15
           id: go
+          
       - name: Code
         uses: actions/checkout@v1
+        
       - name: Unit Test
         run: |
           cd k8s-deploy

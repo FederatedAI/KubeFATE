@@ -15,6 +15,8 @@
 
 package service
 
+import "github.com/rs/zerolog/log"
+
 // GetClusterInfo GetClusterInfo
 func GetClusterInfo(name, namespace string) (map[string]interface{}, error) {
 	ip, err := GetNodeIP()
@@ -25,10 +27,21 @@ func GetClusterInfo(name, namespace string) (map[string]interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	podList, err := GetPodList(name, getDefaultNamespace(namespace))
+
+	containerList, err := GetPodContainersStatus(name, getDefaultNamespace(namespace))
 	if err != nil {
 		return nil, err
 	}
+
+	deploymentList, err := GetClusterDeployStatus(name, getDefaultNamespace(namespace))
+	if err != nil {
+		return nil, err
+	}
+
+	status := make(map[string]interface{})
+
+	status["containers"] = containerList
+	status["deployments"] = deploymentList
 
 	ingressURLList, err := GetIngressURLList(name, getDefaultNamespace(namespace))
 	if err != nil {
@@ -43,9 +56,57 @@ func GetClusterInfo(name, namespace string) (map[string]interface{}, error) {
 	if port != 0 {
 		info["port"] = port
 	}
-	info["pod"] = podList
+
+	info["status"] = status
 
 	info["dashboard"] = ingressURLList
 
+	log.Debug().Interface("cluster-info", info).Msg("show the cluster info real-time status")
+
 	return info, nil
+}
+
+//GetClusterStatus GetClusterStatus
+func GetClusterStatus(name, namespace string) (map[string]string, error) {
+	return GetClusterDeployStatus(name, namespace)
+}
+
+// CheckClusterStatus CheckClusterStatus
+func CheckClusterStatus(ClusterStatus map[string]string) bool {
+	if len(ClusterStatus) == 0 {
+		return false
+	}
+	var clusterStatusOk = true
+	for _, v := range ClusterStatus {
+		if !CheckStatus(v) {
+			clusterStatusOk = false
+		}
+	}
+	return clusterStatusOk
+}
+
+// CheckClusterStatus CheckClusterStatus
+func CheckClusterInfoStatus(ClusterInfoStatus map[string]interface{}) bool {
+	Status, ok := ClusterInfoStatus["status"]
+	if !ok {
+		return false
+	}
+
+	deployments, ok := Status.(map[string]interface{})["deployments"]
+	if !ok {
+		return false
+	}
+
+	ClusterStatus := deployments.(map[string]string)
+
+	if len(ClusterStatus) == 0 {
+		return false
+	}
+	var clusterStatusOk = true
+	for _, v := range ClusterStatus {
+		if !CheckStatus(v) {
+			clusterStatusOk = false
+		}
+	}
+	return clusterStatusOk
 }

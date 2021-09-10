@@ -1,7 +1,7 @@
 name: fate-10000
 namespace: fate-10000
 chartName: fate
-chartVersion: v1.6.0-a
+chartVersion: v1.6.1
 partyId: 10000
 registry: ""
 imageTag: ""
@@ -27,9 +27,6 @@ backend: eggroll
 # host:
   # fateboard: 10000.fateboard.kubefate.net
   # client: 10000.notebook.kubefate.net
-  # sparkUI: 10000.spark.kubefate.net
-  # rabbitmqUI: 10000.rabbitmq.kubefate.net
-  # pulsarUI: 10000.pulsar.kubefate.net
 
 rollsite: 
   type: NodePort
@@ -46,9 +43,3 @@ python:
 
 servingIp: 192.168.10.1
 servingPort: 30105
-serving:
-  useRegistry: true
-  zookeeper:
-    hosts:
-    - serving-zookeeper.fate-serving-10000:2181
-    use_acl: false

@@ -1,10 +1,10 @@
 name: fate-9999
 namespace: fate-9999
 chartName: fate
-chartVersion: v1.6.0-a
+chartVersion: v1.6.1
 partyId: 9999
 registry: ""
-imageTag: "1.6.0-release"
+imageTag: "1.6.1-release"
 pullPolicy: 
 imagePullSecrets: 
 - name: myregistrykey
@@ -29,7 +29,6 @@ backend: spark
   # fateboard: 9999.fateboard.kubefate.net
   # client: 9999.notebook.kubefate.net
   # sparkUI: 9999.spark.kubefate.net
-  # rabbitmqUI: 9999.rabbitmq.kubefate.net
   # pulsarUI: 9999.pulsar.kubefate.net
 
 python:
@@ -58,10 +57,11 @@ pulsar:
   type: NodePort
   httpNodePort: 30094
   httpsNodePort: 30099
-  # exchange:
-    # ip: 192.168.0.1
-    # port: 30000
   route_table:
+    9999:
+      host: pulsar
+      port: 6650
+      sslPort:6651
     10000:
       host: 192.168.10.1
       port: 30104
