@@ -16,6 +16,7 @@
 | istio                     | mappings  | Whether to open istio                                        |
 | podSecurityPolicy.enabled | bool      | if `true`, create & use Pod Security Policy resources        |
 | modules                   | sequences | Modules to be deployed in the FATE-Serving cluster.          |
+| ingress                   | mappings  | Custom domain of FATE-Serving UI component                   |
 | servingAdmin              | mappings  | Configuration of FATE cluster `servingAdmin` module.         |
 | servingZookeeper          | mappings  | Configuration of FATE cluster `servingZookeeper` module.     |
 | servingProxy              | mappings  | Configuration of FATE cluster `rollsite` module.             |
@@ -25,16 +26,38 @@
 | externalRedisPort         | scalars   | Access your own Redis.                                       |
 | externalRedisPassword     | scalars   | Access your own Redis.                                       |
 
+### list of modules
+
+- servingProxy
+  - servingRedis
+  - servingServer
+  - servingZookeeper
+  - servingAdmin
+
+### ingress mappings
+
+| Name                        | Type      | Description                                  |
+| --------------------------- | --------- | -------------------------------------------- |
+| `servingProxy`              | mappings  | Configuration of Fateboard UI domain         |
+| `servingProxy.annotations`  | mappings  | The annotations used commonly for ingresses  |
+| `servingProxy.hosts`        | sequences | Set hosts list of ingress record             |
+| `servingProxy.tls`          | sequences | Set this to enable TLS on the ingress record |
+| `servingServer`             | mappings  | Configuration of Fateboard UI domain         |
+| `servingServer.annotations` | mappings  | The annotations used commonly for ingresses  |
+| `servingServer.hosts`       | sequences | Set hosts list of ingress record             |
+| `servingServer.tls`         | sequences | Set this to enable TLS on the ingress record |
+
+
+
 ### servingAdmin mappings
 
 This is the UI display component of FATE-Serving.
 
-| Name         | subitem | Type     | Description                              |
-| ------------ | ------- | -------- | ---------------------------------------- |
-| nodeSelector |         | mappings | kubernetes nodeSelector.                 |
-| ingressHost  |         | scalars  | Define the host of the ingress of the UI |
-| username     |         | scalars  | username                                 |
-| password     |         | scalars  | password                                 |
+| Name         | subitem | Type     | Description              |
+| ------------ | ------- | -------- | ------------------------ |
+| nodeSelector |         | mappings | kubernetes nodeSelector. |
+| username     |         | scalars  | username                 |
+| password     |         | scalars  | password                 |
 
 ### servingProxy mappings
 
@@ -43,7 +66,6 @@ It is used to declare the `servingProxy` module in the FATE cluster to be deploy
 | Name         | subitem   | Type      | Description                                                  |
 | ------------ | --------- | --------- | ------------------------------------------------------------ |
 | nodePort     |           | scalars   | The port used by `proxy` module's kubernetes service, default range: 30000-32767. |
-| ingerssHost  |           | scalars   | The entrance of FATE-Service api.                            |
 | partyList    |           | sequences | If this FATE cluster is exchange cluster, partyList is all party's sequences of all parties proxy address. If this FATE cluster is one of participants, delete this configuration item. |
 | partyList    | partyId   | scalars   | Participant FATE cluster party ID.                           |
 | partyList    | partyIp   | scalars   | Participant FATE cluster IP.                                 |
@@ -95,4 +117,3 @@ Configuration of kubernetes deployment zookeeper.
 | accessMode    | scalars  | Kubernetes Persistent Volume Access Modes: <br />ReadWriteOnce<br />ReadOnlyMany <br />ReadWriteMany. |
 | size          | scalars  | Match the volume size of PVC.                                |
 
-### 

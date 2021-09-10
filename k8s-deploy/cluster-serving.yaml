@@ -19,26 +19,44 @@ modules:
   - servingServer
   - servingZookeeper
   - servingAdmin
-  
+
+ingress:
+  servingProxy: 
+    # annotations: 
+    hosts:
+    - name: serving-proxy.kubefate.net
+      path: /
+  # tls:
+    # - secretName: my-tls-secret
+      # hosts:
+        # - serving-proxy.kubefate.net
+  servingAdmin: 
+    # annotations: 
+    hosts:
+    - name: serving-admin.kubefate.net
+      path: /
+  # tls:
+    # - secretName: my-tls-secret
+      # hosts:
+         # - serving-admin.kubefate.net
+
 # servingAdmin:
   # nodeSelector:
   # tolerations:
   # affinity:
-  # ingressHost: 10000.serving-admin.kubefate.net
   # username: admin
   # password: admin
 
 # servingProxy: 
   # nodePort: 30310
   # type: NodePort
-  # ingerssHost: 10000.serving-proxy.kubefate.net
   # nodeSelector:
   # tolerations:
   # affinity:
   # partyList:
-  # # - partyId: 9999
-    # # partyIp: 192.168.9.1
-    # # partyPort: 30309
+  # # - partyId: 10000
+    # # partyIp: 192.168.10.1
+    # # partyPort: 30310
   # exchange:
     # ip: 192.168.1.1
     # port: 30100
@@ -50,8 +68,8 @@ modules:
   # tolerations:
   # affinity:
   # fateflow:
-    # ip: 192.168.10.1
-    # port: 30110
+    # ip: 192.168.9.1
+    # port: 30109
   # subPath: ""
   # existingClaim: ""
   # storageClass: "serving-server"
