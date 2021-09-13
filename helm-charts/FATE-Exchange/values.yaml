@@ -29,6 +29,7 @@ modules:
     ip: rollsite
     type: ClusterIP
     nodePort: 30001
+    loadBalancerIP: 
     nodeSelector:
     tolerations:
     affinity:
@@ -45,6 +46,7 @@ modules:
     type: NodePort
     httpNodePort:  30003
     grpcNodePort:  30008
+    loadBalancerIP: 
     nodeSelector: 
     tolerations:
     affinity:
@@ -72,6 +74,7 @@ modules:
     include: false
     type: ClusterIP
     nodePort: 30007
+    loadBalancerIP: 
     nodeSelector: 
     tolerations:
     affinity:

@@ -50,6 +50,7 @@ ingress:
 # servingProxy: 
   # nodePort: 30310
   # type: NodePort
+  # loadBalancerIP: 
   # nodeSelector:
   # tolerations:
   # affinity:
@@ -64,6 +65,7 @@ ingress:
 # servingServer:
   # type: NodePort
   # nodePort: 30210
+  # loadBalancerIP: 
   # nodeSelector:
   # tolerations:
   # affinity:

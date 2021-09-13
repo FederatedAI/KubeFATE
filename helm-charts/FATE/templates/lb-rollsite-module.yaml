@@ -215,6 +215,9 @@ spec:
       {{- end }}
       protocol: TCP
   type: {{ .Values.modules.lbrollsite.type }}
+{{- if .Values.modules.lbrollsite.loadBalancerIP }}
+  loadBalancerIP: "{{ .Values.modules.lbrollsite.loadBalancerIP }}"
+{{- end }}
   selector:
     fateMoudle: rollsite
 {{ include "fate.matchLabels" . | indent 4 }}

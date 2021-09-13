@@ -188,6 +188,9 @@ spec:
       {{- end }}
       protocol: TCP
   type: {{ .Values.modules.rollsite.type }}
+  {{- if .Values.modules.rollsite.loadBalancerIP }}
+  loadBalancerIP: "{{ .Values.modules.rollsite.loadBalancerIP }}"
+  {{- end }}
   selector:
     fateMoudle: rollsite
 {{ include "fate.matchLabels" . | indent 4 }}

@@ -196,6 +196,11 @@ spec:
       {{- end }}
       protocol: TCP
   type: {{ .Values.modules.nginx.type }}
+  
+  {{- if .Values.modules.nginx.loadBalancerIP }}
+  loadBalancerIP: "{{ .Values.modules.nginx.loadBalancerIP }}"
+  {{- end }}
+  
   selector:
     fateMoudle: nginx
 {{ include "fate.matchLabels" . | indent 4 }}

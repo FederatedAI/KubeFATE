@@ -45,6 +45,7 @@ servingProxy:
   port: 6379
   type: NodePort
   nodePort: 30109
+  loadBalancerIP:  
   nodeSelector:
   tolerations:
   affinity:
@@ -72,6 +73,7 @@ servingServer:
   include: true
   type: NodePort
   nodePort: 30209
+  loadBalancerIP:  
   fateflow:
     ip: fateflow
     port: 9380

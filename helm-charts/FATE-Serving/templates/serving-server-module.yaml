@@ -155,6 +155,9 @@ spec:
       {{- end }}
       protocol: TCP
   type: {{ .Values.servingServer.type }}
+  {{- if .Values.servingServer.loadBalancerIP }}
+  loadBalancerIP: "{{ .Values.servingServer.loadBalancerIP }}"
+  {{- end }}
   selector:
     fateMoudle: serving-server
     name: {{ .Values.partyName | quote  }}

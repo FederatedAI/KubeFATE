@@ -307,9 +307,9 @@ spec:
                 fieldPath: status.podIP
           {{- if eq .Values.modules.python.backend  "spark" }}
           - name: FATE_FLOW_UPLOAD_MAX_NUM
-            value: 1000000
+            value: "1000000"
           - name: FATE_FLOW_UPLOAD_MAX_BYTES
-            value: 104868093952
+            value: "104868093952"
           {{- end }}
           ports:
             - containerPort: 9360
@@ -463,6 +463,11 @@ spec:
       {{- end }}
       protocol: TCP
   type: {{ .Values.modules.python.type }}
+  
+  {{- if .Values.modules.python.loadBalancerIP }}
+  loadBalancerIP: "{{ .Values.modules.python.loadBalancerIP }}"
+  {{- end }}
+  
   selector:
     fateMoudle: python
 {{ include "fate.matchLabels" . | indent 4 }}

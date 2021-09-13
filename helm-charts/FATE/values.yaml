@@ -77,6 +77,7 @@ modules:
     ip: rollsite
     type: ClusterIP
     nodePort: 30091
+    loadBalancerIP: 
     nodeSelector:
     tolerations:
     affinity:
@@ -98,6 +99,7 @@ modules:
     ip: rollsite
     type: ClusterIP
     nodePort: 30091
+    loadBalancerIP: 
     size: "2M"
     nodeSelector:
     tolerations:
@@ -107,6 +109,7 @@ modules:
     type: ClusterIP
     httpNodePort: 30097
     grpcNodePort: 30092
+    loadBalancerIP: 
     serviceAccountName: 
     nodeSelector:
     tolerations:
@@ -283,6 +286,7 @@ modules:
     type: ClusterIP
     httpNodePort: 30093
     grpcNodePort: 30098
+    loadBalancerIP: 
     exchange:
       ip: 192.168.10.1
       httpPort: 30003
@@ -304,6 +308,7 @@ modules:
     affinity:
     type: ClusterIP
     nodePort: 30094
+    loadBalancerIP: 
     default_user: fate
     default_pass: fate
     user: fate
@@ -321,6 +326,7 @@ modules:
     type: ClusterIP
     httpNodePort: 30094
     httpsNodePort: 30099
+    loadBalancerIP: 
     publicLB:
       enabled: false
     # exchange:
