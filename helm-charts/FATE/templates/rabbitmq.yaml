@@ -112,6 +112,9 @@ spec:
       targetPort: 15672
       protocol: TCP
   type: {{ .Values.modules.rabbitmq.type }}
+  {{- if .Values.modules.rabbitmq.loadBalancerIP }}
+  loadBalancerIP: "{{ .Values.modules.rabbitmq.loadBalancerIP }}"
+  {{- end }}
   selector:
     fateMoudle: rabbitmq
 {{ include "fate.matchLabels" . | indent 4 }}

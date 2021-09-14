@@ -13,6 +13,91 @@ partyId: {{ .partyId | int64 | toString }}
 partyName: {{ .name }}
 
 {{- $partyId := (.partyId | int64 | toString) }}
+
+{{- with .ingress }}
+ingress:
+  {{- with .fateboard }}
+  fateboard: 
+    {{- with .annotations }}
+    annotations: 
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    {{- with .hosts }}
+    hosts:
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    {{- with .tls }}
+    tls: 
+{{ toYaml . | indent 6 }}
+    {{- end }}
+  {{- end }}
+  
+  {{- with .client }}
+  client: 
+    {{- with .annotations }}
+    annotations: 
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    {{- with .hosts }}
+    hosts:
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    {{- with .tls }}
+    tls: 
+{{ toYaml . | indent 6 }}
+    {{- end }}
+  {{- end }}
+  
+  {{- with .spark }}
+  spark: 
+    {{- with .annotations }}
+    annotations: 
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    {{- with .hosts }}
+    hosts:
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    {{- with .tls }}
+    tls: 
+{{ toYaml . | indent 6 }}
+    {{- end }}
+  {{- end }}
+  
+  {{- with .rabbitmq }}
+  rabbitmq: 
+    {{- with .annotations }}
+    annotations: 
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    {{- with .hosts }}
+    hosts:
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    {{- with .tls }}
+    tls: 
+{{ toYaml . | indent 6 }}
+    {{- end }}
+  {{- end }}
+  
+  {{- with .pulsar }}
+  pulsar: 
+    {{- with .annotations }}
+    annotations: 
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    {{- with .hosts }}
+    hosts:
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    {{- with .tls }}
+    tls: 
+{{ toYaml . | indent 6 }}
+    {{- end }}
+  {{- end }}
+  
+{{- end }}
+
 {{- with .host }}
 host:
   fateboard: {{ .fateboard | default (printf "%v.fateboard.kubefate.net" $partyId) }}
@@ -75,6 +160,7 @@ modules:
     ip: rollsite
     type: {{ .type | default "ClusterIP" }}
     nodePort: {{ .nodePort }}
+    loadBalancerIP: {{ .loadBalancerIP }}
     {{- with .nodeSelector }}
     nodeSelector: 
 {{ toYaml . | indent 6 }}
@@ -110,6 +196,7 @@ modules:
     {{- with .lbrollsite }}
     ip: rollsite
     type: {{ .type | default "ClusterIP" }}
+    loadBalancerIP: {{ .loadBalancerIP }}
     nodePort: {{ .nodePort }}
     size: {{ .size | default "2M" }}
     {{- with .nodeSelector }}
@@ -138,6 +225,7 @@ modules:
     type: {{ .type | default "ClusterIP" }}
     httpNodePort: {{ .httpNodePort }}
     grpcNodePort: {{ .grpcNodePort }}
+    loadBalancerIP: {{ .loadBalancerIP }}
     serviceAccountName: {{ .serviceAccountName }}
     {{- with .nodeSelector }}
     nodeSelector: 
@@ -426,6 +514,7 @@ modules:
     type: {{ .type | default "ClusterIP" }}
     httpNodePort:  {{ .httpNodePort }}
     grpcNodePort:  {{ .grpcNodePort }}
+    loadBalancerIP: {{ .loadBalancerIP }}
     {{- with .exchange }}
     exchange:
       ip: {{ .ip }}
@@ -459,6 +548,7 @@ modules:
     nodePort: {{ .nodePort }}
     default_user: {{ .default_user }}
     default_pass: {{ .default_pass }}
+    loadBalancerIP: {{ .loadBalancerIP }}
     user: {{ .user }}
     password: {{ .password }}
     route_table:
@@ -487,6 +577,7 @@ modules:
     type: {{ .type | default "ClusterIP" }}
     httpNodePort: {{ .httpNodePort }}
     httpsNodePort: {{ .httpsNodePort }}
+    loadBalancerIP: {{ .loadBalancerIP }}
     {{- with .publicLB}}
     publicLB:
       enabled: {{ .enabled | default false }}

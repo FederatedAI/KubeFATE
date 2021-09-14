@@ -20,15 +20,25 @@ metadata:
     partyId: {{ .Values.partyId | quote  }}
     owner: kubefate
     cluster: fate
+{{- if .Values.ingress.servingProxy.annotations }}
+  annotations:
+{{ toYaml .Values.ingress.servingProxy.annotations | indent 4 }}
+{{- end }}
 spec:
   rules:
-  - host: {{ .Values.servingProxy.ingressHost }}
+  {{- range .Values.ingress.servingProxy.hosts }}
+  - host: {{ .name }}
     http:
       paths:
-      - path: /
+      - path: {{ default "/" .path }}
         backend:
           serviceName: serving-proxy
           servicePort: 8059
+  {{- end }}
+{{- if .Values.ingress.servingProxy.tls }}
+  tls:
+{{ toYaml .Values.ingress.servingProxy.tls | indent 4 }}
+{{- end }}
 ---
 {{ end }}
 
@@ -43,14 +53,24 @@ metadata:
     partyId: {{ .Values.partyId | quote  }}
     owner: kubefate
     cluster: fate
+{{- if .Values.ingress.servingAdmin.annotations }}
+  annotations:
+{{ toYaml .Values.ingress.servingAdmin.annotations | indent 4 }}
+{{- end }}
 spec:
   rules:
-    - host: {{ .Values.servingAdmin.ingressHost }}
+  {{- range .Values.ingress.servingAdmin.hosts }}
+    - host: {{ .name }}
       http:
         paths:
-          - path: /
+          - path: {{ default "/" .path }}
             backend:
               serviceName: serving-admin
               servicePort: 8350
+  {{- end }}
+{{- if .Values.ingress.servingAdmin.tls }}
+  tls:
+{{ toYaml .Values.ingress.servingAdmin.tls | indent 4 }}
+{{- end }}
 ---
 {{ end }}

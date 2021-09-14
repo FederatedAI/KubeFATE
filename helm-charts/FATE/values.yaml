@@ -16,12 +16,41 @@ istio:
 podSecurityPolicy:
   enabled: false
 
-host:
-  fateboard: 9999.fateboard.kubefate.net
-  client: 9999.notebook.kubefate.net
-  sparkUI: 9999.spark.kubefate.net
-  rabbitmqUI: 9999.rabbitmq.kubefate.net
-  pulsarUI: 9999.pulsar.kubefate.net
+ingress:
+  fateboard: 
+    # annotations: 
+    hosts:
+    - name: fateboard.kubefate.net
+      path: /
+    tls: []
+    # - secretName: my-tls-secret
+      # hosts:
+        # - fateboard.kubefate.net
+  client: 
+    # annotations: 
+    hosts:
+    - name: notebook.kubefate.net
+      path: /
+    tls: [] 
+  spark: 
+    # annotations: 
+    hosts:
+    - name: spark.kubefate.net
+      path: /
+    tls: [] 
+  rabbitmq: 
+    # annotations: 
+    hosts:
+    - name: rabbitmq.kubefate.net
+      path: /
+    tls: [] 
+  pulsar: 
+    # annotations: 
+    hosts:
+    - name:  pulsar.kubefate.net
+      path: /
+    tls: []
+    
 exchange:
   partyIp: 192.168.1.1
   partyPort: 30001
@@ -48,6 +77,7 @@ modules:
     ip: rollsite
     type: ClusterIP
     nodePort: 30091
+    loadBalancerIP: 
     nodeSelector:
     tolerations:
     affinity:
@@ -69,6 +99,7 @@ modules:
     ip: rollsite
     type: ClusterIP
     nodePort: 30091
+    loadBalancerIP: 
     size: "2M"
     nodeSelector:
     tolerations:
@@ -78,6 +109,7 @@ modules:
     type: ClusterIP
     httpNodePort: 30097
     grpcNodePort: 30092
+    loadBalancerIP: 
     serviceAccountName: 
     nodeSelector:
     tolerations:
@@ -254,6 +286,7 @@ modules:
     type: ClusterIP
     httpNodePort: 30093
     grpcNodePort: 30098
+    loadBalancerIP: 
     exchange:
       ip: 192.168.10.1
       httpPort: 30003
@@ -275,6 +308,7 @@ modules:
     affinity:
     type: ClusterIP
     nodePort: 30094
+    loadBalancerIP: 
     default_user: fate
     default_pass: fate
     user: fate
@@ -292,6 +326,7 @@ modules:
     type: ClusterIP
     httpNodePort: 30094
     httpsNodePort: 30099
+    loadBalancerIP: 
     publicLB:
       enabled: false
     # exchange:

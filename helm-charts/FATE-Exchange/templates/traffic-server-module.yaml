@@ -162,6 +162,9 @@ spec:
       nodePort: {{ .Values.modules.trafficServer.nodePort }}
       protocol: TCP
   type: {{ .Values.modules.trafficServer.type }}
+  {{- if .Values.modules.trafficServer.loadBalancerIP }}
+  loadBalancerIP: "{{ .Values.modules.trafficServer.loadBalancerIP }}"
+  {{- end }}
   selector:
     fateMoudle: traffic-server
     name: {{ .Values.partyName | quote }}

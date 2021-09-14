@@ -26,14 +26,52 @@ podSecurityPolicy:
   enabled: {{ .enabled | default false }}
 {{- end }}
 
+
+{{- with .ingress }}
+ingress:
+  {{- with .servingProxy }}
+  servingProxy: 
+    {{- with .annotations }}
+    annotations: 
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    {{- with .hosts }}
+    hosts:
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    {{- with .tls }}
+    tls: 
+{{ toYaml . | indent 6 }}
+    {{- end }}
+  {{- end }}
+  
+  {{- with .servingAdmin }}
+  servingAdmin: 
+    {{- with .annotations }}
+    annotations: 
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    {{- with .hosts }}
+    hosts:
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    {{- with .tls }}
+    tls: 
+{{ toYaml . | indent 6 }}
+    {{- end }}
+  {{- end }}
+  
+{{- end }}
+
 servingProxy: 
   include: {{ has "servingProxy" .modules }}
   {{- with .servingProxy }}
   ip: serving-proxy
   type: {{ .type }}
   nodePort: {{ .nodePort }}
-  ingressHost: {{ .ingressHost | default (printf "%s.serving-proxy.kubefate.net" $partyId) }}
-  
+  loadBalancerIP: {{ .loadBalancerIP }}
+  ingerssHost: {{ .ingressHost | default (printf "%s.serving-admin.kubefate.net" $partyId) }}
+
   {{- with .partyList }}
   partyList:
   {{- range . }}
@@ -99,7 +137,7 @@ servingServer:
   {{- with .servingServer }}
   nodePort: {{ .nodePort }}
   type: {{ .type | default "ClusterIP" }}
-  
+  loadBalancerIP: {{ .loadBalancerIP }}
   {{- with .fateflow }}
   fateflow:
     ip: {{ .ip }}
