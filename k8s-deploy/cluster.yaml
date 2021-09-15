@@ -24,13 +24,29 @@ modules:
 
 backend: eggroll
 
- # Specify domain name for service
-# host:
-  # fateboard: 9999.fateboard.kubefate.net
-  # client: 9999.notebook.kubefate.net
-  # sparkUI: 9999.spark.kubefate.net
-  # rabbitmqUI: 9999.rabbitmq.kubefate.net
-  # pulsarUI: 9999.pulsar.kubefate.net
+# Specify domain name for service
+# ingress:
+  # fateboard: 
+    # annotations:
+    # hosts:
+    # - name: 9999.fateboard.kubefate.net
+      # path: /
+    # tls: 
+    # - secretName: my-tls-secret
+      # hosts:
+        # - 9999.fateboard.kubefate.net
+  # client: 
+    # hosts:
+    # - name: 9999.notebook.kubefate.net
+  # spark: 
+    # hosts:
+    # - name: 9999.spark.kubefate.net
+  # rabbitmq: 
+    # hosts:
+    # - name: 9999.rabbitmq.kubefate.net
+  # pulsar: 
+    # hosts:
+    # - name: 9999.pulsar.kubefate.net
   
 # Specify rollsite properties
 # rollsite: 

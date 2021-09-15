@@ -24,9 +24,14 @@ modules:
 
 backend: eggroll
 
-# host:
-  # fateboard: 9999.fateboard.kubefate.net
-  # client: 9999.notebook.kubefate.net
+ingress:
+  fateboard: 
+    hosts:
+    - name: party9999.fateboard.kubefate.net
+      path: /
+  client: 
+    hosts:
+    - name: party9999.notebook.kubefate.net
 
 rollsite: 
   type: NodePort
