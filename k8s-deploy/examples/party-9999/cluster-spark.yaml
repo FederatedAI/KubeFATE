@@ -25,12 +25,21 @@ modules:
 
 backend: spark
 
-# host:
-  # fateboard: 9999.fateboard.kubefate.net
-  # client: 9999.notebook.kubefate.net
-  # sparkUI: 9999.spark.kubefate.net
-  # rabbitmqUI: 9999.rabbitmq.kubefate.net
-
+ingress:
+  fateboard: 
+    hosts:
+    - name: party9999.fateboard.kubefate.net
+      path: /
+  client: 
+    hosts:
+    - name: party9999.notebook.kubefate.net
+  spark: 
+    hosts:
+    - name: party9999.spark.kubefate.net
+  rabbitmq: 
+    hosts:
+    - name: party9999.rabbitmq.kubefate.net
+    
 python:
   type: NodePort
   httpNodePort: 30097
@@ -63,3 +72,4 @@ rabbitmq:
     10000:
       host: 192.168.10.1
       port: 30104
+      
