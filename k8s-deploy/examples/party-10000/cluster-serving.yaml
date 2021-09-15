@@ -20,15 +20,23 @@ modules:
   - servingZookeeper
   - servingAdmin
 
+ingress:
+  servingProxy: 
+    hosts:
+    - name: party10000.serving-proxy.kubefate.net
+      path: /
+  servingAdmin: 
+    hosts:
+    - name: party10000.serving-admin.kubefate.net
+      path: /
+
 servingAdmin:
-  ingressHost: 10000.serving-admin.kubefate.net
   username: admin
   password: admin
 
 servingProxy: 
   nodePort: 30106
   type: NodePort
-  ingerssHost: 10000.serving-proxy.kubefate.net
   partyList:
   - partyId: 9999
     partyIp: 192.168.9.1

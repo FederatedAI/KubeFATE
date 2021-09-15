@@ -25,11 +25,20 @@ modules:
 
 backend: spark
 
-# host:
-  # fateboard: 10000.fateboard.kubefate.net
-  # client: 10000.notebook.kubefate.net
-  # sparkUI: 10000.spark.kubefate.net
-  # rabbitmqUI: 10000.rabbitmq.kubefate.net
+ingress:
+  fateboard: 
+    hosts:
+    - name: party10000.fateboard.kubefate.net
+      path: /
+  client: 
+    hosts:
+    - name: party10000.notebook.kubefate.net
+  spark: 
+    hosts:
+    - name: party10000.spark.kubefate.net
+  rabbitmq: 
+    hosts:
+    - name: party10000.rabbitmq.kubefate.net
 
 python:
   type: NodePort
@@ -63,4 +72,5 @@ rabbitmq:
     10000:
       host: pulsar
       port: 6650
-      sslPort:6651
+      sslPort: 6651
+      
