@@ -130,8 +130,10 @@ data:
     {{- with .Values.modules.serving }}
     servings:
       hosts:
-      {{- if and .ip .port }}
-      - {{ .ip }}:{{ .port }}
+      {{- if and .ip .port}}
+      - '{{ .ip }}:{{ .port }}'
+      {{- else }}
+      - ''
       {{- end }}
       {{- if and .useRegistry .zookeeper }}
     zookeeper:
