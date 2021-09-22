@@ -20,8 +20,8 @@ from pipeline.backend.config import Backend, WorkMode
 from pipeline.backend.pipeline import PipeLine
 
 # path to data
-# default fate installation path
-DATA_BASE = "/data/projects/fate"
+# default Examples folder path
+DATA_BASE = "/Examples"
 
 # site-package ver
 # import site
