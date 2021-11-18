@@ -1,0 +1,22 @@
+{
+  "components": {
+  },
+  "providers": {
+  },
+  "default_settings": {
+    "fate_flow":{
+      "default_version_key": "FATEFlow"
+    },
+    "fate": {
+      "default_version_key": "FATE"
+    },
+    "class_path": {
+      "interface": "components.components.Components",
+      "feature_instance": "feature.instance.Instance",
+      "feature_vector": "feature.sparse_vector.SparseVector",
+      "model": "protobuf.generated",
+      "model_migrate": "protobuf.model_migrate.model_migrate",
+      "homo_model_convert": "protobuf.homo_model_convert.homo_model_convert"
+    }
+  }
+}

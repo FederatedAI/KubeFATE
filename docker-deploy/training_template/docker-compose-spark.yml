@@ -46,7 +46,7 @@ services:
       - "8080:8080"
     volumes:
       - ./confs/fateboard/conf:/data/projects/fate/fateboard/conf
-      - fate_flow_logs:/data/projects/fate/logs
+      - fate_flow_logs:/data/projects/fate/fate_flow/logs
     networks:
       - fate-network
     depends_on:
@@ -54,6 +54,9 @@ services:
 
   python:
     image: "federatedai/python-spark:${TAG}"
+    environment:
+      PYTHONPATH: "$PYTHONPATH:/data/projects/fate/fate/python:/data/projects/fate/eggroll/python:/data/projects/fate/fate"
+      FATE_PROJECT_BASE: "/data/projects/fate"
     restart: always
     ports:
       - 9380:9380
@@ -61,15 +64,18 @@ services:
     volumes:
       - ./confs/spark/spark-defaults.conf:/data/projects/spark-2.4.1-bin-hadoop2.7/conf/spark-defaults.conf
       - ./confs/fate_flow/conf:/data/projects/fate/conf
-      - shared_dir_federatedml:/data/projects/fate/python/federatedml
+      - shared_dir_federatedml:/data/projects/fate/fate/python/federatedml
       - shared_dir_examples:/data/projects/fate/examples
       - download_dir:/data/projects/fate/python/download_dir
-      - fate_flow_logs:/data/projects/fate/logs
-      - ./shared_dir/data/model_local_cache:/data/projects/fate/model_local_cache
+      - fate_flow_logs:/data/projects/fate/fate_flow/logs
+      - ./shared_dir/data/model_local_cache:/data/projects/fate/fate_flow/model_local_cache
     networks:
       fate-network:
         ipv4_address: 192.167.0.100
-    command: ["/bin/bash", "-c", "sleep 5 && python ./fate_flow/fate_flow_server.py"]
+    command:
+    - "/bin/bash"
+    - "-c"
+    - "flow init --ip 192.167.0.100 --port 9380 && sleep 5 && python fate_flow/python/fate_flow/fate_flow_server.py"
     environment:
       FATE_FLOW_UPLOAD_MAX_NUM: "1000000"
       FATE_FLOW_UPLOAD_MAX_BYTES: "104868093952"
