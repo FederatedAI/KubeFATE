@@ -43,8 +43,14 @@ Suppose in an organization, there are two roles:
 <div align="center">
   <img src="./images/swim.PNG">
 </div>
-
 ### Initializing a FATE deployment
+
+Recommended version of dependent software:
+
+Kubernetes: [v1.21.7](https://github.com/kubernetes/kubernetes/releases/tag/v1.21.7)
+
+Ingress-nginx: [v1.0.5](https://github.com/kubernetes/ingress-nginx/releases/tag/controller-v1.0.5)
+
 #### Creating role, namespace and other resource in Kubernetes
 The sample yaml can be found in [rbac-config.yaml](./rbac-config.yaml). In this sample, we create a kube-fate namespace for KubeFATE service. Resource constraints can be applied to kube-fate namespace, refer to [Kubernetes Namespace](https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/), [Configure Memory and CPU Quotas for Namespace](https://kubernetes.io/docs/tasks/administer-cluster/manage-resources/quota-memory-cpu-namespace/).
 

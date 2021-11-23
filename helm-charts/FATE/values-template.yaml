@@ -2,7 +2,7 @@
 image:
   registry: {{ .registry | default "federatedai" }}
   isThridParty: {{ empty .registry | ternary  "false" "true" }}
-  tag: {{ .imageTag | default "1.6.1-release" }}
+  tag: {{ .imageTag | default "1.7.0-release" }}
   pullPolicy: {{ .pullPolicy | default "IfNotPresent" }}
   {{- with .imagePullSecrets }}
   imagePullSecrets:
@@ -96,22 +96,6 @@ ingress:
     {{- end }}
   {{- end }}
   
-{{- end }}
-
-{{- with .host }}
-host:
-  fateboard: {{ .fateboard | default (printf "%v.fateboard.kubefate.net" $partyId) }}
-  client: {{ .client | default (printf "%v.notebook.kubefate.net" $partyId) }}
-  sparkUI: {{ .sparkUI | default (printf "%v.spark.kubefate.net" $partyId) }}
-  rabbitmqUI: {{ .rabbitmqUI | default (printf "%v.rabbitmq.kubefate.net" $partyId) }}
-  pulsarUI: {{ .pulsarUI | default (printf "%v.pulsar.kubefate.net" $partyId) }}
-{{- else }}
-host:
-  fateboard: {{ .partyId }}.fateboard.kubefate.net
-  client: {{ .partyId }}.notebook.kubefate.net
-  sparkUI: {{ .partyId }}.spark.kubefate.net
-  rabbitmqUI: {{ .partyId }}.rabbitmq.kubefate.net
-  pulsarUI: {{ .partyId }}.pulsar.kubefate.net
 {{- end }}
 
 {{- with .istio }}

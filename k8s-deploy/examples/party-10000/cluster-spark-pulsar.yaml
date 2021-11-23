@@ -1,10 +1,10 @@
 name: fate-10000
 namespace: fate-10000
 chartName: fate
-chartVersion: v1.6.1
+chartVersion: v1.7.0
 partyId: 10000
 registry: ""
-imageTag: "1.6.1-release"
+imageTag: "1.7.0-release"
 pullPolicy: 
 imagePullSecrets: 
 - name: myregistrykey
@@ -23,27 +23,29 @@ modules:
   - nginx
   - pulsar
 
-backend: spark
+backend: spark_pulsar
 
 ingress:
   fateboard: 
+    annotations:
+      kubernetes.io/ingress.class: "nginx"
     hosts:
-    - name: party10000.fateboard.kubefate.net
-      path: /
-  client: 
+    - name: party10000.fateboard.example.com
+  client:  
+    annotations:
+      kubernetes.io/ingress.class: "nginx"
     hosts:
-    - name: party10000.notebook.kubefate.net
-  spark: 
+    - name: party10000.notebook.example.com
+  spark:  
+    annotations:
+      kubernetes.io/ingress.class: "nginx"
     hosts:
-    - name: party10000.spark.kubefate.net
-  pulsar: 
+    - name: party10000.spark.example.com
+  pulsar:  
+    annotations:
+      kubernetes.io/ingress.class: "nginx"
     hosts:
-    - name: party10000.pulsar.kubefate.net
-
-python:
-  type: NodePort
-  httpNodePort: 30107
-  grpcNodePort: 30102
+    - name: party10000.pulsar.example.com
 
 servingIp: 192.168.10.1
 servingPort: 30105
@@ -54,18 +56,17 @@ nginx:
   grpc_port: 30108 
   route_table: 
     9999: 
-      proxy: 
         - host: 192.168.9.1
+      fateflow: 
           http_port: 30093
           grpc_port: 30098
-      fateflow: 
-        - host: 192.168.9.1
-          http_port: 30097
-          grpc_port: 30092
+
 pulsar:
   type: NodePort
   httpNodePort: 30104
   httpsNodePort: 30109
+  publicLB:
+    enabled: false
   route_table:
     9999:
       host: 192.168.9.1

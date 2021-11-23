@@ -42,8 +42,14 @@ KubeFATE在设计上分离了服务与FATE集群的配置(基于Helm Chart)，�
 <div align="center">
   <img src="./images/swim.PNG">
 </div>
-
 ### 初始化新的FATE集群
+
+依赖软件的建议版本：
+
+Kubernetes: [v1.21.7](https://github.com/kubernetes/kubernetes/releases/tag/v1.21.7)
+
+Ingress-nginx: [v1.0.5](https://github.com/kubernetes/ingress-nginx/releases/tag/controller-v1.0.5)
+
 #### 创建Kubernetes服务账号、namespace等
 我们的发布包提供了[rbac-config.yaml](./rbac-config.yaml)作为样例。但是现实使用请与系统管理员确认权限问题，以及商量资源配额。更多请参考[Kubernetes Namespace](https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/)和[Configure Memory and CPU Quotas for Namespace](https://kubernetes.io/docs/tasks/administer-cluster/manage-resources/quota-memory-cpu-namespace/)。
 
