@@ -167,8 +167,7 @@ a1f784882d20        federatedai/eggroll:<tag>          "bash -c 'java -Dlog…" 
 On the target node of each party, a container named  `confs-<party_id>_python_1` should have been created and running the `fate-flow` service. For example, on Party 10000's node, run the following commands to verify the deployment:
 ```bash
 $ docker exec -it confs-10000_python_1 bash
-$ cd /data/projects/fate/examples/toy_example/
-$ python run_toy_example.py 10000 9999 1
+$ flow test toy --guest-party-id 10000 --host-party-id 9999
 ```
 If the test passed, the output may look like the following:
 ```
@@ -188,249 +187,390 @@ For more details about the testing result, please refer to `python/examples/toy_
 ##### Logging in to the python container
 `$ docker exec -it confs-10000_python_1 bash`
 
-##### Going to `fate_flow` directory
-`$ cd fate_flow`
-
 ##### Modifying examples/upload_host.json 
-`$ vi examples/upload_host.json`
-```
+`$ vi fate_flow/examples/upload/upload_host.json`
+
+```json
 {
   "file": "examples/data/breast_hetero_host.csv",
+  "id_delimiter": ",",
   "head": 1,
   "partition": 10,
-  "work_mode": 1,
-  "namespace": "fate_flow_test_breast",
-  "table_name": "breast"
+  "namespace": "experiment",
+  "table_name": "breast_hetero_host"
 }
 ```
 
 ##### Uploading data
-`$ python fate_flow_client.py -f upload -c examples/upload_host.json `
+`$ flow data upload -c fate_flow/examples/upload/upload_host.json `
 
 #### Steps on the guest
 ##### Getting in to the python container
 `$ docker exec -it confs-9999_python_1 bash`
 
-##### Going to `fate_flow` directory
-`$ cd fate_flow`
-
 ##### Modifying examples/upload_guest.json 
-`$ vi examples/upload_guest.json`
-```
+`$ vi fate_flow/examples/upload/upload_guest.json`
+
+```json
 {
   "file": "examples/data/breast_hetero_guest.csv",
+  "id_delimiter": ",",
   "head": 1,
-  "partition": 10,
-  "work_mode": 1,
-  "namespace": "fate_flow_test_breast",
-  "table_name": "breast"
+  "partition": 4,
+  "namespace": "experiment",
+  "table_name": "breast_hetero_guest"
 }
 ```
 
 ##### Uploading data
 
-`$ python fate_flow_client.py -f upload -c examples/upload_guest.json`
+`$ flow data upload -c fate_flow/examples/upload/upload_guest.json`
 
 ##### Modifying examples/test_hetero_lr_job_conf.json
 
 **Currently the FATE Serving does not support DSL 2.0, which introduced in FATE 1.5. So please do not use `"dsl_version": "2"` in job configuration while online-serving is required.**
 
-`$ vi examples/test_hetero_lr_job_conf.json`
+`$ vi fate_flow/examples/lr/test_hetero_lr_job_conf.json`
 
 ```json
 {
-    "initiator": {
-        "role": "guest",
-        "party_id": 9999
-    },
-    "job_parameters": {
-        "work_mode": 1
+  "dsl_version": "2",
+  "initiator": {
+    "role": "guest",
+    "party_id": 9999
+  },
+  "role": {
+    "guest": [
+      9999
+    ],
+    "host": [
+      10000
+    ],
+    "arbiter": [
+      10000
+    ]
+  },
+  "job_parameters": {
+    "common": {
+      "task_parallelism": 2,
+      "computing_partitions": 8,
+      "task_cores": 4,
+      "auto_retries": 1
+    }
+  },
+  "component_parameters": {
+    "common": {
+      "intersection_0": {
+        "intersect_method": "raw",
+        "sync_intersect_ids": true,
+        "only_output_key": false
+      },
+      "hetero_lr_0": {
+        "penalty": "L2",
+        "optimizer": "rmsprop",
+        "alpha": 0.01,
+        "max_iter": 3,
+        "batch_size": 320,
+        "learning_rate": 0.15,
+        "init_param": {
+          "init_method": "random_uniform"
+        }
+      }
     },
     "role": {
-        "guest": [9999],
-        "host": [10000],
-        "arbiter": [10000]
-    },
-    "role_parameters": {
-        "guest": {
-            "args": {
-                "data": {
-                    "train_data": [{"name": "breast", "namespace": "fate_flow_test_breast"}]
-                }
-            },
-            "dataio_0":{
-                "with_label": [true],
-                "label_name": ["y"],
-                "label_type": ["int"],
-                "output_format": ["dense"]
+      "guest": {
+        "0": {
+          "reader_0": {
+            "table": {
+              "name": "breast_hetero_guest",
+              "namespace": "experiment"
             }
-        },
-        "host": {
-            "args": {
-                "data": {
-                    "train_data": [{"name": "breast", "namespace": "fate_flow_test_breast"}]
-                }
-            },
-             "dataio_0":{
-                "with_label": [false],
-                "output_format": ["dense"]
-            }
+          },
+          "dataio_0": {
+            "with_label": true,
+            "label_name": "y",
+            "label_type": "int",
+            "output_format": "dense"
+          }
         }
-    },
-    "algorithm_parameters": {
-        "hetero_lr_0": {
-            "penalty": "L2",
-            "optimizer": "rmsprop",
-            "alpha": 0.01,
-            "max_iter": 3,
-            "batch_size": 320,
-            "learning_rate": 0.15,
-            "init_param": {
-                "init_method": "random_uniform"
+      },
+      "host": {
+        "0": {
+          "reader_0": {
+            "table": {
+              "name": "breast_hetero_host",
+              "namespace": "experiment"
             }
+          },
+          "dataio_0": {
+            "with_label": false,
+            "output_format": "dense"
+          },
+          "evaluation_0": {
+            "need_run": false
+          }
         }
+      }
     }
+  }
 }
 ```
 
 ##### Modifying examples/test_hetero_lr_job_dsl.json
-`$ vi examples/test_hetero_lr_job_dsl.json`
+`$ vi fate_flow/examples/lr/test_hetero_lr_job_dsl.json`
 
 ```json
 {
-    "components" : {
-        "dataio_0": {
-            "module": "DataIO",
-            "input": {
-                "data": {
-                    "data": [
-                        "args.train_data"
-                    ]
-                }
-            },
-            "output": {
-                "data": ["train"],
-                "model": ["dataio"]
-            },
-            "need_deploy": true
-         },
-        "hetero_feature_binning_0": {
-            "module": "HeteroFeatureBinning",
-            "input": {
-                "data": {
-                    "data": [
-                        "dataio_0.train"
-                    ]
-                }
-            },
-            "output": {
-                "data": ["train"],
-                "model": ["hetero_feature_binning"]
-            }
-        },
-        "hetero_feature_selection_0": {
-            "module": "HeteroFeatureSelection",
-            "input": {
-                "data": {
-                    "data": [
-                        "hetero_feature_binning_0.train"
-                    ]
-                },
-                "isometric_model": [
-                    "hetero_feature_binning_0.hetero_feature_binning"
-                ]
-            },
-            "output": {
-                "data": ["train"],
-                "model": ["selected"]
-            }
-        },
-        "hetero_lr_0": {
-            "module": "HeteroLR",
-            "input": {
-                "data": {
-                    "train_data": ["hetero_feature_selection_0.train"]
-                }
-            },
-            "output": {
-                "data": ["train"],
-                "model": ["hetero_lr"]
-            }
-        },
-        "evaluation_0": {
-            "module": "Evaluation",
-            "input": {
-                "data": {
-                    "data": ["hetero_lr_0.train"]
-                }
-            },
-            "output": {
-                "data": ["evaluate"]
-            }
+  "components": {
+    "reader_0": {
+      "module": "Reader",
+      "output": {
+        "data": [
+          "table"
+        ]
+      }
+    },
+    "dataio_0": {
+      "module": "DataIO",
+      "input": {
+        "data": {
+          "data": [
+            "reader_0.table"
+          ]
         }
+      },
+      "output": {
+        "data": [
+          "train"
+        ],
+        "model": [
+          "dataio"
+        ]
+      },
+      "need_deploy": true
+    },
+    "intersection_0": {
+      "module": "Intersection",
+      "input": {
+        "data": {
+          "data": [
+            "dataio_0.train"
+          ]
+        }
+      },
+      "output": {
+        "data": [
+          "train"
+        ]
+      }
+    },
+    "hetero_feature_binning_0": {
+      "module": "HeteroFeatureBinning",
+      "input": {
+        "data": {
+          "data": [
+            "intersection_0.train"
+          ]
+        }
+      },
+      "output": {
+        "data": [
+          "train"
+        ],
+        "model": [
+          "hetero_feature_binning"
+        ]
+      }
+    },
+    "hetero_feature_selection_0": {
+      "module": "HeteroFeatureSelection",
+      "input": {
+        "data": {
+          "data": [
+            "hetero_feature_binning_0.train"
+          ]
+        },
+        "isometric_model": [
+          "hetero_feature_binning_0.hetero_feature_binning"
+        ]
+      },
+      "output": {
+        "data": [
+          "train"
+        ],
+        "model": [
+          "selected"
+        ]
+      }
+    },
+    "hetero_lr_0": {
+      "module": "HeteroLR",
+      "input": {
+        "data": {
+          "train_data": [
+            "hetero_feature_selection_0.train"
+          ]
+        }
+      },
+      "output": {
+        "data": [
+          "train"
+        ],
+        "model": [
+          "hetero_lr"
+        ]
+      }
+    },
+    "evaluation_0": {
+      "module": "Evaluation",
+      "input": {
+        "data": {
+          "data": [
+            "hetero_lr_0.train"
+          ]
+        }
+      },
+      "output": {
+        "data": [
+          "evaluate"
+        ]
+      }
     }
+  }
 }
 ```
 
 ##### Submitting a job
-`$ python fate_flow_client.py -f submit_job -d examples/test_hetero_lr_job_dsl.json -c examples/test_hetero_lr_job_conf.json`
+`$ flow job submit -d fate_flow/examples/lr/test_hetero_lr_job_dsl.json -c fate_flow/examples/lr/test_hetero_lr_job_conf.json`
 
 output：
 ```
 {
     "data": {
-        "board_url": "http://fateboard:8080/index.html#/dashboard?job_id=202003060553168191842&role=guest&party_id=9999",
-        "job_dsl_path": "/data/projects/fate/python/jobs/202003060553168191842/job_dsl.json",
-        "job_runtime_conf_path": "/data/projects/fate/python/jobs/202003060553168191842/job_runtime_conf.json",
-        "logs_directory": "/data/projects/fate/python/logs/202003060553168191842",
+        "board_url": "http://fateboard:8080/index.html#/dashboard?job_id=202111230933232084530&role=guest&party_id=9999",
+        "code": 0,
+        "dsl_path": "/data/projects/fate/fate_flow/jobs/202111230933232084530/job_dsl.json",
+        "job_id": "202111230933232084530",
+        "logs_directory": "/data/projects/fate/fate_flow/logs/202111230933232084530",
+        "message": "success",
         "model_info": {
             "model_id": "arbiter-10000#guest-9999#host-10000#model",
-            "model_version": "202003060553168191842"
-        }
+            "model_version": "202111230933232084530"
+        },
+        "pipeline_dsl_path": "/data/projects/fate/fate_flow/jobs/202111230933232084530/pipeline_dsl.json",
+        "runtime_conf_on_party_path": "/data/projects/fate/fate_flow/jobs/202111230933232084530/guest/9999/job_runtime_on_party_conf.json",
+        "runtime_conf_path": "/data/projects/fate/fate_flow/jobs/202111230933232084530/job_runtime_conf.json",
+        "train_runtime_conf_path": "/data/projects/fate/fate_flow/jobs/202111230933232084530/train_runtime_conf.json"
     },
-    "jobId": "202003060553168191842",
+    "jobId": "202111230933232084530",
     "retcode": 0,
     "retmsg": "success"
 }
 ```
 
 ##### Checking status of training jobs
-`$ python fate_flow_client.py -f query_task -j 202003060553168191842 | grep f_status`
+`$ flow task query -j 202111230933232084530 | grep -w f_status`
 
 output:
 ```
-"f_status": "success",
-"f_status": "success",
-
+            "f_status": "success",
+            "f_status": "waiting",
+            "f_status": "waiting",
+            "f_status": "waiting",
+            "f_status": "waiting",
+            "f_status": "success",
+            "f_status": "waiting",
+            "f_status": "success",
+            "f_status": "waiting",
+            "f_status": "waiting",
+            "f_status": "running",
+            "f_status": "waiting",
+            "f_status": "success",
+            "f_status": "waiting",
+            "f_status": "success",
+            "f_status": "waiting",
 ```
+
+Wait for all waiting states to change to success.
+
+##### Deploy model
+
+`$ flow model deploy --model-id arbiter-10000#guest-9999#host-10000#model --model-version 202111230933232084530`
+
+```bash
+{
+    "data": {
+        "arbiter": {
+            "10000": 0
+        },
+        "detail": {
+            "arbiter": {
+                "10000": {
+                    "retcode": 0,
+                    "retmsg": "deploy model of role arbiter 10000 success"
+                }
+            },
+            "guest": {
+                "9999": {
+                    "retcode": 0,
+                    "retmsg": "deploy model of role guest 9999 success"
+                }
+            },
+            "host": {
+                "10000": {
+                    "retcode": 0,
+                    "retmsg": "deploy model of role host 10000 success"
+                }
+            }
+        },
+        "guest": {
+            "9999": 0
+        },
+        "host": {
+            "10000": 0
+        },
+        "model_id": "arbiter-10000#guest-9999#host-10000#model",
+        "model_version": "202111230954255210490"
+    },
+    "retcode": 0,
+    "retmsg": "success"
+}
+```
+
+
 
 ##### Modifying the configuration of loading model
-`$ vi examples/publish_load_model.json`
+`$ vi fate_flow/examples/model/publish_load_model.json`
 
-```
+```json
 {
-    "initiator": {
-        "party_id": "9999",
-        "role": "guest"
-    },
-    "role": {
-        "guest": ["9999"],
-        "host": ["10000"],
-        "arbiter": ["10000"]
-    },
-    "job_parameters": {
-        "work_mode": 1,
-        "model_id": "arbiter-10000#guest-9999#host-10000#model",
-        "model_version": "202003060553168191842"
-    }
+  "initiator": {
+    "party_id": "9999",
+    "role": "guest"
+  },
+  "role": {
+    "guest": [
+      "9999"
+    ],
+    "host": [
+      "10000"
+    ],
+    "arbiter": [
+      "10000"
+    ]
+  },
+  "job_parameters": {
+    "model_id": "arbiter-10000#guest-9999#host-10000#model",
+    "model_version": "202111230954255210490"
+  }
 }
 ```
 
 ##### Loading a model
-`$ python fate_flow_client.py -f load -c examples/publish_load_model.json`
+`$ flow model load -c fate_flow/examples/model/publish_load_model.json`
 
 output:
-```
+```json
 {
     "data": {
         "guest": {
@@ -447,9 +587,9 @@ output:
 ```
 
 ##### Modifying the configuration of binding model
-`$ vi examples/bind_model_service.json`
+`$ vi fate_flow/examples/model/bind_model_service.json`
 
-```
+```json
 {
     "service_id": "test",
     "initiator": {
@@ -471,10 +611,10 @@ output:
 
 
 ##### Binding a model
-`$ python fate_flow_client.py -f bind -c examples/bind_model_service.json`
+`$ flow model bind -c fate_flow/examples/model/bind_model_service.json`
 
 output:
-```
+```json
 {
     "retcode": 0,
     "retmsg": "service id is test"
@@ -484,7 +624,7 @@ output:
 ##### Testing online serving
 Send the following message to serving interface "{SERVING_SERVICE_IP}:8059/federation/v1/inference" of the "GUEST" party.
 
-```
+```bash
 $ curl -X POST -H 'Content-Type: application/json' -i 'http://192.168.7.2:8059/federation/v1/inference' --data '{
   "head": {
     "serviceId": "test"
@@ -510,7 +650,7 @@ $ curl -X POST -H 'Content-Type: application/json' -i 'http://192.168.7.2:8059/f
 ```
 
 output:
-```
+```json
 {"flag":0,"data":{"prob":0.30684422824464636,"retmsg":"success","retcode":0}
 ```
 
