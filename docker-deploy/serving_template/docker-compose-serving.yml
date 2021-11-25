@@ -6,7 +6,9 @@
 version: '3'
 
 networks:
-  fate-network:
+  fate-serving-network:
+    external:
+      name: <fate-network>
 services:
   serving-server:
     image: "federatedai/serving-server:${SERVING_TAG}"
@@ -16,7 +18,7 @@ services:
       - ./confs/serving-server/conf/serving-server.properties:/data/projects/fate/serving-server/conf/serving-server.properties
       - ./confs/serving-server/cache:/data/projects/fate/serving-server/.fate
     networks:
-      - fate-network
+      - fate-serving-network
 
   serving-proxy:
     image: "federatedai/serving-proxy:${SERVING_TAG}"
@@ -29,7 +31,7 @@ services:
       - ./confs/serving-proxy/conf/application.properties:/data/projects/fate/serving-proxy/conf/application.properties
       - ./confs/serving-proxy/conf/route_table.json:/data/projects/fate/serving-proxy/conf/route_table.json
     networks:
-      - fate-network
+      - fate-serving-network
 
   redis:
     image: "redis:5"
@@ -39,5 +41,25 @@ services:
     volumes:
       - ./confs/redis/data:/data
     networks:
-      - fate-network
+      - fate-serving-network
 
+  serving-zookeeper:
+    image: "bitnami/zookeeper:3.7.0"
+    ports:
+      - "2181:2181"
+      - "2888"
+      - "3888"
+    environment:
+      ALLOW_ANONYMOUS_LOGIN: "yes"
+    networks:
+      - fate-serving-network
+
+  serving-admin:
+    image: "federatedai/serving-admin:${SERVING_TAG}"
+    ports:
+      - "8350:8350"
+    volumes:
+      - ./confs/serving-admin/conf/application.properties:/data/projects/fate/serving-admin/conf/application.properties
+    command: /bin/sh -c "java -cp conf/:lib/*:fate-serving-admin.jar com.webank.ai.fate.serving.admin.Bootstrap -c conf/application.properties"
+    networks:
+      - fate-serving-network

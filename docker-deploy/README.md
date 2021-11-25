@@ -469,26 +469,17 @@ output：
 ```
 
 ##### Checking status of training jobs
-`$ flow task query -j 202111230933232084530 | grep -w f_status`
+`$ flow task query -r guest -j 202111230933232084530 | grep -w f_status`
 
 output:
-```
+```bash
             "f_status": "success",
-            "f_status": "waiting",
-            "f_status": "waiting",
-            "f_status": "waiting",
-            "f_status": "waiting",
-            "f_status": "success",
-            "f_status": "waiting",
-            "f_status": "success",
-            "f_status": "waiting",
             "f_status": "waiting",
             "f_status": "running",
             "f_status": "waiting",
-            "f_status": "success",
             "f_status": "waiting",
             "f_status": "success",
-            "f_status": "waiting",
+            "f_status": "success",
 ```
 
 Wait for all waiting states to change to success.
@@ -537,8 +528,6 @@ Wait for all waiting states to change to success.
 }
 ```
 
-
-
 ##### Modifying the configuration of loading model
 `$ vi fate_flow/examples/model/publish_load_model.json`
 
@@ -566,6 +555,8 @@ Wait for all waiting states to change to success.
 }
 ```
 
+*The `model_version` that needs to be used later are all obtained in this step `"model_version": "202111230954255210490"`*
+
 ##### Loading a model
 `$ flow model load -c fate_flow/examples/model/publish_load_model.json`
 
@@ -573,6 +564,20 @@ output:
 ```json
 {
     "data": {
+        "detail": {
+            "guest": {
+                "9999": {
+                    "retcode": 0,
+                    "retmsg": "success"
+                }
+            },
+            "host": {
+                "10000": {
+                    "retcode": 0,
+                    "retmsg": "success"
+                }
+            }
+        },
         "guest": {
             "9999": 0
         },
@@ -580,7 +585,7 @@ output:
             "10000": 0
         }
     },
-    "jobId": "202005120554339112925",
+    "jobId": "202111240844337394000",
     "retcode": 0,
     "retmsg": "success"
 }
@@ -604,7 +609,7 @@ output:
     "job_parameters": {
         "work_mode": 1,
         "model_id": "arbiter-10000#guest-9999#host-10000#model",
-        "model_version": "202003060553168191842"
+        "model_version": "202111230954255210490"
     }
 }
 ```

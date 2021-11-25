@@ -432,6 +432,11 @@ EOF
 		sed -i "s/<redis.password>/${redis_password}/g" ./serving-$party_id/confs/serving-server/conf/serving-server.properties
 		sed -i "s/<redis.password>/${redis_password}/g" ./serving-$party_id/docker-compose.yml
 
+		# network
+		sed -i "s/name: <fate-network>/name: confs-${party_id}_fate-network/g" serving-$party_id/docker-compose.yml
+		
+		
+
 		# serving proxy
 		sed -i "s/coordinator=9999/coordinator=${party_id}/g" ./serving-$party_id/confs/serving-proxy/conf/application.properties
 		cat >./serving-$party_id/confs/serving-proxy/conf/route_table.json <<EOF

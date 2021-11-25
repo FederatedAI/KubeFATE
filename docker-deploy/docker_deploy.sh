@@ -310,6 +310,7 @@ handleLocally() {
 }
 
 main() {
+
 	if [ "$1" = "" ] || [ "$" = "--help" ]; then
 		ShowUsage
 		exit 1
@@ -321,11 +322,17 @@ main() {
 	fi
 
 	for ((i = 0; i < ${#party_list[*]}; i++)); do
-	if [ $party_list[$i] != "exchange" ]; then
-   echo "
+	  if [ $party_list[$i] != "exchange" ]; then
+        echo "
    Use  ${party_ip_list[$i]}:8080 to access fateboard of party: ${party_list[$i]}
    Use  ${party_ip_list[$i]}:20000 to access notebook of party: ${party_list[$i]}"
-        fi
+      fi
+      if [[ "$backend" == "spark"* ]]; then
+        echo "   Use  ${party_ip_list[$i]}:8888 to access Spark of party: ${party_list[$i]}"
+      fi
+      if [ ${serving_ip_list[$i]} ]; then
+        echo "   Use  ${party_ip_list[$i]}:8350 to access serving-admin of party: ${party_list[$i]}"
+      fi
 	done
 
 	exit 0

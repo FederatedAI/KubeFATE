@@ -496,26 +496,17 @@ output：
 ```
 
 ###### 查看训练任务状态
-`$  flow task query -j 202111230933232084530 | grep -w f_status`
+`$  flow task query -r guest -j 202111230933232084530 | grep -w f_status`
 
 output:
 ```bash
             "f_status": "success",
             "f_status": "waiting",
-            "f_status": "waiting",
-            "f_status": "waiting",
-            "f_status": "waiting",
-            "f_status": "success",
-            "f_status": "waiting",
-            "f_status": "success",
-            "f_status": "waiting",
-            "f_status": "waiting",
             "f_status": "running",
             "f_status": "waiting",
-            "f_status": "success",
             "f_status": "waiting",
             "f_status": "success",
-            "f_status": "waiting",
+            "f_status": "success",
 ```
 
 等到所有的`waiting`状态变为`success`.
@@ -564,6 +555,8 @@ output:
 }
 ```
 
+*后面需要用到的`model_version`都是这一步得到的`"model_version": "202111230954255210490"`*
+
 ###### 修改加载模型的配置
 `$ vi fate_flow/examples/model/publish_load_model.json`
 
@@ -598,6 +591,20 @@ output:
 ```json
 {
     "data": {
+        "detail": {
+            "guest": {
+                "9999": {
+                    "retcode": 0,
+                    "retmsg": "success"
+                }
+            },
+            "host": {
+                "10000": {
+                    "retcode": 0,
+                    "retmsg": "success"
+                }
+            }
+        },
         "guest": {
             "9999": 0
         },
@@ -605,7 +612,7 @@ output:
             "10000": 0
         }
     },
-    "jobId": "202005120554339112925",
+    "jobId": "202111240844337394000",
     "retcode": 0,
     "retmsg": "success"
 }
@@ -616,21 +623,22 @@ output:
 
 ```json
 {
-    "service_id": "test",
-    "initiator": {
-        "party_id": "9999",
-        "role": "guest"
-    },
-    "role": {
-        "guest": ["9999"],
-        "host": ["10000"],
-        "arbiter": ["10000"]
-    },
-    "job_parameters": {
-        "work_mode": 1,
-        "model_id": "arbiter-10000#guest-9999#host-10000#model",
-        "model_version": "202003060553168191842"
-    }
+  "service_id": "test",
+  "initiator": {
+    "party_id": "9999",
+    "role": "guest"
+  },
+  "role": {
+    "guest": [ "9999" ],
+    "host": [ "10000" ],
+    "arbiter": [ "10000" ]
+  },
+  "job_parameters": {
+    "model_id": "arbiter-10000#guest-9999#host-10000#model",
+    "model_version": "202111230954255210490"
+  },
+  "servings": [
+  ]
 }
 ```
 
@@ -656,19 +664,14 @@ $ curl -X POST -H 'Content-Type: application/json' -i 'http://192.168.7.2:8059/f
   },
   "body": {
     "featureData": {
-      "x0": 0.254879,
-      "x1": -1.046633,
-      "x2": 0.209656,
-      "x3": 0.074214,
-      "x4": -0.441366,
-      "x5": -0.377645,
-      "x6": -0.485934,
-      "x7": 0.347072,
-      "x8": -0.287570,
-      "x9": -0.733474
+        "x0": 1.88669,
+        "x1": -1.359293,
+        "x2": 2.303601,
+        "x3": 2.00137,
+        "x4": 1.307686
     },
     "sendToRemoteFeatureData": {
-      "id": "123"
+        "phone_num": "122222222"
     }
   }
 }'
@@ -676,7 +679,7 @@ $ curl -X POST -H 'Content-Type: application/json' -i 'http://192.168.7.2:8059/f
 
 output:
 ```json
-{"flag":0,"data":{"prob":0.30684422824464636,"retmsg":"success","retcode":0}
+{"retcode":0,"retmsg":"","data":{"score":0.018025086161221948,"modelId":"guest#9999#arbiter-10000#guest-9999#host-10000#model","modelVersion":"202111240318516571130","timestamp":1637743473990},"flag":0}
 ```
 ### 删除部署
 在部署机器上运行以下命令可以停止所有FATE集群：
