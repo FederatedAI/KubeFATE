@@ -362,7 +362,7 @@ spec:
               fieldRef:
                 fieldPath: status.podIP
           - name: PYTHONPATH
-            value: "$PYTHONPATH:/data/projects/fate/fate/python:/data/projects/fate/eggroll/python:/data/projects/fate/fateflow/python"
+            value: "$PYTHONPATH:/data/projects/fate/fate/python:/data/projects/fate/eggroll/python:/data/projects/fate/fateflow/python:/data/projects/fate/fate/python/fate_client"
           - name: FATE_PROJECT_BASE
             value: "/data/projects/fate"
           {{- if eq .Values.modules.python.backend "spark_pulsar" "spark_rabbitmq" }}

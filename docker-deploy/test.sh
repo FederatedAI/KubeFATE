@@ -83,7 +83,7 @@ toy_example() {
 cd $dir
 cd confs-$target_party_id
 
-docker-compose exec -T python bash -c '
+docker-compose exec -T client bash -c '
 flow test toy --guest-party-id $guest --host-party-id $host
 '
 
