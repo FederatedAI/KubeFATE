@@ -4,9 +4,9 @@ FROM ${SOURCE_PREFIX}/python:${SOURCE_TAG} as data
 
 FROM python:3.7
 
-COPY Examples/pipeline /data/projects/fate/pipeline
+COPY pipeline /data/projects/fate/pipeline
 RUN pip install notebook fate-client pandas sklearn
-RUN mkdir /Examples/Pipeline/logs
+RUN mkdir /data/projects/fate/logs
 COPY --from=data /data/projects/fate/examples /data/projects/fate/examples
 COPY --from=data /data/projects/fate/fateflow/example /data/projects/fate/fateflow/examples
 
