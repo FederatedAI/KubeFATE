@@ -117,7 +117,7 @@ services:
     command:
     - "/bin/bash"
     - "-c"
-    - sleep 5 && python fate_flow/python/fate_flow/fate_flow_server.py"
+    - "sleep 5 && python fate_flow/python/fate_flow/fate_flow_server.py"
     
   client:
     image: "federatedai/client:${TAG}"
