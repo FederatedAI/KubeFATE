@@ -201,13 +201,12 @@ services:
       - "20000:20000"
     restart: always
     environment:
-      FATE_FLOW_HOST: "python:9380"
+      FATE_FLOW_IP: "python"
+      FATE_FLOW_PORT: "9380"
       FATE_SERVING_HOST: "fate-serving:8059"
     volumes:
-      - download_dir:/fml_manager/Examples/download_dir
+      - download_dir:/data/projects/fate/download_dir
       - shared_dir_examples:/data/projects/fate/examples
-      - ./confs/fate_flow/conf:/data/projects/fate/conf
-      - ./confs/client/pipeline_conf.yaml:/data/projects/fate/conf/pipeline_conf.yaml
     depends_on:
       - python
     networks:

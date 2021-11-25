@@ -4,9 +4,16 @@ FROM ${SOURCE_PREFIX}/python:${SOURCE_TAG} as data
 
 FROM python:3.7
 
-COPY Examples /Examples
+COPY Examples/pipeline /data/projects/fate/pipeline
 RUN pip install notebook fate-client pandas sklearn
 RUN mkdir /Examples/Pipeline/logs
-copy --from=data /data/projects/fate/examples /Examples/examples
+COPY --from=data /data/projects/fate/examples /data/projects/fate/examples
+COPY --from=data /data/projects/fate/fateflow/example /data/projects/fate/fateflow/examples
 
-CMD flow init -c /data/projects/fate/conf/service_conf.yaml && pipeline init -c /data/projects/fate/conf/pipeline_conf.yaml && jupyter notebook --ip=0.0.0.0 --port=20000 --allow-root --debug --NotebookApp.notebook_dir='/Examples' --no-browser --NotebookApp.token='' --NotebookApp.password=''
+
+WORKDIR /data/projects/fate/
+
+ENV FATE_FLOW_IP=fateflow
+ENV FATE_FLOW_PORT=9380
+
+CMD flow init --ip ${FATE_FLOW_IP} --port ${FATE_FLOW_PORT} && jupyter notebook --ip=0.0.0.0 --port=20000 --allow-root --debug --NotebookApp.notebook_dir='/data/projects/fate/' --no-browser --NotebookApp.token='' --NotebookApp.password=''
