@@ -61,14 +61,11 @@ nginx:
   grpc_port: 30108 
   route_table: 
     9999: 
-      proxy: 
+      fateflow: 
         - host: 192.168.9.1
           http_port: 30093
           grpc_port: 30098
-      fateflow: 
-        - host: 192.168.9.1
-          http_port: 30097
-          grpc_port: 30092
+
 rabbitmq:
   type: NodePort
   nodePort: 30104

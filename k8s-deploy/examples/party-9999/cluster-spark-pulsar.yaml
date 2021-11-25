@@ -56,8 +56,8 @@ nginx:
   grpcNodePort: 30098
   route_table: 
     10000: 
-        - host: 192.168.10.1
       fateflow: 
+        - host: 192.168.10.1
           http_port: 30103
           grpc_port: 30108 
 
