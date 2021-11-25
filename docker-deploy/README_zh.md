@@ -191,7 +191,7 @@ docker-compose上的FATE启动成功之后需要验证各个服务是否都正�
 
 ```bash
 #在192.168.7.1上执行下列命令
-$ docker exec -it confs-10000_python_1 bash                        #进入python组件容器内部
+$ docker exec -it confs-10000_client_1 bash                        #进入python组件容器内部
 $ flow test toy --guest-party-id 10000 --host-party-id 9999        #验证
 ```
 
@@ -213,12 +213,13 @@ $ flow test toy --guest-party-id 10000 --host-party-id 9999        #验证
 #### 验证Serving-Service功能
 ##### Host方操作
 ###### 进入python容器
-`$ docker exec -it confs-10000_python_1 bash`
+```bash
+docker exec -it confs-10000_client_1 bash
+```
 
 ###### 修改examples/upload_host.json 
-`$ vi fate_flow/examples/upload/upload_host.json`
-
-```json
+```bash
+cat > fateflow/examples/upload/upload_host.json <<EOF
 {
   "file": "examples/data/breast_hetero_host.csv",
   "id_delimiter": ",",
@@ -227,19 +228,23 @@ $ flow test toy --guest-party-id 10000 --host-party-id 9999        #验证
   "namespace": "experiment",
   "table_name": "breast_hetero_host"
 }
+EOF
 ```
 
 ###### 上传数据
-`$ flow data upload -c fate_flow/examples/upload/upload_host.json`
+```bash
+flow data upload -c fateflow/examples/upload/upload_host.json
+```
 
 ##### Guest方操作
 ###### 进入python容器
-`$ docker exec -it confs-9999_python_1 bash`
+```bash
+docker exec -it confs-9999_client_1 bash
+```
 
 ###### 修改examples/upload_guest.json 
-`$ vi fate_flow/examples/upload/upload_guest.json`
-
-```json
+```bash
+cat > fateflow/examples/upload/upload_guest.json <<EOF
 {
   "file": "examples/data/breast_hetero_guest.csv",
   "id_delimiter": ",",
@@ -248,17 +253,18 @@ $ flow test toy --guest-party-id 10000 --host-party-id 9999        #验证
   "namespace": "experiment",
   "table_name": "breast_hetero_guest"
 }
+EOF
 ```
+
 ###### 上传数据
-`$ flow data upload -c fate_flow/examples/upload/upload_guest.json `
+```bash
+flow data upload -c fateflow/examples/upload/upload_guest.json
+```
 
 ###### 修改examples/test_hetero_lr_job_conf.json
 
-**目前FATE Serving还不支持DSL 2.0，因此如果要使用在线推理的话请不要在任务中的配置文件中使用`"dsl_version": "2"`字段**
-
-`$ vi fate_flow/examples/lr/test_hetero_lr_job_conf.json`
-
-```json
+```bash
+cat > fateflow/examples/lr/test_hetero_lr_job_conf.json <<EOF
 {
   "dsl_version": "2",
   "initiator": {
@@ -340,13 +346,13 @@ $ flow test toy --guest-party-id 10000 --host-party-id 9999        #验证
     }
   }
 }
+EOF
 ```
 
 ##### 修改examples/test_hetero_lr_job_dsl.json
 
-`$ vi fate_flow/examples/lr/test_hetero_lr_job_dsl.json`
-
-```json
+```bash
+cat > fateflow/examples/lr/test_hetero_lr_job_dsl.json <<EOF
 {
   "components": {
     "reader_0": {
@@ -465,10 +471,13 @@ $ flow test toy --guest-party-id 10000 --host-party-id 9999        #验证
     }
   }
 }
+EOF
 ```
 
 ###### 提交任务
-`$ flow job submit -d fate_flow/examples/lr/test_hetero_lr_job_dsl.json -c fate_flow/examples/lr/test_hetero_lr_job_conf.json`
+```bash
+flow job submit -d fateflow/examples/lr/test_hetero_lr_job_dsl.json -c fateflow/examples/lr/test_hetero_lr_job_conf.json
+```
 
 output：
 ```json
@@ -496,7 +505,9 @@ output：
 ```
 
 ###### 查看训练任务状态
-`$  flow task query -r guest -j 202111230933232084530 | grep -w f_status`
+```bash
+flow task query -r guest -j 202111230933232084530 | grep -w f_status
+```
 
 output:
 ```bash
@@ -513,9 +524,11 @@ output:
 
 ###### 部署模型
 
-`$ flow model deploy --model-id arbiter-10000#guest-9999#host-10000#model --model-version 202111230933232084530`
-
 ```bash
+flow model deploy --model-id arbiter-10000#guest-9999#host-10000#model --model-version 202111230933232084530
+```
+
+```json
 {
     "data": {
         "arbiter": {
@@ -558,9 +571,8 @@ output:
 *后面需要用到的`model_version`都是这一步得到的`"model_version": "202111230954255210490"`*
 
 ###### 修改加载模型的配置
-`$ vi fate_flow/examples/model/publish_load_model.json`
-
-```json
+```bash
+cat > fateflow/examples/model/publish_load_model.json <<EOF
 {
   "initiator": {
     "party_id": "9999",
@@ -582,10 +594,13 @@ output:
     "model_version": "202111230954255210490"
   }
 }
+EOF
 ```
 
 ###### 加载模型
-`$ flow model load -c fate_flow/examples/model/publish_load_model.json`
+```bash 
+flow model load -c fateflow/examples/model/publish_load_model.json
+```
 
 output:
 ```json
@@ -619,32 +634,33 @@ output:
 ```
 
 ###### 修改绑定模型的配置
-`$ vi fate_flow/examples/model/bind_model_service.json`
-
-```json
+```bash
+cat > fateflow/examples/model/bind_model_service.json <<EOF
 {
-  "service_id": "test",
-  "initiator": {
-    "party_id": "9999",
-    "role": "guest"
-  },
-  "role": {
-    "guest": [ "9999" ],
-    "host": [ "10000" ],
-    "arbiter": [ "10000" ]
-  },
-  "job_parameters": {
-    "model_id": "arbiter-10000#guest-9999#host-10000#model",
-    "model_version": "202111230954255210490"
-  },
-  "servings": [
-  ]
+    "service_id": "test",
+    "initiator": {
+        "party_id": "9999",
+        "role": "guest"
+    },
+    "role": {
+        "guest": ["9999"],
+        "host": ["10000"],
+        "arbiter": ["10000"]
+    },
+    "job_parameters": {
+        "work_mode": 1,
+        "model_id": "arbiter-10000#guest-9999#host-10000#model",
+        "model_version": "202111230954255210490"
+    }
 }
+EOF
 ```
 
 
 ###### 绑定模型
-`$ flow model bind -c fate_flow/examples/model/bind_model_service.json`
+```bash
+flow model bind -c fateflow/examples/model/bind_model_service.json
+```
 
 output:
 ```json

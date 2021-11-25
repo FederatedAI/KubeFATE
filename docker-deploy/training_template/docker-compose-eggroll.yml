@@ -91,7 +91,7 @@ services:
   python:
     image: "federatedai/python:${TAG}"
     environment:
-      PYTHONPATH: "$PYTHONPATH:/data/projects/fate/fate/python:/data/projects/fate/eggroll/python:/data/projects/fate/fate"
+      PYTHONPATH: "$PYTHONPATH:/data/projects/fate/fate/python:/data/projects/fate/eggroll/python:/data/projects/fate/fateflow/python"
       FATE_PROJECT_BASE: "/data/projects/fate"
     ports:
       - "9360:9360"
@@ -102,7 +102,6 @@ services:
       - shared_dir_examples:/data/projects/fate/examples
       - download_dir:/data/projects/fate/python/download_dir
       - ./confs/fate_flow/conf:/data/projects/fate/conf
-      - ./confs/fate_flow/conf:/data/projects/fate/fate/conf
       - ./confs/eggroll/conf:/data/projects/fate/eggroll/conf
       - fate_flow_logs:/data/projects/fate/fate_flow/logs
       - ./shared_dir/data/model_local_cache:/data/projects/fate/fate_flow/model_local_cache
@@ -117,7 +116,7 @@ services:
     command:
     - "/bin/bash"
     - "-c"
-    - "sleep 5 && python fate_flow/python/fate_flow/fate_flow_server.py"
+    - "sleep 5 && python fateflow/python/fate_flow/fate_flow_server.py"
     
   client:
     image: "federatedai/client:${TAG}"

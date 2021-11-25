@@ -55,7 +55,7 @@ services:
   python:
     image: "federatedai/python-spark:${TAG}"
     environment:
-      PYTHONPATH: "$PYTHONPATH:/data/projects/fate/fate/python:/data/projects/fate/eggroll/python:/data/projects/fate/fate"
+      PYTHONPATH: "$PYTHONPATH:/data/projects/fate/fate/python:/data/projects/fate/eggroll/python:/data/projects/fate/fateflow/python"
       FATE_PROJECT_BASE: "/data/projects/fate"
     restart: always
     ports:

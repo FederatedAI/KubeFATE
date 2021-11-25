@@ -166,7 +166,7 @@ a1f784882d20        federatedai/eggroll:<tag>          "bash -c 'java -Dlog…" 
 ### Verifying the deployment
 On the target node of each party, a container named  `confs-<party_id>_python_1` should have been created and running the `fate-flow` service. For example, on Party 10000's node, run the following commands to verify the deployment:
 ```bash
-$ docker exec -it confs-10000_python_1 bash
+$ docker exec -it confs-10000_client_1 bash
 $ flow test toy --guest-party-id 10000 --host-party-id 9999
 ```
 If the test passed, the output may look like the following:
@@ -185,12 +185,13 @@ For more details about the testing result, please refer to `python/examples/toy_
 ### Verifying the serving service
 #### Steps on the host
 ##### Logging in to the python container
-`$ docker exec -it confs-10000_python_1 bash`
+```bash
+docker exec -it confs-10000_client_1 bash
+```
 
 ##### Modifying examples/upload_host.json 
-`$ vi fate_flow/examples/upload/upload_host.json`
-
-```json
+```bash
+cat > fateflow/examples/upload/upload_host.json <<EOF
 {
   "file": "examples/data/breast_hetero_host.csv",
   "id_delimiter": ",",
@@ -199,19 +200,24 @@ For more details about the testing result, please refer to `python/examples/toy_
   "namespace": "experiment",
   "table_name": "breast_hetero_host"
 }
+EOF
 ```
 
 ##### Uploading data
-`$ flow data upload -c fate_flow/examples/upload/upload_host.json `
+```bash
+flow data upload -c fateflow/examples/upload/upload_host.json
+```
 
 #### Steps on the guest
 ##### Getting in to the python container
-`$ docker exec -it confs-9999_python_1 bash`
+```bash
+docker exec -it confs-9999_client_1 bash
+```
 
 ##### Modifying examples/upload_guest.json 
-`$ vi fate_flow/examples/upload/upload_guest.json`
 
-```json
+```bash
+cat > fateflow/examples/upload/upload_guest.json <<EOF
 {
   "file": "examples/data/breast_hetero_guest.csv",
   "id_delimiter": ",",
@@ -220,19 +226,19 @@ For more details about the testing result, please refer to `python/examples/toy_
   "namespace": "experiment",
   "table_name": "breast_hetero_guest"
 }
+EOF
 ```
 
 ##### Uploading data
 
-`$ flow data upload -c fate_flow/examples/upload/upload_guest.json`
+```bash
+flow data upload -c fateflow/examples/upload/upload_guest.json
+```
 
 ##### Modifying examples/test_hetero_lr_job_conf.json
 
-**Currently the FATE Serving does not support DSL 2.0, which introduced in FATE 1.5. So please do not use `"dsl_version": "2"` in job configuration while online-serving is required.**
-
-`$ vi fate_flow/examples/lr/test_hetero_lr_job_conf.json`
-
-```json
+```bash
+cat > fateflow/examples/lr/test_hetero_lr_job_conf.json <<EOF
 {
   "dsl_version": "2",
   "initiator": {
@@ -314,12 +320,13 @@ For more details about the testing result, please refer to `python/examples/toy_
     }
   }
 }
+EOF
 ```
 
 ##### Modifying examples/test_hetero_lr_job_dsl.json
-`$ vi fate_flow/examples/lr/test_hetero_lr_job_dsl.json`
 
-```json
+```bash
+cat > fateflow/examples/lr/test_hetero_lr_job_dsl.json <<EOF
 {
   "components": {
     "reader_0": {
@@ -438,13 +445,16 @@ For more details about the testing result, please refer to `python/examples/toy_
     }
   }
 }
+EOF
 ```
 
 ##### Submitting a job
-`$ flow job submit -d fate_flow/examples/lr/test_hetero_lr_job_dsl.json -c fate_flow/examples/lr/test_hetero_lr_job_conf.json`
+```bash
+flow job submit -d fateflow/examples/lr/test_hetero_lr_job_dsl.json -c fateflow/examples/lr/test_hetero_lr_job_conf.json
+```
 
 output：
-```
+```json
 {
     "data": {
         "board_url": "http://fateboard:8080/index.html#/dashboard?job_id=202111230933232084530&role=guest&party_id=9999",
@@ -469,10 +479,12 @@ output：
 ```
 
 ##### Checking status of training jobs
-`$ flow task query -r guest -j 202111230933232084530 | grep -w f_status`
+```bash
+flow task query -r guest -j 202111230933232084530 | grep -w f_status
+```
 
 output:
-```bash
+```json
             "f_status": "success",
             "f_status": "waiting",
             "f_status": "running",
@@ -486,9 +498,11 @@ Wait for all waiting states to change to success.
 
 ##### Deploy model
 
-`$ flow model deploy --model-id arbiter-10000#guest-9999#host-10000#model --model-version 202111230933232084530`
-
 ```bash
+flow model deploy --model-id arbiter-10000#guest-9999#host-10000#model --model-version 202111230933232084530
+```
+
+```json
 {
     "data": {
         "arbiter": {
@@ -528,10 +542,11 @@ Wait for all waiting states to change to success.
 }
 ```
 
-##### Modifying the configuration of loading model
-`$ vi fate_flow/examples/model/publish_load_model.json`
+*The `model_version` that needs to be used later are all obtained in this step `"model_version": "202111230954255210490"`*
 
-```json
+##### Modifying the configuration of loading model
+```bash
+cat > fateflow/examples/model/publish_load_model.json <<EOF
 {
   "initiator": {
     "party_id": "9999",
@@ -553,12 +568,14 @@ Wait for all waiting states to change to success.
     "model_version": "202111230954255210490"
   }
 }
+EOF
 ```
 
-*The `model_version` that needs to be used later are all obtained in this step `"model_version": "202111230954255210490"`*
 
 ##### Loading a model
-`$ flow model load -c fate_flow/examples/model/publish_load_model.json`
+```bash 
+flow model load -c fateflow/examples/model/publish_load_model.json
+```
 
 output:
 ```json
@@ -592,9 +609,9 @@ output:
 ```
 
 ##### Modifying the configuration of binding model
-`$ vi fate_flow/examples/model/bind_model_service.json`
 
-```json
+```bash
+cat > fateflow/examples/model/bind_model_service.json <<EOF
 {
     "service_id": "test",
     "initiator": {
@@ -612,11 +629,14 @@ output:
         "model_version": "202111230954255210490"
     }
 }
+EOF
 ```
 
 
 ##### Binding a model
-`$ flow model bind -c fate_flow/examples/model/bind_model_service.json`
+```bash
+flow model bind -c fateflow/examples/model/bind_model_service.json
+```
 
 output:
 ```json
@@ -636,19 +656,14 @@ $ curl -X POST -H 'Content-Type: application/json' -i 'http://192.168.7.2:8059/f
   },
   "body": {
     "featureData": {
-      "x0": 0.254879,
-      "x1": -1.046633,
-      "x2": 0.209656,
-      "x3": 0.074214,
-      "x4": -0.441366,
-      "x5": -0.377645,
-      "x6": -0.485934,
-      "x7": 0.347072,
-      "x8": -0.287570,
-      "x9": -0.733474
+        "x0": 1.88669,
+        "x1": -1.359293,
+        "x2": 2.303601,
+        "x3": 2.00137,
+        "x4": 1.307686
     },
     "sendToRemoteFeatureData": {
-      "id": "123"
+        "phone_num": "122222222"
     }
   }
 }'
@@ -656,7 +671,7 @@ $ curl -X POST -H 'Content-Type: application/json' -i 'http://192.168.7.2:8059/f
 
 output:
 ```json
-{"flag":0,"data":{"prob":0.30684422824464636,"retmsg":"success","retcode":0}
+{"retcode":0,"retmsg":"","data":{"score":0.018025086161221948,"modelId":"guest#9999#arbiter-10000#guest-9999#host-10000#model","modelVersion":"202111240318516571130","timestamp":1637743473990},"flag":0}
 ```
 
 ### Deleting the cluster
