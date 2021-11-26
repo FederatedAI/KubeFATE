@@ -47,6 +47,11 @@ ingress:
     hosts:
     - name: party9999.pulsar.example.com
 
+python:
+  type: NodePort
+  httpNodePort: 30097
+  grpcNodePort: 30092
+
 servingIp: 192.168.9.1
 servingPort: 30095
 
