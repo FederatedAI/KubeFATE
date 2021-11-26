@@ -82,15 +82,23 @@ GenerateConfig() {
 		cp -r training_template/public/* confs-$party_id/confs/
 		# handle spark backend here
 		if [ "$backend" == "spark_rabbitmq" ]; then
-			cp -r training_template/backends/spark/* confs-$party_id/confs/
+			cp -r training_template/backends/spark/hadoop confs-$party_id/confs/
+			cp -r training_template/backends/spark/nginx confs-$party_id/confs/
+			cp -r training_template/backends/spark/spark confs-$party_id/confs/
+			cp -r training_template/backends/spark/rabbitmq confs-$party_id/confs/
+			
 			cp training_template/docker-compose-spark.yml confs-$party_id/docker-compose.yml
-			sed -i '146,162d' confs-$party_id/docker-compose.yml
+			sed -i '155,170d' confs-$party_id/docker-compose.yml
 		fi
 
 		if [ "$backend" == "spark_pulsar" ]; then
-			cp -r training_template/backends/spark/* confs-$party_id/confs/
+			cp -r training_template/backends/spark/hadoop confs-$party_id/confs/
+			cp -r training_template/backends/spark/nginx confs-$party_id/confs/
+			cp -r training_template/backends/spark/spark confs-$party_id/confs/
+			cp -r training_template/backends/spark/pulsar confs-$party_id/confs/
+			
 			cp training_template/docker-compose-spark.yml confs-$party_id/docker-compose.yml
-			sed -i '129,145d' confs-$party_id/docker-compose.yml
+			sed -i '138,153d' confs-$party_id/docker-compose.yml
 		fi
 
 		if [ "$backend" == "eggroll" ]; then
@@ -124,7 +132,8 @@ GenerateConfig() {
 
 		# generate conf dir
 		cp ${WORKINGDIR}/.env ./confs-$party_id
-				# check if use python-nn
+		
+		# check if use python-nn
 		if [ "$enabled_nn" = "true" ]; then
 			sed -i 's#image: "federatedai/python:${TAG}"#image: "federatedai/python-nn:${TAG}"#g' ./confs-$party_id/docker-compose.yml
 		fi
@@ -132,7 +141,6 @@ GenerateConfig() {
 		if [ "$RegistryURI" != "" ]; then
 			sed -i 's#federatedai#${RegistryURI}/federatedai#g' ./confs-$party_id/docker-compose.yml
 			sed -i 's#image: "mysql:8"#image: ${RegistryURI}/federatedai/mysql:8#g' ./confs-$party_id/docker-compose.yml
-			#sed -i 's#image: "redis:5"#image: "${RegistryURI}/redis:5"#g' ./confs-$party_id/docker-compose.yml
 		fi
 
 		# replace namenode in training_template/public/fate_flow/conf/service_conf.yaml
@@ -165,18 +173,25 @@ GenerateConfig() {
 		echo fateboard module of $party_id done!
 
 		# mysql
-		sed -i "s/eggroll_meta/${db_name}/g" ./confs-$party_id/confs/mysql/init/create-eggroll-meta-tables.sql
+		
 		echo >./confs-$party_id/confs/mysql/init/insert-node.sql
 		echo "CREATE DATABASE IF NOT EXISTS ${db_name};" >>./confs-$party_id/confs/mysql/init/insert-node.sql
 		echo "CREATE USER '${db_user}'@'%' IDENTIFIED BY '${db_password}';" >>./confs-$party_id/confs/mysql/init/insert-node.sql
 		echo "GRANT ALL ON *.* TO '${db_user}'@'%';" >>./confs-$party_id/confs/mysql/init/insert-node.sql
-		echo 'USE `'${db_name}'`;' >>./confs-$party_id/confs/mysql/init/insert-node.sql
-		echo "INSERT INTO server_node (host, port, node_type, status) values ('${clustermanager_ip}', '${clustermanager_port_db}', 'CLUSTER_MANAGER', 'HEALTHY');" >>./confs-$party_id/confs/mysql/init/insert-node.sql
-		for ((j = 0; j < ${#nodemanager_ip[*]}; j++)); do
-			echo "INSERT INTO server_node (host, port, node_type, status) values ('${nodemanager_ip[j]}', '${nodemanager_port_db}', 'NODE_MANAGER', 'HEALTHY');" >>./confs-$party_id/confs/mysql/init/insert-node.sql
-		done
-		echo "show tables;" >>./confs-$party_id/confs/mysql/init/insert-node.sql
-		echo "select * from server_node;" >>./confs-$party_id/confs/mysql/init/insert-node.sql
+		
+		if [[ "$backend" == "eggroll" ]]; then
+			echo 'USE `'${db_name}'`;' >>./confs-$party_id/confs/mysql/init/insert-node.sql
+			echo "INSERT INTO server_node (host, port, node_type, status) values ('${clustermanager_ip}', '${clustermanager_port_db}', 'CLUSTER_MANAGER', 'HEALTHY');" >>./confs-$party_id/confs/mysql/init/insert-node.sql
+			for ((j = 0; j < ${#nodemanager_ip[*]}; j++)); do
+				echo "INSERT INTO server_node (host, port, node_type, status) values ('${nodemanager_ip[j]}', '${nodemanager_port_db}', 'NODE_MANAGER', 'HEALTHY');" >>./confs-$party_id/confs/mysql/init/insert-node.sql
+			done
+			echo "show tables;" >>./confs-$party_id/confs/mysql/init/insert-node.sql
+			echo "select * from server_node;" >>./confs-$party_id/confs/mysql/init/insert-node.sql
+		
+			sed -i "s/eggroll_meta/${db_name}/g" ./confs-$party_id/confs/mysql/init/create-eggroll-meta-tables.sql
+		else
+			rm -f ./confs-$party_id/confs/mysql/init/create-eggroll-meta-tables.sql
+		fi
 		echo mysql module of $party_id done!
 
 		# fate_flow
@@ -186,75 +201,28 @@ GenerateConfig() {
 		sed -i "s/host: <db_host>/host: '${db_ip}'/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
 		sed -i "s/127.0.0.1:8000/${serving_ip}:8000/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
 
-		if [[ "$backend" == "spark"* ]]; then
+
+		if [[ "$backend" == "spark_rabbitmq" ]]; then
 			sed -i "s/proxy: rollsite/proxy: nginx/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
+			# 
+			sed -i "s/  computing: eggroll/  computing: spark/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
+			sed -i "s/  federation: eggroll/  federation: rabbitmq/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
+			sed -i "s/  storage: eggroll/  storage: hdfs/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
+		fi
+
+		if [[ "$backend" == "spark_pulsar" ]]; then
+			sed -i "s/proxy: rollsite/proxy: nginx/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
+			# 
+			sed -i "s/  computing: eggroll/  computing: spark/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
+			sed -i "s/  federation: eggroll/  federation: pulsar/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
+			sed -i "s/  storage: eggroll/  storage: hdfs/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
 		fi
 
 		echo fate_flow module of $party_id done!
+
 		# now we handles the route table
-		if [[ "$backend" == "spark"* ]]; then
-			cat >./confs-$party_id/confs/nginx/route_table.yaml <<EOF
-default:
-  proxy:
-    - host: nginx
-      http_port: 9300
-      grpc_port: 9310
-$(for ((j = 0; j < ${#party_list[*]}; j++)); do
-				if [ "${party_id}" == "${party_list[${j}]}" ]; then
-					continue
-				fi
-				echo "${party_list[${j}]}:
-  proxy:
-    - host: ${party_ip_list[${j}]} 
-      http_port: 9300
-      grpc_port: 9310
-  fateflow:
-    - host: ${party_ip_list[${j}]}
-      grpc_port: ${fate_flow_grpc_port}
-      http_port: ${fate_flow_http_port}
-"
-			done)
-${party_id}:
-  proxy:
-    - host: nginx
-      http_port: 9300
-      grpc_port: 9310
-  fateflow:
-    - host: ${fate_flow_ip}
-      grpc_port: ${fate_flow_grpc_port}
-      http_port: ${fate_flow_http_port}
-EOF
-			cat >./confs-$party_id/confs/fate_flow/conf/rabbitmq_route_table.yaml <<EOF
-$(for ((j = 0; j < ${#party_list[*]}; j++)); do
-				if [ "${party_id}" == "${party_list[${j}]}" ]; then
-					continue
-				fi
-				echo "${party_list[${j}]}:
-    host: ${party_ip_list[${j}]}
-    port: 5672
-"
-			done)
-${party_id}:
-    host: rabbitmq
-    port: 5672
-EOF
-
-			cat >./confs-$party_id/confs/fate_flow/conf/pulsar_route_table.yaml <<EOF
-$(for ((j = 0; j < ${#party_list[*]}; j++)); do
-				if [ "${party_id}" == "${party_list[${j}]}" ]; then
-					continue
-				fi
-				echo "${party_list[${j}]}:
-    host: ${party_ip_list[${j}]}
-    port: 6650
-"
-			done)
-${party_id}:
-    host: pulsar
-    port: 6650
-EOF
-
-		else
+		# eggroll
+		if [[ "$backend" == "eggroll" ]]; then
 			cat >./confs-$party_id/confs/eggroll/conf/route_table.json <<EOF
 {
 	"route_table": {
@@ -305,9 +273,85 @@ $(for ((j = 0; j < ${#party_list[*]}; j++)); do
 }
 EOF
 		fi
+
+		# nginx
+        # TODO nginx 不需要对方fateflow IP PORT
+		if [[ "$backend" == "spark"* ]]; then
+			cat >./confs-$party_id/confs/nginx/route_table.yaml <<EOF
+default:
+  proxy:
+    - host: nginx
+      http_port: 9300
+      grpc_port: 9310
+$(for ((j = 0; j < ${#party_list[*]}; j++)); do
+				if [ "${party_id}" == "${party_list[${j}]}" ]; then
+					continue
+				fi
+				echo "${party_list[${j}]}:
+  proxy:
+    - host: ${party_ip_list[${j}]} 
+      http_port: 9300
+      grpc_port: 9310
+  fateflow:
+    - host: ${party_ip_list[${j}]}
+      grpc_port: ${fate_flow_grpc_port}
+      http_port: ${fate_flow_http_port}
+"
+			done)
+${party_id}:
+  proxy:
+    - host: nginx
+      http_port: 9300
+      grpc_port: 9310
+  fateflow:
+    - host: ${fate_flow_ip}
+      grpc_port: ${fate_flow_grpc_port}
+      http_port: ${fate_flow_http_port}
+EOF
+		fi
+
+		# spark_pulsar
+		if [[ "$backend" == "spark_pulsar" ]]; then
+			cat >./confs-$party_id/confs/fate_flow/conf/pulsar_route_table.yaml <<EOF
+$(for ((j = 0; j < ${#party_list[*]}; j++)); do
+				if [ "${party_id}" == "${party_list[${j}]}" ]; then
+					continue
+				fi
+				echo "${party_list[${j}]}:
+    host: ${party_ip_list[${j}]}
+    port: 6650
+"
+			done)
+${party_id}:
+    host: pulsar
+    port: 6650
+EOF
+
+		fi
+
+		# spark_rabbitmq
+		if [[ "$backend" == "spark_rabbitmq" ]]; then
+			cat >./confs-$party_id/confs/fate_flow/conf/rabbitmq_route_table.yaml <<EOF
+$(for ((j = 0; j < ${#party_list[*]}; j++)); do
+				if [ "${party_id}" == "${party_list[${j}]}" ]; then
+					continue
+				fi
+				echo "${party_list[${j}]}:
+    host: ${party_ip_list[${j}]}
+    port: 5672
+"
+			done)
+${party_id}:
+    host: rabbitmq
+    port: 5672
+EOF
+		fi
+		echo proxy module of $party_id done!
+
+		# package of $party_id
 		tar -czf ./outputs/confs-$party_id.tar ./confs-$party_id
 		rm -rf ./confs-$party_id
-		echo proxy module of $party_id done!
+		echo package $party_id done!
 
 		if [ "$exchange_ip" != "" ]; then
 			# handle exchange
@@ -387,6 +431,11 @@ EOF
 		sed -i "s/<redis.port>/${redis_port}/g" ./serving-$party_id/confs/serving-server/conf/serving-server.properties
 		sed -i "s/<redis.password>/${redis_password}/g" ./serving-$party_id/confs/serving-server/conf/serving-server.properties
 		sed -i "s/<redis.password>/${redis_password}/g" ./serving-$party_id/docker-compose.yml
+
+		# network
+		sed -i "s/name: <fate-network>/name: confs-${party_id}_fate-network/g" serving-$party_id/docker-compose.yml
+		
+		
 
 		# serving proxy
 		sed -i "s/coordinator=9999/coordinator=${party_id}/g" ./serving-$party_id/confs/serving-proxy/conf/application.properties

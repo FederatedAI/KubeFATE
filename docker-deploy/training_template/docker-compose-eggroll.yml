@@ -58,7 +58,7 @@ services:
       - "8080:8080"
     volumes:
       - ./confs/fateboard/conf:/data/projects/fate/fateboard/conf
-      - fate_flow_logs:/data/projects/fate/logs
+      - fate_flow_logs:/data/projects/fate/fateflow/logs
     networks:
       - fate-network
     depends_on:
@@ -82,7 +82,7 @@ services:
       - 4671
     volumes:
       - ./confs/eggroll/conf:/data/projects/fate/eggroll/conf
-      - ./confs/fate_flow/conf/service_conf.yaml:/data/projects/fate/conf/service_conf.yaml
+      - ./confs/fate_flow/conf/service_conf.yaml:/data/projects/fate/fate/conf/service_conf.yaml
       - ./shared_dir/data/nodemanager:/data/projects/fate/eggroll/data
     networks:
       - fate-network
@@ -90,18 +90,21 @@ services:
   
   python:
     image: "federatedai/python:${TAG}"
+    environment:
+      PYTHONPATH: "$PYTHONPATH:/data/projects/fate/fate/python:/data/projects/fate/eggroll/python:/data/projects/fate/fateflow/python:/data/projects/fate/fate/python/fate_client"
+      FATE_PROJECT_BASE: "/data/projects/fate"
     ports:
       - "9360:9360"
       - "9380:9380"
     restart: always
     volumes:
-      - shared_dir_federatedml:/data/projects/fate/python/federatedml
+      - shared_dir_federatedml:/data/projects/fate/fate/python/federatedml
       - shared_dir_examples:/data/projects/fate/examples
       - download_dir:/data/projects/fate/python/download_dir
       - ./confs/fate_flow/conf:/data/projects/fate/conf
       - ./confs/eggroll/conf:/data/projects/fate/eggroll/conf
-      - fate_flow_logs:/data/projects/fate/logs
-      - ./shared_dir/data/model_local_cache:/data/projects/fate/model_local_cache
+      - fate_flow_logs:/data/projects/fate/fateflow/logs
+      - ./shared_dir/data/model_local_cache:/data/projects/fate/fateflow/model_local_cache
     depends_on:
       - mysql
       - rollsite
@@ -110,21 +113,25 @@ services:
     networks:
       fate-network:
         ipv4_address: 192.167.0.100
-    command: ["/bin/bash", "-c", "sleep 5 && python ./fate_flow/fate_flow_server.py"]
-    
+    command:
+    - "/bin/bash"
+    - "-c"
+    - |
+        set -x
+        sleep 5 && python fateflow/python/fate_flow/fate_flow_server.py
+
   client:
     image: "federatedai/client:${TAG}"
     ports:
       - "20000:20000"
     restart: always
     environment:
-      FATE_FLOW_HOST: "python:9380"
+      FATE_FLOW_IP: "python"
+      FATE_FLOW_PORT: "9380"
       FATE_SERVING_HOST: "fate-serving:8059"
     volumes:
-      - download_dir:/fml_manager/Examples/download_dir
+      - download_dir:/data/projects/fate/download_dir
       - shared_dir_examples:/data/projects/fate/examples
-      - ./confs/fate_flow/conf:/data/projects/fate/conf
-      - ./confs/client/pipeline_conf.yaml:/data/projects/fate/conf/pipeline_conf.yaml
     depends_on:
       - python
     networks:

@@ -42,14 +42,16 @@ data:
     spark.pyspark.driver.python       python
     {{- end }}
   service_conf.yaml: |
-    work_mode: 1
     use_registry: {{ .Values.modules.serving.useRegistry | default false }}
     use_deserialize_safe_module: false
+    dependent_distribution: false
     fateflow:
       # you must set real ip address, 127.0.0.1 and 0.0.0.0 is not supported
       host: {{ if .Values.istio.enabled }}127.0.0.1{{ else }}fateflow{{ end }}
       http_port: 9380
       grpc_port: 9360
+      # http_app_key:
+      # http_secret_key:
       # support rollsite/nginx/fateflow as a coordination proxy
       # rollsite support fate on eggroll, use grpc protocol
       # nginx support fate on eggroll and fate on spark, use http or grpc protocol, default is http
@@ -62,7 +64,7 @@ data:
       #   host: xx
       #   http_port: xx
       #   grpc_port: xx 
-      {{- if eq .Values.modules.python.backend  "spark" }}
+      {{- if eq .Values.modules.python.backend "spark_pulsar" "spark_rabbitmq" }}
       proxy: nginx
       {{- else }}
       proxy: rollsite
@@ -71,9 +73,6 @@ data:
       protocol: default
       # It can also be specified in the job configuration using the federated_status_collect_type parameter
       default_federated_status_collect_type: PULL
-    fateboard:
-      host: fateboard
-      port: 8080
     database:
       name: '{{ .Values.externalMysqlDatabase | default .Values.modules.mysql.database | default "eggroll_meta" }}'
       user: '{{ .Values.externalMysqlUser | default .Values.modules.mysql.user | default "fate" }}'
@@ -82,6 +81,31 @@ data:
       port: {{ .Values.externalMysqlPort | default .Values.modules.mysql.port | default "3306" }}
       max_connections: 100
       stale_timeout: 30
+    zookeeper:
+      hosts:
+      - "serving-zookeeper:2181"
+       # use_acl: false
+       # user: fate
+       # password: fate
+       # engine services
+    default_engines:
+      {{- if eq .Values.modules.python.backend  "spark_pulsar" }}
+      computing: spark
+      federation: pulsar
+      storage: hdfs
+      {{- else if eq .Values.modules.python.backend  "spark_rabbitmq" }}
+      computing: spark
+      federation: rabbitmq
+      storage: hdfs
+      {{- else }}
+      computing: eggroll
+      federation: eggroll
+      storage: eggroll
+      {{- end }}
+    fate_on_standalone:
+      standalone:
+        cores_per_node: 20
+        nodes: 1
     fate_on_eggroll:
       clustermanager:
         cores_per_node: {{ .Values.modules.python.clustermanager.cores_per_node | default 16 }}
@@ -92,9 +116,25 @@ data:
     fate_on_spark:
       spark:
         # default use SPARK_HOME environment variable
-        home: 
+        home: /data/projects/spark-2.4.1-bin-hadoop2.7/
         cores_per_node: {{ .Values.modules.python.spark.cores_per_node }}
         nodes: {{ .Values.modules.python.spark.nodes }}
+      linkis_spark:
+        cores_per_node: 20
+        nodes: 2
+        host: 127.0.0.1
+        port: 9001
+        token_code: MLSS
+        python_path: /data/projects/fate/python
+      hive:
+        host: 127.0.0.1
+        port: 10000
+        auth_mechanism:
+        username:
+        password:
+      linkis_hive:
+        host: 127.0.0.1
+        port: 9001
       hdfs:
         name_node: {{ .Values.modules.python.hdfs.name_node | default "hdfs://namenode:9000" }}
         # default /
@@ -118,6 +158,14 @@ data:
         host: {{ .Values.modules.python.nginx.host }}
         http_port: {{ .Values.modules.python.nginx.http_port }}
         grpc_port: {{ .Values.modules.python.nginx.grpc_port }}
+    fateboard:
+      host: fateboard
+      port: 8080
+    # on API `/model/load` and `/model/load/do`
+    # automatic upload models to the model store if it exists locally but does not exist in the model storage
+    # or download models from the model store if it does not exist locally but exists in the model storage
+    # this config will not affect API `/model/store` or `/model/restore`
+    enable_model_store: false
     model_store_address:
       storage: mysql
       name: {{ .Values.externalMysqlDatabase | default .Values.modules.mysql.database | default "eggroll_meta" }}
@@ -143,6 +191,57 @@ data:
   transfer_conf.yaml: |
     paths: # dir or path
       - "python/federatedml/transfer_variable/auth_conf"
+  component_registry.json: |
+    {
+      "components": {
+      },
+      "providers": {
+      },
+      "default_settings": {
+        "fate_flow":{
+          "default_version_key": "FATEFlow"
+        },
+        "fate": {
+          "default_version_key": "FATE"
+        },
+        "class_path": {
+          "interface": "components.components.Components",
+          "feature_instance": "feature.instance.Instance",
+          "feature_vector": "feature.sparse_vector.SparseVector",
+          "model": "protobuf.generated",
+          "model_migrate": "protobuf.model_migrate.model_migrate",
+          "homo_model_convert": "protobuf.homo_model_convert.homo_model_convert"
+        }
+      }
+    }
+  job_default_config.yaml: |
+    # component provider, relative path to get_fate_python_directory
+    default_component_provider_path: federatedml
+    
+    # resource
+    total_cores_overweight_percent: 1  # 1 means no overweight
+    total_memory_overweight_percent: 1  # 1 means no overweight
+    task_parallelism: 1
+    task_cores: 4
+    task_memory: 0  # mb
+    max_cores_percent_per_job: 1  # 1 means total
+    
+    # scheduling
+    job_timeout: 259200 # s
+    remote_request_timeout: 30000  # ms
+    federated_command_trys: 3
+    end_status_job_scheduling_time_limit: 300000 # ms
+    end_status_job_scheduling_updates: 1
+    auto_retries: 0
+    auto_retry_delay: 1  #seconds
+    # It can also be specified in the job configuration using the federated_status_collect_type parameter
+    federated_status_collect_type: PUSH
+    
+    # upload
+    upload_max_bytes: 4194304000 # bytes
+    
+    #component output
+    output_data_summary_count_limit: 100
 ---
 kind: ConfigMap
 apiVersion: v1
@@ -177,6 +276,10 @@ data:
     #server.ssl.key-store-password=
     #server.ssl.key-password=
     #server.ssl.key-alias=
+    spring.session.store-type=jdbc
+    spring.session.jdbc.initialize-schema=always
+    #HTTP_APP_KEY=
+    #HTTP_SECRET_KEY=
 ---
 kind: ConfigMap
 apiVersion: v1
@@ -291,7 +394,7 @@ spec:
       {{- end }}
       containers:
         - name: python
-          {{- if eq .Values.modules.python.backend  "spark" }}
+          {{- if eq .Values.modules.python.backend "spark_pulsar" "spark_rabbitmq" }}
           image: {{ .Values.image.registry }}/python-spark:{{ .Values.image.tag }}
           {{- else }}
           image: {{ .Values.image.registry }}/{{ if .Values.modules.python.enabledNN }}python-nn{{ else }}python{{ end }}:{{ .Values.image.tag }}
@@ -309,7 +412,11 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: status.podIP
-          {{- if eq .Values.modules.python.backend  "spark" }}
+          - name: PYTHONPATH
+            value: "$PYTHONPATH:/data/projects/fate/fate/python:/data/projects/fate/eggroll/python:/data/projects/fate/fateflow/python:/data/projects/fate/fate/python/fate_client"
+          - name: FATE_PROJECT_BASE
+            value: "/data/projects/fate"
+          {{- if eq .Values.modules.python.backend "spark_pulsar" "spark_rabbitmq" }}
           - name: FATE_FLOW_UPLOAD_MAX_NUM
             value: "1000000"
           - name: FATE_FLOW_UPLOAD_MAX_BYTES
@@ -324,27 +431,25 @@ spec:
             - |
                 set -x
                 mkdir -p /data/projects/fate/conf/
-                cp /data/projects/fate/conf1/transfer_conf.yaml /data/projects/fate/conf/transfer_conf.yaml
-                cp /data/projects/fate/conf1/service_conf.yaml /data/projects/fate/conf/service_conf.yaml
-                # cp /data/projects/fate/conf1/pipeline_conf.yaml /data/projects/fate/conf/pipeline_conf.yaml
+                cp /data/projects/fate/conf-tmp/transfer_conf.yaml /data/projects/fate/conf/transfer_conf.yaml
+                cp /data/projects/fate/conf-tmp/service_conf.yaml /data/projects/fate/conf/service_conf.yaml
+                cp /data/projects/fate/conf-tmp/component_registry.json /data/projects/fate/conf/component_registry.json
+                cp /data/projects/fate/conf-tmp/job_default_config.yaml /data/projects/fate/conf/job_default_config.yaml
                 # fix fateflow conf must use IP
                 sed -i "s/host: fateflow/host: ${POD_IP}/g" /data/projects/fate/conf/service_conf.yaml
-                # fix pipeline conf must use IP
-                # sed -i "s/ip: fateflow/ip: ${POD_IP}/g" /data/projects/fate/conf/pipeline_conf.yaml
                 
                 cp /data/projects/spark-2.4.1-bin-hadoop2.7/conf/spark-defaults-template.conf /data/projects/spark-2.4.1-bin-hadoop2.7/conf/spark-defaults.conf
                 sed -i "s/fateflow/${POD_IP}/g" /data/projects/spark-2.4.1-bin-hadoop2.7/conf/spark-defaults.conf
                 
-                sleep 5;
-                python ./fate_flow/fate_flow_server.py
+                sleep 5 && python fateflow/python/fate_flow/fate_flow_server.py
           volumeMounts:
             - mountPath: /data/projects/fate/eggroll/conf/eggroll.properties
               name: eggroll-confs
               subPath: eggroll.properties
             - name: python-data
-              mountPath: /data/projects/fate/logs
+              mountPath: /data/projects/fate/fateflow/logs
               subPath: logs
-            - mountPath: /data/projects/fate/conf1/
+            - mountPath: /data/projects/fate/conf-tmp/
               name: python-confs
             - mountPath: /data/projects/spark-2.4.1-bin-hadoop2.7/conf/spark-defaults-template.conf
               name: python-confs
@@ -371,7 +476,7 @@ spec:
               name: fateboard-confs
               subPath: application.properties
             - name: python-data
-              mountPath: /data/projects/fate/logs
+              mountPath: /data/projects/fate/fateflow/logs
               subPath: logs
         {{- end }}
       {{- with .Values.modules.python.nodeSelector }}

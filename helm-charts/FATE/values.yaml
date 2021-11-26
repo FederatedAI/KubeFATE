@@ -2,7 +2,7 @@
 image:
   registry: federatedai
   isThridParty:
-  tag: 1.6.1-release
+  tag: 1.7.0-release
   pullPolicy: IfNotPresent
   imagePullSecrets: 
 #  - name: 
@@ -20,34 +20,34 @@ ingress:
   fateboard: 
     # annotations: 
     hosts:
-    - name: fateboard.kubefate.net
+    - name: fateboard.example.com
       path: /
     tls: []
     # - secretName: my-tls-secret
       # hosts:
-        # - fateboard.kubefate.net
+        # - fateboard.example.com
   client: 
     # annotations: 
     hosts:
-    - name: notebook.kubefate.net
+    - name: notebook.example.com
       path: /
     tls: [] 
   spark: 
     # annotations: 
     hosts:
-    - name: spark.kubefate.net
+    - name: spark.example.com
       path: /
     tls: [] 
   rabbitmq: 
     # annotations: 
     hosts:
-    - name: rabbitmq.kubefate.net
+    - name: rabbitmq.example.com
       path: /
     tls: [] 
   pulsar: 
     # annotations: 
     hosts:
-    - name:  pulsar.kubefate.net
+    - name:  pulsar.example.com
       path: /
     tls: []
     
@@ -256,11 +256,11 @@ modules:
       replicas: 2
       resources:
         requests:
-          cpu: "1"
-          memory: "2Gi"
-        limits:
           cpu: "2"
           memory: "4Gi"
+        limits:
+          cpu: "4"
+          memory: "8Gi"
       nodeSelector:
       tolerations:
       affinity:

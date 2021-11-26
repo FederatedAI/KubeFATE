@@ -22,9 +22,6 @@ source ${WORKINGDIR}/parties.conf
 
 cd ${WORKINGDIR}
 
-work_mode=1
-backend=0
-
 get_party_ip(){
     target_party_id=$1
     for ((i = 0; i < ${#partylist[*]}; i++)); do
@@ -86,9 +83,8 @@ toy_example() {
 cd $dir
 cd confs-$target_party_id
 
-docker-compose exec -T python bash -c '
-cd ../examples/toy_example; 
-python run_toy_example.py $guest $host 1 -b $backend
+docker-compose exec -T client bash -c '
+flow test toy --guest-party-id $guest --host-party-id $host
 '
 
 exit
@@ -113,8 +109,8 @@ cd $dir
 cd confs-$target_party_id
 
 docker-compose exec -T python bash -c '
-cd ../examples/scripts; 
-python upload_default_data.py -m ${work_mode}
+cd examples/scripts; 
+python upload_default_data.py -f 1
 '
 
 exit
@@ -147,8 +143,8 @@ cd $dir
 cd confs-$target_party_id
 
 docker-compose exec -T python bash -c '
-cd ../examples/min_test_task; 
-python run_task.py -m ${work_mode} -gid ${guest_id} -hid ${host_id} -aid ${arbiter_id}
+cd examples/min_test_task; 
+python run_task.py -gid ${guest_id} -hid ${host_id} -aid ${arbiter_id}
 '
 
 exit

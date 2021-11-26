@@ -1,7 +1,7 @@
 name: fate-9999
 namespace: fate-9999
 chartName: fate
-chartVersion: v1.6.1
+chartVersion: v1.7.0
 partyId: 9999
 registry: ""
 imageTag: ""
@@ -21,32 +21,38 @@ modules:
   - python
   - fateboard
   - client
-
+  
+  
+# backend could be eggroll, spark_rabbitmq and spark_pulsar
 backend: eggroll
 
 # Specify domain name for service
 # ingress:
   # fateboard: 
     # annotations:
+      # kubernetes.io/ingress.class: "nginx"
     # hosts:
-    # - name: 9999.fateboard.kubefate.net
-      # path: /
-    # tls: 
-    # - secretName: my-tls-secret
-      # hosts:
-        # - 9999.fateboard.kubefate.net
-  # client: 
+    # - name: party9999.fateboard.example.com
+  # client:  
+    # annotations:
+      # kubernetes.io/ingress.class: "nginx"
     # hosts:
-    # - name: 9999.notebook.kubefate.net
-  # spark: 
+    # - name: party9999.notebook.example.com
+  # spark:  
+    # annotations:
+      # kubernetes.io/ingress.class: "nginx"
     # hosts:
-    # - name: 9999.spark.kubefate.net
-  # rabbitmq: 
+    # - name: party9999.spark.example.com
+  # rabbitmq:  
+    # annotations:
+      # kubernetes.io/ingress.class: "nginx"
     # hosts:
-    # - name: 9999.rabbitmq.kubefate.net
-  # pulsar: 
+    # - name: party9999.rabbitmq.example.com
+  # pulsar:  
+    # annotations:
+      # kubernetes.io/ingress.class: "nginx"
     # hosts:
-    # - name: 9999.pulsar.kubefate.net
+    # - name: party9999.pulsar.example.com
   
 # Specify rollsite properties
 # rollsite: 

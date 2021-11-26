@@ -4,7 +4,7 @@ chartName: fate-serving
 chartVersion: v2.0.4
 partyId: 9999
 registry: ""
-imageTag: ""
+imageTag: "2.0.4-release"
 pullPolicy: 
 imagePullSecrets: 
 - name: myregistrykey
@@ -23,11 +23,11 @@ modules:
 ingress:
   servingProxy: 
     hosts:
-    - name: party9999.serving-proxy.kubefate.net
+    - name: party9999.serving-proxy.example.com
       path: /
   servingAdmin: 
     hosts:
-    - name: party9999.serving-admin.kubefate.net
+    - name: party9999.serving-admin.example.com
       path: /
       
 servingAdmin:

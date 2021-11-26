@@ -160,7 +160,7 @@ spec:
             - mountPath: /data/projects/fate/eggroll/conf/eggroll.properties
               name: nodemanager-confs
               subPath: eggroll.properties
-            - mountPath: /data/projects/fate/conf/
+            - mountPath: /data/projects/fate/fate/conf/
               name: python-confs
             - name: data-dir
               mountPath: /data/projects/fate/eggroll/data
