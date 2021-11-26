@@ -409,7 +409,7 @@ modules:
       affinity:
 {{ toYaml . | indent 8 }}
       {{- end }}
-      type: {{ .type }}
+      type: {{ .master.type }}
     {{- end }}
     {{- if .worker }}
     worker:

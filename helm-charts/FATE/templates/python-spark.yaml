@@ -394,7 +394,7 @@ spec:
               name: eggroll-confs
               subPath: eggroll.properties
             - name: python-data
-              mountPath: /data/projects/fate/fate_flow/logs
+              mountPath: /data/projects/fate/fateflow/logs
               subPath: logs
             - mountPath: /data/projects/fate/conf-tmp/
               name: python-confs
@@ -423,7 +423,7 @@ spec:
               name: fateboard-confs
               subPath: application.properties
             - name: python-data
-              mountPath: /data/projects/fate/fate_flow/logs
+              mountPath: /data/projects/fate/fateflow/logs
               subPath: logs
         {{- end }}
       {{- with .Values.modules.python.nodeSelector }}

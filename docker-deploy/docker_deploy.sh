@@ -272,17 +272,17 @@ docker-compose down
 exit
 eeooff
 		else
+			ssh -tt $user@$target_party_serving_ip <<eeooff
+cd $dir/serving-$target_party_id
+docker-compose down
+exit
+eeooff
 			ssh -tt $user@$target_party_ip <<eeooff
 cd $dir/confs-$target_party_id
 docker-compose down
 exit
 eeooff
 			echo "party $target_party_id training cluster is deleted!"
-			ssh -tt $user@$target_party_serving_ip <<eeooff
-cd $dir/serving-$target_party_id
-docker-compose down
-exit
-eeooff
 			echo "party $target_party_id serving cluster is deleted!"
 		fi
 	fi
