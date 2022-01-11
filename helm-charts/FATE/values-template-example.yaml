@@ -27,7 +27,7 @@ modules:
   # - nginx
   # - rabbitmq
 
-# backend could be eggroll, spark_rabbitmq and spark_pulsar
+# backend could be eggroll, spark_rabbitmq and spark_pulsar spark_local_pulsar
 backend: eggroll
 
 # ingress:

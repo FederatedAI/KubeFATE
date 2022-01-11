@@ -18,13 +18,11 @@ modules:
   - python
   - fateboard
   - client
-  - spark
-  - hdfs
   - nginx
   - pulsar
 
-# backend could be eggroll, spark_rabbitmq and spark_pulsar
-backend: spark_pulsar
+# backend could be eggroll, spark_rabbitmq and spark_pulsar spark_local_pulsar
+backend: spark_local_pulsar
 
 # Specify domain name for service
 # ingress:
