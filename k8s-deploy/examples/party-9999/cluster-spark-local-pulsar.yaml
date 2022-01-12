@@ -1,8 +1,8 @@
-name: fate-10000
-namespace: fate-10000
+name: fate-9999
+namespace: fate-9999
 chartName: fate
 chartVersion: v1.7.1
-partyId: 10000
+partyId: 9999
 registry: ""
 imageTag: "1.7.1-release"
 pullPolicy: 
@@ -18,68 +18,66 @@ modules:
   - mysql
   - fateboard
   - client
-  - spark
-  - hdfs
   - nginx
   - pulsar
 
-backend: spark_pulsar
+backend: spark_local_pulsar
 
 ingress:
   fateboard: 
     annotations:
       kubernetes.io/ingress.class: "nginx"
     hosts:
-    - name: party10000.fateboard.example.com
+    - name: party9999.fateboard.example.com
   client:  
     annotations:
       kubernetes.io/ingress.class: "nginx"
     hosts:
-    - name: party10000.notebook.example.com
+    - name: party9999.notebook.example.com
   spark:  
     annotations:
       kubernetes.io/ingress.class: "nginx"
     hosts:
-    - name: party10000.spark.example.com
+    - name: party9999.spark.example.com
   pulsar:  
     annotations:
       kubernetes.io/ingress.class: "nginx"
     hosts:
-    - name: party10000.pulsar.example.com
+    - name: party9999.pulsar.example.com
 
 python:
   type: NodePort
-  httpNodePort: 30107
-  grpcNodePort: 30102
+  httpNodePort: 30097
+  grpcNodePort: 30092
 
-servingIp: 192.168.10.1
-servingPort: 30105
+servingIp: 192.168.9.1
+servingPort: 30095
 
 nginx:
   type: NodePort
-  http_port: 30103
-  grpc_port: 30108 
+  httpNodePort: 30093
+  grpcNodePort: 30098
   route_table: 
-    9999: 
+    10000: 
       fateflow: 
-        - host: 192.168.9.1
-          http_port: 30093
-          grpc_port: 30098
+        - host: 192.168.10.1
+          http_port: 30103
+          grpc_port: 30108 
 
 pulsar:
   type: NodePort
-  httpNodePort: 30104
-  httpsNodePort: 30109
+  httpNodePort: 30094
+  httpsNodePort: 30099
   publicLB:
     enabled: false
   route_table:
     9999:
-      host: 192.168.9.1
-      port: 30094
-      sslPort: 30099
-      proxy: ""
-    10000:
       host: pulsar
       port: 6650
       sslPort: 6651
+    10000:
+      host: 192.168.10.1
+      port: 30104
+      sslPort: 30109
+      proxy: ""
       
