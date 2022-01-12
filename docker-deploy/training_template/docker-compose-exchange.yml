@@ -3,6 +3,7 @@ version: '3'
 services:
   exchange:
     image: "federatedai/eggroll:${TAG}"
+    restart: always
     ports:
       - "9371:9370"
     volumes:

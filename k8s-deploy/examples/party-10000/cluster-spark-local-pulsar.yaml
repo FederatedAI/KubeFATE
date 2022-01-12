@@ -18,12 +18,10 @@ modules:
   - mysql
   - fateboard
   - client
-  - spark
-  - hdfs
   - nginx
   - pulsar
 
-backend: spark_pulsar
+backend: spark_local_pulsar
 
 ingress:
   fateboard: 

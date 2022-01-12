@@ -14,17 +14,15 @@ istio:
 podSecurityPolicy:
   enabled: false
 modules:
-  - rollsite
-  - clustermanager
-  - nodemanager
   - mysql
   - python
   - fateboard
   - client
-  
-  
+  - nginx
+  - pulsar
+
 # backend could be eggroll, spark_rabbitmq and spark_pulsar spark_local_pulsar
-backend: eggroll
+backend: spark_local_pulsar
 
 # Specify domain name for service
 # ingress:
@@ -53,7 +51,7 @@ backend: eggroll
       # kubernetes.io/ingress.class: "nginx"
     # hosts:
     # - name: party9999.pulsar.example.com
-  
+
 # Specify rollsite properties
 # rollsite: 
   # type: NodePort
@@ -67,83 +65,34 @@ backend: eggroll
     # partyPort: 30101
   # nodeSelector: 
 
-# Specify nodemanager properties
-# nodemanager:
-  # count: 3
-  # sessionProcessorsPerNode: 4
-  # storageClass: "nodemanagers"
-  # accessMode: ReadWriteOnce
-  # size: 2Gi
-  # list:
-  # - name: nodemanager
-    # nodeSelector: 
-    # sessionProcessorsPerNode: 4
-    # subPath: "nodemanager"
-    # existingClaim: ""
-    # storageClass: "nodemanager"
-    # accessMode: ReadWriteOnce
-    # size: 1Gi
-
 # Specify the fateflow service's properties
 # python:
   # type: NodePort
-  # httpNodePort: 30097
-  # grpcNodePort: 30092
-  # serviceAccountName: ""
-  # nodeSelector:
-  # tolerations:
-  # affinity:
-  # enabledNN: false
-  # existingClaim: ""
-  # storageClass: "python"
-  # accessMode: ReadWriteMany
-  # size: 1Gi
-  # clustermanager:
-    # cores_per_node: 16
-    # nodes: 2
+  # nodePort: 30102
+  # nodeSelector: 
   # spark: 
     # cores_per_node: 20
     # nodes: 2
     # master: spark://spark-master:7077
-    # driverHost: 
-    # driverHostType: 
-    # portMaxRetries: 
-    # driverStartPort: 
-    # blockManagerStartPort: 
-    # pysparkPython: 
+    # Only for using external Spark
+    ## driverHost:
+    ## driverHostType:
+    ## portMaxRetries:
+    ## driverStartPort:
+    ## blockManagerStartPort:
+    ## pysparkPython:
   # hdfs:
     # name_node: hdfs://namenode:9000
     # path_prefix:
-  # rabbitmq:
-    # host: rabbitmq
-    # mng_port: 15672
-    # port: 5672
-    # user: fate
-    # password: fate
   # pulsar:
     # host: pulsar
-    # mng_port: 8080
     # port: 6650
+    # mng_port: 8080
   # nginx:
     # host: nginx
     # http_port: 9300
     # grpc_port: 9310
-
- # Specify the fateboard service's properties
-# fateboard: 
-  # type: ClusterIP
-  # username: admin
-  # password: admin
-
- # Specify the client service's properties
-# client:
-  # nodeSelector: 
-  # subPath: ""
-  # existingClaim: ""
-  # storageClass: "client"
-  # accessMode: ReadWriteOnce
-  # size: 1Gi
-
+    
 # Specify the mysql properties
 # mysql: 
   # nodeSelector: 
@@ -158,13 +107,77 @@ backend: eggroll
   # accessMode: ReadWriteOnce
   # size: 1Gi
 
-# #
+# 
 # #externalMysqlIp: mysql
 # #externalMysqlPort: 3306
 # #externalMysqlDatabase: eggroll_meta
 # #externalMysqlUser: fate
 # #externalMysqlPassword: fate_dev
 
-# Specify serving configuration
+
 # servingIp: 192.168.0.1
 # servingPort: 30095
+
+# FATE on spark configuration
+# spark:
+  # master:
+    # Image: "federatedai/spark-master"
+    # ImageTag: "1.6.0-release"
+    # replicas: 1
+    # resources:
+      # requests:
+        # cpu: "1"
+        # memory: "2Gi"
+      # limits:
+        # cpu: "1"
+        # memory: "2Gi"
+    # nodeSelector: 
+    # type: ClusterIP
+  # worker:
+    # Image: "federatedai/spark-worker"
+    # ImageTag: "1.6.0-release"
+    # replicas: 2
+    # resources:
+      # requests:
+        # cpu: "2"
+        # memory: "4Gi"
+      # limits:
+        # cpu: "4"
+        # memory: "8Gi"
+    # nodeSelector: 
+    # type: ClusterIP
+# hdfs:
+  # namenode:
+    # nodeSelector: 
+    # type: ClusterIP
+  # datanode:
+    # nodeSelector: 
+    # type: ClusterIP
+# nginx:
+  # nodeSelector: 
+  # type: ClusterIP
+  # httpNodePort: 30093
+  # grpcNodePort: 30098
+  # route_table: 
+    # 10000: 
+      # proxy: 
+        # - host: 192.168.0.1 
+          # http_port: 30103
+          # grpc_port: 30108 
+      # fateflow: 
+        # - host: 192.168.0.1
+          # http_port: 30107
+          # grpc_port: 30102
+# pulsar:
+  # type: ClusterIP
+  # nodePort: 30094
+  # route_table:
+    # 10000:
+      # host: 192.168.0.1
+      # port: 6650 
+      # sslPort:6651
+      # proxy: ""
+    # 9999:
+      # host: pulsar
+      # port: 6650
+      # sslPort:6651

@@ -88,7 +88,7 @@ GenerateConfig() {
 			cp -r training_template/backends/spark/rabbitmq confs-$party_id/confs/
 			
 			cp training_template/docker-compose-spark.yml confs-$party_id/docker-compose.yml
-			sed -i '155,170d' confs-$party_id/docker-compose.yml
+			sed -i '157,173d' confs-$party_id/docker-compose.yml
 		fi
 
 		if [ "$backend" == "spark_pulsar" ]; then
@@ -98,7 +98,13 @@ GenerateConfig() {
 			cp -r training_template/backends/spark/pulsar confs-$party_id/confs/
 			
 			cp training_template/docker-compose-spark.yml confs-$party_id/docker-compose.yml
-			sed -i '138,153d' confs-$party_id/docker-compose.yml
+			sed -i '139,155d' confs-$party_id/docker-compose.yml
+		fi
+
+		if [ "$backend" == "spark_local_pulsar" ]; then
+			cp -r training_template/backends/spark/nginx confs-$party_id/confs/
+			cp -r training_template/backends/spark/pulsar confs-$party_id/confs/
+			cp training_template/docker-compose-spark-slim.yml confs-$party_id/docker-compose.yml
 		fi
 
 		if [ "$backend" == "eggroll" ]; then
@@ -216,6 +222,14 @@ GenerateConfig() {
 			sed -i "s/  computing: eggroll/  computing: spark/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
 			sed -i "s/  federation: eggroll/  federation: pulsar/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
 			sed -i "s/  storage: eggroll/  storage: hdfs/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
+		fi
+
+		if [ "$backend" == "spark_local_pulsar" ]; then
+			sed -i 's/proxy: rollsite/proxy: nginx/g' ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
+
+			sed -i "s/  computing: eggroll/  computing: spark/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
+			sed -i "s/  federation: eggroll/  federation: pulsar/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
+			sed -i "s/  storage: eggroll/  storage: localfs/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
 		fi
 
 		echo fate_flow module of $party_id done!
@@ -346,6 +360,27 @@ ${party_id}:
     port: 5672
 EOF
 		fi
+        
+        		# spark_local_pulsar
+		if [[ "$backend" == "spark_local_pulsar" ]]; then
+			cat >./confs-$party_id/confs/fate_flow/conf/pulsar_route_table.yaml <<EOF
+$(for ((j = 0; j < ${#party_list[*]}; j++)); do
+				if [ "${party_id}" == "${party_list[${j}]}" ]; then
+					continue
+				fi
+				echo "${party_list[${j}]}:
+    host: ${party_ip_list[${j}]}
+    port: 6650
+"
+			done)
+${party_id}:
+    host: pulsar
+    port: 6650
+EOF
+
+		fi
+
+
 		echo proxy module of $party_id done!
 
 		# package of $party_id

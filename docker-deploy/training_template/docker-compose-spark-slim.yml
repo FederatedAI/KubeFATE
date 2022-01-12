@@ -17,6 +17,7 @@ networks:
     ipam:
       config:
         - subnet: 192.167.0.0/16
+
 volumes:
   fate_flow_logs:
   download_dir:
@@ -47,9 +48,9 @@ services:
     volumes:
       - ./confs/fateboard/conf:/data/projects/fate/fateboard/conf
       - fate_flow_logs:/data/projects/fate/fateflow/logs
+    restart: always
     networks:
       - fate-network
-    restart: always
     depends_on:
       - python
 
@@ -82,96 +83,6 @@ services:
       FATE_FLOW_UPLOAD_MAX_NUM: "1000000"
       FATE_FLOW_UPLOAD_MAX_BYTES: "104868093952"
 
-  namenode:
-    image: federatedai/hadoop-namenode:2.0.0-hadoop2.7.4-java8
-    restart: always
-    ports:
-      - 9000:9000
-      - 9870:9870
-      - 50070:50070
-    volumes:
-      - ./shared_dir/data/namenode:/hadoop/dfs/name
-      - ./confs/hadoop/core-site.xml:/etc/hadoop/core-site.xml
-    env_file:
-      - ./confs/hadoop/hadoop.env
-    environment:
-      - CLUSTER_NAME=fate
-    networks:
-      - fate-network
-
-  datanode:
-    image: federatedai/hadoop-datanode:2.0.0-hadoop2.7.4-java8
-    restart: always
-    volumes:
-      - ./shared_dir/data/datanode:/hadoop/dfs/data
-    environment:
-      SERVICE_PRECONDITION: "namenode:9000"
-    env_file:
-      - ./confs/hadoop/hadoop.env
-    networks:
-      - fate-network
-
-  spark-master:
-    image: federatedai/spark-master:${TAG}
-    restart: always
-    ports:
-      - "8888:8080"
-      - "7077:7077"
-    environment:
-      INIT_DAEMON_STEP: setup_spark
-    networks:
-      - fate-network
-
-  spark-worker:
-    image: federatedai/spark-worker:${TAG}
-    restart: always
-    depends_on:
-      - spark-master
-    ports:
-      - "8081:8081"
-    environment:
-      SPARK_MASTER: "spark://spark-master:7077"
-    volumes:
-      - ./confs/fate_flow/conf:/data/projects/fate/conf
-    networks:
-      - fate-network
-
-  rabbitmq:
-    image: federatedai/rabbitmq:3.8.3-management
-    ports:
-      - "5672:5672"
-      - "15672:15672"
-    environment:
-      RABBITMQ_DEFAULT_USER: fate
-      RABBITMQ_DEFAULT_PASS: fate
-      RABBITMQ_USER: fate
-      RABBITMQ_PASSWORD: fate
-      RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: "-rabbit max_message_size 536870912"
-    volumes:
-      - ./confs/rabbitmq/enabled_plugins:/etc/rabbitmq/enabled_plugins
-      - ./shared_dir/data/rabbitmq:/var/lib/rabbitmq
-    restart: always
-    networks:
-      - fate-network
-
-  pulsar:
-    image: "federatedai/pulsar:2.7.0"
-    ports:
-      - "6650:6650"
-      - "6651:6651"
-      - "8001:8080"
-    deploy:
-      restart_policy:
-        condition: any
-    volumes:
-      - ./confs/pulsar/standalone.conf:/pulsar/conf/standalone.conf
-      - ./shared_dir/data/pulsar:/pulsar/data
-    command:
-      ["/bin/bash", "-c", "bin/pulsar standalone -nss"]
-    restart: always
-    networks:
-      - fate-network
-
   mysql:
     image: "mysql:8"
     expose:
@@ -198,7 +109,25 @@ services:
       - fate-network
     depends_on:
       - python
-  
+
+  pulsar:
+    image: "federatedai/pulsar:2.7.0"
+    ports:
+      - "6650:6650"
+      - "6651:6651"
+      - "8001:8080"
+    deploy:
+      restart_policy:
+        condition: any
+    volumes:
+      - ./confs/pulsar/standalone.conf:/pulsar/conf/standalone.conf
+      - ./shared_dir/data/pulsar:/pulsar/data
+    command:
+      ["/bin/bash", "-c", "bin/pulsar standalone -nss"]
+    restart: always
+    networks:
+      - fate-network
+      
   client:
     image: "federatedai/client:${TAG}"
     ports:

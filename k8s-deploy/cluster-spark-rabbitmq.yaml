@@ -1,7 +1,7 @@
 name: fate-9999
 namespace: fate-9999
 chartName: fate
-chartVersion: v1.7.0
+chartVersion: v1.7.1
 partyId: 9999
 registry: ""
 imageTag: ""
@@ -21,10 +21,10 @@ modules:
   - spark
   - hdfs
   - nginx
-  - pulsar
+  - rabbitmq
 
-# backend could be eggroll, spark_rabbitmq and spark_pulsar
-backend: spark_pulsar
+# backend could be eggroll, spark_rabbitmq and spark_pulsar spark_local_pulsar
+backend: spark_rabbitmq
 
 # Specify domain name for service
 # ingress:

@@ -19,7 +19,7 @@ metadata:
 {{ include "fate.labels" . | indent 4 }}
 data:
   spark-defaults.conf: |
-    spark.master                      {{  .Values.modules.python.spark.master | default "spark://spark-master:7077"}}
+    spark.master                      {{ if eq .Values.modules.python.backend "spark_local_pulsar" }}local[*]{{ else }}{{ .Values.modules.python.spark.master | default "spark://spark-master:7077"}}{{ end }}
     spark.driver.host                 {{  .Values.modules.python.spark.driverHost | default "fateflow" }}
     {{- if .Values.modules.python.spark.driverStartPort }}
     spark.driver.port                 {{  .Values.modules.python.spark.driverStartPort }}
@@ -64,7 +64,7 @@ data:
       #   host: xx
       #   http_port: xx
       #   grpc_port: xx 
-      {{- if eq .Values.modules.python.backend "spark_pulsar" "spark_rabbitmq" }}
+      {{- if eq .Values.modules.python.backend "spark_pulsar" "spark_rabbitmq" "spark_local_pulsar" }}
       proxy: nginx
       {{- else }}
       proxy: rollsite
@@ -97,6 +97,10 @@ data:
       computing: spark
       federation: rabbitmq
       storage: hdfs
+      {{- else if eq .Values.modules.python.backend  "spark_local_pulsar" }}
+      computing: spark
+      federation: pulsar
+      storage: localfs
       {{- else }}
       computing: eggroll
       federation: eggroll
@@ -544,6 +548,7 @@ spec:
       targetPort: 9380
       protocol: TCP
   type: ClusterIP
+  clusterIP: None
   selector:
     fateMoudle: python
 {{ include "fate.matchLabels" . | indent 4 }}
