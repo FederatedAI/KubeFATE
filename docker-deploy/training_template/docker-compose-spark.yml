@@ -49,6 +49,7 @@ services:
       - fate_flow_logs:/data/projects/fate/fateflow/logs
     networks:
       - fate-network
+    restart: always
     depends_on:
       - python
 
@@ -149,6 +150,7 @@ services:
     volumes:
       - ./confs/rabbitmq/enabled_plugins:/etc/rabbitmq/enabled_plugins
       - ./shared_dir/data/rabbitmq:/var/lib/rabbitmq
+    restart: always
     networks:
       - fate-network
 
@@ -166,6 +168,7 @@ services:
       - ./shared_dir/data/pulsar:/pulsar/data
     command:
       ["/bin/bash", "-c", "bin/pulsar standalone -nss"]
+    restart: always
     networks:
       - fate-network
 

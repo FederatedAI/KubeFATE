@@ -48,6 +48,7 @@ services:
     volumes:
       - ./confs/fateboard/conf:/data/projects/fate/fateboard/conf
       - fate_flow_logs:/data/projects/fate/fateflow/logs
+    restart: always
     networks:
       - fate-network
     depends_on:
@@ -88,6 +89,7 @@ services:
       - 3306
     volumes:
       - ./confs/mysql/init:/docker-entrypoint-initdb.d/
+      - ./shared_dir/data/mysql:/var/lib/mysql
     restart: always
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
@@ -122,6 +124,7 @@ services:
       - ./shared_dir/data/pulsar:/pulsar/data
     command:
       ["/bin/bash", "-c", "bin/pulsar standalone -nss"]
+    restart: always
     networks:
       - fate-network
       
