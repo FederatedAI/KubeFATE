@@ -398,7 +398,7 @@ spec:
       {{- end }}
       containers:
         - name: python
-          {{- if eq .Values.modules.python.backend "spark_pulsar" "spark_rabbitmq" }}
+          {{- if eq .Values.modules.python.backend "spark_pulsar" "spark_rabbitmq" "spark_local_pulsar" }}
           image: {{ .Values.image.registry }}/python-spark:{{ .Values.image.tag }}
           {{- else }}
           image: {{ .Values.image.registry }}/{{ if .Values.modules.python.enabledNN }}python-nn{{ else }}python{{ end }}:{{ .Values.image.tag }}
