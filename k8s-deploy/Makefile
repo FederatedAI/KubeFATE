@@ -65,11 +65,11 @@ vet:
 swag: swag-bin
 	$(SWAG_BIN) init --parseDependency --parseInternal -g pkg/api/service.go
 
-package: kubefate
-	mkdir -p package;
-	cp -r bin/kubefate cluster.yaml cluster-serving.yaml cluster-spark.yaml config.yaml kubefate.yaml rbac-config.yaml examples package/;
-	tar -czvf kubefate-k8s-${RELEASE_VERSION}.tar.gz -C package/ .;
-	rm -r package;
+package: kubefate-without-swag
+	mkdir -p tmp/kubefate;
+	cp -r bin/kubefate *.yaml examples tmp/kubefate;
+	tar -czvf kubefate-k8s-${RELEASE_VERSION}.tar.gz -C tmp/ kubefate;
+	rm -r tmp;
 
 release: package docker-save
 	mkdir -p release;
