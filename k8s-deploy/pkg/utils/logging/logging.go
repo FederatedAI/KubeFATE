@@ -16,9 +16,11 @@ package logging
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
@@ -51,4 +53,22 @@ func InitLog() {
 			Msg("Get log level configuration error")
 	}
 	log.Logger = log.Logger.Level(logLevel)
+}
+
+var GetGinLogger = func(c *gin.Context, out io.Writer, latency time.Duration) zerolog.Logger {
+	logger := zerolog.New(out).With().
+		Timestamp().
+		Int("status", c.Writer.Status()).
+		Str("method", c.Request.Method).
+		Str("path", c.Request.URL.Path).
+		Str("ip", c.ClientIP()).
+		Dur("latency", latency).
+		Str("user_agent", c.Request.UserAgent()).
+		Logger().Output(zerolog.ConsoleWriter{
+		Out:        os.Stderr,
+		NoColor:    viper.GetBool("log.nocolor"),
+		TimeFormat: time.RFC3339,
+	})
+	return logger
+
 }
