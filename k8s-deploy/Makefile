@@ -1,5 +1,5 @@
 NAME ?= federatedai/kubefate
-VERSION ?= v1.4.2
+VERSION ?= v1.4.3
 IMG ?= ${NAME}:${VERSION}
 
 ifeq (,$(shell go env GOBIN))
@@ -85,7 +85,7 @@ ifeq (, $(shell which swag))
 	SWAG_BIN_TMP_DIR=$$(mktemp -d) ;\
 	cd $$SWAG_BIN_TMP_DIR ;\
 	go mod init tmp ;\
-	go get -u github.com/swaggo/swag/cmd/swag ;\
+	go install -u github.com/swaggo/swag/cmd/swag ;\
 	rm -rf $$SWAG_BIN_TMP_DIR ;\
 	}
 SWAG_BIN=$(GOBIN)/swag

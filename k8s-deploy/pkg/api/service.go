@@ -26,6 +26,7 @@ import (
 	"github.com/gin-contrib/logger"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
+
 	"github.com/spf13/viper"
 )
 
@@ -126,12 +127,13 @@ func Run() error {
 	r.Use(gin.Recovery())
 
 	// reset caller info level to identify http server log from normal log
-	customizedLog := log.With().CallerWithSkipFrameCount(9).Logger()
+	// customizedLog := log.With().CallerWithSkipFrameCount(9).Logger()
 	// use customized logger
-	r.Use(logger.SetLogger(logger.Config{
-		Logger: &customizedLog,
-		UTC:    true,
-	}))
+	r.Use(
+		logger.SetLogger(
+			logger.WithUTC(true),
+		),
+	)
 
 	Router(r)
 
