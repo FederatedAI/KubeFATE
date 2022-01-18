@@ -22,6 +22,7 @@ import (
 
 	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/modules"
 	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/orm"
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/utils/logging"
 
 	"github.com/gin-contrib/logger"
 	"github.com/gin-gonic/gin"
@@ -132,6 +133,7 @@ func Run() error {
 	r.Use(
 		logger.SetLogger(
 			logger.WithUTC(true),
+			logger.WithLogger(logging.GetGinLogger),
 		),
 	)
 
