@@ -2,7 +2,7 @@
 image:
   registry: {{ .registry | default "federatedai" }}
   isThridParty: {{ empty .registry | ternary  "false" "true" }}
-  tag: {{ .imageTag | default "1.7.1-release" }}
+  tag: {{ .imageTag | default "1.7.1.1-release" }}
   pullPolicy: {{ .pullPolicy | default "IfNotPresent" }}
   {{- with .imagePullSecrets }}
   imagePullSecrets:
