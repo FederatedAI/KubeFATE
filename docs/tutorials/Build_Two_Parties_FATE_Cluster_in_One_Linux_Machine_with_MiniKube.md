@@ -15,7 +15,7 @@ After the tutorial, the deployment architecture looks like the following diagram
 5. Network connectivity to dockerhub or 163 Docker Image Registry, and google storage
 6. Setup the global KubeFATE version using in the tutorial and create a folder for the whole tutorial. We use KubeFATE v1.6.0 in this tutorial, other versions should be similar.
 ```
-export version=v1.6.0 && export kubefate_version=v1.4.1 && cd ~ && mkdir demo && cd demo
+export release_version=v1.6.0 && export kubefate_version=v1.4.1 && cd ~ && mkdir demo && cd demo
 ```
 
 **<font color="red">!!!Note: in this tutorial, the IP of the machine we used is 192.168.100.123. Please change it to your machine's IP in all the following commands and config files.</font></div>**
@@ -78,9 +78,9 @@ sudo minikube addons enable ingress
 Till now, Kubernetes have been ready. 
 
 ### Download KubeFATE Release Pack, KubeFATE Server Image v1.4.1 and Install KubeFATE Command Lines
-Go to [KubeFATE Release](https://github.com/FederatedAI/KubeFATE/releases), and find the latest kubefate-k8s release pack, which is `v1.6.0` as set to ENVs before. (replace ${version} with the newest version avaliable)
+Go to [KubeFATE Release](https://github.com/FederatedAI/KubeFATE/releases), and find the latest kubefate-k8s release pack, which is `v1.6.0` as set to ENVs before. (replace ${release_version} with the newest version avaliable)
 ```
-curl -LO https://github.com/FederatedAI/KubeFATE/releases/download/${version}/kubefate-k8s-${version}.tar.gz && tar -xzf ./kubefate-k8s-${version}.tar.gz
+curl -LO https://github.com/FederatedAI/KubeFATE/releases/download/${release_version}/kubefate-k8s-${release_version}.tar.gz && tar -xzf ./kubefate-k8s-${release_version}.tar.gz
 ```
 Then we will get the release pack of KubeFATE, verify it,
 ```
