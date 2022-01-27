@@ -178,9 +178,9 @@ spec:
     spec:
       containers:
         {{- if .Values.image.isThridParty }}
-        - image: {{ .Values.image.registry }}/mysql:8
+        - image: {{ .Values.image.registry }}/mysql:8.0.28
         {{- else }}
-        - image: mysql:8
+        - image: mysql:8.0.28
         {{- end }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           name: mysql

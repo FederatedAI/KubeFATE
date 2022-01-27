@@ -142,7 +142,7 @@ services:
       - fate-network
 
   mysql:
-    image: "mysql:8"
+    image: "mysql:8.0.28"
     expose:
       - 3306
     volumes:
