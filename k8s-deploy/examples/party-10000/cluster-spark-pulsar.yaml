@@ -57,8 +57,8 @@ servingPort: 30105
 
 nginx:
   type: NodePort
-  http_port: 30103
-  grpc_port: 30108 
+  httpNodePort: 30103
+  grpcNodePort: 30108 
   route_table: 
     9999: 
       fateflow: 
