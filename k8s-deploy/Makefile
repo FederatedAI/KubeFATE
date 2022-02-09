@@ -85,7 +85,7 @@ ifeq (, $(shell which swag))
 	SWAG_BIN_TMP_DIR=$$(mktemp -d) ;\
 	cd $$SWAG_BIN_TMP_DIR ;\
 	go mod init tmp ;\
-	go install -u github.com/swaggo/swag/cmd/swag ;\
+	go install github.com/swaggo/swag/cmd/swag@latest ;\
 	rm -rf $$SWAG_BIN_TMP_DIR ;\
 	}
 SWAG_BIN=$(GOBIN)/swag
