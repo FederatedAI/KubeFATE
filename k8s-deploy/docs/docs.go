@@ -1978,7 +1978,7 @@ const docTemplate_swagger = `{
 // SwaggerInfo_swagger holds exported Swagger Info so clients can modify it
 var SwaggerInfo_swagger = &swag.Spec{
 	Version:          "v1",
-	Host:             "kubefate.net",
+	Host:             "",
 	BasePath:         "/v1",
 	Schemes:          []string{},
 	Title:            "KubeFATE service API",

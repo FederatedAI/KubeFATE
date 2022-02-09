@@ -14,7 +14,6 @@
         },
         "version": "v1"
     },
-    "host": "kubefate.net",
     "basePath": "/v1",
     "paths": {
         "/chart": {
