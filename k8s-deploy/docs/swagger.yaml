@@ -248,7 +248,6 @@ definitions:
       uuid:
         type: string
     type: object
-host: kubefate.net
 info:
   contact:
     name: API Support

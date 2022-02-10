@@ -82,7 +82,6 @@ func initTables() error {
 // @contact.url https://github.com/FederatedAI/KubeFATE
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
-// @host kubefate.net
 // @BasePath /v1
 // @securityDefinitions.apikey ApiKeyAuth
 // @in header
