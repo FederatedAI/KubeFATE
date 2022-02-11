@@ -2,13 +2,14 @@
 name: Story
 about: Create a user story
 title: ''
-labels: 'story'
+labels: 'kind/story'
 assignees: ''
 
 ---
 
 **Summary**
 
+State the story summary
 
 **User Story**
 
