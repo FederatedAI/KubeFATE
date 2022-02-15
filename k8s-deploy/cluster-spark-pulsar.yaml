@@ -72,6 +72,7 @@ backend: spark_pulsar
   # type: NodePort
   # nodePort: 30102
   # nodeSelector: 
+  # logLevel: INFO
   # spark: 
     # cores_per_node: 20
     # nodes: 2

@@ -116,6 +116,7 @@ modules:
     affinity:
     backend: eggroll
     enabledNN: false
+    logLevel: INFO
     # subPath: ""
     existingClaim: ""
     claimName: python-data

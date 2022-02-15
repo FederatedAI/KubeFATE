@@ -206,6 +206,7 @@ modules:
     resources:
 {{ toYaml . | indent 6 }}
     {{- end }}
+    logLevel: {{ .logLevel }}
     type: {{ .type | default "ClusterIP" }}
     httpNodePort: {{ .httpNodePort }}
     grpcNodePort: {{ .grpcNodePort }}
