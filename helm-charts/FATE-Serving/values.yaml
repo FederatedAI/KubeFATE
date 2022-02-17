@@ -23,21 +23,21 @@ ingress:
   servingProxy: 
     # annotations: 
     hosts:
-    - name: serving-proxy.kubefate.net
+    - name: serving-proxy.example.com
       path: /
   # tls:
       # - secretName: my-tls-secret
         # hosts:
-          # - serving-proxy.kubefate.net
+          # - serving-proxy.example.com
   servingAdmin: 
     # annotations: 
     hosts:
-    - name: serving-admin.kubefate.net
+    - name: serving-admin.example.com
       path: /
   # tls:
      # - secretName: my-tls-secret
        # hosts:
-         # - serving-admin.kubefate.net
+         # - serving-admin.example.com
 
 servingProxy: 
   include: true

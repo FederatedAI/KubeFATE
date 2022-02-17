@@ -192,7 +192,7 @@ metadata:
     kubernetes.io/ingress.class: "nginx"
 spec:
   rules:
-    - host: kubefate.net
+    - host: example.com
       http:
         paths:
           - path: /

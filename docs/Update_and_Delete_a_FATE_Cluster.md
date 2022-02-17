@@ -26,8 +26,8 @@ Spec            name: fate-9999
                 ......
                 
 Info            dashboard:
-                - 9999.notebook.kubefate.net
-                - 9999.fateboard.kubefate.net
+                - 9999.notebook.example.com
+                - 9999.fateboard.example.com
                 ip: 192.168.0.1
                 pod:
                 - clustermanager-78f98b85bf-ph2hv

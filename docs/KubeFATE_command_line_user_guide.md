@@ -63,7 +63,7 @@ user:
   username: admin
   password: admin
 
-serviceurl: kubefate.net
+serviceurl: example.com
 ```
 
 #### Check
