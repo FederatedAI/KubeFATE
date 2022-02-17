@@ -369,8 +369,8 @@ Spec            backend: eggroll
                   type: NodePort
 
 Info            dashboard:
-                - 9999.notebook.example.com
-                - 9999.fateboard.example.com
+                - party9999.notebook.example.com
+                - party9999.fateboard.example.com
                 ip: 10.184.103.163
                 pod:
                 - clustermanager-5fcbd4ccc6-fj6tq
@@ -402,10 +402,10 @@ With similar command, we find Notebook for `fate-10000` is `10000.notebook.examp
 If no DNS service configured, we have to add these two url to our hosts file. In a Linux or macOS machine, 
 
 ```
-sudo -- sh -c "echo \"192.168.100.123 9999.notebook.example.com\"  >> /etc/hosts"
-sudo -- sh -c "echo \"192.168.100.123 9999.fateboard.example.com\"  >> /etc/hosts"
-sudo -- sh -c "echo \"192.168.100.123 10000.notebook.example.com\"  >> /etc/hosts"
-sudo -- sh -c "echo \"192.168.100.123 10000.fateboard.example.com\"  >> /etc/hosts"
+sudo -- sh -c "echo \"192.168.100.123 party9999.notebook.example.com\"  >> /etc/hosts"
+sudo -- sh -c "echo \"192.168.100.123 party9999.fateboard.example.com\"  >> /etc/hosts"
+sudo -- sh -c "echo \"192.168.100.123 party10000.notebook.example.com\"  >> /etc/hosts"
+sudo -- sh -c "echo \"192.168.100.123 party10000.fateboard.example.com\"  >> /etc/hosts"
 ```
 
 In a Windows machine, you have to add them to `C:\WINDOWS\system32\drivers\etc\hosts`, please refer to [add host for Windows](https://github.com/ChrisChenSQ/KubeFATE/blob/master/docs/tutorials/Windows_add_host_tutorial.md).

@@ -357,8 +357,8 @@ Spec            backend: eggroll
                   type: NodePort
 
 Info            dashboard:
-                - 9999.notebook.example.com
-                - 9999.fateboard.example.com
+                - party9999.notebook.example.com
+                - party9999.fateboard.example.com
                 ip: 192.168.100.123
                 pod:
                 - clustermanager-5fcbd4ccc6-fj6tq
@@ -390,10 +390,10 @@ Info            dashboard:
 
 在Linux或者MacOS机器可以通过以下命令配置，
 ```
-sudo -- sh -c "echo \"192.168.100.123 9999.notebook.example.com\"  >> /etc/hosts"
-sudo -- sh -c "echo \"192.168.100.123 9999.fateboard.example.com\"  >> /etc/hosts"
-sudo -- sh -c "echo \"192.168.100.123 10000.notebook.example.com\"  >> /etc/hosts"
-sudo -- sh -c "echo \"192.168.100.123 10000.fateboard.example.com\"  >> /etc/hosts"
+sudo -- sh -c "echo \"192.168.100.123 party9999.notebook.example.com\"  >> /etc/hosts"
+sudo -- sh -c "echo \"192.168.100.123 party9999.fateboard.example.com\"  >> /etc/hosts"
+sudo -- sh -c "echo \"192.168.100.123 party10000.notebook.example.com\"  >> /etc/hosts"
+sudo -- sh -c "echo \"192.168.100.123 party10000.fateboard.example.com\"  >> /etc/hosts"
 ```
 
 如果是Windows机器，我们需要把相关域名解析配置到`C:\WINDOWS\system32\drivers\etc\hosts`，请查阅[修改Windows电脑host文件](https://github.com/ChrisChenSQ/KubeFATE/blob/master/docs/tutorials/Windows_add_host_tutorial.md)。
