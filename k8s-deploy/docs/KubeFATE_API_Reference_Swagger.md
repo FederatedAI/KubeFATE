@@ -10,7 +10,7 @@ Copy the swagger.yaml file to https://editor.swagger.io/ to view.
 
 Deploy KubeFATE
 
-Open the URL http://kubefate.net/v1/swagger/index.html
+Open the URL http://example.com/v1/swagger/index.html
 
 
 

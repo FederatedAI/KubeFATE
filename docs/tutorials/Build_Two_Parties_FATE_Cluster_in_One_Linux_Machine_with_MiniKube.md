@@ -391,10 +391,10 @@ Info            dashboard:
                     rollsite: Running
 ```
 In `Info->dashboard` field, we can find there are two dashboards in current deployment: 
-* Notebook in `9999.notebook.example.com`, which is Jupyter Notebook integrated, where data scientists can write python or access shell in. We have pre-install FATE-clients to the Notebook.
-* FATEBoard in `9999.fateboard.example.com`, which we can inspect the status, job flows in FATE.
+* Notebook in `party9999.notebook.example.com`, which is Jupyter Notebook integrated, where data scientists can write python or access shell in. We have pre-install FATE-clients to the Notebook.
+* FATEBoard in `party9999.fateboard.example.com`, which we can inspect the status, job flows in FATE.
 
-With similar command, we find Notebook for `fate-10000` is `10000.notebook.example.com`, and FATEBoard for `fate-10000` is `10000.fateboard.example.com`.
+With similar command, we find Notebook for `fate-10000` is `party10000.notebook.example.com`, and FATEBoard for `fate-10000` is `party10000.fateboard.example.com`.
 
 ### Config dashboard's URLs in hosts
 #### Note: if we have the domain name setup, this step can be skipped.

@@ -379,10 +379,10 @@ Info            dashboard:
                     rollsite: Running
 ```
 从返回的内容中，我们看到`Info->dashboard`里包含了:
-* Jupyter Notebook的访问地址： `9999.notebook.example.com`。这个是我们准备让数据科学家进行建模分析的平台。已经集成了FATE-Clients； 
-* FATEBoard的访问地址： `9999.fateboard.example.com`。我们可以通过FATEBoard来查询当前训练的状态。
+* Jupyter Notebook的访问地址： `party9999.notebook.example.com`。这个是我们准备让数据科学家进行建模分析的平台。已经集成了FATE-Clients； 
+* FATEBoard的访问地址： `party9999.fateboard.example.com`。我们可以通过FATEBoard来查询当前训练的状态。
 
-类似的命令我们得到，`fate-10000`的Jupyter Notebook和FATEBoard地址分别是：`10000.notebook.example.com` 以及`10000.fateboard.example.com`。
+类似的命令我们得到，`fate-10000`的Jupyter Notebook和FATEBoard地址分别是：`party10000.notebook.example.com` 以及`party10000.fateboard.example.com`。
 
 ### 在浏览器访问FATE集群的机器上配置相关的Host信息
 **注意: 如果DNS已经配置了相关的解析，这步可以跳过**
