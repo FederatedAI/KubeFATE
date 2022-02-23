@@ -71,13 +71,13 @@ set_host() {
     ingressNodeIp=$(kubectl -n ingress-nginx get pod/$ingressPodName -o jsonpath='{.status.hostIP}')
     # set host
     loginfo "set hosts"
-    echo $ingressNodeIp kubefate.net >>/etc/hosts
-    loginfo "$ingressNodeIp kubefate.net"
+    echo $ingressNodeIp example.com >>/etc/hosts
+    loginfo "$ingressNodeIp example.com"
     # set SERVICEURL
     loginfo "check kubefate version"
     # get ingress 80 nodeport
     ingressNodePort=$(kubectl -n ingress-nginx get svc/ingress-nginx-controller -o jsonpath='{.spec.ports[0].nodePort}')
-    export FATECLOUD_SERVICEURL=kubefate.net:$ingressNodePort
+    export FATECLOUD_SERVICEURL=example.com:$ingressNodePort
     echo $FATECLOUD_SERVICEURL
 }
 

@@ -61,7 +61,7 @@ Ports is defined in KubeFATE deployment. KubeFATE service uses ingress and clust
 ### Ingress
 ```
 rules:
-  - host: kubefate.net
+  - host: example.com
     http:
       paths:
         - path: /

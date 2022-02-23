@@ -67,7 +67,7 @@ stringData:
 具体参考：[Overview of Cloud Native Security](https://kubernetes.io/docs/concepts/security/)。
 
 #### 准备域名及部署KubeFATE服务
-因为KubeFATE服务向外暴露RESTful APIs，所以系统管理员需要为此准备域名的DNS解析。在我们的配置样例里，使用```kubefate.net```作为域名。同时，系统管理员需要为每个FATE集群创建一个namespace，譬如party_id为9999的FATE集群，创建一个fate-9999的namespace，然后进行配额控制。准备好后，把这些信息反馈给机器学习的系统运维。
+因为KubeFATE服务向外暴露RESTful APIs，所以系统管理员需要为此准备域名的DNS解析。在我们的配置样例里，使用```example.com```作为域名。同时，系统管理员需要为每个FATE集群创建一个namespace，譬如party_id为9999的FATE集群，创建一个fate-9999的namespace，然后进行配额控制。准备好后，把这些信息反馈给机器学习的系统运维。
 
 ```
 kubectl apply -f ./kubefate.yaml
@@ -86,7 +86,7 @@ user:
   username: admin
   password: admin
 
-serviceurl: kubefate.net
+serviceurl: example.com
 ```
 
 |名字       |种类    |描述                                                       |
@@ -158,8 +158,8 @@ Spec            name: fate-9999
                 ......
                 
 Info            dashboard:
-                - 9999.notebook.kubefate.net
-                - 9999.fateboard.kubefate.net
+                - party9999.notebook.example.com
+                - party9999.fateboard.example.com
                 ip: 192.168.0.1
                 pod:
                 - clustermanager-78f98b85bf-ph2hv
@@ -178,11 +178,11 @@ Info            dashboard:
 
 #### 访问 FATEBoard 和 Notebook UI
 
-假如安装了fateboard 和client 的组件就可以通过上一步得到的信息`9999.fateboard.kubefate.net` 和`9999.notebook.kubefate.net`来访问 FATEBoard 和 Notebook UI，配置下这两个域名的解析就可以在浏览器打开。
+假如安装了fateboard 和client 的组件就可以通过上一步得到的信息`party9999.fateboard.example.com` 和`party9999.notebook.example.com`来访问 FATEBoard 和 Notebook UI，配置下这两个域名的解析就可以在浏览器打开。
 
 ##### FATEBoard
 
- http://9999.fateboard.kubefate.net
+ http://party9999.fateboard.example.com
 
 访问FATEBoard UI需要登录用户名和密码，这个可以在`cluster.yaml`里[配置](../docs/configurations/FATE_cluster_configuration.md#fateboard mappings)。
 
@@ -190,7 +190,7 @@ Info            dashboard:
 
 ##### Notebook
 
- http://9999.fateboard.kubefate.net
+ http://party9999.fateboard.example.com
 
 ![notebook](../docs/tutorials/images/tkg_notebook.png)
 

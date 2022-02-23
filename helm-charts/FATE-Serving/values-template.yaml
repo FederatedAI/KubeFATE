@@ -70,7 +70,7 @@ servingProxy:
   type: {{ .type }}
   nodePort: {{ .nodePort }}
   loadBalancerIP: {{ .loadBalancerIP }}
-  ingerssHost: {{ .ingressHost | default (printf "%s.serving-admin.kubefate.net" $partyId) }}
+  ingerssHost: {{ .ingressHost | default (printf "%s.serving-admin.example.com" $partyId) }}
 
   {{- with .partyList }}
   partyList:
@@ -195,7 +195,7 @@ servingAdmin:
   include: {{ has "servingAdmin" .modules }}
   {{- with .servingAdmin }}
   
-  ingressHost: {{ .ingressHost | default (printf "%s.serving-admin.kubefate.net" $partyId) }}
+  ingressHost: {{ .ingressHost | default (printf "%s.serving-admin.example.com" $partyId) }}
   username: {{ .username }}
   password: {{ .password }}
   
