@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `store_locator` (
   `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
 
-CREATE UNIQUE INDEX `idx_u_store_locator_ns_n` ON `store_locator` (`namespace`(120), `name`(640));
+CREATE UNIQUE INDEX `idx_u_store_loinsert-node.sqlcator_ns_n` ON `store_locator` (`namespace`(120), `name`(640));
 CREATE INDEX `idx_store_locator_st` ON `store_locator` (`store_type`(255));
 CREATE INDEX `idx_store_locator_ns` ON `store_locator` (`namespace`(767));
 CREATE INDEX `idx_store_locator_n` ON `store_locator` (`name`(767));

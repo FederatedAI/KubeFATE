@@ -45,6 +45,9 @@ data:
     use_registry: {{ .Values.modules.serving.useRegistry | default false }}
     use_deserialize_safe_module: false
     dependent_distribution: false
+    encrypt_password: false
+    encrypt_module: fate_arch.common.encrypt_utils#pwdecrypt
+    private_key:
     fateflow:
       # you must set real ip address, 127.0.0.1 and 0.0.0.0 is not supported
       host: {{ if .Values.istio.enabled }}127.0.0.1{{ else }}fateflow{{ end }}
