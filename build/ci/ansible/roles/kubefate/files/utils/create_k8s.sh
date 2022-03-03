@@ -111,12 +111,12 @@ main() {
     kubectl apply -f ${INGRESS_FILE}
 
     ip=$(kubectl get nodes -o wide | sed -n "2p" | awk -F ' ' '{printf $6}')
-    kubefate_domain=$(cat /etc/hosts | grep "kubefate.net")
+    kubefate_domain=$(cat /etc/hosts | grep "example.com")
     if [[ "$kubefate_domain" == "" ]]; then
-        echo "${ip}    kubefate.net" >>/etc/hosts
+        echo "${ip}    example.com" >>/etc/hosts
     else
-        sed -i "/kubefate.net/d" /etc/hosts
-        echo "${ip}    kubefate.net" >>/etc/hosts
+        sed -i "/example.com/d" /etc/hosts
+        echo "${ip}    example.com" >>/etc/hosts
     fi
 
     ingress_nginx_controller_admission=$(cat /etc/hosts | grep "ingress-nginx-controller-admission")

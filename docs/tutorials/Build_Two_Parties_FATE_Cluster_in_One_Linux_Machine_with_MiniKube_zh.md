@@ -95,7 +95,7 @@ chmod +x ./kubefate && sudo mv ./kubefate /usr/bin
 然后我们测试下kubefate命令是否可用，
 ```
 kubefate@machine:~/demo$ kubefate version
-* kubefate service connection error, Post http://kubefate.net/v1/user/login: dial tcp: lookup kubefate.net: no such host
+* kubefate service connection error, Post http://example.com/v1/user/login: dial tcp: lookup example.com: no such host
 * kubefate commandLine version=v1.4.1
 ```
 我们发现获取KubeFATE服务版本报了个错，这是因为我们还没部署KubeFATE的服务；而命令行的版本已经正常显示出来了。
@@ -156,30 +156,30 @@ replicaset.apps/kubefate-5d97d65947   1         1         1       51s
 replicaset.apps/mariadb-69484f8465    1         1         1       51s
 
 NAME                          HOSTS          ADDRESS          PORTS   AGE
-ingress.extensions/kubefate   kubefate.net   192.168.100.123   80      50s
+ingress.extensions/kubefate   example.com   192.168.100.123   80      50s
 ```
 
-### 添加kubefate.net到hosts文件
-因为我们要用 kubefate.net 域名来访问KubeFATE服务（该域名在ingress中定义，有需要可自行修改），需要在运行kubefate命令行所在的机器配置hosts文件（注意不一定是Kubernetes所在的机器）。另外下文中部署的FATE集群默认也是使用`kubefate.net`作为默认域名，在部署的时候可以参考：[FATE cluster configuration](https://github.com/FederatedAI/KubeFATE/blob/master/docs/configurations/FATE_cluster_configuration.md#host-mappings)部分进行修改。如果网络环境有域名解析服务，可配置kubefate.net域名指向MiniKube机器的IP地址，这样就不用配置hosts文件。注意：下面地址192.168.100.123 要替换为你的MiniKube机器地址。
+### 添加example.com到hosts文件
+因为我们要用 example.com 域名来访问KubeFATE服务（该域名在ingress中定义，有需要可自行修改），需要在运行kubefate命令行所在的机器配置hosts文件（注意不一定是Kubernetes所在的机器）。另外下文中部署的FATE集群默认也是使用`example.com`作为默认域名，在部署的时候可以参考：[FATE cluster configuration](https://github.com/FederatedAI/KubeFATE/blob/master/docs/configurations/FATE_cluster_configuration.md#host-mappings)部分进行修改。如果网络环境有域名解析服务，可配置example.com域名指向MiniKube机器的IP地址，这样就不用配置hosts文件。注意：下面地址192.168.100.123 要替换为你的MiniKube机器地址。
 
 ```
-sudo -- sh -c "echo \"192.168.100.123 kubefate.net\"  >> /etc/hosts"
+sudo -- sh -c "echo \"192.168.100.123 example.com\"  >> /etc/hosts"
 ```
 
 添加完毕后，可以验证是否生效：
 ```
-kubefate@machine:~/demo$ ping -c 2 kubefate.net
-PING kubefate.net (192.168.100.123) 56(84) bytes of data.
-64 bytes from kubefate.net (192.168.100.123): icmp_seq=1 ttl=64 time=0.080 ms
-64 bytes from kubefate.net (192.168.100.123): icmp_seq=2 ttl=64 time=0.054 ms
+kubefate@machine:~/demo$ ping -c 2 example.com
+PING example.com (192.168.100.123) 56(84) bytes of data.
+64 bytes from example.com (192.168.100.123): icmp_seq=1 ttl=64 time=0.080 ms
+64 bytes from example.com (192.168.100.123): icmp_seq=2 ttl=64 time=0.054 ms
 
---- kubefate.net ping statistics ---
+--- example.com ping statistics ---
 2 packets transmitted, 2 received, 0% packet loss, time 1006ms
 rtt min/avg/max/mdev = 0.054/0.067/0.080/0.013 ms
 ```
 
 ### 验证KubeFATE服务
-当 `kubefate.net` 顺利设置, KubeFATE服务的版本号应该就可以正常显示,
+当 `example.com` 顺利设置, KubeFATE服务的版本号应该就可以正常显示,
 ```
 kubefate@machine:~/demo$ kubefate version
 * kubefate service version=v1.4.1
@@ -357,8 +357,8 @@ Spec            backend: eggroll
                   type: NodePort
 
 Info            dashboard:
-                - 9999.notebook.kubefate.net
-                - 9999.fateboard.kubefate.net
+                - party9999.notebook.example.com
+                - party9999.fateboard.example.com
                 ip: 192.168.100.123
                 pod:
                 - clustermanager-5fcbd4ccc6-fj6tq
@@ -379,10 +379,10 @@ Info            dashboard:
                     rollsite: Running
 ```
 从返回的内容中，我们看到`Info->dashboard`里包含了:
-* Jupyter Notebook的访问地址： `9999.notebook.kubefate.net`。这个是我们准备让数据科学家进行建模分析的平台。已经集成了FATE-Clients； 
-* FATEBoard的访问地址： `9999.fateboard.kubefate.net`。我们可以通过FATEBoard来查询当前训练的状态。
+* Jupyter Notebook的访问地址： `party9999.notebook.example.com`。这个是我们准备让数据科学家进行建模分析的平台。已经集成了FATE-Clients； 
+* FATEBoard的访问地址： `party9999.fateboard.example.com`。我们可以通过FATEBoard来查询当前训练的状态。
 
-类似的命令我们得到，`fate-10000`的Jupyter Notebook和FATEBoard地址分别是：`10000.notebook.kubefate.net` 以及`10000.fateboard.kubefate.net`。
+类似的命令我们得到，`fate-10000`的Jupyter Notebook和FATEBoard地址分别是：`party10000.notebook.example.com` 以及`party10000.fateboard.example.com`。
 
 ### 在浏览器访问FATE集群的机器上配置相关的Host信息
 **注意: 如果DNS已经配置了相关的解析，这步可以跳过**
@@ -390,10 +390,10 @@ Info            dashboard:
 
 在Linux或者MacOS机器可以通过以下命令配置，
 ```
-sudo -- sh -c "echo \"192.168.100.123 9999.notebook.kubefate.net\"  >> /etc/hosts"
-sudo -- sh -c "echo \"192.168.100.123 9999.fateboard.kubefate.net\"  >> /etc/hosts"
-sudo -- sh -c "echo \"192.168.100.123 10000.notebook.kubefate.net\"  >> /etc/hosts"
-sudo -- sh -c "echo \"192.168.100.123 10000.fateboard.kubefate.net\"  >> /etc/hosts"
+sudo -- sh -c "echo \"192.168.100.123 party9999.notebook.example.com\"  >> /etc/hosts"
+sudo -- sh -c "echo \"192.168.100.123 party9999.fateboard.example.com\"  >> /etc/hosts"
+sudo -- sh -c "echo \"192.168.100.123 party10000.notebook.example.com\"  >> /etc/hosts"
+sudo -- sh -c "echo \"192.168.100.123 party10000.fateboard.example.com\"  >> /etc/hosts"
 ```
 
 如果是Windows机器，我们需要把相关域名解析配置到`C:\WINDOWS\system32\drivers\etc\hosts`，请查阅[修改Windows电脑host文件](https://github.com/ChrisChenSQ/KubeFATE/blob/master/docs/tutorials/Windows_add_host_tutorial.md)。

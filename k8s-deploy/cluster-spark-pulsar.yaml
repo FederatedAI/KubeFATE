@@ -1,10 +1,10 @@
 name: fate-9999
 namespace: fate-9999
 chartName: fate
-chartVersion: v1.7.1-a
+chartVersion: v1.7.2
 partyId: 9999
 registry: ""
-imageTag: "1.7.1.1-release"
+imageTag: "1.7.2-release"
 pullPolicy: 
 imagePullSecrets: 
 - name: myregistrykey
@@ -72,6 +72,7 @@ backend: spark_pulsar
   # type: NodePort
   # nodePort: 30102
   # nodeSelector: 
+  # logLevel: INFO
   # spark: 
     # cores_per_node: 20
     # nodes: 2

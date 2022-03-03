@@ -67,7 +67,7 @@ stringData:
 ```
 
 #### Preparing domain name and deploying KubeFATE in Kubernetes
-Because KubeFATE service exposes RESTful APIs for external access, system admin needs to prepare a domain name for KubeFATE service. In our sample, the domain name is `kubefate.net` . Moreover, system admin should create a namespace (e.g. fate-9999) for FATE deployment.
+Because KubeFATE service exposes RESTful APIs for external access, system admin needs to prepare a domain name for KubeFATE service. In our sample, the domain name is `example.com` . Moreover, system admin should create a namespace (e.g. fate-9999) for FATE deployment.
 ```
 $ kubectl apply -f ./kubefate.yaml
 $ kubectl create namespace fate-9999
@@ -84,7 +84,7 @@ user:
   username: admin
   password: admin
 
-serviceurl: kubefate.net
+serviceurl: example.com
 ```
 
 |Name       |Type    |Description                                                       |
@@ -154,8 +154,8 @@ Spec            name: fate-9999
                 ......
                 
 Info            dashboard:
-                - 9999.notebook.kubefate.net
-                - 9999.fateboard.kubefate.net
+                - party9999.notebook.example.com
+                - party9999.fateboard.example.com
                 ip: 192.168.0.1
                 pod:
                 - clustermanager-78f98b85bf-ph2hv
@@ -174,11 +174,11 @@ Info            dashboard:
 
 #### Access the UI of FATEBoard and Notebook
 
-If the components of fateboard and client are installed, you can use the information `9999.fateboard.kubefate.net` and `9999.notebook.kubefate.net` obtained in the previous step to access FATEBoard and Notebook UI, and configure the resolution of these two domain names It can be opened in the browser.
+If the components of fateboard and client are installed, you can use the information `party9999.fateboard.example.com` and `party9999.notebook.example.com` obtained in the previous step to access FATEBoard and Notebook UI, and configure the resolution of these two domain names It can be opened in the browser.
 
 ##### FATEBoard
 
- http://9999.fateboard.kubefate.net
+ http://party9999.fateboard.example.com
 
 Access to FATEBoard UI requires a login user name and password, which can be found in `cluster.yaml` [Configuration](../docs/configurations/FATE_cluster_configuration.md#fateboard mappings).
 
@@ -186,7 +186,7 @@ Access to FATEBoard UI requires a login user name and password, which can be fou
 
 ##### Notebook
 
- http://9999.fateboard.kubefate.net
+ http://party9999.fateboard.example.com
 
 ![notebook](../docs/tutorials/images/tkg_notebook.png)
 

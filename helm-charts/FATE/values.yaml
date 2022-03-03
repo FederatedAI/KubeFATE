@@ -2,7 +2,7 @@
 image:
   registry: federatedai
   isThridParty:
-  tag: 1.7.1.1-release
+  tag: 1.7.2-release
   pullPolicy: IfNotPresent
   imagePullSecrets: 
 #  - name: 
@@ -116,6 +116,7 @@ modules:
     affinity:
     backend: eggroll
     enabledNN: false
+    logLevel: INFO
     # subPath: ""
     existingClaim: ""
     claimName: python-data

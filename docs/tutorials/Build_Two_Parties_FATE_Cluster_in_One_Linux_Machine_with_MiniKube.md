@@ -94,7 +94,7 @@ chmod +x ./kubefate && sudo mv ./kubefate /usr/bin
 Try to verify if kubefate works,
 ```
 kubefate@machine:~/demo$ kubefate version
-* kubefate service connection error, Post http://kubefate.net/v1/user/login: dial tcp: lookup kubefate.net: no such host
+* kubefate service connection error, Post http://example.com/v1/user/login: dial tcp: lookup example.com: no such host
 * kubefate commandLine version=v1.4.1
 ```
 It is fine only the command line version shows and get an error on KubeFATE service's version because we have not deployed KubeFATE service yet.
@@ -163,34 +163,34 @@ replicaset.apps/kubefate-5d97d65947   1         1         1       51s
 replicaset.apps/mariadb-69484f8465    1         1         1       51s
 
 NAME                          HOSTS          ADDRESS          PORTS   AGE
-ingress.extensions/kubefate   kubefate.net   192.168.100.123   80      50s
+ingress.extensions/kubefate   example.com   192.168.100.123   80      50s
 ```
 
 It means KubeFATE service has been deployed. 
 
-### (Optional) Add kubefate.net to host file
+### (Optional) Add example.com to host file
 Note: if we have the domain name setup, this step can be skipped.
 
-Map the machine IP `192.168.100.123` （which is also the 'ADDRESS' field of 'ingress.extensions/kubefate'） above to `kubefate.net`
+Map the machine IP `192.168.100.123` （which is also the 'ADDRESS' field of 'ingress.extensions/kubefate'） above to `example.com`
 
 ```
-sudo -- sh -c "echo \"192.168.100.123 kubefate.net\"  >> /etc/hosts"
+sudo -- sh -c "echo \"192.168.100.123 example.com\"  >> /etc/hosts"
 ```
 
 Verify if it works,
 ```
-kubefate@machine:~/demo$ ping -c 2 kubefate.net
-PING kubefate.net (192.168.100.123) 56(84) bytes of data.
-64 bytes from kubefate.net (192.168.100.123): icmp_seq=1 ttl=64 time=0.080 ms
-64 bytes from kubefate.net (192.168.100.123): icmp_seq=2 ttl=64 time=0.054 ms
+kubefate@machine:~/demo$ ping -c 2 example.com
+PING example.com (192.168.100.123) 56(84) bytes of data.
+64 bytes from example.com (192.168.100.123): icmp_seq=1 ttl=64 time=0.080 ms
+64 bytes from example.com (192.168.100.123): icmp_seq=2 ttl=64 time=0.054 ms
 
---- kubefate.net ping statistics ---
+--- example.com ping statistics ---
 2 packets transmitted, 2 received, 0% packet loss, time 1006ms
 rtt min/avg/max/mdev = 0.054/0.067/0.080/0.013 ms
 ```
 
 ### Verify KubeFATE service
-When `kubefate.net` well set, KubeFATE service version can be shown,
+When `example.com` well set, KubeFATE service version can be shown,
 ```
 kubefate@machine:~/demo$ kubefate version
 * kubefate service version=v1.4.1
@@ -369,8 +369,8 @@ Spec            backend: eggroll
                   type: NodePort
 
 Info            dashboard:
-                - 9999.notebook.kubefate.net
-                - 9999.fateboard.kubefate.net
+                - party9999.notebook.example.com
+                - party9999.fateboard.example.com
                 ip: 10.184.103.163
                 pod:
                 - clustermanager-5fcbd4ccc6-fj6tq
@@ -391,10 +391,10 @@ Info            dashboard:
                     rollsite: Running
 ```
 In `Info->dashboard` field, we can find there are two dashboards in current deployment: 
-* Notebook in `9999.notebook.kubefate.net`, which is Jupyter Notebook integrated, where data scientists can write python or access shell in. We have pre-install FATE-clients to the Notebook.
-* FATEBoard in `9999.fateboard.kubefate.net`, which we can inspect the status, job flows in FATE.
+* Notebook in `party9999.notebook.example.com`, which is Jupyter Notebook integrated, where data scientists can write python or access shell in. We have pre-install FATE-clients to the Notebook.
+* FATEBoard in `party9999.fateboard.example.com`, which we can inspect the status, job flows in FATE.
 
-With similar command, we find Notebook for `fate-10000` is `10000.notebook.kubefate.net`, and FATEBoard for `fate-10000` is `10000.fateboard.kubefate.net`.
+With similar command, we find Notebook for `fate-10000` is `party10000.notebook.example.com`, and FATEBoard for `fate-10000` is `party10000.fateboard.example.com`.
 
 ### Config dashboard's URLs in hosts
 #### Note: if we have the domain name setup, this step can be skipped.
@@ -402,10 +402,10 @@ With similar command, we find Notebook for `fate-10000` is `10000.notebook.kubef
 If no DNS service configured, we have to add these two url to our hosts file. In a Linux or macOS machine, 
 
 ```
-sudo -- sh -c "echo \"192.168.100.123 9999.notebook.kubefate.net\"  >> /etc/hosts"
-sudo -- sh -c "echo \"192.168.100.123 9999.fateboard.kubefate.net\"  >> /etc/hosts"
-sudo -- sh -c "echo \"192.168.100.123 10000.notebook.kubefate.net\"  >> /etc/hosts"
-sudo -- sh -c "echo \"192.168.100.123 10000.fateboard.kubefate.net\"  >> /etc/hosts"
+sudo -- sh -c "echo \"192.168.100.123 party9999.notebook.example.com\"  >> /etc/hosts"
+sudo -- sh -c "echo \"192.168.100.123 party9999.fateboard.example.com\"  >> /etc/hosts"
+sudo -- sh -c "echo \"192.168.100.123 party10000.notebook.example.com\"  >> /etc/hosts"
+sudo -- sh -c "echo \"192.168.100.123 party10000.fateboard.example.com\"  >> /etc/hosts"
 ```
 
 In a Windows machine, you have to add them to `C:\WINDOWS\system32\drivers\etc\hosts`, please refer to [add host for Windows](https://github.com/ChrisChenSQ/KubeFATE/blob/master/docs/tutorials/Windows_add_host_tutorial.md).
