@@ -1,4 +1,4 @@
-# Copyright 2019-2020 VMware, Inc.
+# Copyright 2019-2022 VMware, Inc.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -132,9 +132,11 @@ spec:
                 
                 sleep 5 && python fateflow/python/fate_flow/fate_flow_server.py
           volumeMounts:
+            {{- if eq .Values.modules.python.backend "eggroll" }}
             - mountPath: /data/projects/fate/eggroll/conf/eggroll.properties
               name: eggroll-confs
               subPath: eggroll.properties
+            {{- end }}
             - name: python-data
               mountPath: /data/projects/fate/fateflow/logs
               subPath: logs
@@ -143,10 +145,14 @@ spec:
             - mountPath: /data/projects/spark-2.4.1-bin-hadoop2.7/conf/spark-defaults-template.conf
               name: python-confs
               subPath: spark-defaults.conf
+            {{- if eq .Values.modules.python.backend "spark_rabbitmq" }}
             - mountPath: /data/projects/fate/conf/rabbitmq_route_table
               name: rabbitmq-route-table
+            {{- end }}
+            {{- if eq .Values.modules.python.backend "spark_pulsar" "spark_local_pulsar" }}
             - mountPath: /data/projects/fate/conf/pulsar_route_table
               name: pulsar-route-table
+            {{- end }}
             # TODO add mountPath of job and model-cache 
             - mountPath: /data/projects/fate/jobs
               name: python-data
@@ -191,21 +197,29 @@ spec:
     {{- end }}
       restartPolicy: Always
       volumes:
+        {{- if eq .Values.modules.python.backend "eggroll" }}
         - name: eggroll-confs
           configMap:
             name: eggroll-config
+        {{- end }}
         - name: python-confs
           configMap:
             name: python-config
+        {{- if eq .Values.modules.python.backend "spark_rabbitmq" }}
         - name: rabbitmq-route-table
           configMap:
             name: rabbitmq-route-table
+        {{- end }}
+        {{- if eq .Values.modules.python.backend "spark_pulsar" "spark_local_pulsar" }}
         - name: pulsar-route-table
           configMap:
             name: pulsar-route-table
+        {{- end }}
+        {{- if .Values.modules.fateboard.include }}
         - name: fateboard-confs
           configMap:
             name: fateboard-config
+        {{- end }}
         {{- if not .Values.persistence.enabled }}
         - name: python-data
           emptyDir: {}
