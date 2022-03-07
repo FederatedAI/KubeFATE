@@ -1,0 +1,45 @@
+# Copyright 2019-2022 VMware, Inc.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+{{ if .Values.modules.nginx.include }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx
+  labels:
+    fateMoudle: nginx
+{{ include "fate.labels" . | indent 4 }}
+spec:
+  ports:
+    - name: "http"
+      port: 9300
+      targetPort: 9300
+      {{- if eq .Values.modules.nginx.type "NodePort" "LoadBalancer" }}
+      nodePort: {{ .Values.modules.nginx.httpNodePort }}
+      {{- end }}
+      protocol: TCP
+    - name: "grpc"
+      port: 9310
+      targetPort: 9310
+      {{- if eq .Values.modules.nginx.type "NodePort" "LoadBalancer" }}
+      nodePort: {{ .Values.modules.nginx.grpcNodePort }}
+      {{- end }}
+      protocol: TCP
+  type: {{ .Values.modules.nginx.type }}
+  
+  {{- if .Values.modules.nginx.loadBalancerIP }}
+  loadBalancerIP: "{{ .Values.modules.nginx.loadBalancerIP }}"
+  {{- end }}
+  
+  selector:
+    fateMoudle: nginx
+{{ include "fate.matchLabels" . | indent 4 }}
+{{ end }}

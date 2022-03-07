@@ -1,0 +1,50 @@
+# Copyright 2019-2022 VMware, Inc.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+{{- if .Values.modules.fateboard.include }}
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: fateboard-config
+  labels:
+    fateMoudle: fateboard
+{{ include "fate.labels" . | indent 4 }}
+data:
+  application.properties: |
+    server.port=8080
+    fateflow.url=http://{{ if .Values.istio.enabled }}127.0.0.1{{ else }}fateflow{{ end }}:9380
+    spring.datasource.driver-Class-Name=com.mysql.cj.jdbc.Driver
+    spring.http.encoding.charset=UTF-8
+    spring.http.encoding.enabled=true
+    server.tomcat.uri-encoding=UTF-8
+    fateboard.datasource.jdbc-url=jdbc:mysql://{{ .Values.externalMysqlIp | default .Values.modules.mysql.ip | default "mysql" }}:{{ .Values.externalMysqlPort | default .Values.modules.mysql.port | default "3306" }}/{{ .Values.externalMysqlDatabase | default .Values.modules.mysql.database | default "eggroll_meta" }}?characterEncoding=utf8&characterSetResults=utf8&autoReconnect=true&failOverReadOnly=false&serverTimezone=GMT%2B8
+    fateboard.datasource.username={{ .Values.externalMysqlUser | default .Values.modules.mysql.user | default "fate" }}
+    fateboard.datasource.password={{ .Values.externalMysqlPassword | default .Values.modules.mysql.password | default "fate_dev" }}
+    server.tomcat.max-threads=1000
+    server.tomcat.max-connections=20000
+    spring.servlet.multipart.max-file-size=10MB
+    spring.servlet.multipart.max-request-size=100MB
+    spring.datasource.druid.filter.config.enabled=false
+    spring.datasource.druid.web-stat-filter.enabled=false
+    spring.datasource.druid.stat-view-servlet.enabled=false
+    server.compression.enabled=true
+    server.compression.mime-types=application/json,application/xml,text/html,text/xml,text/plain
+    server.board.login.username={{ .Values.modules.fateboard.username }}
+    server.board.login.password={{ .Values.modules.fateboard.password }}
+    #server.ssl.key-store=classpath:
+    #server.ssl.key-store-password=
+    #server.ssl.key-password=
+    #server.ssl.key-alias=
+    spring.session.store-type=jdbc
+    spring.session.jdbc.initialize-schema=always
+    #HTTP_APP_KEY=
+    #HTTP_SECRET_KEY=
+{{- end }}

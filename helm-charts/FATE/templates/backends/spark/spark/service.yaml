@@ -1,0 +1,89 @@
+# Copyright 2019-2022 VMware, Inc.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+{{ if .Values.modules.spark.include }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: spark-master
+  labels:
+    fateMoudle: spark-master
+{{ include "fate.labels" . | indent 4 }}
+spec:
+  ports:
+  - name: web-ui
+    protocol: TCP
+    port: 8080
+    targetPort: 8080
+  - name: master
+    protocol: TCP
+    port: 7077
+    targetPort: 7077
+  - name: master-rest
+    protocol: TCP
+    port: 6066
+    targetPort: 6066
+  type: ClusterIP
+  clusterIP: None
+  selector:
+    fateMoudle: spark-master
+{{ include "fate.matchLabels" . | indent 4 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: spark-client
+  labels:
+    fateMoudle: spark-master
+{{ include "fate.labels" . | indent 4 }}
+spec:
+  ports:
+  - name: web-ui
+    protocol: TCP
+    port: 8080
+    targetPort: 8080
+  - name: master
+    protocol: TCP
+    port: 7077
+    targetPort: 7077
+    {{- if eq .Values.modules.spark.master.type "NodePort" "LoadBalancer" }}
+    nodePort: {{ .Values.modules.spark.master.nodePort }}
+    {{- end }}
+  - name: master-rest
+    protocol: TCP
+    port: 6066
+    targetPort: 6066
+  type: {{ .Values.modules.spark.master.type }}
+  # clusterIP: None
+  selector:
+    fateMoudle: spark-master
+{{ include "fate.matchLabels" . | indent 4 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: spark-worker-1
+  labels:
+    fateMoudle: spark-worker
+{{ include "fate.labels" . | indent 4 }}
+spec:
+  ports:
+    - name: "tcp-spark"
+      port: 8081
+      targetPort: 8081
+      protocol: TCP
+  type: {{ .Values.modules.spark.worker.type }}
+  clusterIP: None
+  selector:
+    fateMoudle: spark-worker
+{{ include "fate.matchLabels" . | indent 4 }}
+---
+{{ end }}

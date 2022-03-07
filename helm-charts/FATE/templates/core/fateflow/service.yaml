@@ -1,0 +1,102 @@
+# Copyright 2019-2022 VMware, Inc.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+{{ if .Values.modules.python.include }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: fateflow
+  labels:
+    fateMoudle: fateflow
+{{ include "fate.labels" . | indent 4 }}
+spec:
+  ports:
+    - name: "tcp-grpc"
+      port: 9360
+      targetPort: 9360
+      protocol: TCP
+    - name: "tcp-http"
+      port: 9380
+      targetPort: 9380
+      protocol: TCP
+  type: ClusterIP
+  clusterIP: None
+  selector:
+    fateMoudle: python
+{{ include "fate.matchLabels" . | indent 4 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fateflow-client
+  labels:
+    fateMoudle: fateflow
+{{ include "fate.labels" . | indent 4 }}
+spec:
+  ports:
+    - name: "tcp-grpc"
+      port: 9360
+      targetPort: 9360
+      {{- if eq .Values.modules.python.type "NodePort" "LoadBalancer" }}
+      nodePort: {{ .Values.modules.python.grpcNodePort }}
+      {{- end }}
+      protocol: TCP
+    - name: "tcp-http"
+      port: 9380
+      targetPort: 9380
+      {{- if eq .Values.modules.python.type "NodePort" "LoadBalancer" }}
+      nodePort: {{ .Values.modules.python.httpNodePort }}
+      {{- end }}
+      protocol: TCP
+  type: {{ .Values.modules.python.type }}
+  
+  {{- if .Values.modules.python.loadBalancerIP }}
+  loadBalancerIP: "{{ .Values.modules.python.loadBalancerIP }}"
+  {{- end }}
+  
+  selector:
+    fateMoudle: python
+{{ include "fate.matchLabels" . | indent 4 }}
+---
+{{- if and .Values.modules.python.spark.portMaxRetries (ne (print .Values.modules.python.spark.driverHost) "fateflow") }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: fateflow-sparkdriver
+  labels:
+    fateMoudle: python
+{{ include "fate.labels" . | indent 4 }}
+spec:
+  ports:
+    {{ $spark := .Values.modules.python.spark }}
+    {{- range .Values.modules.python.spark.portMaxRetries | int | until }}
+    - name: "spark-driver-port-{{ . }}"
+      port: {{ $spark.driverStartPort | int | add . }}
+      targetPort: {{ $spark.driverStartPort | int | add .  }}
+      {{- if eq $spark.driverHostType "NodePort" "LoadBalancer" }}
+      nodePort: {{ $spark.driverStartPort | int | add .  }}
+      {{- end }}
+      protocol: TCP
+    - name: "spark-block-manager-port-{{ . }}"
+      port: {{ $spark.blockManagerStartPort  | int | add . }}
+      targetPort: {{ $spark.blockManagerStartPort  | int | add . }}
+      {{- if eq $spark.driverHostType "NodePort" "LoadBalancer" }}
+      nodePort: {{ $spark.blockManagerStartPort  | int | add . }}
+      {{- end }}
+      protocol: TCP
+    {{- end }}
+  type: {{ .Values.modules.python.spark.driverHostType }}
+  selector:
+    fateMoudle: python
+{{ include "fate.matchLabels" . | indent 4 }}
+---
+{{- end }}
+{{ end }}
