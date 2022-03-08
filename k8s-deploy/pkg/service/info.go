@@ -21,20 +21,24 @@ import "github.com/rs/zerolog/log"
 func GetClusterInfo(name, namespace string) (map[string]interface{}, error) {
 	ip, err := GetNodeIP()
 	if err != nil {
+		log.Error().Str("func", "GetNodeIP()").Err(err)
 		return nil, err
 	}
 	port, err := GetProxySvcNodePorts(name, getDefaultNamespace(namespace))
 	if err != nil {
+		log.Error().Str("func", "GetProxySvcNodePorts()").Err(err)
 		return nil, err
 	}
 
 	containerList, err := GetPodContainersStatus(name, getDefaultNamespace(namespace))
 	if err != nil {
+		log.Error().Str("func", "GetPodContainersStatus()").Err(err)
 		return nil, err
 	}
 
 	deploymentList, err := GetClusterDeployStatus(name, getDefaultNamespace(namespace))
 	if err != nil {
+		log.Error().Str("func", "GetClusterDeployStatus()").Err(err)
 		return nil, err
 	}
 
@@ -45,6 +49,7 @@ func GetClusterInfo(name, namespace string) (map[string]interface{}, error) {
 
 	ingressURLList, err := GetIngressURLList(name, getDefaultNamespace(namespace))
 	if err != nil {
+		log.Error().Str("func", "GetIngressURLList()").Err(err)
 		return nil, err
 	}
 
