@@ -1513,6 +1513,74 @@ const docTemplate = `{
                 "tags": [
                     "User"
                 ],
+                "summary": "Get user by userId",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User",
+                        "name": "userId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Authentication header",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/api.JSONResult"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/modules.User"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.JSONERRORResult"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized operation",
+                        "schema": {
+                            "$ref": "#/definitions/api.JSONERRORResult"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/api.JSONERRORResult"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
                 "summary": "Delete user by userId",
                 "parameters": [
                     {

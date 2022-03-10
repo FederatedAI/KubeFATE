@@ -63,7 +63,7 @@ vet:
 	go vet ./...
 # Generate swag API file
 swag: swag-bin
-	$(SWAG_BIN) init --parseDependency --parseInternal -g pkg/api/service.go
+	$(SWAG_BIN) init --parseDependency --parseInternal --parseDepth 1 -g pkg/api/service.go
 
 package: kubefate-without-swag
 	mkdir -p tmp/kubefate;
