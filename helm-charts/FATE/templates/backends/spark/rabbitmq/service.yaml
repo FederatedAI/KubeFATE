@@ -1,0 +1,41 @@
+# Copyright 2019-2022 VMware, Inc.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+{{ if .Values.modules.rabbitmq.include }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq
+  labels:
+    fateMoudle: rabbitmq
+{{ include "fate.labels" . | indent 4 }}
+spec:
+  ports:
+    - name: "tcp-rabbitmq"
+      port: 5672
+      targetPort: 5672
+      {{- if eq .Values.modules.rabbitmq.type "NodePort" "LoadBalancer" }}
+      nodePort: {{ .Values.modules.rabbitmq.nodePort }}
+      {{- end }}
+      protocol: TCP
+    - name: "tcp-rabbitmq1"
+      port: 15672
+      targetPort: 15672
+      protocol: TCP
+  type: {{ .Values.modules.rabbitmq.type }}
+  {{- if .Values.modules.rabbitmq.loadBalancerIP }}
+  loadBalancerIP: "{{ .Values.modules.rabbitmq.loadBalancerIP }}"
+  {{- end }}
+  selector:
+    fateMoudle: rabbitmq
+{{ include "fate.matchLabels" . | indent 4 }}
+---
+{{ end }}

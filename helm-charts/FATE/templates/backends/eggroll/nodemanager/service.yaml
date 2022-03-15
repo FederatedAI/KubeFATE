@@ -9,20 +9,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-{{- if .Values.podSecurityPolicy.enabled -}}
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
+{{- if .Values.modules.nodemanager.include }}
+{{- $root := . -}}
+{{- range $nodemanager := .Values.modules.nodemanager.list }}
+---
+apiVersion: v1
+kind: Service
 metadata:
   labels:
-    fateMoudle: serviceAccount
-{{ include "fate.labels" . | indent 4 }}
-  name: {{ .Values.partyName }}
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: {{ .Values.partyName }}
-subjects:
-  - kind: ServiceAccount
-    name: {{ .Values.partyName }}
-    namespace: {{ .Release.Namespace }}
-{{- end -}}
+    fateMoudle: {{ $nodemanager.name }}
+{{ include "fate.labels" $root | indent 4 }}
+  name: {{ $nodemanager.name }}
+spec:
+  ports:
+    - name: "tcp-nodemanager"
+      port: 4671
+      targetPort: 4671
+      protocol: TCP
+  clusterIP: None
+  selector:
+    fateMoudle: {{ $nodemanager.name }}
+{{ include "fate.matchLabels" $root | indent 4 }}
+
+{{- end }}
+{{- end }}

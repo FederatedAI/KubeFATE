@@ -9,20 +9,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-{{- if .Values.podSecurityPolicy.enabled -}}
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
+{{ if .Values.istio.enabled }}
+{{ if .Values.modules.client.include }}
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
 metadata:
+  name: notebook
   labels:
-    fateMoudle: serviceAccount
 {{ include "fate.labels" . | indent 4 }}
-  name: {{ .Values.partyName }}
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: {{ .Values.partyName }}
-subjects:
-  - kind: ServiceAccount
-    name: {{ .Values.partyName }}
-    namespace: {{ .Release.Namespace }}
-{{- end -}}
+spec:
+  hosts:
+  {{- range .Values.ingress.client.hosts }}
+  - {{ .name }}
+  {{- end }}
+  gateways:
+  - {{ .Values.partyName }}-gateway
+  http:
+  - route:
+    - destination:
+        host: notebook
+        port:
+          number: 20000
+{{ end }}
+{{ end }}

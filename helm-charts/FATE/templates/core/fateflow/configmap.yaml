@@ -1,0 +1,300 @@
+# Copyright 2019-2022 VMware, Inc.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+{{ if .Values.modules.python.include }}
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: python-config
+  labels:
+    fateMoudle: python
+{{ include "fate.labels" . | indent 4 }}
+data:
+  spark-defaults.conf: |
+    spark.master                      {{ if eq .Values.modules.python.backend "spark_local_pulsar" }}local[*]{{ else }}{{ .Values.modules.python.spark.master | default "spark://spark-master:7077"}}{{ end }}
+    spark.driver.host                 {{  .Values.modules.python.spark.driverHost | default "fateflow" }}
+    {{- if .Values.modules.python.spark.driverStartPort }}
+    spark.driver.port                 {{  .Values.modules.python.spark.driverStartPort }}
+    {{- end }}
+    
+    {{- if .Values.modules.python.spark.portMaxRetries }}
+    spark.port.maxRetries             {{  .Values.modules.python.spark.portMaxRetries }}
+    {{- end }}
+    
+    {{- if .Values.modules.python.spark.blockManagerStartPort }}
+    spark.blockManager.port           {{  .Values.modules.python.spark.blockManagerStartPort }}
+    {{- end }}
+    
+    {{- if .Values.modules.python.spark.blockManagerStartPort }}
+    spark.driver.bindAddress          0.0.0.0
+    {{- end }}
+    
+    {{- if .Values.modules.python.spark.pysparkPython }}
+    spark.pyspark.python              {{  .Values.modules.python.spark.pysparkPython }}
+    spark.pyspark.driver.python       python
+    {{- end }}
+  service_conf.yaml: |
+    use_registry: {{ .Values.modules.serving.useRegistry | default false }}
+    use_deserialize_safe_module: false
+    dependent_distribution: false
+    encrypt_password: false
+    encrypt_module: fate_arch.common.encrypt_utils#pwdecrypt
+    private_key:
+    fateflow:
+      # you must set real ip address, 127.0.0.1 and 0.0.0.0 is not supported
+      host: {{ if .Values.istio.enabled }}127.0.0.1{{ else }}fateflow{{ end }}
+      http_port: 9380
+      grpc_port: 9360
+      # http_app_key:
+      # http_secret_key:
+      # support rollsite/nginx/fateflow as a coordination proxy
+      # rollsite support fate on eggroll, use grpc protocol
+      # nginx support fate on eggroll and fate on spark, use http or grpc protocol, default is http
+      # fateflow support fate on eggroll and fate on spark, use http protocol, but not support exchange network mode
+    
+      # format(proxy: rollsite) means rollsite use the rollsite configuration of fate_one_eggroll and nginx use the nginx configuration of fate_one_spark
+      # you also can customize the config like this(set fateflow of the opposite party as proxy):
+      # proxy:
+      #   name: fateflow
+      #   host: xx
+      #   http_port: xx
+      #   grpc_port: xx 
+      {{- if eq .Values.modules.python.backend "spark_pulsar" "spark_rabbitmq" "spark_local_pulsar" }}
+      proxy: nginx
+      {{- else }}
+      proxy: rollsite
+      {{- end }}
+      # support default/http/grpc
+      protocol: default
+      # It can also be specified in the job configuration using the federated_status_collect_type parameter
+      default_federated_status_collect_type: PULL
+    database:
+      name: '{{ .Values.externalMysqlDatabase | default .Values.modules.mysql.database | default "eggroll_meta" }}'
+      user: '{{ .Values.externalMysqlUser | default .Values.modules.mysql.user | default "fate" }}'
+      passwd: '{{ .Values.externalMysqlPassword | default .Values.modules.mysql.password | default "fate_dev" }}'
+      host: '{{ .Values.externalMysqlIp | default .Values.modules.mysql.ip | default "mysql" }}'
+      port: {{ .Values.externalMysqlPort | default .Values.modules.mysql.port | default "3306" }}
+      max_connections: 100
+      stale_timeout: 30
+    zookeeper:
+      hosts:
+      - "serving-zookeeper:2181"
+       # use_acl: false
+       # user: fate
+       # password: fate
+       # engine services
+    default_engines:
+      {{- if eq .Values.modules.python.backend  "spark_pulsar" }}
+      computing: spark
+      federation: pulsar
+      storage: hdfs
+      {{- else if eq .Values.modules.python.backend  "spark_rabbitmq" }}
+      computing: spark
+      federation: rabbitmq
+      storage: hdfs
+      {{- else if eq .Values.modules.python.backend  "spark_local_pulsar" }}
+      computing: spark
+      federation: pulsar
+      storage: localfs
+      {{- else }}
+      computing: eggroll
+      federation: eggroll
+      storage: eggroll
+      {{- end }}
+    fate_on_standalone:
+      standalone:
+        cores_per_node: 20
+        nodes: 1
+    fate_on_eggroll:
+      clustermanager:
+        cores_per_node: {{ .Values.modules.python.clustermanager.cores_per_node | default 16 }}
+        nodes: {{ .Values.modules.python.clustermanager.nodes | default 2 }}
+      rollsite:
+        host: {{ .Values.modules.rollsite.ip }}
+        port: 9370
+    fate_on_spark:
+      spark:
+        # default use SPARK_HOME environment variable
+        home: /data/projects/spark-2.4.1-bin-hadoop2.7/
+        cores_per_node: {{ .Values.modules.python.spark.cores_per_node }}
+        nodes: {{ .Values.modules.python.spark.nodes }}
+      linkis_spark:
+        cores_per_node: 20
+        nodes: 2
+        host: 127.0.0.1
+        port: 9001
+        token_code: MLSS
+        python_path: /data/projects/fate/python
+      hive:
+        host: 127.0.0.1
+        port: 10000
+        auth_mechanism:
+        username:
+        password:
+      linkis_hive:
+        host: 127.0.0.1
+        port: 9001
+      hdfs:
+        name_node: {{ .Values.modules.python.hdfs.name_node | default "hdfs://namenode:9000" }}
+        # default /
+        path_prefix: {{ .Values.modules.python.hdfs.path_prefix }}
+      rabbitmq:
+        host: {{ .Values.modules.python.rabbitmq.host }}
+        mng_port: {{ .Values.modules.python.rabbitmq.mng_port }}
+        port: {{ .Values.modules.python.rabbitmq.port }}
+        user: {{ .Values.modules.python.rabbitmq.user }}
+        password: {{ .Values.modules.python.rabbitmq.password }}
+        # default conf/rabbitmq_route_table.yaml
+        route_table: conf/rabbitmq_route_table/rabbitmq_route_table.yaml
+      pulsar:
+        host: {{ .Values.modules.python.pulsar.host }}
+        port: {{ .Values.modules.python.pulsar.port }}
+        mng_port: {{ .Values.modules.python.pulsar.mng_port }}
+        topic_ttl: 3
+        # default conf/pulsar_route_table.yaml
+        route_table: conf/pulsar_route_table/pulsar_route_table.yaml
+      nginx:
+        host: {{ .Values.modules.python.nginx.host }}
+        http_port: {{ .Values.modules.python.nginx.http_port }}
+        grpc_port: {{ .Values.modules.python.nginx.grpc_port }}
+    fateboard:
+      host: fateboard
+      port: 8080
+    # on API `/model/load` and `/model/load/do`
+    # automatic upload models to the model store if it exists locally but does not exist in the model storage
+    # or download models from the model store if it does not exist locally but exists in the model storage
+    # this config will not affect API `/model/store` or `/model/restore`
+    enable_model_store: false
+    model_store_address:
+      storage: mysql
+      name: {{ .Values.externalMysqlDatabase | default .Values.modules.mysql.database | default "eggroll_meta" }}
+      host: '{{ .Values.externalMysqlIp | default .Values.modules.mysql.ip | default "mysql" }}'
+      port: {{ .Values.externalMysqlPort | default .Values.modules.mysql.port | default "3306" }}
+      user: '{{ .Values.externalMysqlUser | default .Values.modules.mysql.user | default "fate" }}'
+      passwd: '{{ .Values.externalMysqlPassword | default .Values.modules.mysql.password | default "fate_dev" }}'
+      max_connections: 10
+      stale_timeout: 10
+    {{- with .Values.modules.serving }}
+    servings:
+      hosts:
+      {{- if and .ip .port}}
+      - '{{ .ip }}:{{ .port }}'
+      {{- else }}
+      - ''
+      {{- end }}
+      {{- if and .useRegistry .zookeeper }}
+    zookeeper:
+{{ toYaml .zookeeper | indent 6 }}
+      {{- end }}
+    {{- end }}
+  transfer_conf.yaml: |
+    paths: # dir or path
+      - "python/federatedml/transfer_variable/auth_conf"
+  component_registry.json: |
+    {
+      "components": {
+      },
+      "providers": {
+      },
+      "default_settings": {
+        "fate_flow":{
+          "default_version_key": "FATEFlow"
+        },
+        "fate": {
+          "default_version_key": "FATE"
+        },
+        "class_path": {
+          "interface": "components.components.Components",
+          "feature_instance": "feature.instance.Instance",
+          "feature_vector": "feature.sparse_vector.SparseVector",
+          "model": "protobuf.generated",
+          "model_migrate": "protobuf.model_migrate.model_migrate",
+          "homo_model_convert": "protobuf.homo_model_convert.homo_model_convert"
+        }
+      }
+    }
+  job_default_config.yaml: |
+    # component provider, relative path to get_fate_python_directory
+    default_component_provider_path: federatedml
+    
+    # resource
+    total_cores_overweight_percent: 1  # 1 means no overweight
+    total_memory_overweight_percent: 1  # 1 means no overweight
+    task_parallelism: 1
+    task_cores: 4
+    task_memory: 0  # mb
+    max_cores_percent_per_job: 1  # 1 means total
+    
+    # scheduling
+    job_timeout: 259200 # s
+    remote_request_timeout: 30000  # ms
+    federated_command_trys: 3
+    end_status_job_scheduling_time_limit: 300000 # ms
+    end_status_job_scheduling_updates: 1
+    auto_retries: 0
+    auto_retry_delay: 1  #seconds
+    # It can also be specified in the job configuration using the federated_status_collect_type parameter
+    federated_status_collect_type: PUSH
+    
+    # upload
+    upload_max_bytes: 4194304000 # bytes
+    
+    #component output
+    output_data_summary_count_limit: 100
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: pulsar-route-table
+  labels:
+    fateMoudle: python
+{{ include "fate.labels" . | indent 4 }}
+data:
+  pulsar_route_table.yaml: |
+    {{- with .Values.modules.pulsar.exchange }}
+    default:
+      proxy: "{{ .ip }}:{{ .port }}"
+      domain: "{{ .domain }}"
+    {{- end }}
+  {{- if .Values.modules.pulsar.route_table }}
+    {{- range $key, $val := .Values.modules.pulsar.route_table }}
+    {{ $key }}:
+{{ toYaml . | indent 6 }}
+    {{- end }}
+  {{- else }}
+    {{ .Values.partyId }}:
+      host: pulsar
+      port: 6650
+      sslPort: 6651
+      proxy: ""
+  {{- end}}
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: rabbitmq-route-table
+  labels:
+    fateMoudle: python
+{{ include "fate.labels" . | indent 4 }}
+data:
+  rabbitmq_route_table.yaml: |
+  {{- if .Values.modules.rabbitmq.route_table }}
+    {{- range $key, $val := .Values.modules.rabbitmq.route_table }}
+    {{ $key }}:
+{{ toYaml . | indent 6 }}
+    {{- end }}
+  {{- else }}
+    {{ .Values.partyId }}:
+      host: rabbitmq
+      port: 5672
+  {{- end}}
+
+{{ end }}
