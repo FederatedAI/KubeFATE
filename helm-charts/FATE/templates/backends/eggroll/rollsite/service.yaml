@@ -9,20 +9,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-{{- if .Values.podSecurityPolicy.enabled -}}
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
+{{ if .Values.modules.rollsite.include }}
+apiVersion: v1
+kind: Service
 metadata:
+  name: rollsite
   labels:
-    fateMoudle: serviceAccount
+    fateMoudle: rollsite
 {{ include "fate.labels" . | indent 4 }}
-  name: {{ .Values.partyName }}
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: {{ .Values.partyName }}
-subjects:
-  - kind: ServiceAccount
-    name: {{ .Values.partyName }}
-    namespace: {{ .Release.Namespace }}
-{{- end -}}
+spec:
+  ports:
+    - name: "tcp-rollsite"
+      port: 9370
+      targetPort: 9370
+      {{- if eq .Values.modules.rollsite.type "NodePort" "LoadBalancer" }}
+      nodePort: {{ .Values.modules.rollsite.nodePort }}
+      {{- end }}
+      protocol: TCP
+  type: {{ .Values.modules.rollsite.type }}
+  {{- if .Values.modules.rollsite.loadBalancerIP }}
+  loadBalancerIP: "{{ .Values.modules.rollsite.loadBalancerIP }}"
+  {{- end }}
+  selector:
+    fateMoudle: rollsite
+{{ include "fate.matchLabels" . | indent 4 }}
+{{ end }}

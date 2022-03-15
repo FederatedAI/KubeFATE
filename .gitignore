@@ -11,3 +11,4 @@ dist/
 *.out
 *.tgz
 *.tar
+release/

@@ -9,20 +9,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-{{- if .Values.podSecurityPolicy.enabled -}}
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
+
+{{- if and .Values.persistence.enabled (not .Values.modules.python.existingClaim) }}
+kind: PersistentVolumeClaim
+apiVersion: v1
 metadata:
+  name: python-data
   labels:
-    fateMoudle: serviceAccount
+    fateMoudle: python
 {{ include "fate.labels" . | indent 4 }}
-  name: {{ .Values.partyName }}
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: {{ .Values.partyName }}
-subjects:
-  - kind: ServiceAccount
-    name: {{ .Values.partyName }}
-    namespace: {{ .Release.Namespace }}
-{{- end -}}
+spec:
+  accessModes: 
+    - {{ .Values.modules.python.accessMode }}
+  resources:
+    requests:
+      storage: {{ .Values.modules.python.size }}
+  {{- if .Values.modules.python.storageClass }}
+    {{- if eq "-" .Values.modules.python.storageClass }}
+  storageClassName: ""
+    {{- else }}
+  storageClassName: {{ .Values.modules.python.storageClass }}
+    {{- end }}
+  {{- end }}
+{{- end }}

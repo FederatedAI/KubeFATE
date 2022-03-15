@@ -9,20 +9,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-{{- if .Values.podSecurityPolicy.enabled -}}
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
+{{ if .Values.modules.mysql.include }}
+{{- if and .Values.persistence.enabled (not .Values.modules.mysql.existingClaim) }}
+kind: PersistentVolumeClaim
+apiVersion: v1
 metadata:
+  name: mysql-data
   labels:
-    fateMoudle: serviceAccount
+    fateMoudle: mysql
 {{ include "fate.labels" . | indent 4 }}
-  name: {{ .Values.partyName }}
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: {{ .Values.partyName }}
-subjects:
-  - kind: ServiceAccount
-    name: {{ .Values.partyName }}
-    namespace: {{ .Release.Namespace }}
-{{- end -}}
+spec:
+  accessModes: 
+    - {{ .Values.modules.mysql.accessMode }}
+  resources:
+    requests:
+      storage: {{ .Values.modules.mysql.size }}
+  {{- if .Values.modules.mysql.storageClass }}
+    {{- if eq "-" .Values.modules.mysql.storageClass }}
+  storageClassName: ""
+    {{- else }}
+  storageClassName: {{ .Values.modules.mysql.storageClass }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+{{ end }}
