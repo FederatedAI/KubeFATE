@@ -2,7 +2,7 @@
 image:
   registry: federatedai
   isThridParty:
-  tag: 1.5.1-release
+  tag: 1.5.3-release
   pullPolicy: IfNotPresent
   imagePullSecrets: 
 #  - name: 

@@ -59,6 +59,9 @@ computing_backend=eggroll
 
 # true if you need python-nn else false, the default value will be false
 enabled_nn=false
+
+fateboard_username=admin                    # Username to access fateboard
+fateboard_password=admin                    # Password to access fateboard
 ```
 
 Spark was introduced in FATE v1.5 as the underlying computing backend, for more details
