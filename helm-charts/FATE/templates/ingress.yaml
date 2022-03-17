@@ -11,7 +11,7 @@
 {{ if .Values.istio.enabled }}
 {{ else }}
 {{ if .Values.modules.fateboard.include }}
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: fateboard
@@ -25,13 +25,15 @@ spec:
       paths:
       - path: /
         backend:
-          serviceName: fateboard
-          servicePort: 8080
+          service:
+            name: fateboard
+            port:
+              number: 8080
 ---
 {{ end }}
 
 {{ if .Values.modules.client.include }}
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: client
@@ -45,13 +47,15 @@ spec:
       paths:
       - path: /
         backend:
-          serviceName: notebook
-          servicePort: 20000
+          service:
+            name: notebook
+            port:
+              number: 20000
 ---
 {{ end }}
 
 {{ if .Values.modules.spark.include }}
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: spark
@@ -65,13 +69,15 @@ spec:
       paths:
       - path: /
         backend:
-          serviceName: spark-master
-          servicePort: 8080
+          service:
+            name: spark-master
+            port:
+              number: 8080
 ---
 {{ end }}
 
 {{ if .Values.modules.rabbitmq.include }}
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: rabbitmq
@@ -85,8 +91,10 @@ spec:
       paths:
       - path: /
         backend:
-          serviceName: rabbitmq
-          servicePort: 15672
+          service:
+            name: rabbitmq
+            port:
+              number: 15672
 ---
 {{ end }}
 {{ end }}

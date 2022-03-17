@@ -151,7 +151,7 @@ spec:
   selector:
     fate: kubefate
 ---
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: kubefate
@@ -163,5 +163,7 @@ spec:
         paths:
           - path: /
             backend:
-              serviceName: kubefate
-              servicePort: 8080
+              service:
+                name: kubefate
+                port:
+                  number: 8080
