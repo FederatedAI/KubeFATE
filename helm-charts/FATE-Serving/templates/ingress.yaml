@@ -26,6 +26,7 @@ spec:
     http:
       paths:
       - path: /
+        pathType: Prefix
         backend:
           service:
             name: serving-proxy
