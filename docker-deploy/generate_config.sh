@@ -62,6 +62,8 @@ GenerateConfig() {
 
 		eval fateboard_ip=fateboard
 		eval fateboard_port=8080
+		eval fateboard_username=${fateboard_username}
+		eval fateboard_password=${fateboard_password}
 
 		eval fate_flow_ip=python
 		eval fate_flow_grpc_port=9360
@@ -150,6 +152,8 @@ GenerateConfig() {
 		sed -i "s#<jdbc.username>#${db_user}#g" ./confs-$party_id/confs/fateboard/conf/application.properties
 		sed -i "s#<jdbc.password>#${db_password}#g" ./confs-$party_id/confs/fateboard/conf/application.properties
 		sed -i "s#<jdbc.url>#jdbc:mysql://${db_ip}:3306/${db_name}?characterEncoding=utf8\&characterSetResults=utf8\&autoReconnect=true\&failOverReadOnly=false\&serverTimezone=GMT%2B8#g" ./confs-$party_id/confs/fateboard/conf/application.properties
+		sed -i "s#<fateboard.username>#${fateboard_username}#g" ./confs-$party_id/confs/fateboard/conf/application.properties
+		sed -i "s#<fateboard.password>#${fateboard_password}#g" ./confs-$party_id/confs/fateboard/conf/application.properties
 		echo fateboard module of $party_id done!
 
 		# mysql

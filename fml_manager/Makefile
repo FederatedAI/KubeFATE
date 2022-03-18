@@ -1,5 +1,5 @@
 NAME ?= federatedai/client
-VERSION ?= v1.5.0
+VERSION ?= v1.5.3
 IMG ?= ${NAME}:${VERSION:v%=%-release}
 
 docker-build:
