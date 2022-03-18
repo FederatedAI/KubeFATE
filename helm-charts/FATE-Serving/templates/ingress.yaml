@@ -10,7 +10,7 @@
 # limitations under the License.
 
 {{ if .Values.servingProxy.include }}
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: serving-proxy
@@ -26,8 +26,11 @@ spec:
     http:
       paths:
       - path: /
+        pathType: Prefix
         backend:
-          serviceName: serving-proxy
-          servicePort: 8059
+          service:
+            name: serving-proxy
+            port:
+              number: 8059
 ---
 {{ end }}
