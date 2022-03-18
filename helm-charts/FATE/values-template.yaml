@@ -211,8 +211,10 @@ modules:
 
   fateboard:
     include: {{ has "fateboard" .modules }}
-    {{- with .spark }}
+    {{- with .fateboard }}
     type: {{ .type }}
+    username: {{ .username }}
+    password: {{ .password }}
     {{- end }}
 
 

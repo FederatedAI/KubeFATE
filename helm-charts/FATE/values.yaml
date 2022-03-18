@@ -129,6 +129,8 @@ modules:
   fateboard:
     include: true
     type: ClusterIP
+    username: admin
+    password: admin
   spark:
     include: true
     master:
