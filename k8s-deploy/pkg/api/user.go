@@ -240,7 +240,7 @@ func getUserFindByUUID(uuid string) (modules.User, error) {
 // @Failure 400 {object} JSONERRORResult "Bad Request"
 // @Failure 401 {object} JSONERRORResult "Unauthorized operation"
 // @Failure 500 {object} JSONERRORResult "Internal server error"
-// @Router /user/{userId} [get]
+// @Router /user/{userId} [delete]
 // @Param Authorization header string true "Authentication header"
 // @Security ApiKeyAuth
 func (*User) deleteUser(c *gin.Context) {
