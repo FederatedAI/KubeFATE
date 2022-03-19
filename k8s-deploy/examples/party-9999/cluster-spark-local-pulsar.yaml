@@ -49,6 +49,7 @@ python:
   type: NodePort
   httpNodePort: 30097
   grpcNodePort: 30092
+  logLevel: INFO
 
 servingIp: 192.168.9.1
 servingPort: 30095

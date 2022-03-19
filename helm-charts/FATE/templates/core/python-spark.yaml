@@ -94,8 +94,10 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: status.podIP
+          {{- if .Values.modules.python.logLevel }}
           - name: FATE_LOG_LEVEL
             value: {{ .Values.modules.python.logLevel }}
+          {{- end }}
           - name: PYTHONPATH
             value: "$PYTHONPATH:/data/projects/fate/fate/python:/data/projects/fate/eggroll/python:/data/projects/fate/fateflow/python:/data/projects/fate/fate/python/fate_client"
           - name: FATE_PROJECT_BASE
