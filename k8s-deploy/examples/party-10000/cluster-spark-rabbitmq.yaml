@@ -43,6 +43,7 @@ python:
   type: NodePort
   httpNodePort: 30107
   grpcNodePort: 30102
+  logLevel: INFO
 
 servingIp: 192.168.10.1
 servingPort: 30105
