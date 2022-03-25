@@ -208,8 +208,8 @@ rtt min/avg/max/mdev = 0.054/0.067/0.080/0.013 ms
 When `example.com` well set, KubeFATE service version can be shown,
 ```
 kubefate@machine:~/kubefate$ kubefate version
-* kubefate service version=v1.4.1
-* kubefate commandLine version=v1.4.1
+* kubefate service version=v1.4.3
+* kubefate commandLine version=v1.4.3
 ```
 Note: The `kubefate` CLI can only work in the same directory of config.yaml
 
