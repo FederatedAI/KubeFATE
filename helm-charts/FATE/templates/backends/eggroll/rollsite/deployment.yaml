@@ -57,6 +57,27 @@ spec:
             java -Dlog4j.configurationFile=$${EGGROLL_HOME}/conf/log4j2.properties -cp $${EGGROLL_HOME}/lib/*:$${EGGROLL_HOME}/conf/ com.webank.eggroll.rollsite.EggSiteBootstrap -c $${EGGROLL_HOME}/conf/eggroll.properties
           ports:
             - containerPort: 9370
+          livenessProbe:
+            tcpSocket:
+              port: 9370
+            initialDelaySeconds: 1
+            periodSeconds: 10
+            timeoutSeconds: 3
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            tcpSocket:
+              port: 9370
+            initialDelaySeconds: 1
+            periodSeconds: 10
+            timeoutSeconds: 3
+            successThreshold: 1
+            failureThreshold: 3
+          startupProbe:
+            tcpSocket:
+              port: 9370
+            failureThreshold: 12
+            periodSeconds: 10
           volumeMounts:
             - mountPath: /data/projects/fate/eggroll/conf/route_table/
               name: rollsite-confs

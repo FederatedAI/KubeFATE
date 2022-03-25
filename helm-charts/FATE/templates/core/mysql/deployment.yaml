@@ -52,6 +52,33 @@ spec:
               value: root
           ports:
             - containerPort: 3306
+          livenessProbe:
+            exec:
+              command:
+              - mysqladmin
+              - ping
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            timeoutSeconds: 3
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            exec:
+              command:
+              - mysqladmin
+              - ping
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 3
+            successThreshold: 1
+            failureThreshold: 3
+          startupProbe:
+            exec:
+              command:
+              - mysqladmin
+              - ping
+            failureThreshold: 12
+            periodSeconds: 10
           volumeMounts:
             - name: mysql-confs
               mountPath: /docker-entrypoint-initdb.d/

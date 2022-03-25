@@ -45,6 +45,39 @@ spec:
             - containerPort: 6651
             - containerPort: 8080
             - containerPort: 8081
+          livenessProbe:
+            tcpSocket:
+              {{- if .Values.modules.pulsar.exchange }}
+              port: 8081
+              {{- else }}
+              port: 8080
+              {{- end }}
+            initialDelaySeconds: 1
+            periodSeconds: 10
+            timeoutSeconds: 3
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            tcpSocket:
+              {{- if .Values.modules.pulsar.exchange }}
+              port: 8081
+              {{- else }}
+              port: 8080
+              {{- end }}
+            initialDelaySeconds: 1
+            periodSeconds: 10
+            timeoutSeconds: 3
+            successThreshold: 1
+            failureThreshold: 3
+          startupProbe:
+            tcpSocket:
+              {{- if .Values.modules.pulsar.exchange }}
+              port: 8081
+              {{- else }}
+              port: 8080
+              {{- end }}
+            failureThreshold: 12
+            periodSeconds: 10
           volumeMounts:
             - mountPath: /pulsar/conf/standalone.conf
               name: pulsar-confs

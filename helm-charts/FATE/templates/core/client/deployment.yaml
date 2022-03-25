@@ -46,6 +46,39 @@ spec:
               value: "{{.Values.modules.serving.ip}}:{{.Values.modules.serving.port}}"
           ports:
             - containerPort: 20000
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 20000
+              httpHeaders:
+                - name: X-Custom-Header
+                  value: livenessProbe
+            initialDelaySeconds: 1
+            periodSeconds: 10
+            timeoutSeconds: 3
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 20000
+              httpHeaders:
+                - name: X-Custom-Header
+                  value: readinessProbe
+            initialDelaySeconds: 1
+            periodSeconds: 10
+            timeoutSeconds: 3
+            successThreshold: 1
+            failureThreshold: 3
+          startupProbe:
+            httpGet:
+              path: /
+              port: 20000
+              httpHeaders:
+                - name: X-Custom-Header
+                  value: startupProbe
+            failureThreshold: 12
+            periodSeconds: 10
           volumeMounts:
             - mountPath: /data/projects/fate/persistence/
               name: persistence

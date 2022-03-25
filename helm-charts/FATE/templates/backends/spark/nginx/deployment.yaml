@@ -43,8 +43,43 @@ spec:
               echo "change path of route_table.yaml success!"
               openresty -g 'daemon off;'
           ports:
-            - containerPort: 9300
-            - containerPort: 9310
+            - name: http-port
+              containerPort: 9300
+            - name: grpc-port
+              containerPort: 9310
+          livenessProbe:
+            httpGet:
+              path: /test
+              port: 9302
+              httpHeaders:
+                - name: X-Custom-Header
+                  value: livenessProbe
+            initialDelaySeconds: 1
+            periodSeconds: 10
+            timeoutSeconds: 3
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /test
+              port: 9302
+              httpHeaders:
+                - name: X-Custom-Header
+                  value: readinessProbe
+            initialDelaySeconds: 1
+            periodSeconds: 10
+            timeoutSeconds: 3
+            successThreshold: 1
+            failureThreshold: 3
+          startupProbe:
+            httpGet:
+              path: /test
+              port: 9302
+              httpHeaders:
+                - name: X-Custom-Header
+                  value: readinessProbe
+            failureThreshold: 12
+            periodSeconds: 10
           volumeMounts:
             - mountPath: /data/projects/fate/proxy/nginx/conf/nginx.conf
               name: nginx-confs
