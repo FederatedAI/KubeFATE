@@ -70,6 +70,12 @@ services:
     networks:
       fate-network:
         ipv4_address: 192.167.0.100
+    healthcheck:
+      test: ["CMD", "curl", "-f", "-X POST", "http://192.167.0.100:9380/v1/version/get"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
     command:
     - "/bin/bash"
     - "-c"
