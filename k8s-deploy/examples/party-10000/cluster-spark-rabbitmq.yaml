@@ -27,23 +27,15 @@ backend: spark_rabbitmq
 
 ingress:
   fateboard: 
-    annotations:
-      kubernetes.io/ingress.class: "nginx"
     hosts:
     - name: party10000.fateboard.example.com
   client:  
-    annotations:
-      kubernetes.io/ingress.class: "nginx"
     hosts:
     - name: party10000.notebook.example.com
   spark:  
-    annotations:
-      kubernetes.io/ingress.class: "nginx"
     hosts:
     - name: party10000.spark.example.com
   rabbitmq:  
-    annotations:
-      kubernetes.io/ingress.class: "nginx"
     hosts:
     - name: party10000.rabbitmq.example.com
 

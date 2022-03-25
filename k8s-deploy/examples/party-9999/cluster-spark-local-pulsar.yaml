@@ -25,23 +25,15 @@ backend: spark_local_pulsar
 
 ingress:
   fateboard: 
-    annotations:
-      kubernetes.io/ingress.class: "nginx"
     hosts:
     - name: party9999.fateboard.example.com
   client:  
-    annotations:
-      kubernetes.io/ingress.class: "nginx"
     hosts:
     - name: party9999.notebook.example.com
   spark:  
-    annotations:
-      kubernetes.io/ingress.class: "nginx"
     hosts:
     - name: party9999.spark.example.com
   pulsar:  
-    annotations:
-      kubernetes.io/ingress.class: "nginx"
     hosts:
     - name: party9999.pulsar.example.com
 

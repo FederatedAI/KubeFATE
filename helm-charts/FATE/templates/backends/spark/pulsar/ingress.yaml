@@ -17,11 +17,8 @@ metadata:
   labels:
     fateMoudle: pulsar
 {{ include "fate.labels" . | indent 4 }}
-{{- if .Values.ingress.pulsar.annotations }}
-  annotations:
-{{ toYaml .Values.ingress.pulsar.annotations | indent 4 }}
-{{- end }}
 spec:
+  ingressClassName: nginx
   rules:
   {{- range .Values.ingress.pulsar.hosts }}
   - host: {{ .name }}

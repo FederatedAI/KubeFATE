@@ -7,34 +7,15 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
-# limitations under the License.
+# limitations under the License
 
-{{ if .Values.modules.client.include }}
 apiVersion: networking.k8s.io/v1
-kind: Ingress
+kind: IngressClass
 metadata:
-  name: client
   labels:
-    fateMoudle: client
-{{ include "fate.labels" . | indent 4 }}
+    app.kubernetes.io/component: controller
+  name: nginx
+  annotations:
+    ingressclass.kubernetes.io/is-default-class: "true"
 spec:
-  ingressClassName: nginx
-  rules:
-  {{- range .Values.ingress.client.hosts }}
-  - host: {{ .name }}
-    http:
-      paths:
-      - path: {{ default "/" .path }}
-        pathType: Prefix
-        backend:
-          service:
-            name: notebook
-            port:
-              number: 20000
-  {{- end }}
-  {{- if .Values.ingress.client.tls }}
-  tls:
-{{ toYaml .Values.ingress.client.tls | indent 4 }}
-  {{- end }}
-
-{{ end }}
+  controller: k8s.io/ingress-nginx

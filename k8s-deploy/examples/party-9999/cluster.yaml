@@ -25,14 +25,10 @@ modules:
 backend: eggroll
 
 ingress:
-  fateboard: 
-    annotations:
-      kubernetes.io/ingress.class: "nginx"
+  fateboard:
     hosts:
     - name: party9999.fateboard.example.com
   client:  
-    annotations:
-      kubernetes.io/ingress.class: "nginx"
     hosts:
     - name: party9999.notebook.example.com
 

@@ -32,7 +32,6 @@ backend: eggroll
 
 # ingress:
   # fateboard: 
-    # annotations:
     # hosts:
     # - name: party9999.fateboard.example.com
       # path: /

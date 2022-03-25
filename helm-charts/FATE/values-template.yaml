@@ -17,9 +17,7 @@ partyName: {{ .name }}
 {{- with .ingress }}
 ingress:
   {{- with .fateboard }}
-  fateboard: 
-    {{- with .annotations }}
-    annotations: 
+  fateboard:
 {{ toYaml . | indent 6 }}
     {{- end }}
     {{- with .hosts }}
@@ -34,10 +32,6 @@ ingress:
   
   {{- with .client }}
   client: 
-    {{- with .annotations }}
-    annotations: 
-{{ toYaml . | indent 6 }}
-    {{- end }}
     {{- with .hosts }}
     hosts:
 {{ toYaml . | indent 6 }}
@@ -50,10 +44,6 @@ ingress:
   
   {{- with .spark }}
   spark: 
-    {{- with .annotations }}
-    annotations: 
-{{ toYaml . | indent 6 }}
-    {{- end }}
     {{- with .hosts }}
     hosts:
 {{ toYaml . | indent 6 }}
@@ -66,10 +56,6 @@ ingress:
   
   {{- with .rabbitmq }}
   rabbitmq: 
-    {{- with .annotations }}
-    annotations: 
-{{ toYaml . | indent 6 }}
-    {{- end }}
     {{- with .hosts }}
     hosts:
 {{ toYaml . | indent 6 }}
@@ -82,10 +68,6 @@ ingress:
   
   {{- with .pulsar }}
   pulsar: 
-    {{- with .annotations }}
-    annotations: 
-{{ toYaml . | indent 6 }}
-    {{- end }}
     {{- with .hosts }}
     hosts:
 {{ toYaml . | indent 6 }}

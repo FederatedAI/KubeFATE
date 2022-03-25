@@ -18,7 +18,6 @@ podSecurityPolicy:
 
 ingress:
   fateboard: 
-    # annotations: 
     hosts:
     - name: fateboard.example.com
       path: /
@@ -27,25 +26,21 @@ ingress:
       # hosts:
         # - fateboard.example.com
   client: 
-    # annotations: 
     hosts:
     - name: notebook.example.com
       path: /
     tls: [] 
   spark: 
-    # annotations: 
     hosts:
     - name: spark.example.com
       path: /
     tls: [] 
   rabbitmq: 
-    # annotations: 
     hosts:
     - name: rabbitmq.example.com
       path: /
     tls: [] 
   pulsar: 
-    # annotations: 
     hosts:
     - name:  pulsar.example.com
       path: /

@@ -29,28 +29,18 @@ backend: spark_rabbitmq
 # Specify domain name for service
 # ingress:
   # fateboard: 
-    # annotations:
-      # kubernetes.io/ingress.class: "nginx"
     # hosts:
     # - name: party9999.fateboard.example.com
   # client:  
-    # annotations:
-      # kubernetes.io/ingress.class: "nginx"
     # hosts:
     # - name: party9999.notebook.example.com
   # spark:  
-    # annotations:
-      # kubernetes.io/ingress.class: "nginx"
     # hosts:
     # - name: party9999.spark.example.com
   # rabbitmq:  
-    # annotations:
-      # kubernetes.io/ingress.class: "nginx"
     # hosts:
     # - name: party9999.rabbitmq.example.com
   # pulsar:  
-    # annotations:
-      # kubernetes.io/ingress.class: "nginx"
     # hosts:
     # - name: party9999.pulsar.example.com
 

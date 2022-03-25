@@ -17,11 +17,8 @@ metadata:
   labels:
     fateMoudle: fateboard
 {{ include "fate.labels" . | indent 4 }}
-{{- if .Values.ingress.fateboard.annotations }}
-  annotations:
-{{ toYaml .Values.ingress.fateboard.annotations | indent 4 }}
-{{- end }}
 spec:
+  ingressClassName: nginx
   rules:
   {{- range .Values.ingress.fateboard.hosts }}
   - host: {{ .name }}

@@ -17,11 +17,8 @@ metadata:
   labels:
     fateMoudle: spark
 {{ include "fate.labels" . | indent 4 }}
-{{- if .Values.ingress.spark.annotations }}
-  annotations:
-{{ toYaml .Values.ingress.spark.annotations | indent 4 }}
-{{- end }}
 spec:
+  ingressClassName: nginx
   rules:
   {{- range .Values.ingress.spark.hosts }}
   - host: {{ .name }}

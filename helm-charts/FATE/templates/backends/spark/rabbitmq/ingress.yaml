@@ -17,11 +17,8 @@ metadata:
   labels:
     fateMoudle: rabbitmq
 {{ include "fate.labels" . | indent 4 }}
-{{- if .Values.ingress.rabbitmq.annotations }}
-  annotations:
-{{ toYaml .Values.ingress.rabbitmq.annotations | indent 4 }}
-{{- end }}
 spec:
+  ingressClassName: nginx
   rules:
   {{- range .Values.ingress.rabbitmq.hosts }}
   - host: {{ .name }}
