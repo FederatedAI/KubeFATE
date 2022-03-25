@@ -27,9 +27,9 @@ spec:
       port: 9870
       targetPort: 9870
       protocol: TCP
-    - name: "tcp-50070"
-      port: 50070
-      targetPort: 50070
+    - name: "tcp-50075"
+      port: 50075
+      targetPort: 50075
       protocol: TCP
   type: {{ .Values.modules.hdfs.datanode.type }}
   selector:

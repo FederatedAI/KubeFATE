@@ -12,12 +12,12 @@ FATE:
 - fluent/fluentd:v1.12
 - federatedai/spark-master:${version-tag}
 - federatedai/spark-worker:${version-tag}
-- hadoop-datanode:2.0.0-hadoop2.7.4-java8
-- hadoop-namenode:2.0.0-hadoop2.7.4-java8
+- federatedai/hadoop-datanode:2.0.0-hadoop2.7.4-java8
+- federatedai/hadoop-namenode:2.0.0-hadoop2.7.4-java8
 - nginx:1.17
 - federatedai/nginx:${version-tag}
-- rabbitmq:3.8.3-management
-- pulsar:2.7.0
+- federatedai/rabbitmq:3.8.3-management
+- federatedai/pulsar:2.7.0
 
 
 

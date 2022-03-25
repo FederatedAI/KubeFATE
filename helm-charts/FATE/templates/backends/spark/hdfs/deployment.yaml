@@ -54,6 +54,36 @@ spec:
             - containerPort: 9000
             - containerPort: 9870
             - containerPort: 50070
+          livenessProbe:
+            exec:
+              command:
+              - /bin/bash
+              - -c
+              - curl -f localhost:50070
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            exec:
+              command:
+              - /bin/bash
+              - -c
+              - curl -f localhost:50070
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 1
+            successThreshold: 1
+            failureThreshold: 3
+          startupProbe:
+            exec:
+              command:
+              - /bin/bash
+              - -c
+              - curl -f localhost:50070
+            failureThreshold: 12
+            periodSeconds: 10
           volumeMounts:
             - mountPath: /etc/hadoop/core-site.xml
               subPath: core-site.xml
@@ -124,7 +154,37 @@ spec:
           ports:
             - containerPort: 9000
             - containerPort: 9870
-            - containerPort: 50070
+            - containerPort: 50075
+          livenessProbe:
+            exec:
+              command:
+              - /bin/bash
+              - -c
+              - curl -f localhost:50075
+            initialDelaySeconds: 1
+            periodSeconds: 10
+            timeoutSeconds: 3
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            exec:
+              command:
+              - /bin/bash
+              - -c
+              - curl -f localhost:50075
+            initialDelaySeconds: 1
+            periodSeconds: 10
+            timeoutSeconds: 3
+            successThreshold: 1
+            failureThreshold: 3
+          startupProbe:
+            exec:
+              command:
+              - /bin/bash
+              - -c
+              - curl -f localhost:50075
+            failureThreshold: 12
+            periodSeconds: 10
           volumeMounts:
           - name: dfs
             mountPath: /hadoop/dfs/data
