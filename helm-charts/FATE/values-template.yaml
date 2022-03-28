@@ -108,6 +108,8 @@ podSecurityPolicy:
   enabled: {{ .enabled | default false }}
 {{- end }}
 
+ingressClassName: {{ .ingressClassName | default nginx}}
+
 exchange:
 {{- with .rollsite }}
 {{- with .exchange }}
@@ -589,5 +591,3 @@ externalMysqlPort: {{ .externalMysqlPort }}
 externalMysqlDatabase: {{ .externalMysqlDatabase }}
 externalMysqlUser: {{ .externalMysqlUser }}
 externalMysqlPassword: {{ .externalMysqlPassword }}
-
-ingressClassName: {{ .ingressClassName }}
