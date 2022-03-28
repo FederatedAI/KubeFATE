@@ -108,7 +108,7 @@ podSecurityPolicy:
   enabled: {{ .enabled | default false }}
 {{- end }}
 
-ingressClassName: {{ .ingressClassName | default nginx}}
+ingressClassName: {{ .ingressClassName | default "nginx"}}
 
 exchange:
 {{- with .rollsite }}
