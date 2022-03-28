@@ -22,9 +22,7 @@ metadata:
 {{ toYaml .Values.ingress.spark.annotations | indent 4 }}
 {{- end }}
 spec:
-  {{- if .Values.ingressclass.enabled}}
-  ingressClassName: {{ .Values.ingressclass.name }}
-  {{- end }}
+  ingressClassName: {{ .Values.ingressClassName }}
   rules:
   {{- range .Values.ingress.spark.hosts }}
   - host: {{ .name }}

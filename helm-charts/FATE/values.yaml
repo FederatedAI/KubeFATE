@@ -16,10 +16,7 @@ istio:
 podSecurityPolicy:
   enabled: false
 
-ingressclass:
-  enabled: false
-  name: ""
-  controller: ""
+ingressClassName: nginx
 
 ingress:
   fateboard:
@@ -50,7 +47,7 @@ ingress:
       path: /
     tls: [] 
   pulsar:
-    # annotations:
+    # annotations: 
     hosts:
     - name:  pulsar.example.com
       path: /

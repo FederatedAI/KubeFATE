@@ -13,10 +13,7 @@ istio:
   enabled: false
 podSecurityPolicy:
   enabled: false
-customizedIngressClass:
-  enabled: false
-  name: ""
-  controller: ""
+ingressClassName: nginx
 modules:
   - mysql
   - python

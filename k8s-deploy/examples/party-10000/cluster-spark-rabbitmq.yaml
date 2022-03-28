@@ -11,6 +11,7 @@ imagePullSecrets:
 persistence: false
 istio:
   enabled: false
+ingressClassName: nginx
 podSecurityPolicy:
   enabled: false
 modules:

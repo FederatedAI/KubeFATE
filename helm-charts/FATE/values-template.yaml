@@ -11,7 +11,6 @@ image:
 
 partyId: {{ .partyId | int64 | toString }}
 partyName: {{ .name }}
-namespace: {{ .namespace }}
 
 {{- $partyId := (.partyId | int64 | toString) }}
 
@@ -591,9 +590,4 @@ externalMysqlDatabase: {{ .externalMysqlDatabase }}
 externalMysqlUser: {{ .externalMysqlUser }}
 externalMysqlPassword: {{ .externalMysqlPassword }}
 
-{{- with .customizedIngressClass }}
-ingressclass:
-  enabled: .enabled
-  name: {{ .name }}
-  controller: {{ .controller }}
-{{- end}}
+ingressClassName: {{ .ingressClassName }}
