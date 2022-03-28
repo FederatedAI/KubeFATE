@@ -109,8 +109,10 @@ spec:
             value: "104868093952"
           {{- end }}
           ports:
-            - containerPort: 9360
-            - containerPort: 9380
+            - name: grpc-port
+              containerPort: 9360
+            - name: http-port
+              containerPort: 9380
           command:
             - /bin/bash
             - -c
@@ -133,6 +135,27 @@ spec:
                 ln -sf /dev/stdout /data/projects/fate/fateflow/logs/fate_flow/INFO.log
                 
                 sleep 5 && python fateflow/python/fate_flow/fate_flow_server.py
+          livenessProbe:
+            tcpSocket:
+              port: 9380
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            tcpSocket:
+              port: 9380
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 3
+            successThreshold: 1
+            failureThreshold: 3
+          startupProbe:
+            tcpSocket:
+              port: 9380
+            failureThreshold: 12
+            periodSeconds: 10
           volumeMounts:
             {{- if eq .Values.modules.python.backend "eggroll" }}
             - mountPath: /data/projects/fate/eggroll/conf/eggroll.properties
@@ -168,6 +191,39 @@ spec:
           name: fateboard
           ports:
             - containerPort: 8080
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+              httpHeaders:
+                - name: X-Custom-Header
+                  value: livenessProbe
+            initialDelaySeconds: 1
+            periodSeconds: 10
+            timeoutSeconds: 3
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+              httpHeaders:
+                - name: X-Custom-Header
+                  value: readinessProbe
+            initialDelaySeconds: 1
+            periodSeconds: 10
+            timeoutSeconds: 3
+            successThreshold: 1
+            failureThreshold: 3
+          startupProbe:
+            httpGet:
+              path: /
+              port: 8080
+              httpHeaders:
+                - name: X-Custom-Header
+                  value: startupProbe
+            failureThreshold: 12
+            periodSeconds: 10
           volumeMounts:
             - mountPath: /data/projects/fate/fateboard/conf/application.properties
               name: fateboard-confs
