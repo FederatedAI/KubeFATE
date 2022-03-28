@@ -11,6 +11,7 @@ image:
 
 partyId: {{ .partyId | int64 | toString }}
 partyName: {{ .name }}
+namespace: {{ .namespace }}
 
 {{- $partyId := (.partyId | int64 | toString) }}
 
@@ -18,6 +19,8 @@ partyName: {{ .name }}
 ingress:
   {{- with .fateboard }}
   fateboard:
+    {{- with .annotations }}
+    annotations:
 {{ toYaml . | indent 6 }}
     {{- end }}
     {{- with .hosts }}
@@ -31,7 +34,11 @@ ingress:
   {{- end }}
   
   {{- with .client }}
-  client: 
+  client:
+    {{- with .annotations }}
+    annotations:
+{{ toYaml . | indent 6 }}
+    {{- end }}
     {{- with .hosts }}
     hosts:
 {{ toYaml . | indent 6 }}
@@ -43,7 +50,11 @@ ingress:
   {{- end }}
   
   {{- with .spark }}
-  spark: 
+  spark:
+    {{- with .annotations }}
+    annotations:
+{{ toYaml . | indent 6 }}
+    {{- end }}
     {{- with .hosts }}
     hosts:
 {{ toYaml . | indent 6 }}
@@ -55,7 +66,11 @@ ingress:
   {{- end }}
   
   {{- with .rabbitmq }}
-  rabbitmq: 
+  rabbitmq:
+    {{- with .annotations }}
+    annotations:
+{{ toYaml . | indent 6 }}
+    {{- end }}
     {{- with .hosts }}
     hosts:
 {{ toYaml . | indent 6 }}
@@ -67,7 +82,11 @@ ingress:
   {{- end }}
   
   {{- with .pulsar }}
-  pulsar: 
+  pulsar:
+    {{- with .annotations }}
+    annotations:
+{{ toYaml . | indent 6 }}
+    {{- end }}
     {{- with .hosts }}
     hosts:
 {{ toYaml . | indent 6 }}
@@ -571,3 +590,10 @@ externalMysqlPort: {{ .externalMysqlPort }}
 externalMysqlDatabase: {{ .externalMysqlDatabase }}
 externalMysqlUser: {{ .externalMysqlUser }}
 externalMysqlPassword: {{ .externalMysqlPassword }}
+
+{{- with .customizedIngressClass }}
+ingressclass:
+  enabled: .enabled
+  name: {{ .name }}
+  controller: {{ .controller }}
+{{- end}}

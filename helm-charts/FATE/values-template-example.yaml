@@ -13,6 +13,10 @@ istio:
   enabled: false
 podSecurityPolicy:
   enabled: false
+ingressclass:
+  enabled: false
+  name: ""
+  controller: ""
 modules:
   - rollsite
   - clustermanager
@@ -336,4 +340,3 @@ backend: eggroll
       # port: 30105
       # sslPort: 30109
       # proxy: ""
-     

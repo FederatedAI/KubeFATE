@@ -16,8 +16,14 @@ istio:
 podSecurityPolicy:
   enabled: false
 
+ingressclass:
+  enabled: false
+  name: ""
+  controller: ""
+
 ingress:
-  fateboard: 
+  fateboard:
+    # annotations:
     hosts:
     - name: fateboard.example.com
       path: /
@@ -25,22 +31,26 @@ ingress:
     # - secretName: my-tls-secret
       # hosts:
         # - fateboard.example.com
-  client: 
+  client:
+    # annotations:
     hosts:
     - name: notebook.example.com
       path: /
     tls: [] 
-  spark: 
+  spark:
+    # annotations:
     hosts:
     - name: spark.example.com
       path: /
     tls: [] 
-  rabbitmq: 
+  rabbitmq:
+    # annotations:
     hosts:
     - name: rabbitmq.example.com
       path: /
     tls: [] 
-  pulsar: 
+  pulsar:
+    # annotations:
     hosts:
     - name:  pulsar.example.com
       path: /

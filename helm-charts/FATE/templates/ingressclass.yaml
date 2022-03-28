@@ -9,13 +9,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
+{{- if .Values.ingressclass.enabled}}
 apiVersion: networking.k8s.io/v1
 kind: IngressClass
 metadata:
   labels:
     app.kubernetes.io/component: controller
-  name: nginx
+  name: {{ .Values.ingressclass.name }}
   annotations:
-    ingressclass.kubernetes.io/is-default-class: "true"
+    app.kubernetes.io/managed-by: Helm
+    meta.helm.sh/release-name: {{ .Values.partyName }}
+    meta.helm.sh/release-namespace: {{ .Values.namespace }}
 spec:
-  controller: k8s.io/ingress-nginx
+  controller: {{ .Values.ingressclass.controller }}
+{{- end}}
