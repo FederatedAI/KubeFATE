@@ -54,10 +54,71 @@ git rebase kubfate/master
 Please use fetch / rebase (as shown above) instead of git pull. git pull does a merge, which leaves merge commits. These make the commit history messy and violate the principle that commits ought to be individually understandable and useful (see below). You can also consider changing your .git/config file via git config branch.autoSetupRebase always to change the behavior of git pull.
 ```
 
+### Develop, Build and Test
+Write code on the new branch in your fork. The coding style used in KubeFATE is suggested by the Golang community. See the [style doc](https://github.com/golang/go/wiki/CodeReviewComments) for details.
+
+Try to limit column width to 120 characters for both code and markdown documents such as this one.
+
+As we are enforcing standards set by [golint](https://github.com/golang/lint), please always run golint on source code before committing your changes. If it reports an issue, in general, the preferred action is to fix the code to comply with the linter's recommendation
+because golint gives suggestions according to the stylistic conventions listed in [Effective Go](https://golang.org/doc/effective_go.html) and the [CodeReviewComments](https://github.com/golang/go/wiki/CodeReviewComments).
+```
+#Install fgt and golint
+
+go get -u golang.org/x/lint/golint
+go get github.com/GeertJohan/fgt
+
+#In the #working_dir/harbor, run
+
+go list ./... | grep -v -E 'vendor|tests' | xargs -L1 fgt golint
+
+```
+
+Unit test cases should be added to cover the new code. Unit test framework for backend services is using [go testing](https://golang.org/doc/code.html#Testing).
+
+Run go test cases:
+```
+#cd #working_dir/src/[package]
+go test -v ./...
+```
+
+In both the root folder of the `KubeFATE` project and the `k8s-deploy` project, there is a Makefile. The Makefile in the `KubeFATE` folder includes all commands to create a KubeFATE release that you found in a KubeFATE release, including:
+* The docker-compose package;
+* The charts;
+* The KubeFATE CLI;
+* The KubeFATE server image.
+
+The Makefile in `k8s-deploy` includes:
+* `go test` command to verify your contributions;
+* Quick testing toolkit to deploy KubeFATE to a given Kubernetes;
+* Generating new Swag documents if APIs changes
+* and other subcommands.
+
+Strongly suggest you use this Makefile as a toolkit for build and testing.
+
 ### Update the APIs and related documents
 Our RESTful APIs are documented with [Swagger](https://swagger.io/)
 If your commit that changes the RESTful APIs, make sure to run `make swag` in `./k8s-deploy/Makefile` to update the Swagger documents.
 If your commit that exposes a user-faced function, make sure to add related introductions to documents.
+
+### License
+KubeFATE is applying Apache license, please include a short license header at the top of original source documents (code and documentation, but not the LICENSE and NOTICE files). An Apache license header example has list below.
+```
+/*
+ * Copyright 2019-2021 VMware, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+```
+_Note: "VMware, Inc." in the above example can be changed to the name of your organization or simplily "The KubeFATE Authors"._
 
 ### Commit
 As KubeFATE has integrated the [DCO (Developer Certificate of Origin)](https://probot.github.io/apps/dco/) check tool, contributors are required to sign-off that they adhere to those requirements by adding a Signed-off-by line to the commit messages. Git has even provided a -s command line option to append that automatically to your commit messages, please use it when you commit your changes.
