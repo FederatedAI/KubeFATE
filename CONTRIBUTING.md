@@ -153,3 +153,28 @@ Once your pull request has been opened, KubeFATE will run two CI pipelines again
 	* If any failure in `github action checks`, you need to figure out whether it is introduced by your commits.
 	* If the coverage dramatic decline, you need to commit unit test to coverage your code.
 2. In the Jenkins CI, the E2E test will be triggered. The pipeline is about to build and install a FATE cluster and run the federated learning workload.
+
+## No-code way contributing
+To contribute to the KubeFATE project, there are many ways beyond coding. 
+
+### Submitting an issue
+It is a great way to contribute to KubeFATE by reporting an issue. Well-written and complete bug reports are always welcome! Please open an issue on GitHub and follow the template to fill in the required information.
+
+Before opening any issue, please look up the existing issues to avoid submitting a duplication. If you find a match, you can "subscribe" to it to get notified of updates. If you have additional helpful information about the issue, please leave a comment.
+
+When reporting an issue of bugs, always include:
+* What deployment mode using? (docker-compose or Kubernetes) This is very important because it is a total difference we implemented between docker-compose and Kubernetes
+* Versions. Includes the KubeFATE CLI version, KubeFATE server version, FATE version, etc. And also we need to know the version and type of OS and Kubernetes. 
+
+Because the issues are open to the public, when submitting the log and configuration files, be sure to remove any sensitive information, e.g. user name, password, IP address, and company name. You can replace those parts with "REDACTED" or other strings like "****".
+
+Be sure to include the steps to reproduce the problem if applicable. It can help us understand and fix your issue faster.
+
+Another very appreciated way of contribution is submitting an issue of `feature request`. Make sure you are selecting the right template to draft it. Make sure you describing the problem to solve clearly. And it is also very important to stress the value of the feature requested, it is the important basis of our decision and work arrangement. 
+
+### Documenting (includes Wikis)
+Help us update, correct, add documents is greatly appreciated! It will help others better use KubeFATE and build a better community. Some documents to guide a beginner on how to use KubeFATE are also welcome and can be added to Wikis. Contact us if there are some documents or articles you can contribute.
+
+### Advocate and educate
+
+We are welcome any articles or blog posts to advocate the KubeFATE project or educate others on how to use KubeFATE for federated learning lifecycle management. If you can let us know the links to the articles or blog posts, we can gather them to the Wiki and help promote them to the community.
