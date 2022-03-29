@@ -22,6 +22,7 @@ metadata:
 {{ toYaml .Values.ingress.fateboard.annotations | indent 4 }}
 {{- end }}
 spec:
+  ingressClassName: {{ .Values.ingressClassName }}
   rules:
   {{- range .Values.ingress.fateboard.hosts }}
   - host: {{ .name }}

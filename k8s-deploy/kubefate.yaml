@@ -241,9 +241,8 @@ kind: Ingress
 metadata:
   name: kubefate
   namespace: kube-fate
-  annotations:
-    kubernetes.io/ingress.class: "nginx"
 spec:
+  ingressClassName: nginx
   rules:
     - host: example.com
       http:
@@ -253,5 +252,5 @@ spec:
             backend:
               service: 
                 name: kubefate
-                port: 
+                port:
                   number: 8080

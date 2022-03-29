@@ -22,6 +22,7 @@ metadata:
 {{ toYaml .Values.ingress.rabbitmq.annotations | indent 4 }}
 {{- end }}
 spec:
+  ingressClassName: {{ .Values.ingressClassName }}
   rules:
   {{- range .Values.ingress.rabbitmq.hosts }}
   - host: {{ .name }}

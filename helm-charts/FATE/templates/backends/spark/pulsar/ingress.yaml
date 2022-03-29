@@ -22,6 +22,7 @@ metadata:
 {{ toYaml .Values.ingress.pulsar.annotations | indent 4 }}
 {{- end }}
 spec:
+  ingressClassName: {{ .Values.ingressClassName }}
   rules:
   {{- range .Values.ingress.pulsar.hosts }}
   - host: {{ .name }}
