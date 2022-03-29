@@ -1,10 +1,10 @@
 # Kubernetes Deployment
-We recommend using [Kubernetes](https://kubernetes.io/) as a underlying infrastructure to create and manage the FATE clusters in a production environment. KubeFATE supports deploying multiple FATE clusters in an instance of Kubernetes with different namespaces for the purposes of development, testing and production. Considering the different IT designs and standards in each company, the actual deployment should be customized. KubeFATE is flexibile for the FATE configuration.
+We recommend using [Kubernetes](https://kubernetes.io/) as an underlying infrastructure to create and manage the FATE clusters in a production environment. KubeFATE supports deploying multiple FATE clusters in an instance of Kubernetes with different namespaces for the purposes of development, testing and production. Considering the different IT designs and standards in each company, the actual deployment should be customized. KubeFATE is flexibile for the FATE configuration.
 
 If you focus on how to quickly use KubeFATE, please jump to [Use Scenarios](#use-scenarios).
 
 ## High-level architecture of multiple federated learning parties
-The hig-hlevel architecture of a multi-party federated learning deployment (e.g. two parties) is shown as follows:
+The high-level architecture of a multi-party federated learning deployment (e.g. two parties) is shown as follows:
 <div align="center">
   <img src="./images/hamflp.PNG">
 </div>
@@ -37,7 +37,7 @@ KubeFATE is designed to handle different versions FATE. Normally, KubeFATE CLI a
 
 ## User scenarios
 Suppose in an organization, there are two roles:
-* System Admin: who is responisble for the infrastructure management as well as Kubernetes administration
+* System Admin: who is responsible for the infrastructure management as well as Kubernetes administration
 * ML Infrastructure Operators: who is responsible for managing the machine learning cluster like FATE
 
 <div align="center">
@@ -52,7 +52,7 @@ Kubernetes: [v1.21.7](https://github.com/kubernetes/kubernetes/releases/tag/v1.2
 Ingress-nginx: [v1.0.5](https://github.com/kubernetes/ingress-nginx/releases/tag/controller-v1.0.5)
 
 #### Creating role, namespace and other resource in Kubernetes
-The sample yaml can be found in [rbac-config.yaml](./rbac-config.yaml). In this sample, we create a kube-fate namespace for KubeFATE service. Resource constraints can be applied to kube-fate namespace, refer to [Kubernetes Namespace](https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/), [Configure Memory and CPU Quotas for Namespace](https://kubernetes.io/docs/tasks/administer-cluster/manage-resources/quota-memory-cpu-namespace/).
+The example yaml can be found in [rbac-config.yaml](./rbac-config.yaml). In this example, we create a kube-fate namespace for KubeFATE service. Resource constraints can be applied to kube-fate namespace, refer to [Kubernetes Namespace](https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/), [Configure Memory and CPU Quotas for Namespace](https://kubernetes.io/docs/tasks/administer-cluster/manage-resources/quota-memory-cpu-namespace/).
 
 Run the following command to create the namespace:
 ```
@@ -67,7 +67,7 @@ stringData:
 ```
 
 #### Preparing domain name and deploying KubeFATE in Kubernetes
-Because KubeFATE service exposes RESTful APIs for external access, system admin needs to prepare a domain name for KubeFATE service. In our sample, the domain name is `example.com` . Moreover, system admin should create a namespace (e.g. fate-9999) for FATE deployment.
+Because KubeFATE service exposes RESTful APIs for external access, system admin needs to prepare a domain name for KubeFATE service. In our example, the domain name is `example.com` . Moreover, system admin should create a namespace (e.g. fate-9999) for FATE deployment.
 ```
 $ kubectl apply -f ./kubefate.yaml
 $ kubectl create namespace fate-9999
@@ -95,7 +95,7 @@ serviceurl: example.com
 
 Create a `cluster.yaml` for FATE cluster configuration. The details of configuration can be found here: [FATE Cluster Configuration Guide](../docs/configurations/FATE_cluster_configuration.md). 
 
-**NOTE:** For Chinese user, specifying a local image registry in `cluster.yaml` can accelerate the download of images. The details is as follows:
+**NOTE:** For Chinese user, specifying a local image registry in `cluster.yaml` can accelerate the download of images. The details are as follows:
 ```
 registry: "hub.c.163.com/federatedai"
 ```
@@ -109,7 +109,7 @@ create job success, job id=fe846176-0787-4879-9d27-622692ce181c
 *NOTE: If you want to deploy **FATE on Spark**, you can use `cluster-spark.yaml`.*
 
 #### Checking the status of "Installing Cluster" job
-After the above command has finished, a job is created for installing a FATE cluster. Run the command `kubefate job describe` to check the status of the job, util the "Status" turns to `Success`.
+After the above command has finished, a job is created for installing a FATE cluster. Run the command `kubefate job describe` to check the status of the job, until the "Status" turns to `Success`.
 
 ```
 $ kubefate job describe fe846176-0787-4879-9d27-622692ce181c
