@@ -15,7 +15,7 @@
 | * persistence             | bool               | mysql and nodemanager data persistence.                                                                |
 | istio.enable              | bool               | enable istio                                                                                           |
 | podSecurityPolicy.enabled | bool               | if `true`, create & use Pod Security Policy resources                                                  |
-| ingressClassName          | mappings           | The Ingress class name, such as "nginx".                                                               |
+| ingressClassName          | scalars            | The Ingress class name, such as "nginx".                                                               |
 | * modules                 | sequences          | Modules to be deployed in the FATE cluster.                                                            |
 | backend                   | set(eggroll,spark) | Configure cluster computing engine( eggroll or spark)                                                  |
 | ingress                   | mappings           | Custom domain of FATE UI component                                                                     |
