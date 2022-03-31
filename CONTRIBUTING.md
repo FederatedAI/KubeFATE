@@ -104,7 +104,7 @@ If your commit that exposes a user-faced function, make sure to add related intr
 KubeFATE is applying Apache license, please include a short license header at the top of original source documents (code and documentation, but not the LICENSE and NOTICE files). An Apache license header example has list below.
 ```
 /*
- * Copyright 2019-2021 VMware, Inc.
+ * Copyright 2019-2022 VMware, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
