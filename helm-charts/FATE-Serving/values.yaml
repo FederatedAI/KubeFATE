@@ -84,6 +84,7 @@ servingServer:
   existingClaim: ""
   storageClass: "serving-server"
   accessMode: ReadWriteOnce
+  cacheType: local
   size: 1Gi
 
 
