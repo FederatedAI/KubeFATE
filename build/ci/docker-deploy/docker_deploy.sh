@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -x
 dir=$(dirname $0)
 
 CONTAINER_NUM=13
