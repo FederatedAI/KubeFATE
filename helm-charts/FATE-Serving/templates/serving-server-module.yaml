@@ -27,7 +27,7 @@ data:
     #serviceRoleName=serving
     # cache
     #remoteModelInferenceResultCacheSwitch=false
-    cache.type={{ .Values.cacheType | default "local" }}
+    cache.type={{ .Values.servingServer.cacheType | default "local" }}
     model.cache.path=/root/.fate
     # local cache
     #local.cache.maxsize=10000
