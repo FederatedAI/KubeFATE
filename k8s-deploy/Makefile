@@ -1,5 +1,5 @@
 NAME ?= federatedai/kubefate
-VERSION ?= v1.4.3
+VERSION ?= v1.4.4
 IMG ?= ${NAME}:${VERSION}
 
 ifeq (,$(shell go env GOBIN))
@@ -63,7 +63,7 @@ vet:
 	go vet ./...
 # Generate swag API file
 swag: swag-bin
-	$(SWAG_BIN) init --parseDependency --parseInternal -g pkg/api/service.go
+	$(SWAG_BIN) init --parseDependency --parseInternal --parseDepth 1 -g pkg/api/service.go
 
 package: kubefate-without-swag
 	mkdir -p tmp/kubefate;
@@ -85,7 +85,7 @@ ifeq (, $(shell which swag))
 	SWAG_BIN_TMP_DIR=$$(mktemp -d) ;\
 	cd $$SWAG_BIN_TMP_DIR ;\
 	go mod init tmp ;\
-	go install github.com/swaggo/swag/cmd/swag@latest ;\
+	go install github.com/swaggo/swag/cmd/swag@v1.8.0 ;\
 	rm -rf $$SWAG_BIN_TMP_DIR ;\
 	}
 SWAG_BIN=$(GOBIN)/swag

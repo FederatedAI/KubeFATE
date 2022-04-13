@@ -13,6 +13,7 @@ istio:
   enabled: false
 podSecurityPolicy:
   enabled: false
+ingressClassName: nginx
 modules:
   - python
   - mysql
@@ -27,23 +28,15 @@ backend: spark_rabbitmq
 
 ingress:
   fateboard: 
-    annotations:
-      kubernetes.io/ingress.class: "nginx"
     hosts:
     - name: party9999.fateboard.example.com
   client:  
-    annotations:
-      kubernetes.io/ingress.class: "nginx"
     hosts:
     - name: party9999.notebook.example.com
   spark:  
-    annotations:
-      kubernetes.io/ingress.class: "nginx"
     hosts:
     - name: party9999.spark.example.com
   rabbitmq:  
-    annotations:
-      kubernetes.io/ingress.class: "nginx"
     hosts:
     - name: party9999.rabbitmq.example.com
     
@@ -51,6 +44,7 @@ python:
   type: NodePort
   httpNodePort: 30097
   grpcNodePort: 30092
+  logLevel: INFO
 
 servingIp: 192.168.9.1
 servingPort: 30095

@@ -17,9 +17,9 @@ partyName: {{ .name }}
 {{- with .ingress }}
 ingress:
   {{- with .fateboard }}
-  fateboard: 
+  fateboard:
     {{- with .annotations }}
-    annotations: 
+    annotations:
 {{ toYaml . | indent 6 }}
     {{- end }}
     {{- with .hosts }}
@@ -33,9 +33,9 @@ ingress:
   {{- end }}
   
   {{- with .client }}
-  client: 
+  client:
     {{- with .annotations }}
-    annotations: 
+    annotations:
 {{ toYaml . | indent 6 }}
     {{- end }}
     {{- with .hosts }}
@@ -49,9 +49,9 @@ ingress:
   {{- end }}
   
   {{- with .spark }}
-  spark: 
+  spark:
     {{- with .annotations }}
-    annotations: 
+    annotations:
 {{ toYaml . | indent 6 }}
     {{- end }}
     {{- with .hosts }}
@@ -65,9 +65,9 @@ ingress:
   {{- end }}
   
   {{- with .rabbitmq }}
-  rabbitmq: 
+  rabbitmq:
     {{- with .annotations }}
-    annotations: 
+    annotations:
 {{ toYaml . | indent 6 }}
     {{- end }}
     {{- with .hosts }}
@@ -81,9 +81,9 @@ ingress:
   {{- end }}
   
   {{- with .pulsar }}
-  pulsar: 
+  pulsar:
     {{- with .annotations }}
-    annotations: 
+    annotations:
 {{ toYaml . | indent 6 }}
     {{- end }}
     {{- with .hosts }}
@@ -107,6 +107,8 @@ istio:
 podSecurityPolicy:
   enabled: {{ .enabled | default false }}
 {{- end }}
+
+ingressClassName: {{ .ingressClassName | default "nginx"}}
 
 exchange:
 {{- with .rollsite }}

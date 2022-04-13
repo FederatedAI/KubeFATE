@@ -1,0 +1,193 @@
+# Copyright 2019-2022 VMware, Inc.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+{{ if .Values.modules.spark.include }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spark-master
+  labels:
+    fateMoudle: spark-master
+{{ include "fate.labels" . | indent 4 }}
+spec:
+  replicas: {{ default 1 .Values.modules.spark.master.replicas }}
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      fateMoudle: spark-master
+{{ include "fate.matchLabels" . | indent 6 }}
+  template:
+    metadata:
+      labels:
+        fateMoudle: spark-master
+{{ include "fate.labels" . | indent 8 }}
+    spec:
+      containers:
+        - name: spark-master
+          image: {{ if .Values.modules.spark.master.Image }}{{ .Values.modules.spark.master.Image }}{{ else }}{{ .Values.image.registry }}/spark-master{{ end }}:{{ default .Values.image.tag .Values.modules.spark.master.ImageTag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if .Values.modules.spark.master.resources}}
+          resources:
+          {{- range $key, $val := .Values.modules.spark.master.resources }}
+            {{ $key }}:
+{{ toYaml $val | indent 14 }}
+          {{- end }}
+          {{- end }}
+          ports:
+            - containerPort: 8080
+            - containerPort: 7077
+            - containerPort: 6066
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+              httpHeaders:
+                - name: X-Custom-Header
+                  value: livenessProbe
+            initialDelaySeconds: 1
+            periodSeconds: 10
+            timeoutSeconds: 3
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+              httpHeaders:
+                - name: X-Custom-Header
+                  value: readinessProbe
+            initialDelaySeconds: 1
+            periodSeconds: 10
+            timeoutSeconds: 3
+            successThreshold: 1
+            failureThreshold: 3
+          startupProbe:
+            httpGet:
+              path: /
+              port: 8080
+              httpHeaders:
+                - name: X-Custom-Header
+                  value: startupProbe
+            failureThreshold: 12
+            periodSeconds: 10
+      {{- with .Values.modules.spark.master.nodeSelector }}
+      nodeSelector: 
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.modules.spark.master.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.modules.spark.master.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.image.imagePullSecrets }}
+      imagePullSecrets:
+{{ toYaml . | indent 6 }}
+      {{- end }}
+      serviceAccountName: {{ template "serviceAccountName" . }}
+      restartPolicy: Always
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spark-worker
+  labels:
+    fateMoudle: spark-worker
+{{ include "fate.labels" . | indent 4 }}
+spec:
+  replicas: {{ default 2 .Values.modules.spark.worker.replicas }}
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      fateMoudle: spark-worker
+{{ include "fate.matchLabels" . | indent 6 }}
+  template:
+    metadata:
+      labels:
+        fateMoudle: spark-worker
+{{ include "fate.labels" . | indent 8 }}
+    spec:
+      containers:
+        - name: spark-worker
+          image: {{ if .Values.modules.spark.worker.Image }}{{ .Values.modules.spark.worker.Image }}{{ else }}{{ .Values.image.registry }}/spark-worker{{ end }}:{{ default .Values.image.tag .Values.modules.spark.worker.ImageTag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if .Values.modules.spark.worker.resources }}
+          resources:
+          {{- range $key, $val := .Values.modules.spark.worker.resources }}
+            {{ $key }}:
+{{ toYaml $val | indent 14 }}
+          {{- end }}
+          {{- end }}
+          volumeMounts:
+            - mountPath: /data/projects/fate/conf/
+              name: spark-worker-confs
+          ports:
+            - containerPort: 8081
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8081
+              httpHeaders:
+                - name: X-Custom-Header
+                  value: livenessProbe
+            initialDelaySeconds: 1
+            periodSeconds: 10
+            timeoutSeconds: 3
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8081
+              httpHeaders:
+                - name: X-Custom-Header
+                  value: readinessProbe
+            initialDelaySeconds: 1
+            periodSeconds: 10
+            timeoutSeconds: 3
+            successThreshold: 1
+            failureThreshold: 3
+          startupProbe:
+            httpGet:
+              path: /
+              port: 8081
+              httpHeaders:
+                - name: X-Custom-Header
+                  value: startupProbe
+            failureThreshold: 12
+            periodSeconds: 10
+      {{- with .Values.modules.spark.worker.nodeSelector }}
+      nodeSelector: 
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.modules.spark.worker.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.modules.spark.worker.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.image.imagePullSecrets }}
+      imagePullSecrets:
+{{ toYaml . | indent 6 }}
+      {{- end }}
+      serviceAccountName: {{ template "serviceAccountName" . }}
+      restartPolicy: Always
+      volumes:
+        - name: spark-worker-confs
+          configMap:
+            name: spark-worker-config
+{{ end }}

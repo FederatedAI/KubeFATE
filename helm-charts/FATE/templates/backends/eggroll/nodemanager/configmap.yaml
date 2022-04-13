@@ -1,0 +1,105 @@
+# Copyright 2019-2022 VMware, Inc.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+{{- if .Values.modules.nodemanager.include }}
+{{- $root := . -}}
+{{- range $nodemanager := .Values.modules.nodemanager.list }}
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ $nodemanager.name }}-config
+  labels:
+    fateMoudle: {{ $nodemanager.name }}
+{{ include "fate.labels" $root | indent 4 }}
+data:
+  eggroll.properties: |
+    [eggroll]
+    eggroll.resourcemanager.clustermanager.jdbc.driver.class.name=com.mysql.cj.jdbc.Driver
+    eggroll.resourcemanager.clustermanager.jdbc.url=jdbc:mysql://{{ $root.Values.modules.mysql.ip }}:{{ $root.Values.modules.mysql.port }}/{{ $root.Values.modules.mysql.mysql_database }}?useSSL=false&serverTimezone=UTC&characterEncoding=utf8&allowPublicKeyRetrieval=true
+    eggroll.resourcemanager.clustermanager.jdbc.username={{ $root.Values.modules.mysql.mysql_user }}
+    eggroll.resourcemanager.clustermanager.jdbc.password={{ $root.Values.modules.mysql.mysql_password }}
+    
+    eggroll.data.dir=data/
+    eggroll.logs.dir=logs/
+    eggroll.resourcemanager.clustermanager.host=clustermanager
+    eggroll.resourcemanager.clustermanager.port=4670
+    eggroll.resourcemanager.nodemanager.port=4671
+    eggroll.resourcemanager.process.tag={{ $root.Values.partyId }}
+    
+    eggroll.bootstrap.root.script=bin/eggroll_boot.sh
+    
+    eggroll.resourcemanager.bootstrap.egg_pair.exepath=bin/roll_pair/egg_pair_bootstrap.sh
+    eggroll.resourcemanager.bootstrap.egg_pair.venv=
+    eggroll.resourcemanager.bootstrap.egg_pair.pythonpath=/data/projects/fate/python:/data/projects/fate/eggroll/python
+    eggroll.resourcemanager.bootstrap.egg_pair.filepath=python/eggroll/roll_pair/egg_pair.py
+    eggroll.resourcemanager.bootstrap.egg_pair.ld_library_path=
+    
+    eggroll.resourcemanager.bootstrap.egg_frame.exepath=bin/roll_pair/roll_pair_master_bootstrap.sh
+    eggroll.resourcemanager.bootstrap.egg_frame.javahome=/usr/lib/jvm/java-1.8.0-openjdk
+    eggroll.resourcemanager.bootstrap.egg_frame.classpath=conf/:lib/*
+    eggroll.resourcemanager.bootstrap.egg_frame.mainclass=com.webank.eggroll.rollframe.EggFrameBootstrap
+    eggroll.resourcemanager.bootstrap.egg_frame.jvm.options=
+    
+    eggroll.core.grpc.channel.keepalive.timeout.sec=20
+    
+    # roll_frame
+    arrow.enable_unsafe_memory_access=true
+    
+    # hadoop
+    hadoop.fs.defaultFS=file:///
+    
+    # hadoop HA mode
+    hadoop.dfs.nameservices=
+    hadoop.dfs.namenode.rpc-address.nn1=
+    hadoop.dfs.namenode.rpc-address.nn2=
+    
+    # session
+    eggroll.session.processors.per.node={{ $nodemanager.sessionProcessorsPerNode }}
+    eggroll.session.start.timeout.ms=180000
+    
+    # rollpair
+    eggroll.rollpair.transferpair.sendbuf.size=250000
+    
+    # rollsite
+    eggroll.rollsite.coordinator={{ $root.Values.partyName }}
+    eggroll.rollsite.host=rollsite
+    eggroll.rollsite.port=9370
+    eggroll.rollsite.party.id={{ $root.Values.partyId }}
+    eggroll.rollsite.route.table.path=conf/route_table/route_table.json
+    eggroll.rollsite.route.table.key=
+    eggroll.rollsite.route.table.whitelist=127.0.0.1
+    eggroll.rollsite.jvm.options=-XX:+UseG1GC -XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:logs/eggroll/rollsite.gc.log
+    
+    eggroll.rollsite.push.max.retry=3
+    eggroll.rollsite.push.long.retry=2
+    eggroll.rollsite.push.batches.per.stream=10
+    eggroll.rollsite.adapter.sendbuf.size=100000
+  fluent.conf: |
+    <source>
+      @type tail
+      path /data/projects/fate/eggroll/logs/*/*.*
+      exclude_path ["/data/projects/fate/eggroll/logs/eggroll/*", "/data/projects/fate/eggroll/logs/log.pos"]
+      pos_file /data/projects/fate/eggroll/logs/log.pos
+      tag eggroll
+      multiline_flush_interval 2s
+      refresh_interval 5s
+      <parse>
+        @type none
+      </parse>
+    </source>
+    
+    <match **>
+      @type stdout
+    </match>
+
+{{- end }}
+{{ end }}

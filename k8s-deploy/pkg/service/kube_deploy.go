@@ -72,34 +72,31 @@ func CheckDeploys(deploys *v1.DeploymentList) bool {
 }
 
 // GetDeployStatus GetDeployStatus
-func GetDeployStatus(deploy *v1.Deployment) (string, string, error) {
+func GetDeployStatus(deploy *v1.Deployment) (string, string) {
 
 	for _, v := range deploy.Status.Conditions {
 		if v.Type == v1.DeploymentAvailable && v.Status == corev1.ConditionTrue {
-			return fmt.Sprint(v1.DeploymentAvailable), v.Message, nil
+			return fmt.Sprint(v1.DeploymentAvailable), v.Message
 		}
 	}
 	for _, v := range deploy.Status.Conditions {
 		if v.Type == v1.DeploymentProgressing && v.Status == corev1.ConditionTrue {
-			return fmt.Sprint(v1.DeploymentProgressing), v.Message, nil
+			return fmt.Sprint(v1.DeploymentProgressing), v.Message
 		}
 	}
 	for _, v := range deploy.Status.Conditions {
 		if v.Type == v1.DeploymentReplicaFailure && v.Status == corev1.ConditionTrue {
-			return fmt.Sprint(v1.DeploymentReplicaFailure), v.Message, nil
+			return fmt.Sprint(v1.DeploymentReplicaFailure), v.Message
 		}
 	}
-	return "", "", fmt.Errorf("Deployment of '%s' not type, please try again", deploy.Name)
+	return "Undefined", fmt.Sprintf("please use kubectl cli check deploy status of %s", deploy.Name)
 }
 
 //GetDeploymentStatus GetDeploymentStatus
 func GetDeploymentStatusInfo(deploys *v1.DeploymentList) (map[string]string, error) {
 	status := make(map[string]string)
 	for _, v := range deploys.Items {
-		Type, message, err := GetDeployStatus(&v)
-		if err != nil {
-			return nil, err
-		}
+		Type, message := GetDeployStatus(&v)
 		status[v.Name] = fmt.Sprintf("%s, %s", Type, message)
 	}
 	return status, nil
@@ -108,10 +105,7 @@ func GetDeploymentStatusInfo(deploys *v1.DeploymentList) (map[string]string, err
 func GetDeploymentStatus(deploys *v1.DeploymentList) (map[string]string, error) {
 	status := make(map[string]string)
 	for _, v := range deploys.Items {
-		Type, _, err := GetDeployStatus(&v)
-		if err != nil {
-			return nil, err
-		}
+		Type, _ := GetDeployStatus(&v)
 		status[v.Name] = fmt.Sprintf("%s", Type)
 	}
 	return status, nil

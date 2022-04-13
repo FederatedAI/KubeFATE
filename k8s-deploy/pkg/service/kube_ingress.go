@@ -15,17 +15,12 @@
 
 package service
 
-import (
-	"fmt"
-)
-
 // GetIngressURLList is Get Ingress Url list
 func GetIngressURLList(name, namespace string) ([]string, error) {
 	var urls []string
 	labelSelector := getLabelSelector(namespace, name)
 	ingressList, err := KubeClient.GetIngresses(namespace, labelSelector)
 	if err != nil {
-		fmt.Println(err)
 		return nil, err
 	}
 	for _, ingress := range ingressList.Items {

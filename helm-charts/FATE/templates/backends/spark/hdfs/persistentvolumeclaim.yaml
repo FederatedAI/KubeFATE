@@ -1,0 +1,59 @@
+# Copyright 2019-2022 VMware, Inc.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+{{ if .Values.modules.hdfs.include }}
+{{ if and .Values.persistence.enabled (not .Values.modules.hdfs.namenode.existingClaim) }}
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: namenode-data
+  labels:
+    fateMoudle: namenode
+{{ include "fate.labels" . | indent 4 }}
+spec:
+  accessModes:
+    - {{ .Values.modules.hdfs.namenode.accessMode }}
+  resources:
+    requests:
+      storage: {{ .Values.modules.hdfs.namenode.size }}
+  {{ if .Values.modules.hdfs.namenode.storageClass }}
+    {{ if eq "-" .Values.modules.hdfs.namenode.storageClass }}
+  storageClassName: ""
+    {{ else }}
+  storageClassName: {{ .Values.modules.hdfs.namenode.storageClass }}
+    {{ end }}
+  {{ end }}
+{{ end }}
+---
+{{ if and .Values.persistence.enabled (not .Values.modules.hdfs.datanode.existingClaim) }}
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: datanode-data
+  labels:
+    fateMoudle: datanode
+{{ include "fate.labels" . | indent 4 }}
+spec:
+  accessModes:
+    - {{ .Values.modules.hdfs.datanode.accessMode }}
+  resources:
+    requests:
+      storage: {{ .Values.modules.hdfs.datanode.size }}
+  {{ if .Values.modules.hdfs.datanode.storageClass }}
+    {{ if eq "-" .Values.modules.hdfs.datanode.storageClass }}
+  storageClassName: ""
+    {{ else }}
+  storageClassName: {{ .Values.modules.hdfs.datanode.storageClass }}
+    {{ end }}
+  {{ end }}
+{{ end }}
+
+{{ end }}
