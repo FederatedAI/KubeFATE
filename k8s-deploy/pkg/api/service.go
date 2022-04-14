@@ -77,7 +77,6 @@ func initTables() error {
 // @title KubeFATE service API
 // @version v1
 // @description This is a KubeFATE.
-// @termsOfService http://swagger.io/terms/
 // @contact.name API Support
 // @contact.url https://github.com/FederatedAI/KubeFATE
 // @license.name Apache 2.0
