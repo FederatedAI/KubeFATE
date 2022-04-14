@@ -149,7 +149,7 @@ servingServer:
   storageClass: {{ .storageClass | default "serving-redis" }}
   accessMode: {{ .accessMode | default "ReadWriteOnce" }}
   size: {{ .size | default "1Gi" }}
-  
+  cacheType: {{ .cacheType | default "local" }}
   {{- with .nodeSelector }}
   nodeSelector:
 {{ toYaml . | indent 4 }}
