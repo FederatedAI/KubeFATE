@@ -22,7 +22,7 @@ After the tutorial, the deployment architecture looks like the following diagram
 6. Setup the global KubeFATE version using in the tutorial and create a folder for the whole tutorial. We use 
    KubeFATE v1.8.0 in this tutorial, other versions should be similar.
 ```
-export release_version=v1.8.0 && export kubefate_version=v1.4.3 && cd ~ && mkdir demo && cd demo
+export release_version=v1.8.0 && export kubefate_version=v1.4.4 && cd ~ && mkdir demo && cd demo
 ```
 
 **<font color="red">!!!Note: in this tutorial, the IP of the machine we used is 192.168.100.123. Please change it to your machine's IP in all the following commands and config files.</font></div>**
@@ -99,7 +99,7 @@ chmod +x ./kubefate && sudo mv ./kubefate /usr/bin
 Try to verify if kubefate works,
 ```
 kubefate@machine:~/kubefate$ kubefate version
-* kubefate commandLine version=v1.4.3
+* kubefate commandLine version=v1.4.4
 * kubefate service connection error, resp.StatusCode=404, error: <?xml version="1.0" encoding="iso-8859-1"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
          "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -118,7 +118,7 @@ deployed the KubeFATE service yet.
 
 ### Deploy KubeFATE service
 #### 1. Load the docker image of the KubeFATE service
-Download the KubeFATE Server v1.4.3's docker image,
+Download the KubeFATE Server v1.4.4's docker image,
 ```
 curl -LO https://github.com/FederatedAI/KubeFATE/releases/download/${release_version}/kubefate-${kubefate_version}.docker
 ```
@@ -128,7 +128,7 @@ the image needs to be loaded into [Docker Registry](https://docs.docker.com/regi
 [Harbor](https://goharbor.io/). For the details of using Harbor as a local image registry, please refer to:
 https://github.com/FederatedAI/KubeFATE/blob/master/registry/README.md.
 ```
-docker load < kubefate-v1.4.3.docker
+docker load < kubefate-v1.4.4.docker
 ```
 #### 2. Create kube-fate namespace and account for KubeFATE service
 We have prepared the yaml for creating kube-fate namespace, as well as creating a service account in rbac-config.yaml in your working folder. Just apply it,
@@ -208,8 +208,8 @@ rtt min/avg/max/mdev = 0.054/0.067/0.080/0.013 ms
 When `example.com` well set, KubeFATE service version can be shown,
 ```
 kubefate@machine:~/kubefate$ kubefate version
-* kubefate service version=v1.4.3
-* kubefate commandLine version=v1.4.3
+* kubefate service version=v1.4.4
+* kubefate commandLine version=v1.4.4
 ```
 Note: The `kubefate` CLI can only work in the same directory of config.yaml
 

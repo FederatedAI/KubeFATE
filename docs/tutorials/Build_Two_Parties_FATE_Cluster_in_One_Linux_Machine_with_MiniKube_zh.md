@@ -17,7 +17,7 @@
 5. 要保证安装机器可以正常访问Docker Hub或者网易云镜像仓库，以及Google gcr； 
 6. 预先创建一个目录，以便整个过程使用该目录作为工作目录，命令如下：
 ```
-export release_version=v1.8.0 && export kubefate_version=v1.4.3 && cd ~ && mkdir demo && cd demo
+export release_version=v1.8.0 && export kubefate_version=v1.4.4 && cd ~ && mkdir demo && cd demo
 ```
 
 **注意：下文介绍的MiniKube机器IP地址是192.168.100.123。请修改为你准备的实验机器IP地址！！！**
@@ -88,7 +88,7 @@ chmod +x ./kubefate && sudo mv ./kubefate /usr/bin
 然后我们测试下kubefate命令是否可用，
 ```
 kubefate@machine:~/kubefate$ kubefate version
-* kubefate commandLine version=v1.4.3
+* kubefate commandLine version=v1.4.4
 * kubefate service connection error, resp.StatusCode=404, error: <?xml version="1.0" encoding="iso-8859-1"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
          "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -106,13 +106,13 @@ kubefate@machine:~/kubefate$ kubefate version
 
 ### 部署Kubefate服务
 #### 1.载入Kubefate服务镜像
-接着，我们下载KubeFATE服务镜像v1.4.3：
+接着，我们下载KubeFATE服务镜像v1.4.4：
 ```
 curl -LO https://github.com/FederatedAI/KubeFATE/releases/download/${release_version}/kubefate-${kubefate_version}.docker
 ```
 然后读入本地Docker环境。请注意，因为本文使用的MiniKube，是all-in-one的Kubernetes环境，所以只需要导入本地Docker环境即可给kubelet拉取。如果你运行的是集群形式的Kubernetes，容器镜像需要读入[Docker Registry](https://docs.docker.com/registry/introduction/)或者[Harbor](https://goharbor.io/)。关于如何集成使用Harbor，可以参考：https://github.com/FederatedAI/KubeFATE/blob/master/registry/README.md
 ```
-docker load < kubefate-v1.4.3.docker
+docker load < kubefate-v1.4.4.docker
 ```
 
 #### 2.创建kube-fate的命名空间以及账号
@@ -189,8 +189,8 @@ rtt min/avg/max/mdev = 0.054/0.067/0.080/0.013 ms
 当 `example.com` 顺利设置, KubeFATE服务的版本号应该就可以正常显示,
 ```
 kubefate@machine:~/kubefate$ kubefate version
-* kubefate service version=v1.4.3
-* kubefate commandLine version=v1.4.3
+* kubefate service version=v1.4.4
+* kubefate commandLine version=v1.4.4
 ```
 到此，所有准备工作完毕，下面我们可以开始安装FATE了。需要注意的是，上面的工作只需要做一次，后面如果添加、删除、更新FATE集群，上面的不需要重新执行。
 
