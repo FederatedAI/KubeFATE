@@ -86,7 +86,7 @@ services:
       - 4671
     volumes:
       - ./confs/eggroll/conf:/data/projects/fate/eggroll/conf
-      - ./confs/fate_flow/conf/service_conf.yaml:/data/projects/fate/fate/conf/service_conf.yaml
+      - ./confs/fate_flow/conf/service_conf.yaml:/data/projects/fate/conf/service_conf.yaml
       - ./shared_dir/data/nodemanager:/data/projects/fate/eggroll/data
     networks:
       - fate-network

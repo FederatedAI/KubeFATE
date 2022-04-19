@@ -1,15 +1,14 @@
-All images required to deploy the chart are recorded here.
+# All images required to deploy the chart are recorded here.
 
+## FATE
 
-
-FATE:
-
-- federatedai/python-spark:${version-tag}
+- federatedai/python:${version-tag}
 - mysql:8
 - federatedai/fateboard:${version-tag}
 - federatedai/client:${version-tag}
 - federatedai/eggroll:${version-tag}
 - fluent/fluentd:v1.12
+- federatedai/python-spark:${version-tag}
 - federatedai/spark-master:${version-tag}
 - federatedai/spark-worker:${version-tag}
 - federatedai/hadoop-datanode:2.0.0-hadoop2.7.4-java8
@@ -19,9 +18,7 @@ FATE:
 - federatedai/rabbitmq:3.8.3-management
 - federatedai/pulsar:2.7.0
 
-
-
-FATE-Serving
+## FATE-Serving
 
 - federatedai/serving-server:${version-tag}
 - federatedai/serving-proxy:${version-tag}
@@ -29,10 +26,8 @@ FATE-Serving
 - federatedai/serving-admin:${version-tag}
 - bitnami/zookeeper:3.7.0
 
-
-
-FATE-Exchange
+## FATE-Exchange
 
 - federatedai/eggroll:${version-tag}
 - federatedai/trafficserver
-- federatedai/nginx
+- federatedai/nginx:${version-tag}
