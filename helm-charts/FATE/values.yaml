@@ -2,7 +2,7 @@
 image:
   registry: federatedai
   isThridParty:
-  tag: 1.7.2-release
+  tag: 1.8.0-release
   pullPolicy: IfNotPresent
   imagePullSecrets: 
 #  - name: 
@@ -16,9 +16,11 @@ istio:
 podSecurityPolicy:
   enabled: false
 
+ingressClassName: nginx
+
 ingress:
-  fateboard: 
-    # annotations: 
+  fateboard:
+    # annotations:
     hosts:
     - name: fateboard.example.com
       path: /
@@ -26,25 +28,25 @@ ingress:
     # - secretName: my-tls-secret
       # hosts:
         # - fateboard.example.com
-  client: 
-    # annotations: 
+  client:
+    # annotations:
     hosts:
     - name: notebook.example.com
       path: /
     tls: [] 
-  spark: 
-    # annotations: 
+  spark:
+    # annotations:
     hosts:
     - name: spark.example.com
       path: /
     tls: [] 
-  rabbitmq: 
-    # annotations: 
+  rabbitmq:
+    # annotations:
     hosts:
     - name: rabbitmq.example.com
       path: /
     tls: [] 
-  pulsar: 
+  pulsar:
     # annotations: 
     hosts:
     - name:  pulsar.example.com

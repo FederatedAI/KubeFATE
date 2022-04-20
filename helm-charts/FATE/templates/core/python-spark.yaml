@@ -1,0 +1,290 @@
+# Copyright 2019-2022 VMware, Inc.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+{{ if .Values.modules.python.include }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python
+  labels:
+    fateMoudle: python
+{{ include "fate.labels" . | indent 4 }}
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      fateMoudle: python
+{{ include "fate.matchLabels" . | indent 6 }}
+  template:
+    metadata:
+      labels:
+        fateMoudle: python
+{{ include "fate.labels" . | indent 8 }}
+    spec:
+      {{- if .Values.istio.enabled }}
+      {{- else }}
+      initContainers:
+      {{- if .Values.image.isThridParty }}
+      - image: {{ .Values.image.registry }}/mysql:8.0.28
+      {{- else }}
+      - image: mysql:8.0.28
+      {{- end }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        name: ping-mysql
+        env:
+        - name: MYSQL_DATABASE
+          value: "{{ .Values.externalMysqlDatabase | default .Values.modules.mysql.database | default "eggroll_meta" }}"
+        - name: MYSQL_USER
+          value: "{{ .Values.externalMysqlUser | default .Values.modules.mysql.user | default "fate" }}"
+        - name: MYSQL_PASSWORD
+          value: "{{ .Values.externalMysqlPassword | default .Values.modules.mysql.password | default "fate_dev" }}"
+        - name: MYSQL_HOST
+          value: "{{ .Values.externalMysqlIp | default .Values.modules.mysql.ip | default "mysql" }}"
+        - name: MYSQL_PORT
+          value: "{{ .Values.externalMysqlPort | default .Values.modules.mysql.port | default "3306" | }}"
+        command:
+        - /bin/bash
+        - -c
+        - |
+          set -x
+          function checkMySQL(){
+            checkMySQLCount=0
+            while true ; do
+              checkMySQLCount=$[checkMySQLCount+1]
+              echo "Waiting for mysql started. check count: $checkMySQLCount"
+              sleep 2
+
+              state=`mysqladmin ping -h ${MYSQL_HOST} --port=${MYSQL_PORT} -u${MYSQL_USER} -p${MYSQL_PASSWORD}| awk '{print $3}'`
+              if [ "$state" == "alive" ]; then
+                echo "mysql server has been already started."
+              break
+              fi
+           done
+          }
+          echo "Waiting for mysql started..."
+          checkMySQL
+      {{- end }}
+      containers:
+        - name: python
+          {{- if eq .Values.modules.python.backend "spark_pulsar" "spark_rabbitmq" "spark_local_pulsar" }}
+          image: {{ .Values.image.registry }}/python-spark:{{ .Values.image.tag }}
+          {{- else }}
+          image: {{ .Values.image.registry }}/{{ if .Values.modules.python.enabledNN }}python-nn{{ else }}python{{ end }}:{{ .Values.image.tag }}
+          {{- end }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if .Values.modules.python.resources}}
+          resources:
+          {{- range $key, $val := .Values.modules.python.resources }}
+            {{ $key }}:
+{{ toYaml $val | indent 14 }}
+          {{- end }}
+          {{- end }}
+          env:
+          - name: POD_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+          {{- if .Values.modules.python.logLevel }}
+          - name: FATE_LOG_LEVEL
+            value: {{ .Values.modules.python.logLevel }}
+          {{- end }}
+          - name: PYTHONPATH
+            value: "$PYTHONPATH:/data/projects/fate/fate/python:/data/projects/fate/eggroll/python:/data/projects/fate/fateflow/python:/data/projects/fate/fate/python/fate_client"
+          - name: FATE_PROJECT_BASE
+            value: "/data/projects/fate"
+          {{- if eq .Values.modules.python.backend "spark_pulsar" "spark_rabbitmq" }}
+          - name: FATE_FLOW_UPLOAD_MAX_NUM
+            value: "1000000"
+          - name: FATE_FLOW_UPLOAD_MAX_BYTES
+            value: "104868093952"
+          {{- end }}
+          ports:
+            - name: grpc-port
+              containerPort: 9360
+            - name: http-port
+              containerPort: 9380
+          command:
+            - /bin/bash
+            - -c
+            - |
+                set -x
+                mkdir -p /data/projects/fate/conf/
+                cp /data/projects/fate/conf-tmp/transfer_conf.yaml /data/projects/fate/conf/transfer_conf.yaml
+                cp /data/projects/fate/conf-tmp/service_conf.yaml /data/projects/fate/conf/service_conf.yaml
+                cp /data/projects/fate/conf-tmp/component_registry.json /data/projects/fate/conf/component_registry.json
+                cp /data/projects/fate/conf-tmp/job_default_config.yaml /data/projects/fate/conf/job_default_config.yaml
+                # fix fateflow conf must use IP
+                sed -i "s/host: fateflow/host: ${POD_IP}/g" /data/projects/fate/conf/service_conf.yaml
+                
+                cp /data/projects/spark-2.4.1-bin-hadoop2.7/conf/spark-defaults-template.conf /data/projects/spark-2.4.1-bin-hadoop2.7/conf/spark-defaults.conf
+                sed -i "s/fateflow/${POD_IP}/g" /data/projects/spark-2.4.1-bin-hadoop2.7/conf/spark-defaults.conf
+                
+                # logs
+                mkdir -p /data/projects/fate/fateflow/logs/fate_flow/
+                touch /data/projects/fate/fateflow/logs/fate_flow/INFO.log
+                ln -sf /dev/stdout /data/projects/fate/fateflow/logs/fate_flow/INFO.log
+                
+                sleep 5 && python fateflow/python/fate_flow/fate_flow_server.py
+          livenessProbe:
+            tcpSocket:
+              port: 9380
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            tcpSocket:
+              port: 9380
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 3
+            successThreshold: 1
+            failureThreshold: 3
+          startupProbe:
+            tcpSocket:
+              port: 9380
+            failureThreshold: 12
+            periodSeconds: 10
+          volumeMounts:
+            {{- if eq .Values.modules.python.backend "eggroll" }}
+            - mountPath: /data/projects/fate/eggroll/conf/eggroll.properties
+              name: eggroll-confs
+              subPath: eggroll.properties
+            {{- end }}
+            - name: python-data
+              mountPath: /data/projects/fate/fateflow/logs
+              subPath: logs
+            - mountPath: /data/projects/fate/conf-tmp/
+              name: python-confs
+            - mountPath: /data/projects/spark-2.4.1-bin-hadoop2.7/conf/spark-defaults-template.conf
+              name: python-confs
+              subPath: spark-defaults.conf
+            {{- if eq .Values.modules.python.backend "spark_rabbitmq" }}
+            - mountPath: /data/projects/fate/conf/rabbitmq_route_table
+              name: rabbitmq-route-table
+            {{- end }}
+            {{- if eq .Values.modules.python.backend "spark_pulsar" "spark_local_pulsar" }}
+            - mountPath: /data/projects/fate/conf/pulsar_route_table
+              name: pulsar-route-table
+            {{- end }}
+            # TODO add mountPath of job and model-cache 
+            - mountPath: /data/projects/fate/jobs
+              name: python-data
+              subPath: jobs
+            - mountPath: /data/projects/fate/model_local_cache
+              name: python-data
+              subPath: model-local-cache
+        {{- if .Values.modules.fateboard.include }}
+        - image: {{ .Values.image.registry }}/fateboard:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          name: fateboard
+          ports:
+            - containerPort: 8080
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+              httpHeaders:
+                - name: X-Custom-Header
+                  value: livenessProbe
+            initialDelaySeconds: 1
+            periodSeconds: 10
+            timeoutSeconds: 3
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+              httpHeaders:
+                - name: X-Custom-Header
+                  value: readinessProbe
+            initialDelaySeconds: 1
+            periodSeconds: 10
+            timeoutSeconds: 3
+            successThreshold: 1
+            failureThreshold: 3
+          startupProbe:
+            httpGet:
+              path: /
+              port: 8080
+              httpHeaders:
+                - name: X-Custom-Header
+                  value: startupProbe
+            failureThreshold: 12
+            periodSeconds: 10
+          volumeMounts:
+            - mountPath: /data/projects/fate/fateboard/conf/application.properties
+              name: fateboard-confs
+              subPath: application.properties
+            - name: python-data
+              mountPath: /data/projects/fate/fateflow/logs
+              subPath: logs
+        {{- end }}
+      {{- with .Values.modules.python.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.modules.python.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.modules.python.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.image.imagePullSecrets }}
+      imagePullSecrets:
+{{ toYaml . | indent 6 }}
+      {{- end }}
+    {{- if .Values.modules.python.serviceAccountName }}
+      serviceAccountName: {{ .Values.modules.python.serviceAccountName }}
+    {{- else }}
+      serviceAccountName: {{ template "serviceAccountName" . }}
+    {{- end }}
+      restartPolicy: Always
+      volumes:
+        {{- if eq .Values.modules.python.backend "eggroll" }}
+        - name: eggroll-confs
+          configMap:
+            name: eggroll-config
+        {{- end }}
+        - name: python-confs
+          configMap:
+            name: python-config
+        {{- if eq .Values.modules.python.backend "spark_rabbitmq" }}
+        - name: rabbitmq-route-table
+          configMap:
+            name: rabbitmq-route-table
+        {{- end }}
+        {{- if eq .Values.modules.python.backend "spark_pulsar" "spark_local_pulsar" }}
+        - name: pulsar-route-table
+          configMap:
+            name: pulsar-route-table
+        {{- end }}
+        {{- if .Values.modules.fateboard.include }}
+        - name: fateboard-confs
+          configMap:
+            name: fateboard-config
+        {{- end }}
+        {{- if not .Values.persistence.enabled }}
+        - name: python-data
+          emptyDir: {}
+        {{- else }}
+        - name: python-data
+          persistentVolumeClaim:
+            claimName: {{ .Values.modules.python.existingClaim | default  "python-data" }}
+        {{- end }}
+
+{{ end }}

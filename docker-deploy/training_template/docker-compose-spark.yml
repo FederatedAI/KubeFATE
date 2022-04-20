@@ -25,19 +25,19 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: {/path/to/host/dir}/examples
+      device: <path-to-host-dir>/examples
   shared_dir_federatedml:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: {/path/to/host/dir}/federatedml
+      device: <path-to-host-dir>/federatedml
   shared_dir_data:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: {/path/to/host/dir}/data
+      device: <path-to-host-dir>/data
 
 services:
   fateboard:
@@ -70,6 +70,12 @@ services:
     networks:
       fate-network:
         ipv4_address: 192.167.0.100
+    healthcheck:
+      test: ["CMD", "curl", "-f", "-X POST", "http://192.167.0.100:9380/v1/version/get"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
     command:
     - "/bin/bash"
     - "-c"

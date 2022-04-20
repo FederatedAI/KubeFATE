@@ -1,10 +1,10 @@
 name: fate-9999
 namespace: fate-9999
 chartName: fate
-chartVersion: v1.7.2
+chartVersion: v1.8.0
 partyId: 9999
 registry: ""
-imageTag: "1.7.2-release"
+imageTag: "1.8.0-release"
 pullPolicy: 
 imagePullSecrets: 
 - name: myregistrykey
@@ -13,6 +13,7 @@ istio:
   enabled: false
 podSecurityPolicy:
   enabled: false
+ingressClassName: nginx
 modules:
   - rollsite
   - clustermanager
@@ -31,7 +32,7 @@ modules:
 backend: eggroll
 
 # ingress:
-  # fateboard: 
+  # fateboard:
     # annotations:
     # hosts:
     # - name: party9999.fateboard.example.com
@@ -337,4 +338,3 @@ backend: eggroll
       # port: 30105
       # sslPort: 30109
       # proxy: ""
-     

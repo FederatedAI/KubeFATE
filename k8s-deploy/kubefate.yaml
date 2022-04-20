@@ -19,7 +19,7 @@ spec:
     spec:
       serviceAccountName: kubefate-admin
       containers:
-        - image: federatedai/kubefate:v1.4.3
+        - image: federatedai/kubefate:v1.4.4
           imagePullPolicy: IfNotPresent
           name: kubefate
           env:
@@ -72,6 +72,39 @@ spec:
             requests:
               memory: 512Mi
               cpu: "0.5"
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+              httpHeaders:
+                - name: X-Custom-Header
+                  value: livenessProbe
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+              httpHeaders:
+                - name: X-Custom-Header
+                  value: readinessProbe
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 1
+            successThreshold: 1
+            failureThreshold: 3
+          startupProbe:
+            httpGet:
+              path: /
+              port: 8080
+              httpHeaders:
+                - name: X-Custom-Header
+                  value: startupProbe
+            failureThreshold: 30
+            periodSeconds: 10
       restartPolicy: Always
 ---
 apiVersion: apps/v1
@@ -125,6 +158,26 @@ spec:
           volumeMounts:
             - name: mariadb-data
               mountPath: /var/lib/mysql
+          livenessProbe:
+            exec:
+              command:
+              - mysqladmin
+              - ping
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            exec:
+              command:
+              - mysqladmin
+              - ping
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 1
+            successThreshold: 1
+            failureThreshold: 3
       restartPolicy: Always
       volumes:
         - name: mariadb-data
@@ -188,9 +241,8 @@ kind: Ingress
 metadata:
   name: kubefate
   namespace: kube-fate
-  annotations:
-    kubernetes.io/ingress.class: "nginx"
 spec:
+  ingressClassName: nginx
   rules:
     - host: example.com
       http:
@@ -200,5 +252,5 @@ spec:
             backend:
               service: 
                 name: kubefate
-                port: 
+                port:
                   number: 8080

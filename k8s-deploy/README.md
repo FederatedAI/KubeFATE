@@ -1,10 +1,10 @@
 # Kubernetes Deployment
-We recommend using [Kubernetes](https://kubernetes.io/) as a underlying infrastructure to create and manage the FATE clusters in a production environment. KubeFATE supports deploying multiple FATE clusters in an instance of Kubernetes with different namespaces for the purposes of development, testing and production. Considering the different IT designs and standards in each company, the actual deployment should be customized. KubeFATE is flexibile for the FATE configuration.
+We recommend using [Kubernetes](https://kubernetes.io/) as an underlying infrastructure to create and manage the FATE clusters in a production environment. KubeFATE supports deploying multiple FATE clusters in an instance of Kubernetes with different namespaces for the purposes of development, testing and production. Considering the different IT designs and standards in each company, the actual deployment should be customized. KubeFATE is flexibile for the FATE configuration.
 
 If you focus on how to quickly use KubeFATE, please jump to [Use Scenarios](#use-scenarios).
 
 ## High-level architecture of multiple federated learning parties
-The hig-hlevel architecture of a multi-party federated learning deployment (e.g. two parties) is shown as follows:
+The high-level architecture of a multi-party federated learning deployment (e.g. two parties) is shown as follows:
 <div align="center">
   <img src="./images/hamflp.PNG">
 </div>
@@ -37,7 +37,7 @@ KubeFATE is designed to handle different versions FATE. Normally, KubeFATE CLI a
 
 ## User scenarios
 Suppose in an organization, there are two roles:
-* System Admin: who is responisble for the infrastructure management as well as Kubernetes administration
+* System Admin: who is responsible for the infrastructure management as well as Kubernetes administration
 * ML Infrastructure Operators: who is responsible for managing the machine learning cluster like FATE
 
 <div align="center">
@@ -47,12 +47,12 @@ Suppose in an organization, there are two roles:
 
 Recommended version of dependent software:
 
-Kubernetes: [v1.21.7](https://github.com/kubernetes/kubernetes/releases/tag/v1.21.7)
+Kubernetes: [v1.23.5](https://github.com/kubernetes/kubernetes/releases/tag/v1.23.5)
 
-Ingress-nginx: [v1.0.5](https://github.com/kubernetes/ingress-nginx/releases/tag/controller-v1.0.5)
+Ingress-nginx: [v1.1.3](https://github.com/kubernetes/ingress-nginx/releases/tag/controller-v1.1.3)
 
 #### Creating role, namespace and other resource in Kubernetes
-The sample yaml can be found in [rbac-config.yaml](./rbac-config.yaml). In this sample, we create a kube-fate namespace for KubeFATE service. Resource constraints can be applied to kube-fate namespace, refer to [Kubernetes Namespace](https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/), [Configure Memory and CPU Quotas for Namespace](https://kubernetes.io/docs/tasks/administer-cluster/manage-resources/quota-memory-cpu-namespace/).
+The example yaml can be found in [rbac-config.yaml](./rbac-config.yaml). In this example, we create a kube-fate namespace for KubeFATE service. Resource constraints can be applied to kube-fate namespace, refer to [Kubernetes Namespace](https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/), [Configure Memory and CPU Quotas for Namespace](https://kubernetes.io/docs/tasks/administer-cluster/manage-resources/quota-memory-cpu-namespace/).
 
 Run the following command to create the namespace:
 ```
@@ -67,7 +67,7 @@ stringData:
 ```
 
 #### Preparing domain name and deploying KubeFATE in Kubernetes
-Because KubeFATE service exposes RESTful APIs for external access, system admin needs to prepare a domain name for KubeFATE service. In our sample, the domain name is `example.com` . Moreover, system admin should create a namespace (e.g. fate-9999) for FATE deployment.
+Because KubeFATE service exposes RESTful APIs for external access, system admin needs to prepare a domain name for KubeFATE service. In our example, the domain name is `example.com` . Moreover, system admin should create a namespace (e.g. fate-9999) for FATE deployment.
 ```
 $ kubectl apply -f ./kubefate.yaml
 $ kubectl create namespace fate-9999
@@ -95,7 +95,7 @@ serviceurl: example.com
 
 Create a `cluster.yaml` for FATE cluster configuration. The details of configuration can be found here: [FATE Cluster Configuration Guide](../docs/configurations/FATE_cluster_configuration.md). 
 
-**NOTE:** For Chinese user, specifying a local image registry in `cluster.yaml` can accelerate the download of images. The details is as follows:
+**NOTE:** For Chinese user, specifying a local image registry in `cluster.yaml` can accelerate the download of images. The details are as follows:
 ```
 registry: "hub.c.163.com/federatedai"
 ```
@@ -104,72 +104,127 @@ Next, install the FATE cluster,
 
 ```
 $ kubefate cluster install -f ./cluster.yaml
-create job success, job id=fe846176-0787-4879-9d27-622692ce181c
+create job success, job id=d92d7a56-7002-46a4-9363-da9c7346e05a
 ```
 *NOTE: If you want to deploy **FATE on Spark**, you can use `cluster-spark.yaml`.*
 
 #### Checking the status of "Installing Cluster" job
-After the above command has finished, a job is created for installing a FATE cluster. Run the command `kubefate job describe` to check the status of the job, util the "Status" turns to `Success`.
+After the above command has finished, a job is created for installing a FATE cluster. Run the command `kubefate job describe` to check the status of the job, until the "Status" turns to `Success`.
 
-```
-$ kubefate job describe fe846176-0787-4879-9d27-622692ce181c
-StartTime       2020-11-13 07:22:53
-EndTime         2020-11-13 07:23:35
-Duration        42s
-Status          Success
-Creator         admin
-ClusterId       27e37a60-fffb-4031-a76f-990b2ff43cf2
-States          - update job status to Running
-                - create cluster in DB Success
-                - overwrite current installation
-                - helm install success
-                - checkout cluster status [28]
-                - job run Success
-SubJobs         clustermanager       PodStatus: Running, SubJobStatus: Success, Duration:     6s, StartTime: 2020-11-13 07:22:53, EndTime: 2020-11-13 07:22:59
-                fateboard            PodStatus: Running, SubJobStatus: Success, Duration:     1s, StartTime: 2020-11-13 07:22:53, EndTime: 2020-11-13 07:22:55
-                mysql                PodStatus: Running, SubJobStatus: Success, Duration:     8s, StartTime: 2020-11-13 07:22:53, EndTime: 2020-11-13 07:23:01
-                nodemanager-0        PodStatus: Running, SubJobStatus: Success, Duration:     8s, StartTime: 2020-11-13 07:22:53, EndTime: 2020-11-13 07:23:01
-                nodemanager-1        PodStatus: Running, SubJobStatus: Success, Duration:     8s, StartTime: 2020-11-13 07:22:53, EndTime: 2020-11-13 07:23:01
-                python               PodStatus: Running, SubJobStatus: Success, Duration:     1s, StartTime: 2020-11-13 07:22:53, EndTime: 2020-11-13 07:22:55
-                rollsite             PodStatus: Running, SubJobStatus: Success, Duration:     8s, StartTime: 2020-11-13 07:22:53, EndTime: 2020-11-13 07:23:01
-                client               PodStatus: Running, SubJobStatus: Success, Duration:    42s, StartTime: 2020-11-13 07:22:53, EndTime: 2020-11-13 07:23:35
+```bash
+$ kubefate job describe d92d7a56-7002-46a4-9363-da9c7346e05a
+UUID     	d92d7a56-7002-46a4-9363-da9c7346e05a
+StartTime	2022-04-12 07:34:09
+EndTime  	2022-04-12 07:48:14
+Duration 	14m
+Status   	Success
+Creator  	admin
+ClusterId	24bb75ff-f636-4c64-8c04-1b9073f89a2f
+States   	- update job status to Running
+         	- create Cluster in DB Success
+         	- helm install Success
+         	- checkout Cluster status [794]
+         	- job run Success
+
+SubJobs  	nodemanager-0        ModuleStatus: Available, SubJobStatus: Success, Duration:    13m, StartTime:
+         	2022-04-12 07:34:09, EndTime: 2022-04-12 07:47:26
+         	nodemanager-1        ModuleStatus: Available, SubJobStatus: Success, Duration:    13m, StartTime:
+         	2022-04-12 07:34:09, EndTime: 2022-04-12 07:47:18
+         	python               ModuleStatus: Available, SubJobStatus: Success, Duration:    14m, StartTime:
+         	2022-04-12 07:34:09, EndTime: 2022-04-12 07:48:14
+         	rollsite             ModuleStatus: Available, SubJobStatus: Success, Duration:    13m, StartTime:
+         	2022-04-12 07:34:09, EndTime: 2022-04-12 07:47:24
+         	client               ModuleStatus: Available, SubJobStatus: Success, Duration:    11m, StartTime:
+         	2022-04-12 07:34:09, EndTime: 2022-04-12 07:45:22
+         	clustermanager       ModuleStatus: Available, SubJobStatus: Success, Duration:    13m, StartTime:
+         	2022-04-12 07:34:09, EndTime: 2022-04-12 07:47:11
+         	mysql                ModuleStatus: Available, SubJobStatus: Success, Duration:    13m, StartTime:
+         	2022-04-12 07:34:09, EndTime: 2022-04-12 07:47:11
 ```
 #### Describing the cluster and finding FATE access information
 After the `installing cluster` job succeeded, use `kubefate cluster describe` to check the FATE access information:
-```
-$ kubefate cluster describe 27e37a60-fffb-4031-a76f-990b2ff43cf2
-UUID            27e37a60-fffb-4031-a76f-990b2ff43cf2
-Name            fate-9999
-NameSpace       fate-9999
-ChartName       fate
-ChartVersion    v1.5.0
-REVISION        1
-Age             92s
-Status          Running
-Spec            name: fate-9999
-                namespace: fate-9999
-                chartName: fate
-                chartVersion: v1.5.0
-                partyId: 9999
-                ......
-                
-Info            dashboard:
-                - party9999.notebook.example.com
-                - party9999.fateboard.example.com
-                ip: 192.168.0.1
-                pod:
-                - clustermanager-78f98b85bf-ph2hv
-                ......
-                status:
-                  modules:
-                    client: Running
-                    clustermanager: Running
-                    fateboard: Running
-                    mysql: Running
-                    nodemanager-0: Running
-                    nodemanager-1: Running
-                    python: Running
-                    rollsite: Running
+```bash
+$ kubefate cluster describe 24bb75ff-f636-4c64-8c04-1b9073f89a2f
+UUID        	24bb75ff-f636-4c64-8c04-1b9073f89a2f
+Name        	fate-9999
+NameSpace   	fate-9999
+ChartName   	fate
+ChartVersion	v1.8.0
+Revision    	1
+Age         	44h
+Status      	Running
+Spec        	backend: eggroll
+            	chartName: fate
+            	chartVersion: v1.8.0
+            	imagePullSecrets:
+            	- name: myregistrykey
+            	imageTag: 1.8.0-release
+            	ingress:
+            	  client:
+            	    hosts:
+            	    - name: party9999.notebook.example.com
+            	  fateboard:
+            	    hosts:
+            	    - name: party9999.fateboard.example.com
+            	ingressClassName: nginx
+            	istio:
+            	  enabled: false
+            	modules:
+            	- rollsite
+            	- clustermanager
+            	- nodemanager
+            	- mysql
+            	- python
+            	- fateboard
+            	- client
+            	name: fate-9999
+            	namespace: fate-9999
+            	partyId: 9999
+            	persistence: false
+            	podSecurityPolicy:
+            	  enabled: false
+            	pullPolicy: null
+            	python:
+            	  grpcNodePort: 30092
+            	  httpNodePort: 30097
+            	  logLevel: INFO
+            	  type: NodePort
+            	registry: ""
+            	rollsite:
+            	  nodePort: 30091
+            	  partyList:
+            	  - partyId: 10000
+            	    partyIp: 192.168.10.1
+            	    partyPort: 30101
+            	  type: NodePort
+            	servingIp: 192.168.9.2
+            	servingPort: 30095
+
+Info        	dashboard:
+            	- party9999.notebook.example.com
+            	- party9999.fateboard.example.com
+            	ip: 192.168.9.1
+            	port: 30091
+            	status:
+            	  containers:
+            	    client: Running
+            	    clustermanager: Running
+            	    fateboard: Running
+            	    mysql: Running
+            	    nodemanager-0: Running
+            	    nodemanager-0-eggrollpair: Running
+            	    nodemanager-1: Running
+            	    nodemanager-1-eggrollpair: Running
+            	    python: Running
+            	    rollsite: Running
+            	  deployments:
+            	    client: Available
+            	    clustermanager: Available
+            	    mysql: Available
+            	    nodemanager-0: Available
+            	    nodemanager-1: Available
+            	    python: Available
+            	    rollsite: Available
 ```
 
 #### Access the UI of FATEBoard and Notebook

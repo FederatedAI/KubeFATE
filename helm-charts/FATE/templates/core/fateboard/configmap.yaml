@@ -1,0 +1,42 @@
+# Copyright 2019-2022 VMware, Inc.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+{{- if .Values.modules.fateboard.include }}
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: fateboard-config
+  labels:
+    fateMoudle: fateboard
+{{ include "fate.labels" . | indent 4 }}
+data:
+  application.properties: |
+    server.port=8080
+    fateflow.url=http://{{ if .Values.istio.enabled }}127.0.0.1{{ else }}fateflow{{ end }}:9380
+    fateflow.http_app_key=
+    fateflow.http_secret_key=
+    spring.http.encoding.charset=UTF-8
+    spring.http.encoding.enabled=true
+    server.tomcat.uri-encoding=UTF-8
+    fateboard.front_end.cors=false
+    fateboard.front_end.url=http://localhost:8028
+    server.tomcat.max-threads=1000
+    server.tomcat.max-connections=20000
+    spring.servlet.multipart.max-file-size=10MB
+    spring.servlet.multipart.max-request-size=100MB
+    server.compression.enabled=true
+    server.compression.mime-types=application/json,application/xml,text/html,text/xml,text/plain
+    server.board.login.username={{ .Values.modules.fateboard.username }}
+    server.board.login.password={{ .Values.modules.fateboard.password }}
+    server.servlet.session.timeout=4h
+    server.servlet.session.cookie.max-age=4h
+    management.endpoints.web.exposure.exclude=*
+{{- end }}

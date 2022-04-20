@@ -1,0 +1,94 @@
+# Copyright 2019-2022 VMware, Inc.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+{{ if .Values.modules.rollsite.include }}
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: rollsite-config
+  labels:
+    fateMoudle: rollsite
+{{ include "fate.labels" . | indent 4 }}
+data:
+  route_table.json: |
+    {
+        "route_table": {
+            "default": {
+                "default": [
+                    {
+                      {{- if .Values.exchange }}
+                        "ip": "{{ .Values.exchange.partyIp }}",
+                        "port": {{ .Values.exchange.partyPort }}
+                      {{- else }}
+                      
+                        {{- if and .Values.modules.rollsite.polling.enabled ( eq (print .Values.modules.rollsite.polling.type) "client" ) }}
+                        
+                        {{- with .Values.modules.rollsite.polling.server }}
+                        "ip": "{{ .ip }}",
+                        "port": {{ .port }}
+                        {{- end }}
+                        
+                        {{- else }}
+                        "ip": "rollsite",
+                        "port": 9370
+                        {{- end }}
+                        
+                      {{- end }}
+                    }
+                ]
+            },
+            {{- range .Values.partyList }}
+            "{{ .partyId }}": {
+                "default": [
+                    {
+                        "ip": "{{ .partyIp }}",
+                        "port": {{ .partyPort }}
+                    }
+                ]
+            },
+            {{- end }}
+            
+            {{- if and .Values.modules.rollsite.polling.enabled ( eq (print .Values.modules.rollsite.polling.type) "server" ) }}
+            
+            {{- range .Values.modules.rollsite.polling.clientList}}
+            "{{ .partID }}": 
+            {
+                "default": [
+                    {
+                        "port": -1,
+                        "ip": "",
+                        "is_polling": true
+                    }
+                ]
+            },
+            {{- end }}
+            
+            {{- end }}
+            "{{ .Values.partyId }}": {
+                "fateflow": [
+                    {
+                        "ip": "fateflow",
+                        "port": 9360
+                    }
+                ],
+                "default": [
+                    {
+                        "ip": "rollsite",
+                        "port": 9370
+                    }
+                ]
+            }
+        },
+        "permission": {
+            "default_allow": true
+        }
+    }
+{{ end }}

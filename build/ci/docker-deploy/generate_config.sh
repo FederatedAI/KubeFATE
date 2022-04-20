@@ -13,7 +13,7 @@ sed -i "s/serving_ip_list=(192.168.1.1 192.168.1.2)/serving_ip_list=(${host_ip})
 
 # Replace tag to latest
 # TODO should replace the serving as well
-# sed -i "s/^TAG=.*/TAG=latest/g" .env
+sed -i "s/^TAG=.*/TAG=latest/g" .env
 echo "# config prepare is ok"
 
 echo "# generate config"

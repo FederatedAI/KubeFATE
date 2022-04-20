@@ -1,0 +1,111 @@
+# Copyright 2019-2022 VMware, Inc.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+{{ if .Values.modules.nginx.include }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+  labels:
+    fateMoudle: nginx
+{{ include "fate.labels" . | indent 4 }}
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      fateMoudle: nginx
+{{ include "fate.matchLabels" . | indent 6 }}
+  template:
+    metadata:
+      labels:
+        fateMoudle: nginx
+{{ include "fate.labels" . | indent 8 }}
+    spec:
+      containers:
+        - name: nginx
+          image: {{ .Values.image.registry }}/nginx:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - /bin/bash
+            - -c
+            - |
+              sed -i "s#conf/route_table.yaml#conf/modifiable/route_table.yaml#g" nginx/lua/route_table.lua;
+              echo "change path of route_table.yaml success!"
+              openresty -g 'daemon off;'
+          ports:
+            - name: http-port
+              containerPort: 9300
+            - name: grpc-port
+              containerPort: 9310
+          livenessProbe:
+            httpGet:
+              path: /test
+              port: 9302
+              httpHeaders:
+                - name: X-Custom-Header
+                  value: livenessProbe
+            initialDelaySeconds: 1
+            periodSeconds: 10
+            timeoutSeconds: 3
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /test
+              port: 9302
+              httpHeaders:
+                - name: X-Custom-Header
+                  value: readinessProbe
+            initialDelaySeconds: 1
+            periodSeconds: 10
+            timeoutSeconds: 3
+            successThreshold: 1
+            failureThreshold: 3
+          startupProbe:
+            httpGet:
+              path: /test
+              port: 9302
+              httpHeaders:
+                - name: X-Custom-Header
+                  value: readinessProbe
+            failureThreshold: 12
+            periodSeconds: 10
+          volumeMounts:
+            - mountPath: /data/projects/fate/proxy/nginx/conf/nginx.conf
+              name: nginx-confs
+              subPath: nginx.conf
+            - mountPath: /data/projects/fate/proxy/nginx/conf/modifiable/
+              name: nginx-confs
+      {{- with .Values.modules.nginx.nodeSelector }}
+      nodeSelector: 
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.modules.nginx.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.modules.nginx.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.image.imagePullSecrets }}
+      imagePullSecrets:
+{{ toYaml . | indent 6 }}
+      {{- end }}
+      serviceAccountName: {{ template "serviceAccountName" . }}
+      restartPolicy: Always
+      volumes:
+        - name: nginx-confs
+          configMap:
+            name: nginx-config
+{{ end }}

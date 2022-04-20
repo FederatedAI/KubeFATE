@@ -1,10 +1,10 @@
 name: fate-9999
 namespace: fate-9999
 chartName: fate
-chartVersion: v1.7.2
+chartVersion: v1.8.0
 partyId: 9999
 registry: ""
-imageTag: "1.7.2-release"
+imageTag: "1.8.0-release"
 pullPolicy: 
 imagePullSecrets: 
 - name: myregistrykey
@@ -13,6 +13,7 @@ istio:
   enabled: false
 podSecurityPolicy:
   enabled: false
+ingressClassName: nginx
 modules:
   - rollsite
   - clustermanager
@@ -29,28 +30,18 @@ backend: eggroll
 # Specify domain name for service
 # ingress:
   # fateboard: 
-    # annotations:
-      # kubernetes.io/ingress.class: "nginx"
     # hosts:
     # - name: party9999.fateboard.example.com
   # client:  
-    # annotations:
-      # kubernetes.io/ingress.class: "nginx"
     # hosts:
     # - name: party9999.notebook.example.com
   # spark:  
-    # annotations:
-      # kubernetes.io/ingress.class: "nginx"
     # hosts:
     # - name: party9999.spark.example.com
   # rabbitmq:  
-    # annotations:
-      # kubernetes.io/ingress.class: "nginx"
     # hosts:
     # - name: party9999.rabbitmq.example.com
   # pulsar:  
-    # annotations:
-      # kubernetes.io/ingress.class: "nginx"
     # hosts:
     # - name: party9999.pulsar.example.com
   

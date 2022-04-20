@@ -17,6 +17,7 @@ First, on a Linux host, download KubeFATE from [releases pages](https://github.c
 
 By default, the installation script pulls the images from Docker Hub during the deployment. If the target node is not connected to Internet, refer to the below section to set up a local registry such as Harbor and use the offline images.
 
+***If you have deployed other versions of FATE before, please delete and clean up before deploying the new version, [Deleting the cluster](#deleting-the-cluster).***
 ### Setting up a local registry Harbor (Optional)
 Please refer to [this guide](../registry/README.md) to install Harbor as a local registry. 
 

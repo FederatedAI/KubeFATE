@@ -4,13 +4,12 @@ package docs
 
 import "github.com/swaggo/swag"
 
-const docTemplate_swagger = `{
+const docTemplate = `{
     "schemes": {{ marshal .Schemes }},
     "swagger": "2.0",
     "info": {
         "description": "{{escape .Description}}",
         "title": "{{.Title}}",
-        "termsOfService": "http://swagger.io/terms/",
         "contact": {
             "name": "API Support",
             "url": "https://github.com/FederatedAI/KubeFATE"
@@ -1513,6 +1512,74 @@ const docTemplate_swagger = `{
                 "tags": [
                     "User"
                 ],
+                "summary": "Get user by userId",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User",
+                        "name": "userId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Authentication header",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/api.JSONResult"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/modules.User"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.JSONERRORResult"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized operation",
+                        "schema": {
+                            "$ref": "#/definitions/api.JSONERRORResult"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/api.JSONERRORResult"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
                 "summary": "Delete user by userId",
                 "parameters": [
                     {
@@ -1975,8 +2042,8 @@ const docTemplate_swagger = `{
     }
 }`
 
-// SwaggerInfo_swagger holds exported Swagger Info so clients can modify it
-var SwaggerInfo_swagger = &swag.Spec{
+// SwaggerInfo holds exported Swagger Info so clients can modify it
+var SwaggerInfo = &swag.Spec{
 	Version:          "v1",
 	Host:             "",
 	BasePath:         "/v1",
@@ -1984,9 +2051,9 @@ var SwaggerInfo_swagger = &swag.Spec{
 	Title:            "KubeFATE service API",
 	Description:      "This is a KubeFATE.",
 	InfoInstanceName: "swagger",
-	SwaggerTemplate:  docTemplate_swagger,
+	SwaggerTemplate:  docTemplate,
 }
 
 func init() {
-	swag.Register(SwaggerInfo_swagger.InstanceName(), SwaggerInfo_swagger)
+	swag.Register(SwaggerInfo.InstanceName(), SwaggerInfo)
 }

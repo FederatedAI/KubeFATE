@@ -1,0 +1,68 @@
+# Copyright 2019-2022 VMware, Inc.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+{{ if .Values.modules.hdfs.include }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: datanode
+  labels:
+    fateMoudle: datanode
+{{ include "fate.labels" . | indent 4 }}
+spec:
+  ports:
+    - name: "tcp-9000"
+      port: 9000
+      targetPort: 9000
+      protocol: TCP
+    - name: "tcp-9870"
+      port: 9870
+      targetPort: 9870
+      protocol: TCP
+    - name: "tcp-50075"
+      port: 50075
+      targetPort: 50075
+      protocol: TCP
+  type: {{ .Values.modules.hdfs.datanode.type }}
+  selector:
+    fateMoudle: datanode
+{{ include "fate.matchLabels" . | indent 4 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: namenode
+  labels:
+    fateMoudle: namenode
+{{ include "fate.labels" . | indent 4 }}
+spec:
+  ports:
+    - name: "tcp-9000"
+      port: 9000
+      targetPort: 9000
+      protocol: TCP
+      {{- if eq .Values.modules.hdfs.namenode.type "NodePort" "LoadBalancer" }}
+      nodePort: {{ .Values.modules.hdfs.namenode.nodePort }}
+      {{- end }}
+    - name: "tcp-9870"
+      port: 9870
+      targetPort: 9870
+      protocol: TCP
+    - name: "tcp-50070"
+      port: 50070
+      targetPort: 50070
+      protocol: TCP
+  type: {{ .Values.modules.hdfs.namenode.type }}
+  selector:
+    fateMoudle: namenode
+{{ include "fate.matchLabels" . | indent 4 }}
+
+{{ end }}

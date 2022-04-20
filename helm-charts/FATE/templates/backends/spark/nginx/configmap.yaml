@@ -1,0 +1,110 @@
+# Copyright 2019-2022 VMware, Inc.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+{{ if .Values.modules.nginx.include }}
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: nginx-config
+  labels:
+    fateMoudle: nginx
+{{ include "fate.labels" . | indent 4 }}
+data:
+  route_table.yaml: |
+    default:
+      proxy:
+        - host: {{ .Values.modules.nginx.exchange.ip }}
+          http_port: {{ .Values.modules.nginx.exchange.httpPort }}
+          grpc_port: {{ .Values.modules.nginx.exchange.grpcPort }}
+    {{ .Values.partyId }}:
+      proxy:
+        - host: nginx 
+          http_port: 9300
+          grpc_port: 9310
+      fateflow:
+        - host: fateflow 
+          http_port: 9380
+          grpc_port: 9360
+{{- range $key, $val := .Values.modules.nginx.route_table }}
+    {{ $key }}: 
+{{ toYaml . | indent 6 }}
+{{- end }}
+  nginx.conf: |
+    
+    #user  nobody;
+    worker_processes  2;
+    
+    #error_log  logs/error.log;
+    #error_log  logs/error.log  notice;
+    error_log  /dev/stdout  info;
+    error_log  /dev/stderr  error;
+    
+    #pid        logs/nginx.pid;
+    
+    
+    events {
+        worker_connections  1024;
+    }
+    
+    
+    http {
+        include       mime.types;
+        default_type  application/octet-stream;
+    
+        log_format  main  '$remote_addr - $remote_user [$time_local] "$request" "$http_host" '
+                          '$status $body_bytes_sent "$http_referer" '
+                          '"$http_user_agent" "$http_x_forwarded_for" '
+                          '$upstream_status $upstream_addr '
+                          '$request_time $upstream_response_time'
+                          ;
+        
+        access_log  logs/access.log  main;
+    
+        sendfile        on;
+        #tcp_nopush     on;
+    
+        keepalive_timeout  65;
+        underscores_in_headers on;
+    
+        #gzip  on;
+        lua_package_path "$prefix/lua/?.lua;;";
+        init_worker_by_lua_file 'lua/initialize.lua';
+    
+        upstream http_cluster {
+            server fateflow:9380;   # just an invalid address as a place holder
+            balancer_by_lua_file 'lua/balancer.lua';
+        }
+    
+        upstream grpc_cluster {
+            server fateflow:9360;   # just an invalid address as a place holder
+            balancer_by_lua_file 'lua/balancer.lua';
+        }
+    
+        include vhost/*.conf;
+    }
+    
+    stream {
+        log_format tcp_proxy '$remote_addr [$time_local] '
+                             '$protocol $status $bytes_sent $bytes_received '
+                             '$session_time "$upstream_addr" '
+                             '"$upstream_bytes_sent" "$upstream_bytes_received" "$upstream_connect_time"';
+    
+        access_log logs/tcp-access.log tcp_proxy;
+    
+        server {
+            listen 9128;
+            proxy_connect_timeout 1s;
+            proxy_timeout 3s;
+            proxy_pass 127.0.0.1:3128;
+        }
+    }
+
+{{ end }}
