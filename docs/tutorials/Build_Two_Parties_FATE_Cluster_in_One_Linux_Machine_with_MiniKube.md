@@ -242,6 +242,7 @@ istio:
   enabled: false
 podSecurityPolicy:
   enabled: false
+ingressClassName: nginx
 modules:
   - rollsite
   - clustermanager
@@ -255,13 +256,9 @@ backend: eggroll
 
 ingress:
   fateboard:
-    annotations:
-      kubernetes.io/ingress.class: "nginx"
     hosts:
     - name: party9999.fateboard.example.com
-  client:
-    annotations:
-      kubernetes.io/ingress.class: "nginx"
+  client:  
     hosts:
     - name: party9999.notebook.example.com
 
@@ -299,6 +296,7 @@ istio:
   enabled: false
 podSecurityPolicy:
   enabled: false
+ingressClassName: nginx
 modules:
   - rollsite
   - clustermanager
@@ -312,13 +310,9 @@ backend: eggroll
 
 ingress:
   fateboard:
-    annotations:
-      kubernetes.io/ingress.class: "nginx"
     hosts:
     - name: party10000.fateboard.example.com
-  client:
-    annotations:
-      kubernetes.io/ingress.class: "nginx"
+  client:  
     hosts:
     - name: party10000.notebook.example.com
 
