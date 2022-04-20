@@ -2,7 +2,7 @@ ARG SOURCE_PREFIX=federatedai
 ARG SOURCE_TAG=1.5.0-release
 FROM ${SOURCE_PREFIX}/python:${SOURCE_TAG} as data
 
-FROM python:3.7
+FROM python:3.6
 
 COPY pipeline /data/projects/fate/pipeline
 RUN pip install notebook fate-client pandas sklearn

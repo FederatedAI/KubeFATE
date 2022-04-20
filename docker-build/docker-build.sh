@@ -14,8 +14,12 @@
 
 set -e
 
-PREFIX=federatedai
-IMG_TAG=latest
+if [ -z "$IMG_TAG" ]; then
+        IMG_TAG=latest
+fi
+if [ -z "$PREFIX" ]; then
+        PREFIX=federatedai
+fi
 
 source .env
 

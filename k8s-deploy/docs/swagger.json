@@ -3,7 +3,6 @@
     "info": {
         "description": "This is a KubeFATE.",
         "title": "KubeFATE service API",
-        "termsOfService": "http://swagger.io/terms/",
         "contact": {
             "name": "API Support",
             "url": "https://github.com/FederatedAI/KubeFATE"
