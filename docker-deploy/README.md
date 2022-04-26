@@ -3,14 +3,16 @@
 This guide describes the process of deploying FATE using Docker Compose.
 
 ## Prerequisites
+
 The nodes (target nodes) to install FATE must meet the following requirements:
 
 1. A Linux host
 2. Docker: 18+
 3. Docker-Compose: 1.24+
-4. Network connection to Internet to pull container images from Docker Hub. If network connection to Internet is not available, consider to set up [Harbor as a local registry](../registry/README.md) or use [offline images](https://github.com/FederatedAI/FATE/tree/master/docker-build). 
+4. Network connection to Internet to pull container images from Docker Hub. If network connection to Internet is not available, consider to set up [Harbor as a local registry](../registry/README.md) or use [offline images](https://github.com/FederatedAI/FATE/tree/master/docker-build).
 
 ## Deploying FATE
+
 A Linux host can be used as a deployment machine to run installation scripts to deploy FATE onto target hosts.
 
 First, on a Linux host, download KubeFATE from [releases pages](https://github.com/FederatedAI/KubeFATE/releases), unzip it into folder KubeFATE.
@@ -18,8 +20,10 @@ First, on a Linux host, download KubeFATE from [releases pages](https://github.c
 By default, the installation script pulls the images from Docker Hub during the deployment. If the target node is not connected to Internet, refer to the below section to set up a local registry such as Harbor and use the offline images.
 
 ***If you have deployed other versions of FATE before, please delete and clean up before deploying the new version, [Deleting the cluster](#deleting-the-cluster).***
+
 ### Setting up a local registry Harbor (Optional)
-Please refer to [this guide](../registry/README.md) to install Harbor as a local registry. 
+
+Please refer to [this guide](../registry/README.md) to install Harbor as a local registry.
 
 After setting up a Harbor registry, update the setting in the `.env` file. Change `RegistryURI` to the hostname or IP address of the Harbor instance. This setting lets the installation script use a local registry instead of Docker Hub.
 
@@ -38,8 +42,8 @@ RegistryURI=192.168.10.1/federatedai
 
 **NOTE:** For Chinese user who has difficulty to access docker hub, you can set `RegistryURI` to `hub.c.163.com` to use the mirror of the registry within China.
 
-
 ### Configuring multiple parties of FATE
+
 There are usually multiple parties participating a federated training. Each party should install FATE using a set of configuration files and scripts.
 
 The following steps illustrate how to generate necessary configuration files and deploy two parties on different hosts.
@@ -51,18 +55,34 @@ In the following sample of `docker-deploy/parties.conf` , two parities are speci
 ```bash
 user=fate
 dir=/data/projects/fate
-partylist=(10000 9999)
-partyiplist=(192.168.7.1 192.168.7.2)
-servingiplist=(192.168.7.1 192.168.7.2)
-exchangeip=
-# computing_backend could be eggroll or spark.
-computing_backend=eggroll
+party_list=(10000 9999)
+party_ip_list=(192.168.7.1 192.168.7.2)
+serving_ip_list=(192.168.7.1 192.168.7.2)
+
+# backend could be eggroll, spark_rabbitmq and spark_pulsar spark_local_pulsar
+backend=eggroll
 
 # true if you need python-nn else false, the default value will be false
 enabled_nn=false
 
-fateboard_username=admin                    # Username to access fateboard
-fateboard_password=admin                    # Password to access fateboard
+# default
+exchangeip=
+
+# modify if you are going to use an external db
+mysql_ip=mysql
+mysql_user=fate
+mysql_password=fate_dev
+mysql_db=fate_flow
+
+name_node=hdfs://namenode:9000
+
+# Define fateboard login information
+fateboard_username=admin
+fateboard_password=admin
+
+# Define serving admin login information
+serving_admin_username=admin
+serving_admin_password=admin
 ```
 
 Spark was introduced in FATE v1.5 as the underlying computing backend, for more details
@@ -95,11 +115,11 @@ By default, the exchange service is not deployed. The exchange service runs on p
 After editting the above configuration file, use the following commands to generate configuration of target hosts.  
 
 ```bash
-$ cd docker-deploy
-$ ./generate_config.sh
+cd docker-deploy
+bash ./generate_config.sh
 ```
 
-Now, tar files have been generated for each party including the exchange node (party). They are named as ```confs-<party-id>.tar ``` and ```serving-<party-id>.tar```.
+Now, tar files have been generated for each party including the exchange node (party). They are named as ```confs-<party-id>.tar``` and ```serving-<party-id>.tar```.
 
 ### Deploying FATE to target hosts
 
@@ -109,8 +129,9 @@ Now, tar files have been generated for each party including the exchange node (p
 * meet the requirements specified in [Prerequisites](#Prerequisites).
 
 To deploy FATE to all configured target hosts, use the below command:
+
 ```bash
-$ ./docker_deploy.sh all
+bash ./docker_deploy.sh all
 ```
 
 The script copies tar files (e.g. `confs-<party-id>.tar` or `serving-<party-id>.tar`) to corresponding target hosts. It then launches a FATE cluster on each host using `docker-compose` commands.
@@ -118,60 +139,58 @@ The script copies tar files (e.g. `confs-<party-id>.tar` or `serving-<party-id>.
 By default, the script starts the training and serving cluster simultaneously. If you need to start them separately, add the `--training` or `--serving` to the `docker_deploy.sh` as follows.
 
 (Optional) To deploy all parties training cluster, use the below command:
+
 ```bash
-$ ./docker_deploy.sh all --training
+bash ./docker_deploy.sh all --training
 ```
 
 (Optional) To deploy all parties serving cluster, use the below command:
+
 ```bash
-$ ./docker_deploy.sh all --serving
+bash ./docker_deploy.sh all --serving
 ```
 
 (Optional) To deploy FATE to a single target host, use the below command with the party's id (10000 in the below example):
+
 ```bash
-$ ./docker_deploy.sh 10000
+bash ./docker_deploy.sh 10000
 ```
 
 (Optional) To deploy the exchange node to a target host, use the below command:
-```bash
-$ ./docker_deploy.sh exchange
-```
 
+```bash
+bash ./docker_deploy.sh exchange
+```
 
 Once the commands finish, log in to any host and use `docker ps` to verify the status of the cluster. A sample output is as follows:
 
-```
-CONTAINER ID        IMAGE                                        COMMAND                  CREATED              STATUS              PORTS                                 NAMES
-69b8b36af395        federatedai/eggroll:<tag>          "bash -c 'java -Dlog…"   2 hours ago         Up 2 hours    
-      0.0.0.0:9371->9370/tcp                                                   confs-exchange_exchange_1
-71cd792ba088        federatedai/serving-proxy:<tag>    "/bin/sh -c 'java -D…"   2 hours ago         Up 2 hours    
-      0.0.0.0:8059->8059/tcp, 0.0.0.0:8869->8869/tcp, 8879/tcp                 serving-10000_serving-proxy_1
-2c79047918c6        federatedai/serving-server:<tag>   "/bin/sh -c 'java -c…"   2 hours ago         Up 2 hours    
-      0.0.0.0:8000->8000/tcp                                                   serving-10000_serving-server_1
-b1a5384a55dc        redis:5                            "docker-entrypoint.s…"   2 hours ago         Up 2 hours    
-      6379/tcp                                                                 serving-10000_redis_1
-321c4e29313b        federatedai/client:<tag>           "/bin/sh -c 'sleep 5…"   2 hours ago         Up 2 hours    
-      0.0.0.0:20000->20000/tcp                                                 confs-10000_client_1
-c1b3190126ab        federatedai/fateboard:<tag>        "/bin/sh -c 'java -D…"   2 hours ago         Up 2 hours    
-      0.0.0.0:8080->8080/tcp                                                   confs-10000_fateboard_1
-cc679996e79f        federatedai/python:<tag>           "/bin/sh -c 'sleep 5…"   2 hours ago         Up 2 hours    
-      0.0.0.0:8484->8484/tcp, 0.0.0.0:9360->9360/tcp, 0.0.0.0:9380->9380/tcp   confs-10000_python_1
-c79800300000        federatedai/eggroll:<tag>          "bash -c 'java -Dlog…"   2 hours ago         Up 2 hours    
-      4671/tcp                                                                 confs-10000_nodemanager_1
-ee2f1c3aad99        federatedai/eggroll:<tag>          "bash -c 'java -Dlog…"   2 hours ago         Up 2 hours    
-      4670/tcp                                                                 confs-10000_clustermanager_1
-a1f784882d20        federatedai/eggroll:<tag>          "bash -c 'java -Dlog…"   2 hours ago         Up 2 hours                  0.0.0.0:9370->9370/tcp                                                   confs-10000_rollsite_1
-2b4526e6d534        mysql:8                            "docker-entrypoint.s…"   2 hours ago         Up 2 hours                  3306/tcp, 33060/tcp                                                      confs-10000_mysql_1
+```bash
+CONTAINER ID   IMAGE                                      COMMAND                  CREATED         STATUS                   PORTS                                                                                                                                           NAMES
+5d2e84ba4c77   federatedai/serving-server:2.1.5-release   "/bin/sh -c 'java -c…"   5 minutes ago   Up 5 minutes             0.0.0.0:8000->8000/tcp, :::8000->8000/tcp                                                                                                       serving-9999_serving-server_1
+3dca43f3c9d5   federatedai/serving-admin:2.1.5-release    "/bin/sh -c 'java -c…"   5 minutes ago   Up 5 minutes             0.0.0.0:8350->8350/tcp, :::8350->8350/tcp                                                                                                       serving-9999_serving-admin_1
+fe924918509b   federatedai/serving-proxy:2.1.5-release    "/bin/sh -c 'java -D…"   5 minutes ago   Up 5 minutes             0.0.0.0:8059->8059/tcp, :::8059->8059/tcp, 0.0.0.0:8869->8869/tcp, :::8869->8869/tcp, 8879/tcp                                                  serving-9999_serving-proxy_1
+b62ed8ba42b7   bitnami/zookeeper:3.7.0                    "/opt/bitnami/script…"   5 minutes ago   Up 5 minutes             0.0.0.0:2181->2181/tcp, :::2181->2181/tcp, 8080/tcp, 0.0.0.0:49226->2888/tcp, :::49226->2888/tcp, 0.0.0.0:49225->3888/tcp, :::49225->3888/tcp   serving-9999_serving-zookeeper_1
+3c643324066f   federatedai/client:1.8.0-release           "/bin/sh -c 'flow in…"   5 minutes ago   Up 5 minutes             0.0.0.0:20000->20000/tcp, :::20000->20000/tcp                                                                                                   confs-9999_client_1
+3fe0af1ebd71   federatedai/fateboard:1.8.0-release        "/bin/sh -c 'java -D…"   5 minutes ago   Up 5 minutes             0.0.0.0:8080->8080/tcp, :::8080->8080/tcp                                                                                                       confs-9999_fateboard_1
+635b7d99357e   federatedai/python:1.8.0-release           "container-entrypoin…"   5 minutes ago   Up 5 minutes (healthy)   0.0.0.0:9360->9360/tcp, :::9360->9360/tcp, 8080/tcp, 0.0.0.0:9380->9380/tcp, :::9380->9380/tcp                                                  confs-9999_python_1
+8b515f08add3   federatedai/eggroll:1.8.0-release          "/tini -- bash -c 'j…"   5 minutes ago   Up 5 minutes             8080/tcp, 0.0.0.0:9370->9370/tcp, :::9370->9370/tcp                                                                                             confs-9999_rollsite_1
+108cc061c191   federatedai/eggroll:1.8.0-release          "/tini -- bash -c 'j…"   5 minutes ago   Up 5 minutes             4670/tcp, 8080/tcp                                                                                                                              confs-9999_clustermanager_1
+f10575e76899   federatedai/eggroll:1.8.0-release          "/tini -- bash -c 'j…"   5 minutes ago   Up 5 minutes             4671/tcp, 8080/tcp                                                                                                                              confs-9999_nodemanager_1
+aa0a0002de93   mysql:8.0.28                               "docker-entrypoint.s…"   5 minutes ago   Up 5 minutes             3306/tcp, 33060/tcp                                                                                                                             confs-9999_mysql_1
 ```
 
 ### Verifying the deployment
+
 On the target node of each party, a container named  `confs-<party_id>_python_1` should have been created and running the `fate-flow` service. For example, on Party 10000's node, run the following commands to verify the deployment:
+
 ```bash
-$ docker exec -it confs-10000_client_1 bash
-$ flow test toy --guest-party-id 10000 --host-party-id 9999
+docker exec -it confs-10000_client_1 bash
+flow test toy --guest-party-id 10000 --host-party-id 9999
 ```
+
 If the test passed, the output may look like the following:
-```
+
+```bash
 "2019-08-29 07:21:25,353 - secure_add_guest.py[line:96] - INFO: begin to init parameters of secure add example guest"
 "2019-08-29 07:21:25,354 - secure_add_guest.py[line:99] - INFO: begin to make guest data"
 "2019-08-29 07:21:26,225 - secure_add_guest.py[line:102] - INFO: split data into two random parts"
@@ -181,16 +200,21 @@ If the test passed, the output may look like the following:
 "2019-08-29 07:21:33,920 - secure_add_guest.py[line:114] - INFO: receive host sum from guest"
 "2019-08-29 07:21:34,118 - secure_add_guest.py[line:121] - INFO: success to calculate secure_sum, it is 2000.0000000000002"
 ```
+
 For more details about the testing result, please refer to `python/examples/toy_example/README.md` .
 
 ### Verifying the serving service
+
 #### Steps on the host
+
 ##### Logging in to the python container
+
 ```bash
 docker exec -it confs-10000_client_1 bash
 ```
 
-##### Modifying examples/upload_host.json 
+##### Modifying examples/upload_host.json
+
 ```bash
 cat > fateflow/examples/upload/upload_host.json <<EOF
 {
@@ -204,18 +228,21 @@ cat > fateflow/examples/upload/upload_host.json <<EOF
 EOF
 ```
 
-##### Uploading data
+##### Uploading data of host
+
 ```bash
 flow data upload -c fateflow/examples/upload/upload_host.json
 ```
 
 #### Steps on the guest
+
 ##### Getting in to the python container
+
 ```bash
 docker exec -it confs-9999_client_1 bash
 ```
 
-##### Modifying examples/upload_guest.json 
+##### Modifying examples/upload_guest.json
 
 ```bash
 cat > fateflow/examples/upload/upload_guest.json <<EOF
@@ -230,7 +257,7 @@ cat > fateflow/examples/upload/upload_guest.json <<EOF
 EOF
 ```
 
-##### Uploading data
+##### Uploading data of guest
 
 ```bash
 flow data upload -c fateflow/examples/upload/upload_guest.json
@@ -450,11 +477,13 @@ EOF
 ```
 
 ##### Submitting a job
+
 ```bash
 flow job submit -d fateflow/examples/lr/test_hetero_lr_job_dsl.json -c fateflow/examples/lr/test_hetero_lr_job_conf.json
 ```
 
 output：
+
 ```json
 {
     "data": {
@@ -480,11 +509,13 @@ output：
 ```
 
 ##### Checking status of training jobs
+
 ```bash
 flow task query -r guest -j 202111230933232084530 | grep -w f_status
 ```
 
 output:
+
 ```json
             "f_status": "success",
             "f_status": "waiting",
@@ -546,6 +577,7 @@ flow model deploy --model-id arbiter-10000#guest-9999#host-10000#model --model-v
 *The `model_version` that needs to be used later are all obtained in this step `"model_version": "202111230954255210490"`*
 
 ##### Modifying the configuration of loading model
+
 ```bash
 cat > fateflow/examples/model/publish_load_model.json <<EOF
 {
@@ -572,13 +604,14 @@ cat > fateflow/examples/model/publish_load_model.json <<EOF
 EOF
 ```
 
-
 ##### Loading a model
-```bash 
+
+```bash
 flow model load -c fateflow/examples/model/publish_load_model.json
 ```
 
 output:
+
 ```json
 {
     "data": {
@@ -633,13 +666,14 @@ cat > fateflow/examples/model/bind_model_service.json <<EOF
 EOF
 ```
 
-
 ##### Binding a model
+
 ```bash
 flow model bind -c fateflow/examples/model/bind_model_service.json
 ```
 
 output:
+
 ```json
 {
     "retcode": 0,
@@ -648,6 +682,7 @@ output:
 ```
 
 ##### Testing online serving
+
 Send the following message to serving interface "{SERVING_SERVICE_IP}:8059/federation/v1/inference" of the "GUEST" party.
 
 ```bash
@@ -671,19 +706,23 @@ $ curl -X POST -H 'Content-Type: application/json' -i 'http://192.168.7.2:8059/f
 ```
 
 output:
+
 ```json
 {"retcode":0,"retmsg":"","data":{"score":0.018025086161221948,"modelId":"guest#9999#arbiter-10000#guest-9999#host-10000#model","modelVersion":"202111240318516571130","timestamp":1637743473990},"flag":0}
 ```
 
 ### Deleting the cluster
+
 Use this command to stop all cluster:
-```
-./docker_deploy.sh --delete all
+
+```bash
+bash ./docker_deploy.sh --delete all
 ```
 
 To delete the cluster completely, log in to each host and run the commands as follows:
+
 ```bash
-$ cd /data/projects/fate/confs-<id>/  # id of party
-$ docker-compose down
-$ rm -rf ../confs-<id>/               # delete the legacy files
+cd /data/projects/fate/confs-<id>/  # id of party
+docker-compose down
+rm -rf ../confs-<id>/               # delete the legacy files
 ```

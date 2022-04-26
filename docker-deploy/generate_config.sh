@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright 2019-2020 VMware, Inc.
+# Copyright 2019-2022 VMware, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -443,6 +443,8 @@ EOF
 		eval party_id=\${party_list[${i}]}
 		eval party_ip=\${party_ip_list[${i}]}
 		eval serving_ip=\${serving_ip_list[${i}]}
+		eval serving_admin_username=${serving_admin_username}
+		eval serving_admin_password=${serving_admin_password}
 
 		rm -rf serving-$party_id/
 		mkdir -p serving-$party_id/confs
@@ -457,20 +459,18 @@ EOF
 		# generate conf dir
 		cp ${WORKINGDIR}/.env ./serving-$party_id
 
+		# serving admin
+		sed -i "s/admin.username=<serving_admin.username>/admin.username=${serving_admin_username}/g" ./serving-$party_id/confs/serving-admin/conf/application.properties
+		sed -i "s/admin.password=<serving_admin.password>/admin.password=${serving_admin_password}/g" ./serving-$party_id/confs/serving-admin/conf/application.properties
+
 		# serving server
-		sed -i "s/127.0.0.1:9380/${party_ip}:9380/g" ./serving-$party_id/confs/serving-server/conf/serving-server.properties
-		sed -i "s/<redis.ip>/${redis_ip}/g" ./serving-$party_id/confs/serving-server/conf/serving-server.properties
-		sed -i "s/<redis.port>/${redis_port}/g" ./serving-$party_id/confs/serving-server/conf/serving-server.properties
-		sed -i "s/<redis.password>/${redis_password}/g" ./serving-$party_id/confs/serving-server/conf/serving-server.properties
-		sed -i "s/<redis.password>/${redis_password}/g" ./serving-$party_id/docker-compose.yml
+		sed -i "s#model.transfer.url=http://127.0.0.1:9380/v1/model/transfer#model.transfer.url=http://${party_ip}:9380/v1/model/transfer#g" ./serving-$party_id/confs/serving-server/conf/serving-server.properties
 
 		# network
 		sed -i "s/name: <fate-network>/name: confs-${party_id}_fate-network/g" serving-$party_id/docker-compose.yml
 		
-		
-
 		# serving proxy
-		sed -i "s/coordinator=9999/coordinator=${party_id}/g" ./serving-$party_id/confs/serving-proxy/conf/application.properties
+		sed -i "s/coordinator=<partyID>/coordinator=${party_id}/g" ./serving-$party_id/confs/serving-proxy/conf/application.properties
 		cat >./serving-$party_id/confs/serving-proxy/conf/route_table.json <<EOF
 {
     "route_table": {
@@ -504,7 +504,7 @@ $(for ((j = 0; j < ${#party_list[*]}; j++)); do
         "default": {
             "default": [
                 {
-                    "ip": "default-serving-proxy",
+                    "ip": "serving-proxy",
                     "port": 8869
                 }
             ]
