@@ -83,6 +83,9 @@ spec:
             - mountPath: /data/projects/fate/persistence/
               name: persistence
               subPath: {{ .Values.modules.client.subPath }}
+            - mountPath: /root/.jupyter/jupyter_notebook_config.py
+              name: client-configmap
+              subPath: jupyter_notebook_config.py                
       {{- with .Values.modules.client.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}
@@ -110,4 +113,7 @@ spec:
           persistentVolumeClaim:
             claimName: {{ .Values.modules.client.existingClaim | default  "client-data" }}
         {{- end }}
+        - name: client-configmap
+          configMap:
+            name: client       
 {{ end }}
