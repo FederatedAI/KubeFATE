@@ -1,0 +1,12 @@
+{{ if .Values.modules.client.include }}
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: client
+  labels:
+    fateMoudle: client
+{{ include "fate.labels" . | indent 4 }}
+data:
+  jupyter_notebook_config.py: |
+    c.NotebookApp.allow_origin = '*'
+{{ end }}
