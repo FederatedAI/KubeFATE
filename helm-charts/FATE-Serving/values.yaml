@@ -5,7 +5,7 @@ partyName: fate-serving-9999
 image:
   registry: federatedai
   isThridParty:
-  tag: 2.0.4-release
+  tag: 2.1.5-release
   pullPolicy: IfNotPresent
   imagePullSecrets: 
 #  - name: 
@@ -57,18 +57,6 @@ servingProxy:
     # partyIp: 192.168.10.1
     # partyPort: 30110
 
-servingRedis:
-  include: true
-  password: fate_dev
-  subPath: ""
-  existingClaim: ""
-  storageClass: "serving-redis"
-  accessMode: ReadWriteOnce
-  size: 1Gi
-  nodeSelector:
-  tolerations:
-  affinity:
-  
 servingServer:
   include: true
   type: NodePort
@@ -80,13 +68,15 @@ servingServer:
   nodeSelector:
   tolerations:
   affinity:
+  cacheType: redis
+  singleAdaptor: com.webank.ai.fate.serving.adaptor.dataaccess.MockAdapter
+  batchAdaptor: com.webank.ai.fate.serving.adaptor.dataaccess.MockBatchAdapter
+  AdapterURL: http://127.0.0.1:9380/v1/http/adapter/getFeature
   subPath: ""
   existingClaim: ""
   storageClass: "serving-server"
   accessMode: ReadWriteOnce
-  cacheType: local
   size: 1Gi
-
 
 servingZookeeper:
   include: true
@@ -98,7 +88,6 @@ servingZookeeper:
   storageClass: "serving-zookeeper"
   accessMode: ReadWriteOnce
   size: 1Gi
-
 
 servingAdmin:
   include: true

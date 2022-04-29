@@ -28,7 +28,7 @@ data:
     # cache
     #remoteModelInferenceResultCacheSwitch=false
     cache.type={{ .Values.servingServer.cacheType | default "local" }}
-    model.cache.path=/root/.fate
+    model.cache.path=/data/projects/fate-serving/serving-server
     # local cache
     #local.cache.maxsize=10000
     #local.cache.expire=30
@@ -46,11 +46,12 @@ data:
     #redis.expire=3000
     #redis.maxTotal=100
     #redis.maxIdle=100
-    # external subsystem
-    #proxy={{ .Values.servingProxy.ip }}:8879
+
+    proxy={{ .Values.servingProxy.ip }}:8879
     # adapter
-    feature.single.adaptor=com.webank.ai.fate.serving.adaptor.dataaccess.MockAdapter
-    feature.batch.adaptor=com.webank.ai.fate.serving.adaptor.dataaccess.MockBatchAdapter
+    feature.single.adaptor={{ .Values.servingServer.singleAdaptor | default "com.webank.ai.fate.serving.adaptor.dataaccess.MockAdapter" }}
+    feature.batch.adaptor={{ .Values.servingServer.batchAdaptor | default "com.webank.ai.fate.serving.adaptor.dataaccess.MockBatchAdapter" }}
+    http.adapter.url={{ .Values.servingServer.AdapterURL | default "http://127.0.0.1:9380/v1/http/adapter/getFeature" }}
     # model transfer
     model.transfer.url=http://{{ .Values.servingServer.fateflow.ip }}:{{ .Values.servingServer.fateflow.port }}/v1/model/transfer
     # zk router
@@ -61,6 +62,11 @@ data:
     #acl.enable=false
     #acl.username=
     #acl.password=
+
+    # LR algorithm config
+    #lr.split.size=500
+    #lr.use.parallel=false
+
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -101,7 +107,7 @@ spec:
               name: serving-server-confs
               subPath: serving-server.properties
             - name: data
-              mountPath: /root/.fate
+              mountPath: /data/projects/fate-serving/serving-server
               subPath: {{ .Values.servingServer.subPath }}
       {{- with .Values.servingServer.nodeSelector }}
       nodeSelector:
