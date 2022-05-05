@@ -18,6 +18,7 @@ istio:
 podSecurityPolicy:
   enabled: false
 
+ingressClassName: nginx
 
 ingress:
   servingProxy: 

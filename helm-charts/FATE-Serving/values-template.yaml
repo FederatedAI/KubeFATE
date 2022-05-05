@@ -26,6 +26,7 @@ podSecurityPolicy:
   enabled: {{ .enabled | default false }}
 {{- end }}
 
+ingressClassName: {{ .ingressClassName | default "nginx"}}
 
 {{- with .ingress }}
 ingress:

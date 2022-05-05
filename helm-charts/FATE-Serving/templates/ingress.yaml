@@ -25,6 +25,7 @@ metadata:
 {{ toYaml .Values.ingress.servingProxy.annotations | indent 4 }}
 {{- end }}
 spec:
+  ingressClassName: {{ .Values.ingressClassName }}
   rules:
   {{- range .Values.ingress.servingProxy.hosts }}
   - host: {{ .name }}
@@ -61,6 +62,7 @@ metadata:
 {{ toYaml .Values.ingress.servingAdmin.annotations | indent 4 }}
 {{- end }}
 spec:
+  ingressClassName: {{ .Values.ingressClassName }}
   rules:
   {{- range .Values.ingress.servingAdmin.hosts }}
   - host: {{ .name }}
