@@ -23,7 +23,7 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - ./confs/serving-server/conf/serving-server.properties:/data/projects/fate/serving-server/conf/serving-server.properties
+      - ./confs/serving-server/conf/serving-server.properties:/data/projects/fate-serving/serving-server/conf/serving-server.properties
       - ./confs/serving-server/cache:/data/projects/fate-serving/serving-server
     networks:
       - fate-serving-network
@@ -36,8 +36,8 @@ services:
     expose:
       - 8879
     volumes:
-      - ./confs/serving-proxy/conf/application.properties:/data/projects/fate/serving-proxy/conf/application.properties
-      - ./confs/serving-proxy/conf/route_table.json:/data/projects/fate/serving-proxy/conf/route_table.json
+      - ./confs/serving-proxy/conf/application.properties:/data/projects/fate-serving/serving-proxy/conf/application.properties
+      - ./confs/serving-proxy/conf/route_table.json:/data/projects/fate-serving/serving-proxy/conf/route_table.json
     networks:
       - fate-serving-network
 
@@ -57,7 +57,6 @@ services:
     ports:
       - "8350:8350"
     volumes:
-      - ./confs/serving-admin/conf/application.properties:/data/projects/fate/serving-admin/conf/application.properties
-    command: /bin/sh -c "java -cp conf/:lib/*:fate-serving-admin.jar com.webank.ai.fate.serving.admin.Bootstrap -c conf/application.properties"
+      - ./confs/serving-admin/conf/application.properties:/data/projects/fate-serving/serving-admin/conf/application.properties
     networks:
       - fate-serving-network
