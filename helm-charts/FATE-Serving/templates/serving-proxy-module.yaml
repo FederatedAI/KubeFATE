@@ -43,7 +43,6 @@ data:
     #inference.service.name=serving
     #random, consistent
     #routeType=random
-    route.table=/data/projects/fate-serving/serving-proxy/conf/route_table/route_table.json
     #route.table=/data/projects/fate-serving/serving-proxy/conf/route_table.json
     #auth.file=/data/projects/fate-serving/serving-proxy/conf/auth_config.json
     # zk router
@@ -164,12 +163,22 @@ spec:
           ports:
             - containerPort: 8059
             - containerPort: 8869
+          command:
+          - /bin/sh
+          - -c
+          - |
+            # make route_table.json editable
+            cp /data/projects/fate-serving/serving-proxy/conf/route_table.base.json /data/projects/fate-serving/serving-proxy/conf/route_table.json
+            chmod 755 /data/projects/fate-serving/serving-proxy/conf/route_table.json
+
+            java -Dspring.config.location=conf/application.properties -cp conf/:lib/*:fate-serving-proxy.jar com.webank.ai.fate.serving.proxy.bootstrap.Bootstrap -c conf/application.properties
           volumeMounts:
             - mountPath: /data/projects/fate-serving/serving-proxy/conf/application.properties
               name: serving-proxy-confs
               subPath: application.properties
-            - mountPath: /data/projects/fate-serving/serving-proxy/conf/route_table
+            - mountPath: /data/projects/fate-serving/serving-proxy/conf/route_table.base.json
               name: serving-proxy-confs
+              subPath: route_table.json
       {{- with .Values.servingProxy.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}
