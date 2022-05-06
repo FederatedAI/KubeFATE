@@ -165,7 +165,7 @@ spec:
             - containerPort: 8059
             - containerPort: 8869
           volumeMounts:
-            - mountPath: /data/projects/fate/serving-proxy/conf/application.properties
+            - mountPath: /data/projects/fate-serving/serving-proxy/conf/application.properties
               name: serving-proxy-confs
               subPath: application.properties
             - mountPath: /data/projects/fate-serving/serving-proxy/conf/route_table

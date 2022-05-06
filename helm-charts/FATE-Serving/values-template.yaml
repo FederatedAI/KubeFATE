@@ -143,6 +143,7 @@ servingServer:
     port: {{ .port }}
   {{- end }}
   
+  cacheSwitch: {{ .cacheType | default "false" }}
   cacheType: {{ .cacheType | default "local" }}
   singleAdaptor: {{ .singleAdaptor | default "com.webank.ai.fate.serving.adaptor.dataaccess.MockAdapter" }}
   batchAdaptor: {{ .batchAdaptor | default "com.webank.ai.fate.serving.adaptor.dataaccess.MockBatchAdapter" }}

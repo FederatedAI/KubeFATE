@@ -26,7 +26,7 @@ data:
     port=8000
     #serviceRoleName=serving
     # cache
-    #remoteModelInferenceResultCacheSwitch=false
+    remoteModelInferenceResultCacheSwitch={{ .Values.servingServer.cacheSwitch | default "false" }}
     cache.type={{ .Values.servingServer.cacheType | default "local" }}
     model.cache.path=/data/projects/fate-serving/serving-server
     # local cache
@@ -103,11 +103,11 @@ spec:
           ports:
             - containerPort: 9394
           volumeMounts:
-            - mountPath: /data/projects/fate/serving-server/conf/serving-server.properties
+            - mountPath: /data/projects/fate-serving/serving-server/conf/serving-server.properties
               name: serving-server-confs
               subPath: serving-server.properties
             - name: data
-              mountPath: /data/projects/fate-serving/serving-server
+              mountPath: /root/.fate
               subPath: {{ .Values.servingServer.subPath }}
       {{- with .Values.servingServer.nodeSelector }}
       nodeSelector:

@@ -49,6 +49,7 @@ servingServer:
   fateflow:
     ip: 192.168.9.1
     port: 30097
+  cacheSwitch: true
   cacheType: "redis"
   singleAdaptor: com.webank.ai.fate.serving.adaptor.dataaccess.MockAdapter
   batchAdaptor: com.webank.ai.fate.serving.adaptor.dataaccess.MockBatchAdapter

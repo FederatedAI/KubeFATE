@@ -69,6 +69,7 @@ servingServer:
   nodeSelector:
   tolerations:
   affinity:
+  cacheSwitch: false
   cacheType: redis
   singleAdaptor: com.webank.ai.fate.serving.adaptor.dataaccess.MockAdapter
   batchAdaptor: com.webank.ai.fate.serving.adaptor.dataaccess.MockBatchAdapter

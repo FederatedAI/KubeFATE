@@ -73,13 +73,8 @@ spec:
           name: serving-admin
           ports:
             - containerPort: 8350
-          command:
-            - sh
-            - -c
-            - |
-              java -cp conf/:lib/*:fate-serving-admin.jar com.webank.ai.fate.serving.admin.Bootstrap -c conf/application.properties
           volumeMounts:
-            - mountPath: /data/projects/fate/serving-admin/conf/application.properties
+            - mountPath: /data/projects/fate-serving/serving-admin/conf/application.properties
               name: serving-admin-confs
               subPath: application.properties
       {{- with .Values.servingAdmin.nodeSelector }}

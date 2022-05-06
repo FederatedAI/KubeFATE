@@ -453,8 +453,6 @@ EOF
 		cp serving_template/docker-compose-serving.yml serving-$party_id/docker-compose.yml
 		if [ "$RegistryURI" != "" ]; then
 			sed -i 's#federatedai#${RegistryURI}/federatedai#g' ./serving-$party_id/docker-compose.yml
-			# should not use federatedai in here
-			sed -i 's#image: "redis:5"#image: "${RegistryURI}/federatedai/redis:5"#g' ./serving-$party_id/docker-compose.yml
 		fi
 		# generate conf dir
 		cp ${WORKINGDIR}/.env ./serving-$party_id
