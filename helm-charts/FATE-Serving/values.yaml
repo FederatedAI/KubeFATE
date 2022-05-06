@@ -99,6 +99,19 @@ servingAdmin:
   tolerations:
   affinity:
 
+servingRedis:
+  include: true
+  password: fate_dev
+  subPath: ""
+  existingClaim: ""
+  storageClass: "serving-redis"
+  accessMode: ReadWriteOnce
+  size: 1Gi
+  nodeSelector:
+  tolerations:
+  affinity:
+
+
 # externalRedisIp: "redis"
 # externalRedisPort: 6379
 # externalRedisPassword: "fate_dev"
