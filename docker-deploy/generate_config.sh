@@ -88,7 +88,7 @@ GenerateConfig() {
 			cp -r training_template/backends/spark/rabbitmq confs-$party_id/confs/
 			
 			cp training_template/docker-compose-spark.yml confs-$party_id/docker-compose.yml
-			sed -i '157,173d' confs-$party_id/docker-compose.yml
+			sed -i '163,179d' confs-$party_id/docker-compose.yml
 		fi
 
 		if [ "$backend" == "spark_pulsar" ]; then
@@ -98,7 +98,7 @@ GenerateConfig() {
 			cp -r training_template/backends/spark/pulsar confs-$party_id/confs/
 			
 			cp training_template/docker-compose-spark.yml confs-$party_id/docker-compose.yml
-			sed -i '139,155d' confs-$party_id/docker-compose.yml
+			sed -i '145,161d' confs-$party_id/docker-compose.yml
 		fi
 
 		if [ "$backend" == "spark_local_pulsar" ]; then
@@ -165,15 +165,12 @@ GenerateConfig() {
 			mkdir -p ${shared_dir}/${value}
 		done
 
-		sed -i "s|{/path/to/host/dir}|${dir}/${shared_dir}|g" ./confs-$party_id/docker-compose.yml
+		sed -i "s|<path-to-host-dir>|${dir}/${shared_dir}|g" ./confs-$party_id/docker-compose.yml
 
 		# Start the general config rendering
 		# fateboard
 		sed -i "s#^server.port=.*#server.port=${fateboard_port}#g" ./confs-$party_id/confs/fateboard/conf/application.properties
 		sed -i "s#^fateflow.url=.*#fateflow.url=http://${fate_flow_ip}:${fate_flow_http_port}#g" ./confs-$party_id/confs/fateboard/conf/application.properties
-		sed -i "s#<jdbc.username>#${db_user}#g" ./confs-$party_id/confs/fateboard/conf/application.properties
-		sed -i "s#<jdbc.password>#${db_password}#g" ./confs-$party_id/confs/fateboard/conf/application.properties
-		sed -i "s#<jdbc.url>#jdbc:mysql://${db_ip}:3306/${db_name}?characterEncoding=utf8\&characterSetResults=utf8\&autoReconnect=true\&failOverReadOnly=false\&serverTimezone=GMT%2B8#g" ./confs-$party_id/confs/fateboard/conf/application.properties
 		sed -i "s#<fateboard.username>#${fateboard_username}#g" ./confs-$party_id/confs/fateboard/conf/application.properties
 		sed -i "s#<fateboard.password>#${fateboard_password}#g" ./confs-$party_id/confs/fateboard/conf/application.properties
 		echo fateboard module of $party_id done!

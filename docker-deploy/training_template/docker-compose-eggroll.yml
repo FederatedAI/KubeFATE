@@ -25,19 +25,19 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: {/path/to/host/dir}/examples
+      device: <path-to-host-dir>/examples
   shared_dir_federatedml:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: {/path/to/host/dir}/federatedml
+      device: <path-to-host-dir>/federatedml
   shared_dir_data:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: {/path/to/host/dir}/data
+      device: <path-to-host-dir>/data
 
 services:
   rollsite:
@@ -86,7 +86,7 @@ services:
       - 4671
     volumes:
       - ./confs/eggroll/conf:/data/projects/fate/eggroll/conf
-      - ./confs/fate_flow/conf/service_conf.yaml:/data/projects/fate/fate/conf/service_conf.yaml
+      - ./confs/fate_flow/conf/service_conf.yaml:/data/projects/fate/conf/service_conf.yaml
       - ./shared_dir/data/nodemanager:/data/projects/fate/eggroll/data
     networks:
       - fate-network

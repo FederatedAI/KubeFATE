@@ -1,11 +1,10 @@
-name: Publish
+name: Push kubefate service image to DockerHub
 
 on:
   push:
     # Publish `master` as Docker `latest` image.
     branches:
       - master
-      - jenkins-integration
 
     # Publish `v1.2.3` tags as releases.
     tags:

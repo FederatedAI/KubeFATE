@@ -70,8 +70,6 @@ When submitting a task, the user can declare in the config file to use Pulsar as
    "job_parameters": {
      "common": {
        "job_type": "train",
-       "work_mode": 1,
-       "backend": 2,
        "spark_run": {
          "num-executors": 1,
          "executor-cores": 2
