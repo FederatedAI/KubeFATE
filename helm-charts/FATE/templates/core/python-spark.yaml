@@ -129,11 +129,6 @@ spec:
                 cp /data/projects/spark-2.4.1-bin-hadoop2.7/conf/spark-defaults-template.conf /data/projects/spark-2.4.1-bin-hadoop2.7/conf/spark-defaults.conf
                 sed -i "s/fateflow/${POD_IP}/g" /data/projects/spark-2.4.1-bin-hadoop2.7/conf/spark-defaults.conf
                 
-                # logs
-                mkdir -p /data/projects/fate/fateflow/logs/fate_flow/
-                touch /data/projects/fate/fateflow/logs/fate_flow/INFO.log
-                ln -sf /dev/stdout /data/projects/fate/fateflow/logs/fate_flow/INFO.log
-                
                 sleep 5 && python fateflow/python/fate_flow/fate_flow_server.py
           livenessProbe:
             tcpSocket:
