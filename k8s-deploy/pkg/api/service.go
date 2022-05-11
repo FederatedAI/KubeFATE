@@ -17,6 +17,7 @@ package api
 
 import (
 	"fmt"
+	"github.com/rs/zerolog"
 	"os"
 	"time"
 
@@ -132,6 +133,7 @@ func Run() error {
 		logger.SetLogger(
 			logger.WithUTC(true),
 			logger.WithLogger(logging.GetGinLogger),
+			logger.WithDefaultLevel(zerolog.DebugLevel),
 		),
 	)
 
