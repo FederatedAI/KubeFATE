@@ -72,6 +72,27 @@ spec:
             requests:
               memory: 512Mi
               cpu: "0.5"
+          livenessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 1
+            successThreshold: 1
+            failureThreshold: 3
+          startupProbe:
+            tcpSocket:
+              port: 8080
+            failureThreshold: 30
+            periodSeconds: 10
       restartPolicy: Always
 ---
 apiVersion: apps/v1
