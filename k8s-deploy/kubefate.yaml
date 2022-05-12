@@ -73,36 +73,24 @@ spec:
               memory: 512Mi
               cpu: "0.5"
           livenessProbe:
-            httpGet:
-              path: /
+            tcpSocket:
               port: 8080
-              httpHeaders:
-                - name: X-Custom-Header
-                  value: livenessProbe
             initialDelaySeconds: 30
             periodSeconds: 10
             timeoutSeconds: 5
             successThreshold: 1
             failureThreshold: 3
           readinessProbe:
-            httpGet:
-              path: /
+            tcpSocket:
               port: 8080
-              httpHeaders:
-                - name: X-Custom-Header
-                  value: readinessProbe
             initialDelaySeconds: 5
             periodSeconds: 10
             timeoutSeconds: 1
             successThreshold: 1
             failureThreshold: 3
           startupProbe:
-            httpGet:
-              path: /
+            tcpSocket:
               port: 8080
-              httpHeaders:
-                - name: X-Custom-Header
-                  value: startupProbe
             failureThreshold: 30
             periodSeconds: 10
       restartPolicy: Always
@@ -164,7 +152,7 @@ spec:
               - mysqladmin
               - ping
             initialDelaySeconds: 30
-            periodSeconds: 10
+            periodSeconds: 30
             timeoutSeconds: 5
             successThreshold: 1
             failureThreshold: 3
@@ -173,8 +161,8 @@ spec:
               command:
               - mysqladmin
               - ping
-            initialDelaySeconds: 5
-            periodSeconds: 10
+            initialDelaySeconds: 30
+            periodSeconds: 30
             timeoutSeconds: 1
             successThreshold: 1
             failureThreshold: 3
