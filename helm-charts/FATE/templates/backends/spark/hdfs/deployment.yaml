@@ -121,16 +121,14 @@ spec:
         {{ end }}
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: datanode
   labels:
     fateMoudle: datanode
 {{ include "fate.labels" . | indent 4 }}
 spec:
-  replicas: 1
-  strategy:
-    type: Recreate
+  replicas: 3
   selector:
     matchLabels:
       fateMoudle: datanode
