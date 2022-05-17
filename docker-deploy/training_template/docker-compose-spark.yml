@@ -105,11 +105,35 @@ services:
     networks:
       - fate-network
 
-  datanode:
+  datanode-0:
     image: federatedai/hadoop-datanode:2.0.0-hadoop2.7.4-java8
     restart: always
     volumes:
-      - ./shared_dir/data/datanode:/hadoop/dfs/data
+      - ./shared_dir/data/datanode-0:/hadoop/dfs/data
+    environment:
+      SERVICE_PRECONDITION: "namenode:9000"
+    env_file:
+      - ./confs/hadoop/hadoop.env
+    networks:
+      - fate-network
+
+  datanode-1:
+    image: federatedai/hadoop-datanode:2.0.0-hadoop2.7.4-java8
+    restart: always
+    volumes:
+      - ./shared_dir/data/datanode-1:/hadoop/dfs/data
+    environment:
+      SERVICE_PRECONDITION: "namenode:9000"
+    env_file:
+      - ./confs/hadoop/hadoop.env
+    networks:
+      - fate-network
+
+  datanode-2:
+    image: federatedai/hadoop-datanode:2.0.0-hadoop2.7.4-java8
+    restart: always
+    volumes:
+      - ./shared_dir/data/datanode-2:/hadoop/dfs/data
     environment:
       SERVICE_PRECONDITION: "namenode:9000"
     env_file:
