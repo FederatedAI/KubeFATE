@@ -463,6 +463,7 @@ modules:
       accessMode: {{ .namenode.accessMode  | default "ReadWriteOnce"  }}
       size: {{ .namenode.size }}
     datanode:
+      replicas: {{ .datanode.replicas | default "3" }}
       {{- with .datanode.nodeSelector }}
       nodeSelector: 
 {{ toYaml . | indent 8 }}
