@@ -88,7 +88,7 @@ GenerateConfig() {
 			cp -r training_template/backends/spark/rabbitmq confs-$party_id/confs/
 			
 			cp training_template/docker-compose-spark.yml confs-$party_id/docker-compose.yml
-			sed -i '163,179d' confs-$party_id/docker-compose.yml
+			sed -i '186,203d' confs-$party_id/docker-compose.yml
 		fi
 
 		if [ "$backend" == "spark_pulsar" ]; then
@@ -98,7 +98,7 @@ GenerateConfig() {
 			cp -r training_template/backends/spark/pulsar confs-$party_id/confs/
 			
 			cp training_template/docker-compose-spark.yml confs-$party_id/docker-compose.yml
-			sed -i '145,161d' confs-$party_id/docker-compose.yml
+			sed -i '168,185d' confs-$party_id/docker-compose.yml
 		fi
 
 		if [ "$backend" == "spark_local_pulsar" ]; then
