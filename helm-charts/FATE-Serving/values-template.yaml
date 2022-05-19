@@ -70,7 +70,6 @@ servingProxy:
   type: {{ .type }}
   nodePort: {{ .nodePort }}
   loadBalancerIP: {{ .loadBalancerIP }}
-  ingerssHost: {{ .ingressHost | default (printf "%s.serving-admin.example.com" $partyId) }}
 
   {{- with .partyList }}
   partyList:
