@@ -8,4 +8,4 @@ Fixes ISSUE #xxx
 ### Before fix
 screenshots, console outputs or logs are acceptable.
 ### After fix
-screenshots, console outputs or logs are acceptable.ßß
+screenshots, console outputs or logs are acceptable.
