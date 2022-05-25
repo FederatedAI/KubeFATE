@@ -6,6 +6,7 @@ This contains the builds of some images for KubeFATE to deploy FATE.
 - nginx
 - spark
 - python-spark
+- fate-test
 
 ## Prerequisites
 

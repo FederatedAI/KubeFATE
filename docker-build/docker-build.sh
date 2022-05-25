@@ -44,11 +44,16 @@ buildModule() {
     # client
     docker build --build-arg SOURCE_PREFIX=${PREFIX} --build-arg SOURCE_TAG=${IMG_TAG} -t ${PREFIX}/client:${IMG_TAG} client
     echo "Image: "${PREFIX}/client:${IMG_TAG}" Build Successful"
+
+    # fate-test
+    docker build --build-arg SOURCE_PREFIX=${PREFIX} --build-arg SOURCE_TAG=${IMG_TAG} -t ${PREFIX}/fate-test:${IMG_TAG} fate-test
+    echo "Image: "${PREFIX}/fate-test:${IMG_TAG}" Build Successful"
+
 }
 
 pushImage() {
     ## push image
-    for module in "nginx" "python-spark" "spark-base" "spark-master" "spark-worker" "client"; do
+    for module in "nginx" "python-spark" "spark-base" "spark-master" "spark-worker" "client" "fate-test"; do
         echo "### START PUSH ${module} ###"
         docker push ${PREFIX}/${module}:${IMG_TAG}
         echo "### FINISH PUSH ${module} ###"
