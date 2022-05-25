@@ -122,9 +122,6 @@ services:
       - "6650:6650"
       - "6651:6651"
       - "8001:8080"
-    deploy:
-      restart_policy:
-        condition: any
     volumes:
       - ./confs/pulsar/standalone.conf:/pulsar/conf/standalone.conf
       - ./shared_dir/data/pulsar:/pulsar/data
