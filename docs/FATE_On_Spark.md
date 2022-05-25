@@ -16,7 +16,7 @@ it self is a in-memory computing engine without the ability to persist data. Thu
 
 The following picture shows the architecture of FATE on Spark:
 <div align="center">
-  <img src="./images/arch_spark.png">
+  <img src="./images/arch_spark_pulsar.png">
 </div> 
 
 In current implementation, the `fate_flow` service uses the `spark-submit` binary tool to submit job to the Spark cluster. With the configuration of the fate's job, a user can also specify the configuration for the spark application, here is an example:

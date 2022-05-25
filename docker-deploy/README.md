@@ -9,7 +9,9 @@ The nodes (target nodes) to install FATE must meet the following requirements:
 1. A Linux host
 2. Docker: 18+
 3. Docker-Compose: 1.24+
-4. Network connection to Internet to pull container images from Docker Hub. If network connection to Internet is not available, consider to set up [Harbor as a local registry](../registry/README.md) or use [offline images](https://github.com/FederatedAI/FATE/tree/master/docker-build).
+4. The deployment machine can be connected to the Internet, so the hosts can communicate with each other;
+5. Network connection to Internet to pull container images from Docker Hub. If network connection to Internet is not available, consider to set up [Harbor as a local registry](../registry/README.md) or use [offline images](https://github.com/FederatedAI/FATE/tree/master/docker-build).
+6. A host running FATE is recommended with 8 CPUs and 16G RAM.
 
 ## Deploying FATE
 
@@ -87,6 +89,10 @@ serving_admin_password=admin
 
 Spark was introduced in FATE v1.5 as the underlying computing backend, for more details
 about FATE on Spark please refer to this [document](../docs/FATE_On_Spark.md).
+
+Using Docker-compose to deploy FATE can support four different types, corresponding to four types of backends. They are eggroll, spark_rabbitmq, spark_pulsar and spark_local_pulsar. For more details on the different types of FATE see: [Introduction to FATE Backend Architecture](../docs/Introduction_to_Backend_Architecture.md).
+
+**Note**: Exchange components are not deployed by default. For deployment, users can fill in the server IP into the `exchangeip` of the above configuration file. The default listening port of this component is 9371.
 
 On the host running FATE, the non-root user needs the owner permission of `/data/projects/fate` folder and Docker permission. No other action is required if the user is root.
 
