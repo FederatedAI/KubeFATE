@@ -8,10 +8,10 @@ FATE支持选择不同的计算引擎，存储引擎和数据传输引擎，现�
 
 目前支持的组合包括以下几种：
 
-- Eggroll
-- Spark + hdfs + RabbitMQ
-- Spark + hdfs + Pulsar
-- Spark-local + localfs + Pulsar
+- **Eggroll**
+- **Spark + hdfs + RabbitMQ**
+- **Spark + hdfs + Pulsar**
+- **Spark-local + localfs + Pulsar**
 
 ### Eggroll
 
@@ -108,6 +108,17 @@ backend: spark_local_pulsar
 <div align="center">
   <img src="./images/arch_slim.png">
 </div>
+
+## 不同backend的比较
+
+Eggroll可以作为FATE的计算，存储和传输引擎，Eggroll是一个简单高性能[联邦]机器学习的计算框架，支持多种联邦网络架构：直链模式、星型和环形等，支持不同组织之间使用证书加密，Eggroll是微众银行主导的github的开源项目。
+项目地址：<https://github.com/WeBankFinTech/eggroll.git>
+
+Rabbitmq是一个简单易上手的MQ，发展较早，有较多的云平台支持，适合上手Spark计算引擎的FATE进行联邦学习的时候使用。
+
+Pulsar相比Rabbitmq，可以支持更大规模的集群化部署，也支持exchange模式的网络结构。使用集群化部署，适合较大规模的联邦学习计算。
+
+spark_local_pulsar相比其他模式，使用这个模式可以最大化减少集群所需的组件，在较少资源多情况下也可以运行FATE集群，可以使用在小规模联邦学习计算，IOT设备等情况。
 
 ## Exchange架构模式
 
