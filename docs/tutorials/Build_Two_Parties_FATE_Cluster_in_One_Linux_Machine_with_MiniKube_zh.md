@@ -17,7 +17,7 @@
 5. 要保证安装机器可以正常访问Docker Hub或者网易云镜像仓库，以及Google gcr； 
 6. 预先创建一个目录，以便整个过程使用该目录作为工作目录，命令如下：
 ```
-export release_version=v1.8.0 && export kubefate_version=v1.4.4 && cd ~ && mkdir demo && cd demo
+export fate_version=v1.8.0 && export kubefate_version=v1.4.4 && cd ~ && mkdir demo && cd demo
 ```
 
 Notes:
@@ -77,7 +77,7 @@ sudo minikube addons enable ingress
 ### 下载KubeFATE命令行工具
 我们从Github上 [KubeFATE Release](https://github.com/FederatedAI/KubeFATE/releases)页面找到Kuberetes部署的下载包，并下载对应版本，如前面环境变量设置`v1.8.0`，
 ```
-curl -LO https://github.com/FederatedAI/KubeFATE/releases/download/${release_version}/kubefate-k8s-${release_version}.tar.gz && tar -xzf ./kubefate-k8s-${release_version}.tar.gz
+curl -LO https://github.com/FederatedAI/KubeFATE/releases/download/${fate_version}/kubefate-k8s-${fate_version}.tar.gz && tar -xzf ./kubefate-k8s-${fate_version}.tar.gz
 ```
 然后我们可以查看下下载解压的安装包内容，
 ```
@@ -113,7 +113,7 @@ kubefate@machine:~/kubefate$ kubefate version
 #### 1.载入Kubefate服务镜像
 接着，我们下载KubeFATE服务镜像v1.4.4：
 ```
-curl -LO https://github.com/FederatedAI/KubeFATE/releases/download/${release_version}/kubefate-${kubefate_version}.docker
+curl -LO https://github.com/FederatedAI/KubeFATE/releases/download/${fate_version}/kubefate-${kubefate_version}.docker
 ```
 然后读入本地Docker环境。请注意，因为本文使用的MiniKube，是all-in-one的Kubernetes环境，所以只需要导入本地Docker环境即可给kubelet拉取。如果你运行的是集群形式的Kubernetes，容器镜像需要读入[Docker Registry](https://docs.docker.com/registry/introduction/)或者[Harbor](https://goharbor.io/)。关于如何集成使用Harbor，可以参考：https://github.com/FederatedAI/KubeFATE/blob/master/registry/README.md
 ```
