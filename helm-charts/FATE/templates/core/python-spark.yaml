@@ -173,8 +173,7 @@ spec:
             - mountPath: /data/projects/fate/conf/pulsar_route_table
               name: pulsar-route-table
             {{- end }}
-            # TODO add mountPath of job and model-cache 
-            - mountPath: /data/projects/fate/jobs
+            - mountPath: /data/projects/fate/fateflow/jobs
               name: python-data
               subPath: jobs
             - mountPath: /data/projects/fate/fateflow/model_local_cache
