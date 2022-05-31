@@ -23,7 +23,7 @@ Unzip one KubeFATE's Chart, you can find a `templates` folder and 4 files:
 
 * Note: `value.yaml` and the rendered `value-template.yaml` will be merged as the "VALUEs" to the chart templates.
 
-## `templates` folderlb-rollsite
+## `templates` folder
 In `templates` folder, the template yaml file combined with values will generate valid Kubernetes manifest files for each `FATE` or `FATE-Serving` component.
 
 e.g. For `FATE` v1.8.0, there are following templates locating in `template` folder:
