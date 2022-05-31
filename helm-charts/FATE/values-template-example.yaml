@@ -269,6 +269,7 @@ backend: eggroll
     # type: ClusterIP
     # nodePort: 30900
   # datanode:
+    # replicas:
     # nodeSelector:
     # tolerations:
     # affinity:
