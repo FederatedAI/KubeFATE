@@ -111,7 +111,7 @@ create job success, job id=d92d7a56-7002-46a4-9363-da9c7346e05a
 
 *如果想要部署使用 **Spark** 计算引擎的FATE集群，可以使用`cluster-spark.yaml`。*
 
-使用KubeFATE部署FATE可以支持四种不同的类型，对应四种backend。分别是eggroll、spark_rabbitmq、spark_pulsar和spark_local_pulsar。关于不同类型的FATE的更多细节查看: [不同类型FATE的架构介绍](../docs/Introduction_to_Backend_Architecture.md)。
+使用KubeFATE部署FATE可以支持四种不同的类型，对应四种backend。分别是eggroll、spark_rabbitmq、spark_pulsar和spark_local_pulsar。关于不同类型的FATE的更多细节查看: [不同类型FATE的架构介绍](../docs/Introduction_to_Backend_Architecture_zh.md)。
 
 #### 检查安装集群任务的状态
 上面的命令会创建一个安装FATE集群的任务，用于异步部署。使用```kubefate job describe```命令可以检查任务的状态，直到看到结果为`install success`

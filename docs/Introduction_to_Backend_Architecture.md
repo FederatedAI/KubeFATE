@@ -1,12 +1,12 @@
-# KubeFATE 部署FATE支持后端介绍
+# Introducing KubeFATE to deploy FATE-backed backends
 
-FATE支持的计算引擎eggroll和spark
+FATE supports eggroll and spark two computing engines
 
-## 支持后端
+## Supported Backends
 
-FATE支持选择不同的计算引擎，存储引擎和数据传输引擎，现在KubeFATE支持快捷的部署不同引擎组合的FATE集群。
+FATE supports the selection of different computing engines, storage engines and federation engines, and now KubeFATE supports quick deployment of FATE clusters with different engine combinations.
 
-目前支持的组合包括以下几种：
+List of supported engine combinations:
 
 - **Eggroll**
 - **Spark + hdfs + RabbitMQ**
@@ -15,23 +15,23 @@ FATE支持选择不同的计算引擎，存储引擎和数据传输引擎，现�
 
 ### Eggroll
 
-Eggroll是FATE支持计算存储引擎，包括rollsite，nodemanager，clustermanager三个组件
+Eggroll is a computing storage engine natively supported by FATE, including three components: rollsite, nodemanager, and clustermanager
 
-rollsite负责数据传输，nodemanager负责存储和计算，clustermanager负责管理。
+Rollsite is responsible for data transmission, nodemanager is responsible for storage and computing, and clustermanager is responsible for managing nodemanager.
 
-docker-compose使用的时候修改`parties.conf`配置
+Modify the `parties.conf` configuration when using docker-compose
 
 ```bash
 backend=eggroll
 ```
 
-k8s使用的时候修改`cluster.yaml`配置
+Modify the `parties.conf` configuration when using Kubernetes
 
 ```yaml
 backend: eggroll
 ```
 
-架构图：
+Architecture diagram:
 
 <div align="center">
   <img src="./images/arch_eggroll.png" />
@@ -39,23 +39,23 @@ backend: eggroll
 
 ### spark_rabbitmq
 
-当backend使用spark_rabbitmq的时候，会部署spark + hdfs + rabbitmq的引擎组合的FATE集群。
+When backend uses spark_rabbitmq, a FATE cluster of spark + hdfs + rabbitmq engine combination will be deployed.
 
-spark是计算组件，hdfs是存储组件，rabbitmq是数据传输组件。
+spark is the computing component, hdfs is the storage component, rabbitmq is the federation component.
 
-docker-compose使用的时候修改`parties.conf`配置
+Modify the `parties.conf` configuration when using docker-compose
 
 ```bash
 backend=spark_rabbitmq
 ```
 
-k8s使用的时候修改`cluster.yaml`配置
+Modify the `parties.conf` configuration when using Kubernetes
 
 ```yaml
 backend: spark_rabbitmq
 ```
 
-架构图：
+Architecture diagram:
 
 <div align="center">
   <img src="./images/arch_spark_rabbitmq.png">
@@ -63,23 +63,23 @@ backend: spark_rabbitmq
 
 ### spark_pulsar
 
-当backend使用spark_pulsar的时候，会部署Spark + Hdfs + Pulsar的引擎组合的FATE集群。
+When backend uses spark_pulsar, it will deploy a FATE cluster of Spark + Hdfs + Pulsar engine combination.
 
-Spark是计算组件，Hdfs是存储组件，Pulsar是数据传输组件。
+Spark is the computing component, Hdfs is the storage component, and Pulsar is the federation component.
 
-docker-compose使用的时候修改`parties.conf`配置
+Modify the `parties.conf` configuration when using docker-compose
 
 ```bash
 backend=spark_pulsar
 ```
 
-k8s使用的时候修改`cluster.yaml`配置
+Modify the `parties.conf` configuration when using Kubernetes
 
 ```yaml
 backend: spark_pulsar
 ```
 
-架构图：
+Architecture diagram:
 
 <div align="center">
   <img src="./images/arch_spark_pulsar.png">
@@ -87,48 +87,47 @@ backend: spark_pulsar
 
 ### spark_local_pulsar (slim FATE)
 
-当backend使用spark_local_pulsar的时候，会部署一个slim的FATE集群。所有的计算和存储部分都在一起，通过Spark local和localfs来实现，数据传输是通过Pulsar完成。
+When backend uses spark_local_pulsar, a slim FATE cluster is deployed. All computing and storage parts are together, implemented through Spark local and localfs, and data transfer is done through Pulsar.
 
-Spark local是计算组件，localfs是存储组件，Pulsar是数据传输组件。
+Spark local is the computing component, localfs is the storage component, and Pulsar is the federation component.
 
-docker-compose使用的时候修改`parties.conf`配置
+Modify the `parties.conf` configuration when using docker-compose
 
 ```bash
 backend=spark_local_pulsar
 ```
 
-k8s使用的时候修改`cluster.yaml`配置
+Modify the `parties.conf` configuration when using Kubernetes
 
 ```yaml
 backend: spark_local_pulsar
 ```
 
-架构图：
+Architecture diagram:
 
 <div align="center">
   <img src="./images/arch_slim.png">
 </div>
 
-## 不同backend的比较
+## Comparison of different backends
 
-Eggroll可以作为FATE的计算，存储和传输引擎，Eggroll是一个简单高性能[联邦]机器学习的计算框架，支持多种联邦网络架构：直链模式、星型和环形等，支持不同组织之间使用证书加密，Eggroll是微众银行主导的github的开源项目。
-项目地址：<https://github.com/WeBankFinTech/eggroll.git>
+Eggroll can be used as FATE's computing, storage and transmission engine. Eggroll is a simple and high-performance [federation] machine learning computing framework that supports multiple federated network architectures: straight-chain mode, star and ring, etc., and supports use between different organizations. Certificate encryption, Eggroll is an open source project on github led by WeBank.
+repository: <https://github.com/WeBankFinTech/eggroll.git>
 
-Rabbitmq是一个简单易上手的MQ，发展较早，有较多的云平台支持，适合上手Spark计算引擎的FATE进行联邦学习的时候使用。
+Rabbitmq is a simple and easy-to-use Message Queue. It developed earlier and has more cloud platform support. It is suitable for federated learning with FATE of the Spark computing engine.
 
-Pulsar相比Rabbitmq，可以支持更大规模的集群化部署，也支持exchange模式的网络结构。使用集群化部署，适合较大规模的联邦学习计算。
+Compared with Rabbitmq, Pulsar can support larger-scale cluster deployment and also support exchange mode network structure. Using clustered deployment, it is suitable for larger-scale federated learning computing.
 
-spark_local_pulsar相比其他模式，使用这个模式可以最大化减少集群所需的组件，在较少资源多情况下也可以运行FATE集群，可以使用在小规模联邦学习计算，IOT设备等情况。
+Compared with other modes, spark_local_pulsar can use this mode to minimize the components required for the cluster. It can also run FATE clusters with less resources and more resources, and can be used in small-scale federated learning computing, IOT devices, etc.
 
-## Exchange架构模式
+## Exchange Architecture
 
-当使用rollsite和Pulsar传输数据的时候，可以使用Exchange的架构来部署联邦学习网络。
+When using rollsite and Pulsar to federation, a federated learning network can be deployed using the Exchange architecture.
 
-也就是说backend是eggroll、spark_pulsar和spark_local_pulsar三种模式的时候可以支持Exchange的使用。
+That is to say, when the backend is eggroll, spark_pulsar and spark_local_pulsar, it can support the use of Exchange.
 
-**rollsite只能和其他rollsite的FATE通过exchange链接，Pulsar也只能和其他Pulsar的FATE通过exchange链接。**
+**Through exchange, rollsite can only link with FATE of other rollsites, and Pulsar can only link with FATE of other Pulsar.**
 
+Reference documentation:
 
-参考文档：
-
-- [使用KubeFATE部署一个多成员参与的联邦学习网络](https://github.com/FederatedAI/KubeFATE/wiki/%E4%BD%BF%E7%94%A8KubeFATE%E9%83%A8%E7%BD%B2%E4%B8%80%E4%B8%AA%E5%A4%9A%E6%88%90%E5%91%98%E5%8F%82%E4%B8%8E%E7%9A%84%E8%81%94%E9%82%A6%E5%AD%A6%E4%B9%A0%E7%BD%91%E7%BB%9C)
+- [Deploy an exchange central multi parties federated learning network with KubeFATE](https://github.com/FederatedAI/KubeFATE/wiki/Deploy-an-exchange-central-multi-parties-federated-learning-network-with-KubeFATE)

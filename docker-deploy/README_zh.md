@@ -131,7 +131,7 @@ serving_admin_password=admin
 
 FATE v1.5 开始支持使用Spark作为底层的分布式计算引擎，Spark集群默认会通过容器的方式部署。相关的简介可以参考这个[链接](../docs/FATE_On_Spark.md).
 
-使用Docker-compose部署FATE可以支持四种不同的类型，对应四种backend。分别是eggroll、spark_rabbitmq、spark_pulsar和spark_local_pulsar。关于不同类型的FATE的更多细节查看: [不同类型FATE的架构介绍](../docs/Introduction_to_Backend_Architecture.md)。
+使用Docker-compose部署FATE可以支持四种不同的类型，对应四种backend。分别是eggroll、spark_rabbitmq、spark_pulsar和spark_local_pulsar。关于不同类型的FATE的更多细节查看: [不同类型FATE的架构介绍](../docs/Introduction_to_Backend_Architecture_zh.md)。
 
 **注意**: 默认情况下不会部署exchange组件。如需部署，用户可以把服务器IP填入上述配置文件的`exchangeip`中，该组件的默认监听端口为9371。
 
