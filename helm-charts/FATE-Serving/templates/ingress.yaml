@@ -1,4 +1,4 @@
-# Copyright 2019-2022 VMware, Inc.
+# Copyright 2019-2021 VMware, Inc.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -10,7 +10,7 @@
 # limitations under the License.
 
 {{ if .Values.servingProxy.include }}
-apiVersion: networking.k8s.io/v1
+apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
   name: serving-proxy
@@ -25,19 +25,15 @@ metadata:
 {{ toYaml .Values.ingress.servingProxy.annotations | indent 4 }}
 {{- end }}
 spec:
-  ingressClassName: {{ .Values.ingressClassName }}
   rules:
   {{- range .Values.ingress.servingProxy.hosts }}
   - host: {{ .name }}
     http:
       paths:
       - path: {{ default "/" .path }}
-        pathType: Prefix
         backend:
-          service:
-            name: serving-proxy
-            port: 
-              number: 8059
+          serviceName: serving-proxy
+          servicePort: 8059
   {{- end }}
 {{- if .Values.ingress.servingProxy.tls }}
   tls:
@@ -47,7 +43,7 @@ spec:
 {{ end }}
 
 {{ if .Values.servingAdmin.include }}
-apiVersion: networking.k8s.io/v1
+apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
   name: serving-admin
@@ -62,19 +58,15 @@ metadata:
 {{ toYaml .Values.ingress.servingAdmin.annotations | indent 4 }}
 {{- end }}
 spec:
-  ingressClassName: {{ .Values.ingressClassName }}
   rules:
   {{- range .Values.ingress.servingAdmin.hosts }}
-  - host: {{ .name }}
-    http:
-      paths:
-      - path: {{ default "/" .path }}
-        pathType: Prefix
-        backend:
-          service:
-            name: serving-admin
-            port: 
-              number: 8350
+    - host: {{ .name }}
+      http:
+        paths:
+          - path: {{ default "/" .path }}
+            backend:
+              serviceName: serving-admin
+              servicePort: 8350
   {{- end }}
 {{- if .Values.ingress.servingAdmin.tls }}
   tls:

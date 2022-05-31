@@ -2,7 +2,7 @@
 set -x
 dir=$(dirname $0)
 
-CONTAINER_NUM=12
+CONTAINER_NUM=13
 
 echo "# config prepare"
 target_dir=/data/projects/fate

@@ -9,7 +9,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-{{- if .Values.podSecurityPolicy.enabled }}
+{{- if .Values.podSecurityPolicy.enabled -}}
 apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
 metadata:
@@ -29,4 +29,4 @@ spec:
     rule: RunAsAny
   volumes:
   - '*'
-{{- end }}
+{{- end -}}

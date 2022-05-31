@@ -1,10 +1,10 @@
 name: fate-serving-9999
 namespace: fate-serving-9999
 chartName: fate-serving
-chartVersion: v2.1.5
+chartVersion: v2.0.4
 partyId: 9999
 registry: ""
-imageTag: "2.1.5-release"
+imageTag: ""
 pullPolicy: 
 imagePullSecrets: 
 - name: myregistrykey
@@ -24,21 +24,21 @@ modules:
   # servingProxy: 
     # # annotations: 
     # hosts:
-    # - name: party9999.serving-proxy.example.com
+    # - name: serving-proxy.example.com
       # path: /
   # # tls:
     # # - secretName: my-tls-secret
       # # hosts:
-        # # - party9999.serving-proxy.example.com
+        # # - serving-proxy.example.com
   # servingAdmin: 
     # # annotations: 
     # hosts:
-    # - name: party9999.serving-admin.example.com
+    # - name: serving-admin.example.com
       # path: /
   # # tls:
     # # - secretName: my-tls-secret
       # # hosts:
-         # # - party9999.serving-admin.example.com
+         # # - serving-admin.example.com
 
 # servingAdmin:
   # nodeSelector:
@@ -50,14 +50,13 @@ modules:
 # servingProxy: 
   # nodePort: 30310
   # type: NodePort
-  # loadBalancerIP: 
   # nodeSelector:
   # tolerations:
   # affinity:
   # partyList:
-  # # - partyId: 9999
-    # # partyIp: 192.168.9.1
-    # # partyPort: 30309
+  # # - partyId: 10000
+    # # partyIp: 192.168.10.1
+    # # partyPort: 30310
   # exchange:
     # ip: 192.168.1.1
     # port: 30100
@@ -65,18 +64,12 @@ modules:
 # servingServer:
   # type: NodePort
   # nodePort: 30210
-  # loadBalancerIP: 
   # nodeSelector:
   # tolerations:
   # affinity:
   # fateflow:
-    # ip: 192.168.10.1
-    # port: 30110
-  # cacheSwitch: true
-  # cacheType: "redis"
-  # singleAdaptor: com.webank.ai.fate.serving.adaptor.dataaccess.MockAdapter
-  # batchAdaptor: com.webank.ai.fate.serving.adaptor.dataaccess.MockBatchAdapter
-  # AdapterURL: http://127.0.0.1:9380/v1/http/adapter/getFeature
+    # ip: 192.168.9.1
+    # port: 30109
   # subPath: ""
   # existingClaim: ""
   # storageClass: "serving-server"

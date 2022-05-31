@@ -43,12 +43,12 @@ data:
     #inference.service.name=serving
     #random, consistent
     #routeType=random
-    #route.table=/data/projects/fate-serving/serving-proxy/conf/route_table.json
-    #auth.file=/data/projects/fate-serving/serving-proxy/conf/auth_config.json
+    route.table=/data/projects/fate/serving-proxy/conf/route_table/route_table.json
+    #auth.file=/data/projects/fate/serving-proxy/conf/auth_config.json
     # zk router
-    #useZkRouter=true
-    zk.url=serving-zookeeper:2181
     useZkRouter=true
+    useRegister=true
+    zk.url=serving-zookeeper:2181
     # zk acl
     #acl.enable=false
     #acl.username=
@@ -57,19 +57,7 @@ data:
     #proxy.grpc.intra.port=8879
     # inter-partyid port
     #proxy.grpc.inter.port=8869
-
     # grpc
-    # only support PLAINTEXT, TLS(we use Mutual TLS here), if use TSL authentication
-    #proxy.grpc.inter.negotiationType=PLAINTEXT
-    # only needs to be set when negotiationType is TLS
-    #proxy.grpc.inter.CA.file=/data/projects/fate-serving/serving-proxy/conf/ssl/ca.crt
-    # negotiated client side certificates
-    #proxy.grpc.inter.client.certChain.file=/data/projects/fate-serving/serving-proxy/conf/ssl/client.crt
-    #proxy.grpc.inter.client.privateKey.file=/data/projects/fate-serving/serving-proxy/conf/ssl/client.pem
-    # negotiated server side certificates
-    #proxy.grpc.inter.server.certChain.file=/data/projects/fate-serving/serving-proxy/conf/ssl/server.crt
-    #proxy.grpc.inter.server.privateKey.file=/data/projects/fate-serving/serving-proxy/conf/ssl/server.pem
-
     #proxy.grpc.inference.timeout=3000
     #proxy.grpc.inference.async.timeout=1000
     #proxy.grpc.unaryCall.timeout=3000
@@ -91,7 +79,7 @@ data:
                     "ip": "{{ .partyIp }}",
                     "port": {{ .partyPort }}
                   {{- else }}
-                    "ip": "serving-proxy",
+                    "ip": "default-serving-proxy",
                     "port": 8869
                   {{- end }}
                 }
@@ -163,22 +151,12 @@ spec:
           ports:
             - containerPort: 8059
             - containerPort: 8869
-          command:
-          - /bin/sh
-          - -c
-          - |
-            # make route_table.json editable
-            cp /data/projects/fate-serving/serving-proxy/conf/route_table.base.json /data/projects/fate-serving/serving-proxy/conf/route_table.json
-            chmod 755 /data/projects/fate-serving/serving-proxy/conf/route_table.json
-
-            java -Dspring.config.location=conf/application.properties -cp conf/:lib/*:fate-serving-proxy.jar com.webank.ai.fate.serving.proxy.bootstrap.Bootstrap -c conf/application.properties
           volumeMounts:
-            - mountPath: /data/projects/fate-serving/serving-proxy/conf/application.properties
+            - mountPath: /data/projects/fate/serving-proxy/conf/application.properties
               name: serving-proxy-confs
               subPath: application.properties
-            - mountPath: /data/projects/fate-serving/serving-proxy/conf/route_table.base.json
+            - mountPath: /data/projects/fate/serving-proxy/conf/route_table
               name: serving-proxy-confs
-              subPath: route_table.json
       {{- with .Values.servingProxy.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}
