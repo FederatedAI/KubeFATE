@@ -29,7 +29,6 @@ It is used to declare the `servingProxy` module in the FATE cluster to be deploy
 | Name         | subitem   | Type      | Description                                                  |
 | ------------ | --------- | --------- | ------------------------------------------------------------ |
 | nodePort     |           | scalars   | The port used by `proxy` module's kubernetes service, default range: 30000-32767. |
-| ingerssHost  |           | scalars   | The entrance of FATE-Service api.                            |
 | partyList    |           | sequences | If this FATE cluster is exchange cluster, partyList is all party's sequences of all parties proxy address. If this FATE cluster is one of participants, delete this configuration item. |
 | partyList    | partyId   | scalars   | Participant FATE cluster party ID.                           |
 | partyList    | partyIp   | scalars   | Participant FATE cluster IP.                                 |
