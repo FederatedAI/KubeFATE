@@ -2,11 +2,14 @@
 
 This contains the builds of some images for KubeFATE to deploy FATE.
 
-- client
-- nginx
-- spark
-- python-spark
-- fate-test
+Images list:
+
+- federatedai/client
+- federatedai/nginx
+- federatedai/spark-master
+- federatedai/spark-worker
+- federatedai/python-spark
+- federatedai/fate-test
 
 ## Prerequisites
 
