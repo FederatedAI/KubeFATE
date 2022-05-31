@@ -20,7 +20,7 @@ Compose是用于定义和运行多容器Docker应用程序的工具。通过Comp
 2. 所有主机安装Docker 版本 : 18+；
 3. 所有主机安装Docker-Compose 版本: 1.24+；
 4. 部署机可以联网，所以主机相互之间可以网络互通；
-5. 运行机已经下载FATE 的各组件镜像（离线构建镜像参考文档[构建镜像](https://github.com/FederatedAI/FATE/tree/master/docker-build)）。
+5. 运行机已经下载FATE 的各组件镜像（离线构建镜像参考文档[构建镜像](https://github.com/FederatedAI/FATE/tree/master/build/docker-build)）。
 
 ### 下载部署脚本
 
@@ -99,8 +99,8 @@ dir=/data/projects/fate                     # docker-compose部署目录
 partylist=(10000 9999)                      # 组织id
 partyiplist=(192.168.7.1 192.168.7.2)       # id对应训练集群ip
 servingiplist=(192.168.7.1 192.168.7.2)     # id对应在线预测集群ip
-# computing_backend could be eggroll or spark.
-computing_backend=eggroll
+# backend could be eggroll, spark_rabbitmq and spark_pulsar spark_local_pulsar
+backend=eggroll
 
 # true if you need python-nn else false, the default value will be false
 enabled_nn=false
@@ -109,7 +109,9 @@ fateboard_username=admin                    # 访问fateboard的用户名
 fateboard_password=admin                    # 访问fateboard的密码
 ```
 
-FATE 1.5 支持使用Spark作为底层的分布式计算引擎，Spark集群默认会通过容器的方式部署。相关的简介可以参考这个[链接](../docs/FATE_On_Spark.md).
+* 使用Spark+Rabbitmq的部署方式的文档可以参考[这里](../docs/FATE_On_Spark.md).
+* 使用Spark+Pulsar的部署方式的文档可以参考[这里](../docs/FATE_On_Spark_With_Pulsar.md).
+* 使用Spark+local Pulsar的部署方式的文档可以参考[这里](TBD)
 
 **注意**: 默认情况下不会部署exchange组件。如需部署，用户可以把服务器IP填入上述配置文件的`exchangeip`中，该组件的默认监听端口为9371
 

@@ -20,7 +20,12 @@
 export release_version=v1.8.0 && export kubefate_version=v1.4.4 && cd ~ && mkdir demo && cd demo
 ```
 
-**注意：下文介绍的MiniKube机器IP地址是192.168.100.123。请修改为你准备的实验机器IP地址！！！**
+Notes:
+* 当我们提到"KubeFATE的版本"，通常来讲会有三个概念：
+    * KubeFATE命令行工具的版本，在本教程中为v1.4.4，一个类似的例子是同为命令行工具的KubeCtl。
+    * KubeFATE服务版本，在本教程中为v1.4.4，一个类似的例子是Kubernetes。
+    * FATE版本，在本教程中v1.8.0，它也意味着FATE的Helm Chart的版本, 值得注意的是我们用这个版本来给GitHub上的KubeFATE的发布打tag。
+* **<font color="red">下文介绍的MiniKube机器IP地址是192.168.100.123。请修改为你准备的实验机器IP地址</font></div>**
 
 # 开始安装
 ## 安装需要的工具

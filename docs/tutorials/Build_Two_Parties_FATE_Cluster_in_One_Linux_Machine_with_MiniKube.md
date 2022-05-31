@@ -19,13 +19,17 @@ After the tutorial, the deployment architecture looks like the following diagram
 4. Configure username and password for a images repository/registry after the docker has been installed, please refer to
    [use image pull secrets](https://github.com/federatedai/KubeFATE/blob/master/docs/Use_image_pull_secrets.md).
 5. Network connectivity to dockerhub or 163 Docker Image Registry, and google gcr.
-6. Setup the global KubeFATE version using in the tutorial and create a folder for the whole tutorial. We use 
-   KubeFATE v1.8.0 in this tutorial, other versions should be similar.
+6. Setup the global KubeFATE version using in the tutorial and create a folder for the whole tutorial.
 ```
-export release_version=v1.8.0 && export kubefate_version=v1.4.4 && cd ~ && mkdir demo && cd demo
+export fate_version=v1.8.0 && export kubefate_version=v1.4.4 && cd ~ && mkdir demo && cd demo
 ```
 
-**<font color="red">!!!Note: in this tutorial, the IP of the machine we used is 192.168.100.123. Please change it to your machine's IP in all the following commands and config files.</font></div>**
+Notes:
+ * When talking about KubeFATE version, usually there are 3 notions:
+   * The KubeFATE CLI version, in this tutorial, it is v1.4.4, consider KubeCtl as an example.
+   * The KubeFATE service version, in this tutorial, it is v1.4.4, consider Kubernetes as an example.
+   * The FATE version, in this tutorial, it is v1.8.0, it also means the version of the helm chart of FATE, currently we use this version to tag the KubeFATE GitHub master branch.
+ * **<font color="red">In this tutorial, the IP of the machine we used is 192.168.100.123. Please change it to your machine's IP in all the following commands and config files.</font></div>**
 
 # Start Tutorial
 ## Install the dependencies
@@ -81,9 +85,9 @@ Till now, Kubernetes have been ready.
 ## Setup Kubefate
 ### Install KubeFATE CLI
 Go to [KubeFATE Release](https://github.com/FederatedAI/KubeFATE/releases), and find the latest kubefate-k8s release 
-pack, which is `v1.8.0` as set to ENVs before. (replace ${release_version} with the newest version available)
+pack, which is `v1.8.0` as set to ENVs before. (replace ${fate_version} with the newest version available)
 ```
-curl -LO https://github.com/FederatedAI/KubeFATE/releases/download/${release_version}/kubefate-k8s-${release_version}.tar.gz && tar -xzf ./kubefate-k8s-${release_version}.tar.gz
+curl -LO https://github.com/FederatedAI/KubeFATE/releases/download/${fate_version}/kubefate-k8s-${fate_version}.tar.gz && tar -xzf ./kubefate-k8s-${fate_version}.tar.gz
 ```
 Then we will get the release pack of KubeFATE, verify it,
 ```
@@ -120,7 +124,7 @@ deployed the KubeFATE service yet.
 #### 1. Load the docker image of the KubeFATE service
 Download the KubeFATE Server v1.4.4's docker image,
 ```
-curl -LO https://github.com/FederatedAI/KubeFATE/releases/download/${release_version}/kubefate-${kubefate_version}.docker
+curl -LO https://github.com/FederatedAI/KubeFATE/releases/download/${fate_version}/kubefate-${kubefate_version}.docker
 ```
 and load into local Docker. Please note that, because we are using MiniKube, which is an all-in-one deployment of
 Kubernetes, loading image to local is work for this tutorial. If you are running a cluster-installed Kubernetes,
