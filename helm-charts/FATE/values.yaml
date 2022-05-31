@@ -277,6 +277,7 @@ modules:
       type: ClusterIP
       nodePort: 30900
     datanode:
+      replicas: 3
       nodeSelector:
       tolerations:
       affinity:
