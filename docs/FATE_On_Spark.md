@@ -15,7 +15,7 @@ Since FATE v1.5.0 a user can select Spark as the underlying computing engine, ho
 
 The following picture shows the architecture of FATE on Spark:
 <div align="center">
-  <img src="./images/arch_spark.png">
+  <img src="./images/arch_spark_pulsar.png">
 </div> 
 
 In current implementation, the `fate_flow` service uses the `spark-submit` binary tool to submit job to the Spark cluster. With the configuration of the fate's job, a user can also specify the configuration for the spark application, here is an example:

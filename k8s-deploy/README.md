@@ -108,6 +108,8 @@ create job success, job id=d92d7a56-7002-46a4-9363-da9c7346e05a
 ```
 *NOTE: If you want to deploy **FATE on Spark**, you can use `cluster-spark.yaml`.*
 
+Using KubeFATE to deploy FATE can support four different types, corresponding to four types of backends. They are eggroll, spark_rabbitmq, spark_pulsar and spark_local_pulsar. For more details on the different types of FATE see: [Introduction to FATE Backend Architecture](../docs/Introduction_to_Backend_Architecture.md).
+
 #### Checking the status of "Installing Cluster" job
 After the above command has finished, a job is created for installing a FATE cluster. Run the command `kubefate job describe` to check the status of the job, until the "Status" turns to `Success`.
 
