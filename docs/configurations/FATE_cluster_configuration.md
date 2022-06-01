@@ -143,6 +143,7 @@ The parties are directly connected.
 | hdfs                        | mappings | If you use the existing hdfs, you can set this configuration                                 |
 | rabbitmq                    | mappings | If you use the existing rabbitmq, you can set this configuration                             |
 | nginx                       | mappings | If you use the existing nginx, you can set this configuration                                |
+| logLevel                    | scalars  | The log level of the Python process, default level is Info                                   |
 
 ### fateboard mappings
 
@@ -204,12 +205,11 @@ Configuration of kubernetes deployment spark.
 
 Configuration of kubernetes deployment hdfs.
 
-| Name                  | SubItem      | Type     | Description                                      |
-|-----------------------|--------------|----------|--------------------------------------------------|
-| namenode/<br>datanode | nodeSelector | mappings | kubernetes nodeSelector.                         |
-|                       | type         | scalars  | Kubernetes ServiceTypes, default is `ClusterIp`. |
-
-
+| Name                   | SubItem      | Type     | Description                                      |
+|------------------------|--------------|----------|--------------------------------------------------|
+| namenode/<br>datanode  | nodeSelector | mappings | kubernetes nodeSelector.                         |
+|                        | type         | scalars  | Kubernetes ServiceTypes, default is `ClusterIp`. |
+| datanode               | replicas     | scalars  | The replicas of the HDFS datanode pods           |
 
 ### nginx mappings
 
