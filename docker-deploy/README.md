@@ -10,7 +10,7 @@ The nodes (target nodes) to install FATE must meet the following requirements:
 2. Docker: 18+
 3. Docker-Compose: 1.24+
 4. The deployment machine have access to the Internet, so the hosts can communicate with each other;
-5. Network connection to Internet to pull container images from Docker Hub. If network connection to Internet is not available, consider to set up [Harbor as a local registry](../registry/README.md) or use [offline images](https://github.com/FederatedAI/FATE/tree/master/docker-build).
+5. Network connection to Internet to pull container images from Docker Hub. If network connection to Internet is not available, consider to set up [Harbor as a local registry](../registry/README.md) or use [offline images](https://github.com/FederatedAI/FATE/tree/master/build/docker-build).
 6. A host running FATE is recommended to be with 8 CPUs and 16G RAM.
 
 ## Deploying FATE
