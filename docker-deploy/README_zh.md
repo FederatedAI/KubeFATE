@@ -20,7 +20,7 @@ Compose是用于定义和运行多容器Docker应用程序的工具。通过Comp
 2. 所有主机安装Docker 版本 : 18+；
 3. 所有主机安装Docker-Compose 版本: 1.24+；
 4. 部署机可以联网，所以主机相互之间可以网络互通；
-5. 运行机已经下载FATE 的各组件镜像（离线构建镜像参考文档[构建镜像](https://github.com/FederatedAI/FATE/tree/master/docker-build)）。
+5. 运行机已经下载FATE 的各组件镜像（离线构建镜像参考文档[构建镜像](https://github.com/FederatedAI/FATE/tree/master/build/docker-build)）。
 
 ### 下载部署脚本
 
@@ -95,6 +95,7 @@ RegistryURI=192.168.10.1/federatedai
 
 下面是修改好的文件，`party 10000`的集群将部署在*192.168.7.1*上，而`party 9999`的集群将部署在*192.168.7.2*上。为了减少所需拉取镜像的大小，KubeFATE在默认情况下，会使用不带神经网络的“python”容器，若需要跑神经网络的算法则需把“parties.conf”中的`enabled_nn`设置成`true`。
 
+
 ```bash
 user=fate
 dir=/data/projects/fate
@@ -128,7 +129,9 @@ serving_admin_username=admin
 serving_admin_password=admin
 ```
 
-FATE v1.5 开始支持使用Spark作为底层的分布式计算引擎，Spark集群默认会通过容器的方式部署。相关的简介可以参考这个[链接](../docs/FATE_On_Spark.md).
+* 使用Spark+Rabbitmq的部署方式的文档可以参考[这里](../docs/FATE_On_Spark.md).
+* 使用Spark+Pulsar的部署方式的文档可以参考[这里](../docs/FATE_On_Spark_With_Pulsar.md).
+* 使用Spark+local Pulsar的部署方式的文档可以参考[这里](TBD)
 
 **注意**: 默认情况下不会部署exchange组件。如需部署，用户可以把服务器IP填入上述配置文件的`exchangeip`中，该组件的默认监听端口为9371
 
