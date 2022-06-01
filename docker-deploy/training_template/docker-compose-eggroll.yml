@@ -1,5 +1,5 @@
-# Copyright 2019-2020 VMware, Inc.
-# 
+# Copyright 2019-2022 VMware, Inc.
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # you may obtain a copy of the License at
@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-version: '3'
+version: '3.7'
 networks:
   fate-network:
     ipam:
@@ -49,6 +49,7 @@ services:
       PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION: python
     volumes:
       - ./confs/eggroll/conf:/data/projects/fate/eggroll/conf
+      - shared_dir_federatedml:/data/projects/fate/fate/python/federatedml
     networks:
       - fate-network
     command: ["bash", "-c", "java -Dlog4j.configurationFile=$${EGGROLL_HOME}/conf/log4j2.properties -cp $${EGGROLL_HOME}/lib/*:$${EGGROLL_HOME}/conf/ com.webank.eggroll.rollsite.EggSiteBootstrap -c $${EGGROLL_HOME}/conf/eggroll.properties"]
@@ -73,6 +74,7 @@ services:
       - 4670 
     volumes:
       - ./confs/eggroll/conf:/data/projects/fate/eggroll/conf
+      - shared_dir_federatedml:/data/projects/fate/fate/python/federatedml
     environment:
       PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION: python
     networks:
@@ -88,6 +90,7 @@ services:
       - ./confs/eggroll/conf:/data/projects/fate/eggroll/conf
       - ./confs/fate_flow/conf/service_conf.yaml:/data/projects/fate/conf/service_conf.yaml
       - ./shared_dir/data/nodemanager:/data/projects/fate/eggroll/data
+      - shared_dir_federatedml:/data/projects/fate/fate/python/federatedml
     networks:
       - fate-network
     command: ["bash", "-c", "java -Dlog4j.configurationFile=$${EGGROLL_HOME}/conf/log4j2.properties -cp $${EGGROLL_HOME}/lib/*: com.webank.eggroll.core.Bootstrap --bootstraps com.webank.eggroll.core.resourcemanager.NodeManagerBootstrap -c $${EGGROLL_HOME}/conf/eggroll.properties -p 4671 -s 'EGGROLL_DEAMON'"]

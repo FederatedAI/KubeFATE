@@ -96,6 +96,7 @@ RegistryURI=192.168.10.1/federatedai
 
 下面是修改好的文件，`party 10000`的集群将部署在*192.168.7.1*上，而`party 9999`的集群将部署在*192.168.7.2*上。为了减少所需拉取镜像的大小，KubeFATE在默认情况下，会使用不带神经网络的“python”容器，若需要跑神经网络的算法则需把“parties.conf”中的`enabled_nn`设置成`true`。
 
+
 ```bash
 user=fate
 dir=/data/projects/fate
@@ -129,7 +130,9 @@ serving_admin_username=admin
 serving_admin_password=admin
 ```
 
-FATE v1.5 开始支持使用Spark作为底层的分布式计算引擎，Spark集群默认会通过容器的方式部署。相关的简介可以参考这个[链接](../docs/FATE_On_Spark.md).
+* 使用Spark+Rabbitmq的部署方式的文档可以参考[这里](../docs/FATE_On_Spark.md).
+* 使用Spark+Pulsar的部署方式的文档可以参考[这里](../docs/FATE_On_Spark_With_Pulsar.md).
+* 使用Spark+local Pulsar的部署方式的文档可以参考[这里](TBD)
 
 使用Docker-compose部署FATE可以支持四种不同的类型，对应四种backend。分别是eggroll、spark_rabbitmq、spark_pulsar和spark_local_pulsar。关于不同类型的FATE的更多细节查看: [不同类型FATE的架构介绍](../docs/Introduction_to_Backend_Architecture_zh.md)。
 
