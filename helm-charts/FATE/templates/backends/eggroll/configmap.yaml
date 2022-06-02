@@ -63,7 +63,7 @@ data:
     hadoop.dfs.namenode.rpc-address.nn2=
     
     # session
-    eggroll.session.processors.per.node=4
+    eggroll.session.processors.per.node={{ .Values.modules.nodemanager.sessionProcessorsPerNode | default 2 }}
     eggroll.session.start.timeout.ms=180000
     
     # rollpair

@@ -293,28 +293,23 @@ modules:
   nodemanager:  
     include: {{ has "nodemanager" .modules }}
     {{- with .nodemanager }}
-    list:
-    {{- $nodemanager := . }}
-    {{- range .count | int | until }}
-    - name: nodemanager-{{ . }}
-      {{- with $nodemanager.nodeSelector }}
-      nodeSelector: 
-{{ toYaml . | indent 8 }}
-      {{- end}}
-      {{- with $nodemanager.tolerations }}
-      tolerations:
-{{ toYaml . | indent 8 }}
-      {{- end}}
-      {{- with $nodemanager.affinity }}
-      affinity:
-{{ toYaml . | indent 8 }}
-      {{- end}}
-      sessionProcessorsPerNode: {{ $nodemanager.sessionProcessorsPerNode }}
-      subPath: "nodemanager-{{ . }}"
-      existingClaim: ""
-      storageClass: "{{ $nodemanager.storageClass }}"
-      accessMode: {{ $nodemanager.accessMode }}
-      size: {{ $nodemanager.size }}
+    sessionProcessorsPerNode: {{ .sessionProcessorsPerNode }}
+    replicas: {{ .replicas }}
+    subPath: {{ .subPath }}
+    storageClass: {{ .storageClass  | default "client" }}
+    accessMode: {{ .accessMode  | default "ReadWriteOnce" }}
+    size: {{ .size  | default "1Gi" }}
+    {{- with .nodeSelector }}
+    nodeSelector: 
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    {{- with .tolerations }}
+    tolerations:
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    {{- with .affinity }}
+    affinity:
+{{ toYaml . | indent 6 }}
     {{- end }}
     {{- end }}
 
