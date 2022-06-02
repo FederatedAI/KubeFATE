@@ -110,7 +110,7 @@ spec:
         name: dfs
         labels:
           fateMoudle: datanode
-          {{ include "fate.labels" . | indent 10 }}
+{{ include "fate.labels" . | indent 10 }}
       spec:
         accessModes: [{{ .Values.modules.hdfs.datanode.accessMode }}]
         storageClassName: {{ .Values.modules.hdfs.datanode.storageClass }}
