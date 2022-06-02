@@ -149,7 +149,7 @@ backend: eggroll
   # enabledNN: false
   # logLevel: INFO
   # existingClaim: ""
-  # s: "python"
+  # storageClass: "python"
   # accessMode: ReadWriteMany
   # size: 1Gi
   # clustermanager:
