@@ -176,27 +176,15 @@ modules:
     affinity:
   nodemanager:  
     include: true
-    list:
-    - name: nodemanager-0
-      nodeSelector:
-      tolerations:
-      affinity:
-      sessionProcessorsPerNode: 2
-      subPath: "nodemanager-0"
-      existingClaim: ""
-      storageClass: "nodemanager-0"
-      accessMode: ReadWriteOnce
-      size: 1Gi
-    - name: nodemanager-1
-      nodeSelector:
-      tolerations:
-      affinity:
-      sessionProcessorsPerNode: 2
-      subPath: "nodemanager-1"
-      existingClaim: ""
-      storageClass: "nodemanager-1"
-      accessMode: ReadWriteOnce
-      size: 1Gi
+    replicas: 2
+    nodeSelector:
+    tolerations:
+    affinity:
+    sessionProcessorsPerNode: 2
+    subPath: "nodemanager"
+    storageClass: "nodemanager"
+    accessMode: ReadWriteOnce
+    size: 1Gi
 
   client: 
     include: true
