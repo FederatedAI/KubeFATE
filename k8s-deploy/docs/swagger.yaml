@@ -150,6 +150,8 @@ definitions:
         type: string
       values_template:
         type: string
+      values_template_example:
+        type: string
       version:
         type: string
     type: object
@@ -280,6 +282,38 @@ paths:
                   items:
                     $ref: '#/definitions/modules.HelmChart'
                   type: array
+              type: object
+        "401":
+          description: Unauthorized operation
+          schema:
+            $ref: '#/definitions/api.JSONERRORResult'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/api.JSONERRORResult'
+      security:
+      - ApiKeyAuth: []
+      summary: List all historical Charts
+      tags:
+      - Chart
+    patch:
+      parameters:
+      - description: Authentication header
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            allOf:
+            - $ref: '#/definitions/api.JSONResult'
+            - properties:
+                data:
+                  $ref: '#/definitions/modules.HelmChart'
               type: object
         "401":
           description: Unauthorized operation
