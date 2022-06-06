@@ -252,7 +252,7 @@ Access to FATEBoard UI requires a login user name and password, which can be fou
 #### [Update and Delete a FATE Cluster](../docs/Update_and_Delete_a_FATE_Cluster.md)
 #### [KubeFATE Examples](examples)
 
-#### [KubeFATE Command Line User Guide](../docs/KubeFATE_command_line_user_guide.md)
+#### [KubeFATE Command Line User Guide](../docs/KubeFATE_CLI_user_guide.md)
 
 ## KubeFATE service RESTful APIs reference
 #### [API Reference](docs/KubeFATE_API_Reference_Swagger.md)
