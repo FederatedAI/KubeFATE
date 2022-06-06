@@ -26,14 +26,15 @@ import (
 
 // HelmChart Helm Chart model
 type HelmChart struct {
-	Uuid           string    `json:"uuid" gorm:"type:varchar(36);index;unique"`
-	Name           string    `json:"name" gorm:"type:varchar(16);not null"`
-	Chart          string    `json:"chart" gorm:"type:text;not null"`
-	Values         string    `json:"values" gorm:"type:text;not null"`
-	ValuesTemplate string    `json:"values_template" gorm:"type:text;not null"`
-	Templates      Templates `json:"templates" gorm:"type:mediumblob" swaggerignore:"true"`
-	Version        string    `json:"version" gorm:"type:varchar(32);not null"`
-	AppVersion     string    `json:"app_version" gorm:"type:varchar(32);not null"`
+	Uuid                  string    `json:"uuid" gorm:"type:varchar(36);index;unique"`
+	Name                  string    `json:"name" gorm:"type:varchar(16);not null"`
+	Chart                 string    `json:"chart" gorm:"type:text;not null"`
+	Values                string    `json:"values" gorm:"type:text;not null"`
+	ValuesTemplate        string    `json:"values_template" gorm:"type:text;not null"`
+	ValuesTemplateExample string    `json:"values_template_example" gorm:"type:text;not null"`
+	Templates             Templates `json:"templates" gorm:"type:mediumblob" swaggerignore:"true"`
+	Version               string    `json:"version" gorm:"type:varchar(32);not null"`
+	AppVersion            string    `json:"app_version" gorm:"type:varchar(32);not null"`
 
 	gorm.Model
 }
