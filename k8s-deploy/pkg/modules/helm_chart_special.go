@@ -39,6 +39,7 @@ func (e *HelmChart) ChartRequestedToHelmChart(chartRequested *chart.Chart) (*Hel
 	var chartData string
 	var valuesData string
 	var ValuesTemplate string
+	var ValuesTemplateExample string
 	for _, v := range chartRequested.Raw {
 		if v.Name == "Chart.yaml" {
 			chartData = string(v.Data)
@@ -49,12 +50,16 @@ func (e *HelmChart) ChartRequestedToHelmChart(chartRequested *chart.Chart) (*Hel
 		if v.Name == "values-template.yaml" {
 			ValuesTemplate = string(v.Data)
 		}
+		if v.Name == "values-template-example.yaml" {
+			ValuesTemplateExample = string(v.Data)
+		}
 	}
 
 	helmChart := NewHelmChart(chartRequested.Name(),
 		chartData, valuesData, chartRequested.Templates, chartRequested.Metadata.Version, chartRequested.AppVersion())
 
 	helmChart.ValuesTemplate = ValuesTemplate
+	helmChart.ValuesTemplateExample = ValuesTemplateExample
 	return helmChart, nil
 }
 
@@ -103,6 +108,7 @@ func ChartRequestedToHelmChart(chartRequested *chart.Chart) (*HelmChart, error) 
 	var chartData string
 	var valuesData string
 	var ValuesTemplate string
+	var ValuesTemplateExample string
 	for _, v := range chartRequested.Raw {
 		if v.Name == "Chart.yaml" {
 			chartData = string(v.Data)
@@ -113,12 +119,16 @@ func ChartRequestedToHelmChart(chartRequested *chart.Chart) (*HelmChart, error) 
 		if v.Name == "values-template.yaml" {
 			ValuesTemplate = string(v.Data)
 		}
+		if v.Name == "values-template-example.yaml" {
+			ValuesTemplateExample = string(v.Data)
+		}
 	}
 
 	helmChart := NewHelmChart(chartRequested.Name(),
 		chartData, valuesData, chartRequested.Templates, chartRequested.Metadata.Version, chartRequested.AppVersion())
 
 	helmChart.ValuesTemplate = ValuesTemplate
+	helmChart.ValuesTemplateExample = ValuesTemplateExample
 	return helmChart, nil
 }
 
