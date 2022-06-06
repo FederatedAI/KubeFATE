@@ -263,12 +263,20 @@ backend: eggroll
     # affinity:
     # type: ClusterIP
     # nodePort: 30900
+    # existingClaim:
+    # storageClass:
+    # accessMode:
+    # size:
   # datanode:
     # replicas:
     # nodeSelector:
     # tolerations:
     # affinity:
     # type: ClusterIP
+    # existingClaim:
+    # storageClass:
+    # accessMode:
+    # size:
 # nginx:
   # nodeSelector:
   # tolerations:

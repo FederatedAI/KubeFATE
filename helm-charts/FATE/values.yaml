@@ -264,12 +264,20 @@ modules:
       affinity:
       type: ClusterIP
       nodePort: 30900
+      existingClaim:
+      storageClass:
+      accessMode:
+      size:
     datanode:
       replicas: 3
       nodeSelector:
       tolerations:
       affinity:
       type: ClusterIP
+      existingClaim:
+      storageClass:
+      accessMode:
+      size:
   nginx:
     include: true
     nodeSelector:
