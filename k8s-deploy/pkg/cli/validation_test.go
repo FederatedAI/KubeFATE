@@ -2,7 +2,6 @@ package cli
 
 import (
 	"errors"
-	"io/ioutil"
 	"reflect"
 	"testing"
 )
@@ -236,8 +235,6 @@ func TestValidateYaml(t *testing.T) {
 		testValue     string
 		skippedKeys   []string
 	}
-	template, _ := ioutil.ReadFile(_templateFilename)
-	test, _ := ioutil.ReadFile(_testFilename)
 	tests := []struct {
 		name     string
 		args     args
@@ -248,7 +245,6 @@ func TestValidateYaml(t *testing.T) {
 		{"validateValidYaml", args{s1, s2, nil}, []error{}},
 		{"validateNotValidYaml", args{s1, s3, nil}, []error{errors.New("Warning : Your yaml at '/a/d', line 8 \n  'd: 3' may be redundant\n")}},
 		{"validateYamlWithskippedKeys", args{s1, s4, []string{"d"}}, []error{}},
-		{"validateLocalYaml", args{string(template), string(test), nil}, []error{errors.New("Warning : Your yaml at '/rollsite/900', line 47 '900:' may be redundant\n")}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
