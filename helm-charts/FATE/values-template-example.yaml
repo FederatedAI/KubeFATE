@@ -101,32 +101,9 @@ backend: eggroll
 #   replicas: 2
 #   sessionProcessorsPerNode: 4
 #   nodeSelector:
-#     kubernetes.io/hostname: localhost.localdomain
 #   tolerations:
-#     - key: "swapenable"
-#       operator: "Equal"
-#       value: "true"
-#       effect: "PreferNoSchedule"
 #   affinity:
-#     nodeAffinity:
-#       requiredDuringSchedulingIgnoredDuringExecution:
-#         nodeSelectorTerms:
-#           - matchExpressions:
-#               - key: kubernetes.io/hostname
-#                 operator: In
-#                 values:
-#                   - localhost.localdomain
-#     podAntiAffinity:
-#       requiredDuringSchedulingIgnoredDuringExecution:
-#         - labelSelector:
-#             matchExpressions:
-#               - key: app
-#                 operator: In
-#                 values:
-#                   - nodemanager
-#             topologyKey: kubernetes.io/hostname
 #   subPath: "nodemanager"
-#   existingClaim: ""
 #   storageClass: "local-scsi"
 #   accessMode: ReadWriteOnce
 #   size: 1Gi
