@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"reflect"
 	"regexp"
 	"strconv"
@@ -38,8 +37,8 @@ type ValidationManager struct {
 	skippedKeys            []string
 }
 
+// // trimComments trims the comments started with "# ".
 func trimComments(t []byte) []byte {
-	// to trim the comments started with "# "
 	pattern := regexp.MustCompile(`^ *# `)
 	for {
 		ok := pattern.Match(t)
@@ -52,8 +51,8 @@ func trimComments(t []byte) []byte {
 	return t
 }
 
+// deconstructKey deconstructs the key to the original key and the lineno.
 func deconstructKey(k interface{}) (string, int) {
-	// to deconstruct the key to the original key and the lineno
 	key, lineno := "", 0
 	var err error
 	switch k := k.(type) {
@@ -74,16 +73,19 @@ func deconstructKey(k interface{}) (string, int) {
 	return key, lineno
 }
 
+// NewTreeNode return default TreeNode.
 func NewTreeNode() *TreeNode {
-	// return default TreeNode
 	node := new(TreeNode)
 	node.leaf = false
 	node.children = make(map[string]*TreeNode)
 	return node
 }
 
+// mapToTreeNode recursively converts the yaml map to TreeNode,
+// the route is the path to the current node.
+// if node is a anomymous member in one array, the current route is @ArrayItem.
+// node.value depends on the type of the key (map, list or basic type).
 func mapToTreeNode(body interface{}, route []string) *TreeNode {
-	// recursively convert the yaml map to TreeNode, the route is the path to the current node (if node is a anomymous member in one array, the current route is @ArrayItem). value depends on the type of the key (map, list or basic type)
 	node := NewTreeNode()
 	node.route = route
 	if body == nil {
@@ -117,8 +119,8 @@ func mapToTreeNode(body interface{}, route []string) *TreeNode {
 	return node
 }
 
+// Contains checks whether an element is in slice/array/map.
 func Contains(element interface{}, set interface{}) bool {
-	// check whether an element is in slice/array/map
 	setVal := reflect.ValueOf(set)
 	switch setVal.Type().Kind() {
 	case reflect.Slice, reflect.Array:
@@ -138,8 +140,8 @@ func Contains(element interface{}, set interface{}) bool {
 	return false
 }
 
+// compareTwoTrees recursively compares the two trees, walking through the nodes not skipped.
 func compareTwoTrees(rootTemp, rootTest *TreeNode, testLines, skippedKeys []string) (errs []error) {
-	// recursively compare the two trees, walking through the nodes not skipped
 	valueTemp, valueTest := rootTemp.value, rootTest.value
 	typeTemp, typeTest := reflect.TypeOf(valueTemp), reflect.TypeOf(valueTest)
 	if typeTemp != typeTest {
@@ -175,8 +177,8 @@ func (m *ValidationManager) Validate() error {
 	return nil
 }
 
+// versionValid checks if the chart version is valid.
 func versionValid(chartVersion string, startVersion []int) (valid bool) {
-	// check if the chart version is valid
 	chartVersion = strings.TrimLeft(chartVersion, "v")
 	for i, v := range strings.Split(chartVersion, ".") {
 		if i >= len(startVersion) {
@@ -192,8 +194,8 @@ func versionValid(chartVersion string, startVersion []int) (valid bool) {
 	return
 }
 
+// GetValueTemplateExample gets the value template example from api.
 func GetValueTemplateExample(chartName, chartVersion string) (value string, err error) {
-	// get the value template example from api
 	if !versionValid(chartVersion, []int{1, 9, 0}) {
 		err = errors.New("Yaml validation requires the chartVersion >= 1.9.0")
 		return
@@ -224,16 +226,13 @@ func (m *ValidationManager) compareTwoTrees() []error {
 	return compareTwoTrees(m.templateTree.root, m.testTree.root, m.testTree.lines, m.skippedKeys)
 }
 
-func stringToReadCloser(s string) io.ReadCloser {
-	return ioutil.NopCloser(strings.NewReader(s))
-}
-
-func readCloserToBuffer(readCloser io.ReadCloser, restoreComments, markLineno bool) ([]byte, []string, error) {
-	// read the yaml file and return the content (may be modified) in []byte, the original lines in []string and error
-	reader := bufio.NewReader(readCloser)
-	defer readCloser.Close()
+// yamlStringToBuffer reads the yaml value and returns
+// the content (may be modified) in []byte,the original lines in []string and error.
+func yamlStringToBuffer(value string, restoreComments, markLineno bool) ([]byte, []string, error) {
+	reader := bufio.NewReader(strings.NewReader(value))
 	buffer := make([]byte, 0, 10)
-	lines := make([]string, 1, 10) // 1 for the first lineno
+	// 1 for the first lineno
+	lines := make([]string, 1, 10)
 
 	linenoReg := regexp.MustCompile(`:`)
 	for lineno := 1; ; lineno++ {
@@ -246,7 +245,7 @@ func readCloserToBuffer(readCloser io.ReadCloser, restoreComments, markLineno bo
 			}
 		}
 		if !Contains(byte(':'), line) && !Contains(byte('-'), line) {
-			// if one line is pure comment, treat it as a blank line
+			// if one line is pure comment, treat it as a blank line.
 			line = []byte("")
 		}
 
@@ -262,14 +261,16 @@ func readCloserToBuffer(readCloser io.ReadCloser, restoreComments, markLineno bo
 	return buffer, lines, nil
 }
 
+// bufferToMap unmarshals the byte buffer to map,
+// keys are string and numbers are float64.
 func bufferToMap(buffer []byte) (m map[string]interface{}, err error) {
-	// unmarshal the buffer to map, keys are string and numbers are float64
 	err = yaml.Unmarshal(buffer, &m)
 	return
 }
 
-func buildValidationTree(readCloser io.ReadCloser, restoreComments, markLineno bool) (*ValidationTree, error) {
-	yamlBuffer, lines, err := readCloserToBuffer(readCloser, restoreComments, markLineno)
+// buildValidationTree builds the validation tree from yaml string.
+func buildValidationTree(yamlString string, restoreComments, markLineno bool) (*ValidationTree, error) {
+	yamlBuffer, lines, err := yamlStringToBuffer(yamlString, restoreComments, markLineno)
 	if err != nil {
 		return nil, err
 	}
@@ -281,8 +282,10 @@ func buildValidationTree(readCloser io.ReadCloser, restoreComments, markLineno b
 	return &ValidationTree{root, yamlMap, lines}, nil
 }
 
+// getSkippedKeys returns the skippedKeys in a map.
+// The type of skippedKeys array is []interface{},
+// so we need to transform every element to string.
 func getSkippedKeys(m map[string]interface{}) (skippedKeys []string) {
-	// the type of skippedKeys array is []interface{}, so we need to transform every element to string
 	value, ok := m["skippedKeys"]
 	if !ok {
 		return
@@ -297,16 +300,16 @@ func getSkippedKeys(m map[string]interface{}) (skippedKeys []string) {
 	return skippedKeys
 }
 
+// ValidateYaml validates the yaml file.
 func ValidateYaml(templateValue, testValue string, skippedKeys []string) (errs []error) {
 	if templateValue == "" || testValue == "" {
 		return []error{errors.New("template or test yaml is empty")}
 	}
-	templateReadCloser, testReadCloser := stringToReadCloser(templateValue), stringToReadCloser(testValue)
-	templateTree, err := buildValidationTree(templateReadCloser, true, false)
+	templateTree, err := buildValidationTree(templateValue, true, false)
 	if err != nil {
 		return []error{err}
 	}
-	testTree, err := buildValidationTree(testReadCloser, false, true)
+	testTree, err := buildValidationTree(testValue, false, true)
 	if err != nil {
 		return []error{err}
 	}

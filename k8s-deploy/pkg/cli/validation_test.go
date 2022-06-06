@@ -243,7 +243,7 @@ func TestValidateYaml(t *testing.T) {
 		{"validateEmptyYaml", args{"", "", nil}, []error{errors.New("template or test yaml is empty")}},
 		{"validateSameYaml", args{s1, s1, nil}, []error{}},
 		{"validateValidYaml", args{s1, s2, nil}, []error{}},
-		{"validateNotValidYaml", args{s1, s3, nil}, []error{errors.New("Warning : Your yaml at '/a/d', line 8 \n  'd: 3' may be redundant\n")}},
+		{"validateNotValidYaml", args{s1, s3, nil}, []error{errors.New("Your yaml at '/a/d', line 8 \n  'd: 3' may be redundant\n")}},
 		{"validateYamlWithskippedKeys", args{s1, s4, []string{"d"}}, []error{}},
 	}
 	for _, tt := range tests {
