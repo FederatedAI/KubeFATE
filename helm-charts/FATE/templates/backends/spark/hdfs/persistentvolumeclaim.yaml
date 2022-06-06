@@ -32,28 +32,4 @@ spec:
     {{ end }}
   {{ end }}
 {{ end }}
----
-{{ if and .Values.persistence.enabled (not .Values.modules.hdfs.datanode.existingClaim) }}
-kind: PersistentVolumeClaim
-apiVersion: v1
-metadata:
-  name: datanode-data
-  labels:
-    fateMoudle: datanode
-{{ include "fate.labels" . | indent 4 }}
-spec:
-  accessModes:
-    - {{ .Values.modules.hdfs.datanode.accessMode }}
-  resources:
-    requests:
-      storage: {{ .Values.modules.hdfs.datanode.size }}
-  {{ if .Values.modules.hdfs.datanode.storageClass }}
-    {{ if eq "-" .Values.modules.hdfs.datanode.storageClass }}
-  storageClassName: ""
-    {{ else }}
-  storageClassName: {{ .Values.modules.hdfs.datanode.storageClass }}
-    {{ end }}
-  {{ end }}
-{{ end }}
-
 {{ end }}
