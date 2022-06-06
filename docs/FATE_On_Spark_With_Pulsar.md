@@ -70,7 +70,6 @@ When submitting a task, the user can declare in the config file to use Pulsar as
    "job_parameters": {
      "common": {
        "job_type": "train",
-       "backend": 2,
        "spark_run": {
          "num-executors": 1,
          "executor-cores": 2
@@ -86,8 +85,6 @@ When submitting a task, the user can declare in the config file to use Pulsar as
      }
    }
 ```
-
-In above configuration, the `backend: 2` specifies the use of Pulsar as the transmission service. In `pulsar_run`, a user can also specify the parameters when creating "producer" and "consumer". 
 
 Generally, there is no need to set such a configuration. As for the available parameters, please refer to the [`create_producer`](https://pulsar.apache.org/api/python/2.7.0-SNAPSHOT/#pulsar.Client.create_producer) and [`subscribe`](https://pulsar.apache.org/api/python/2.7.0-SNAPSHOT/#pulsar.Client.subscribe) methods in the Pulsar python client.
 
