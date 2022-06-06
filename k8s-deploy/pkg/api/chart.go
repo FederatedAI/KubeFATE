@@ -39,12 +39,42 @@ func (c *Chart) Router(r *gin.RouterGroup) {
 		chart.GET("/", c.getChartList)
 		chart.GET("/:chartId", c.getChart)
 		chart.DELETE("/:chartId", c.deleteChart)
+		chart.GET("/valueTemplateExample/:chartName/:chartVersion", c.getValueTemplateExample)
 	}
 }
 
 // HelmUUID HelmUUID
 type HelmUUID struct {
 	HelmUUID string
+}
+
+// getValueTemplateExample return valueTemplateExample string by chart name and version
+// @Summary List all historical Charts
+// @Tags Chart
+// @Produce  json
+// @Success 200 {object} JSONResult{data=modules.HelmChart} "Success"
+// @Failure 401 {object} JSONERRORResult "Unauthorized operation"
+// @Failure 500 {object} JSONERRORResult "Internal server error"
+// @Router /chart [patch]
+// @Param Authorization header string true "Authentication header"
+// @Security ApiKeyAuth
+func (*Chart) getValueTemplateExample(c *gin.Context) {
+	name, version := c.Param("chartName"), c.Param("chartVersion")
+	if name == "" || version == "" {
+		err := errors.New("name or version is empty")
+		log.Error().Err(err).Msg("request params error")
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	helmChart, err := modules.GetFateChart(name, version)
+	if err != nil {
+		log.Error().Err(err).Msg("GetFateChart error")
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	v := helmChart.ValuesTemplateExample
+	log.Debug().Interface("ValuesTemplateExample", v).Msg("getValueTemplateExample Success")
+	c.JSON(200, gin.H{"msg": "getChartByNameVersion Success", "data": v})
 }
 
 // createChart Upload a Chart
