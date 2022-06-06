@@ -138,13 +138,13 @@ func Contains(element interface{}, set interface{}) bool {
 	return false
 }
 
-func compareTwoTrees(root_temp, root_test *TreeNode, testLines, skippedKeys []string) (errs []error) {
+func compareTwoTrees(rootTemp, rootTest *TreeNode, testLines, skippedKeys []string) (errs []error) {
 	// recursively compare the two trees, walking through the nodes not skipped
-	valueTemp, valueTest := root_temp.value, root_test.value
+	valueTemp, valueTest := rootTemp.value, rootTest.value
 	typeTemp, typeTest := reflect.TypeOf(valueTemp), reflect.TypeOf(valueTest)
 	if typeTemp != typeTest {
-		route := strings.Join(root_test.route, "/")
-		errs = append(errs, fmt.Errorf("Your yaml at '%s', line %d \n  '%s' may not match the type\n", route, root_test.lineno, testLines[root_test.lineno]))
+		route := strings.Join(rootTest.route, "/")
+		errs = append(errs, fmt.Errorf("Your yaml at '%s', line %d \n  '%s' may not match the type\n", route, rootTest.lineno, testLines[rootTest.lineno]))
 		return
 	}
 	switch valueTest := valueTest.(type) {
