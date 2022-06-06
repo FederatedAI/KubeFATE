@@ -1,6 +1,6 @@
-# Deploy an ATS exchange to pulsar
+# Deploy an ATS exchange for pulsar
 
-#### Create an Exchange Cluster Yaml
+## Create an Exchange Cluster Yaml
 
 ```bash
 $ cat exchange.yaml 
@@ -32,11 +32,9 @@ trafficServer:
 
 ```
 
+## Import the secret keys to Kubernetes
 
-
-#### Import the secret key to Kubernetes
-
-Before that, you need to finish generating the secret key. https://github.com/FederatedAI/KubeFATE/blob/master/docs/FATE_On_Spark_With_Pulsar.md#generate-cas-certificate
+Before that, you need to finish generating the secret key by folling this [doc](https://github.com/FederatedAI/KubeFATE/blob/master/docs/FATE_On_Spark_With_Pulsar.md#generate-cas-certificate).
 
 Execute the corresponding command in the corresponding cluster.
 
@@ -61,12 +59,9 @@ kubectl -n fate-exchange  create secret generic traffic-server-cert \
 	--from-file=ca.cert.pem=certs/ca.cert.pem
 ```
 
-
-
-#### Configure cluster to connect to exchange
+## Configure the clusters to connect to the exchange service
 
 ```bash
-$ cat cluster.yaml
 ...
 pulsar:
   ...
@@ -75,4 +70,4 @@ pulsar:
     port: 30000
 ```
 
-Then you can deploy and test.
+Then you can deploy and start to use the FATE cluster.
