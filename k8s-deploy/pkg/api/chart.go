@@ -52,10 +52,12 @@ type HelmUUID struct {
 // @Summary return valueTemplateExample string by chart name and version
 // @Tags Chart
 // @Produce  json
+// @Param  chartName path string true "chart name"
+// @Param  chartVersion path string true "chart version"
 // @Success 200 {object} JSONResult{data=string} "Success"
 // @Failure 401 {object} JSONERRORResult "Unauthorized operation"
 // @Failure 500 {object} JSONERRORResult "Internal server error"
-// @Router /chart [get]
+// @Router /valueTemplateExample/{chartName}/{chartVersion} [get]
 // @Param Authorization header string true "Authentication header"
 // @Security ApiKeyAuth
 func (*Chart) getValueTemplateExample(c *gin.Context) {

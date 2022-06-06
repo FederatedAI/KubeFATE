@@ -1243,6 +1243,49 @@ paths:
       summary: logout
       tags:
       - User
+  /valueTemplateExample/{chartName}/{chartVersion}:
+    get:
+      parameters:
+      - description: chart name
+        in: path
+        name: chartName
+        required: true
+        type: string
+      - description: chart version
+        in: path
+        name: chartVersion
+        required: true
+        type: string
+      - description: Authentication header
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            allOf:
+            - $ref: '#/definitions/api.JSONResult'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "401":
+          description: Unauthorized operation
+          schema:
+            $ref: '#/definitions/api.JSONERRORResult'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/api.JSONERRORResult'
+      security:
+      - ApiKeyAuth: []
+      summary: return valueTemplateExample string by chart name and version
+      tags:
+      - Chart
   /version:
     get:
       parameters:
