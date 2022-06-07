@@ -1,6 +1,6 @@
 # Kubernetes Deployment
 
-This document introduces the architecture, the user cases and the usage of KubeFATE, If you only care about how to use it, then you can jump to [Usage](#usage).
+This document introduces the architecture, the user cases and the usage of KubeFATE. If you only care about how to use it, then you can jump to [Usage](#usage).
 
 We recommend using [Kubernetes](https://kubernetes.io/) as an underlying infrastructure to create and manage the FATE clusters in a production environment. KubeFATE supports deploying multiple FATE clusters in an instance of Kubernetes with different namespaces for the purposes of development, testing and production. Considering the different IT designs and standards in each company, the actual deployment should be customized. KubeFATE is flexible for the FATE configuration.
 
