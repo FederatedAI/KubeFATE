@@ -95,12 +95,27 @@ spec:
       {{- end }}
       serviceAccountName: {{ template "serviceAccountName" . }}
       restartPolicy: Always
+      {{ if not .Values.persistence.enabled }}
       volumes:
         - name: dfs
-        {{ if .Values.persistence.enabled }}
-          persistentVolumeClaim:
-            claimName: {{ .Values.modules.hdfs.datanode.existingClaim | default  "datanode-data" }}
-        {{ else }}
           emptyDir: {}
-        {{ end }}
+      {{ else if and .Values.persistence.enabled (.Values.modules.hdfs.datanode.existingClaim) }}
+      volumes:
+        - name: dfs
+          persistentVolumeClaim:
+            claimName: {{ .Values.modules.hdfs.datanode.existingClaim }}
+      {{ else }}
+  volumeClaimTemplates:
+    - metadata:
+        name: dfs
+        labels:
+          fateMoudle: datanode
+{{ include "fate.labels" . | indent 10 }}
+      spec:
+        accessModes: [{{ .Values.modules.hdfs.datanode.accessMode }}]
+        storageClassName: {{ .Values.modules.hdfs.datanode.storageClass }}
+        resources:
+          requests:
+            storage: {{ .Values.modules.hdfs.datanode.size }}
+      {{ end }}
 {{ end }}

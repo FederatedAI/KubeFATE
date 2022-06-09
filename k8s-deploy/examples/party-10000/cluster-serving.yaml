@@ -1,10 +1,10 @@
 name: fate-serving-10000
 namespace: fate-serving-10000
 chartName: fate-serving
-chartVersion: v2.0.4
+chartVersion: v2.1.5
 partyId: 10000
 registry: ""
-imageTag: 2.0.4-release
+imageTag: 2.1.5-release
 pullPolicy: 
 imagePullSecrets: 
 - name: myregistrykey
@@ -13,6 +13,7 @@ istio:
   enabled: false
 podSecurityPolicy:
   enabled: false
+ingressClassName: nginx
 modules:
   - servingProxy
   - servingRedis
@@ -41,7 +42,6 @@ servingProxy:
   - partyId: 9999
     partyIp: 192.168.9.1
     partyPort: 30096
-  nodeSelector: {}
 
 servingServer:
   type: NodePort
@@ -49,25 +49,9 @@ servingServer:
   fateflow:
     ip: 192.168.10.1
     port: 30107
-  subPath: ""
-  existingClaim: ""
-  storageClass: "serving-server"
-  accessMode: ReadWriteOnce
-  size: 1Gi
-  nodeSelector: {}
-
-servingRedis:
-  password: fate_dev
-  nodeSelector: {}
-  subPath: ""
-  existingClaim: ""
-  storageClass: "serving-redis"
-  accessMode: ReadWriteOnce
-  size: 1Gi
-
-servingZookeeper:
-  subPath: ""
-  existingClaim: ""
-  storageClass: "serving-zookeeper"
-  accessMode: ReadWriteOnce
-  size: 1Gi
+  cacheSwitch: true
+  cacheType: "redis"
+  singleAdaptor: com.webank.ai.fate.serving.adaptor.dataaccess.MockAdapter
+  batchAdaptor: com.webank.ai.fate.serving.adaptor.dataaccess.MockBatchAdapter
+  AdapterURL: http://127.0.0.1:9380/v1/http/adapter/getFeature
+  

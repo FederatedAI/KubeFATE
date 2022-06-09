@@ -11,7 +11,7 @@ FATE supports using [Spark](https://spark.apache.org/) as a computing engine sin
 ## Configuration and Usage
 
 ### Update Config of the FATE Flow service
-For more details of the Pulsar Deployment, a user can refer to this [Deployment Guide](https://github.com/FederatedAI/FATE/blob/develop-1.6/cluster-deploy/doc/fate_on_spark/pulsar_deployment_guide.md). After the Pulsar cluster is running, a user needs to update the configuration of the "fate flow" service. The update splits into two parts. They are:
+For more details of the Pulsar Deployment, a user can refer to this [Deployment Guide](https://github.com/FederatedAI/FATE/blob/master/deploy/cluster-deploy/doc/fate_on_spark/common/pulsar_deployment_guide.md). After the Pulsar cluster is running, a user needs to update the configuration of the "fate flow" service. The update splits into two parts. They are:
 
 - "conf/service_conf.yaml" 
 ``` yml
@@ -86,8 +86,6 @@ When submitting a task, the user can declare in the config file to use Pulsar as
    }
 ```
 
-In above configuration, the `backend: 2` specifies the use of Pulsar as the transmission service. In `pulsar_run`, a user can also specify the parameters when creating "producer" and "consumer". 
-
 Generally, there is no need to set such a configuration. As for the available parameters, please refer to the [`create_producer`](https://pulsar.apache.org/api/python/2.7.0-SNAPSHOT/#pulsar.Client.create_producer) and [`subscribe`](https://pulsar.apache.org/api/python/2.7.0-SNAPSHOT/#pulsar.Client.subscribe) methods in the Pulsar python client.
 
 ## Deployment of Star Network
@@ -104,23 +102,23 @@ Using Pulsar as a transmission engine can support star deployment. Its central n
 Next, we will create a federated learning network based on the SNI proxy model. Since certificates are required, a user can unify domain name suffix for this network, such as "fate.org". In this way, each entity in the network can be identified by `${party_id}.fate.org`. For example, the CN of the certificate used by party 10000 is "10000.fate.org".
 
 #### Deployment Plan
-Host | IP | OS | Application | Service
---- | --- | --- | --- | --- |
-proxy.fate.org | 192.168.0.1 | CentOS 7.2/Ubuntu 16.04 | ats | ats
-10000.fate.org | 192.168.0.2 | CentOS 7.2/Ubuntu 16.04 | pulsar | pulsar
-9999.fate.org | 192.168.0.3  | CentOS 7.2/Ubuntu 16.04 | pulsar | pulsar
+| Host           | IP          | OS                      | Application | Service |
+|----------------|-------------|-------------------------|-------------|---------|
+| proxy.fate.org | 192.168.0.1 | CentOS 7.2/Ubuntu 16.04 | ats         | ats     |
+| 10000.fate.org | 192.168.0.2 | CentOS 7.2/Ubuntu 16.04 | pulsar      | pulsar  |
+| 9999.fate.org  | 192.168.0.3 | CentOS 7.2/Ubuntu 16.04 | pulsar      | pulsar  |
 
-The architecture is shown in the following diagram. The Pulsar service "10000.fate.org" belongs to the organization with ID 10000, and the pulsar service "9999.fate.org" belongs to the organization with ID 9999, and "proxy.fate.org" is ats Service is the center of the star network.
+The architecture is shown in the following diagram. The Pulsar service "10000.fate.org" belongs to the organization with ID 10000, and the pulsar service "9999.fate.org" belongs to the organization with ID 9999, and "proxy.fate.org" is the ATS Service and is the center of the star network.
 
 <div style="text-align:center", align=center>
 <img src="./images/pulsar_sni_proxy.png" />
 </div>
 
-#### Certificate Generation
+### Certificate Generation
 
 Since the SNI proxy is based on TLS, it is necessary to configure the certificate for the ATS and Pulsar services.
 
-##### Generate CA's Certificate
+#### Generate CA's Certificate
 
 Enter the following command to create a directory for the CA, and put the openssl configuration file in the directory.
 
@@ -151,7 +149,7 @@ Once the above commands are completed, the CA-related certificates and keys have
 - certs/ca.cert.pem   the certification of CA
 - private/ca.key.pem  the key of CA
 
-##### Generate a certificate for "10000.fate.org"
+#### Generate a certificate for "10000.fate.org"
 
 1. Create the directory
 
@@ -188,27 +186,27 @@ $ openssl ca -config openssl.cnf -extensions server_cert \
 
 At this time, the certificate "broker.cert.pem" and a key "broker.key-pk8.pem" are stored in the "10000.fate.org" directory.
 
-##### Generate a certificate for "9999.fate.org"
+#### Generate a certificate for "9999.fate.org"
 
 The generation of the "9999.fate.org" certificate is consistent with the above steps, however, the Common Name in the step 4 is "9999.fate.org".
 
 The following operation assume that the certificate of "9999.fate.org" has been generated.
 
-##### Generate a certificate for "proxy.fate.org"
+#### Generate a certificate for "proxy.fate.org"
 The generation of the "proxy.fate.org" certificate is the same as the above steps, the conversion in step 3 can be omitted, and the Common Name in step 4 is "proxy.fate.org".
 
 The following operation assume that the certificate of "proxy.fate.org" has been generated.
 
-#### Deploy Apache Traffic Server
+### Deploy Apache Traffic Server
 
-##### Install Apache Traffic Server
+#### Install Apache Traffic Server
 
 1. Log in to the "proxy.fate.org" host and prepare the dependencies according to this [document](https://github.com/apache/trafficserver/tree/9.0.0).
 
 2. Download
 
 ``` bash
-$ wget https://apache.claz.org/trafficserver/trafficserver-9.0.0.tar.bz2
+$ wget https://archive.apache.org/dist/trafficserver/trafficserver-9.0.0.tar.bz2
 ```
 
 3. Install
@@ -224,7 +222,7 @@ $ echo 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/ts/lib' >> ~/.profile
 $ source ~/.profile
 ```
 
-Once the processes were finished, the traffic server will be installed in the "/opt/ts" directory and the configuration file path is "/opt/ts/etc/trafficserver/".
+Once the processes are finished, the traffic server will be installed in the "/opt/ts" directory and the configuration file path is "/opt/ts/etc/trafficserver/".
 
 ##### Start Apache Traffic Server
 
@@ -261,7 +259,7 @@ Once the processes were finished, the traffic server will be installed in the "/
     tunnel_route: 192.168.0.3:6651
  ```
  
- For a more details of the configurations, please refer to the official [documents](https://docs.trafficserver.apache.org/en/9.0.x/admin-guide/configuring-traffic-server.en.html).
+ For more details of the configurations, please refer to the official [documents](https://docs.trafficserver.apache.org/en/9.0.x/admin-guide/configuring-traffic-server.en.html).
  
  2. Start the service
  
@@ -273,9 +271,9 @@ Copy the certificate, private key, and CA certificate generated for ATS in the p
 
 #### Deploy Pulsar
 
- The details of how Pulsar deploy can be find in [pulsar_deployment_guide.md](https://github.com/FederatedAI/FATE/blob/develop-1.6-pulsar/cluster-deploy/doc/fate_on_spark/pulsar_deployment_guide.md). A user only need to add a certificate for the broker and open the security service port. The specific operations are as follows:
+ The details of how Pulsar deploy can be find in [pulsar_deployment_guide.md](https://github.com/FederatedAI/FATE/blob/master/deploy/cluster-deploy/doc/fate_on_spark/common/pulsar_deployment_guide.md). A user only need to add a certificate for the broker and open the security service port. The specific operations are as follows:
 1. Log in to the corresponding host and copy the certificate, private key, and CA certificate generated for 10000.fate.org to the "/opt/pulsar/certs" directory
-2. Modify the conf/standalone.conf file in the pulsar installation directory and append the following content
+2. Modify the conf/standalone.conf file in the pulsar installation directory and append the following content:
 
 ``` bash
 brokerServicePortTls=6651
@@ -324,7 +322,7 @@ default:
 
 ```
 
-FATE will fill in the host and proxy parameters of the cluster according to the content of the "default" field. For example, the Pulsar cluster used for synchronization with party 9999 is as follow:
+FATE will fill in the host and proxy parameters of the cluster according to the content of the "default" field. For example, the Pulsar cluster used for synchronization with party 9999 is as follows:
 
 ``` json
 
