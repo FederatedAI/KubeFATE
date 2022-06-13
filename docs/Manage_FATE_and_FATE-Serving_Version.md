@@ -1,5 +1,5 @@
 # Manage FATE and FATE-Serving Version
-In KubeFATE, we can deploy and manage multiple clusters including FATE and FATE-serving with multiple versions. We reuse the features of [Helm](https://helm.sh/), and fully compatiable with Helm Chart. It means the charts can be:
+By using one certain version of KubeFATE CLI and KubeFATE Service, we can deploy and manage multiple FATE/FATE-Serving clusters including having multiple versions. We reuse the features of [Helm](https://helm.sh/), and fully compatible with Helm Chart. It means the charts can be:
 1. Deploy directly with Helm;
 2. Can be customized to fit different requirements.
 
@@ -12,13 +12,13 @@ To set the default chart repo in kubefate.yml,
   value: "https://federatedai.github.io/KubeFATE/"
 ```
 
-In the sample config file is set to our address hosted in github. It can be customized to self repo which follow [The Chart Repository Guide](https://helm.sh/docs/topics/chart_repository/). 
+In the sample config file is set to our address hosted in GitHub. It can be customized to self repo which follow [The Chart Repository Guide](https://helm.sh/docs/topics/chart_repository/). 
 
 ## Manage charts in KubeFATE manually
 KubeFATE provides commands to manage the charts, which include:
 1. Upload a new chart;
 2. List existed charts;
-3. Delete a existed chart;
+3. Delete an existed chart;
 4. Show the details of a chart.
 
 The chart can be downloaded in each KubeFATE release, with name `fate-{release_version}.tgz`: https://github.com/FederatedAI/KubeFATE/releases
