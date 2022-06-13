@@ -10,16 +10,13 @@
 # limitations under the License.
 
 {{- if .Values.modules.nodemanager.include }}
-{{- $root := . -}}
-{{- range $nodemanager := .Values.modules.nodemanager.list }}
----
 apiVersion: v1
 kind: Service
 metadata:
   labels:
-    fateMoudle: {{ $nodemanager.name }}
-{{ include "fate.labels" $root | indent 4 }}
-  name: {{ $nodemanager.name }}
+    fateMoudle: nodemanager
+{{ include "fate.labels" . | indent 4 }}
+  name: nodemanager
 spec:
   ports:
     - name: "tcp-nodemanager"
@@ -28,8 +25,6 @@ spec:
       protocol: TCP
   clusterIP: None
   selector:
-    fateMoudle: {{ $nodemanager.name }}
-{{ include "fate.matchLabels" $root | indent 4 }}
-
-{{- end }}
+    fateMoudle: nodemanager
+{{ include "fate.matchLabels" . | indent 4 }}
 {{- end }}

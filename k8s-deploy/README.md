@@ -1,7 +1,8 @@
 # Kubernetes Deployment
-We recommend using [Kubernetes](https://kubernetes.io/) as an underlying infrastructure to create and manage the FATE clusters in a production environment. KubeFATE supports deploying multiple FATE clusters in an instance of Kubernetes with different namespaces for the purposes of development, testing and production. Considering the different IT designs and standards in each company, the actual deployment should be customized. KubeFATE is flexibile for the FATE configuration.
 
-If you focus on how to quickly use KubeFATE, please jump to [Use Scenarios](#use-scenarios).
+This document introduces the architecture, the user cases and the usage of KubeFATE. If you only care about how to use it, then you can jump to [Usage](#usage).
+
+We recommend using [Kubernetes](https://kubernetes.io/) as an underlying infrastructure to create and manage the FATE clusters in a production environment. KubeFATE supports deploying multiple FATE clusters in an instance of Kubernetes with different namespaces for the purposes of development, testing and production. Considering the different IT designs and standards in each company, the actual deployment should be customized. KubeFATE is flexible for the FATE configuration.
 
 ## High-level architecture of multiple federated learning parties
 The high-level architecture of a multi-party federated learning deployment (e.g. two parties) is shown as follows:
@@ -25,7 +26,7 @@ The high-level architecture of KubeFATE is shown as follows:
 
 The numbers depicted in the diagram:
 1. Accepting external API calls of Authentication & authorization
-2. Rendering templates via Helm;
+2. Rendering templates via Helm
 3. Storing jobs and configuration of a FATE deployment
 4. KubeFATE is running as a service of Kubernetes
 
@@ -35,15 +36,17 @@ There are two parts of KubeFATE:
 
 KubeFATE is designed to handle different versions FATE. Normally, KubeFATE CLI and KubeFATE service can work with several FATE releases.
 
-## User scenarios
+## Real-world story
 Suppose in an organization, there are two roles:
 * System Admin: who is responsible for the infrastructure management as well as Kubernetes administration
-* ML Infrastructure Operators: who is responsible for managing the machine learning cluster like FATE
+* ML Infrastructure Operators: who is responsible for managing the machine learning cluster such as FATE
 
 <div align="center">
   <img src="./images/swim.PNG">
 </div>
-### Initializing a FATE deployment
+
+## Usage
+### Prerequisite
 
 Recommended version of dependent software:
 
@@ -51,7 +54,7 @@ Kubernetes: [v1.23.5](https://github.com/kubernetes/kubernetes/releases/tag/v1.2
 
 Ingress-nginx: [v1.1.3](https://github.com/kubernetes/ingress-nginx/releases/tag/controller-v1.1.3)
 
-#### Creating role, namespace and other resource in Kubernetes
+### Creating role, namespace and other resource in Kubernetes
 The example yaml can be found in [rbac-config.yaml](./rbac-config.yaml). In this example, we create a kube-fate namespace for KubeFATE service. Resource constraints can be applied to kube-fate namespace, refer to [Kubernetes Namespace](https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/), [Configure Memory and CPU Quotas for Namespace](https://kubernetes.io/docs/tasks/administer-cluster/manage-resources/quota-memory-cpu-namespace/).
 
 Run the following command to create the namespace:
@@ -66,7 +69,7 @@ stringData:
   kubefatePassword: admin
 ```
 
-#### Preparing domain name and deploying KubeFATE in Kubernetes
+### Preparing domain name and deploying KubeFATE in Kubernetes
 Because KubeFATE service exposes RESTful APIs for external access, system admin needs to prepare a domain name for KubeFATE service. In our example, the domain name is `example.com` . Moreover, system admin should create a namespace (e.g. fate-9999) for FATE deployment.
 ```
 $ kubectl apply -f ./kubefate.yaml
@@ -74,7 +77,7 @@ $ kubectl create namespace fate-9999
 ```
 For more about the configuration of KubeFATE service, please refer to: [KubeFATE service Configuration Guild](../docs/configurations/kubefate_service_configuration.md).
 
-#### Preparing cluster configuration and deploying FATE
+### Preparing cluster configuration and deploying FATE
 After the system admin deployed the KubeFATE service and prepared the namespace for FATE. The ML Infrastructure Operator is able to start the deployment of FATE. The `config.yaml` for `kubefate` CLI is required. It contains the username and password of KubeFATE access, and the KubeFATE service URL:
 
 ```
@@ -108,7 +111,9 @@ create job success, job id=d92d7a56-7002-46a4-9363-da9c7346e05a
 ```
 *NOTE: If you want to deploy **FATE on Spark**, you can use `cluster-spark.yaml`.*
 
-#### Checking the status of "Installing Cluster" job
+Using KubeFATE to deploy FATE can support four different types, corresponding to four types of backends. They are eggroll, spark_rabbitmq, spark_pulsar and spark_local_pulsar. For more details on the different types of FATE see: [Introduction to FATE Backend Architecture](../docs/Introduction_to_Backend_Architecture.md).
+
+### Checking the status of "Installing Cluster" job
 After the above command has finished, a job is created for installing a FATE cluster. Run the command `kubefate job describe` to check the status of the job, until the "Status" turns to `Success`.
 
 ```bash
@@ -141,7 +146,7 @@ SubJobs  	nodemanager-0        ModuleStatus: Available, SubJobStatus: Success, D
          	mysql                ModuleStatus: Available, SubJobStatus: Success, Duration:    13m, StartTime:
          	2022-04-12 07:34:09, EndTime: 2022-04-12 07:47:11
 ```
-#### Describing the cluster and finding FATE access information
+### Describing the cluster and finding FATE access information
 After the `installing cluster` job succeeded, use `kubefate cluster describe` to check the FATE access information:
 ```bash
 $ kubefate cluster describe 24bb75ff-f636-4c64-8c04-1b9073f89a2f
@@ -227,11 +232,11 @@ Info        	dashboard:
             	    rollsite: Available
 ```
 
-#### Access the UI of FATEBoard and Notebook
+### Access the UI of FATEBoard and Notebook
 
 If the components of fateboard and client are installed, you can use the information `party9999.fateboard.example.com` and `party9999.notebook.example.com` obtained in the previous step to access FATEBoard and Notebook UI, and configure the resolution of these two domain names It can be opened in the browser.
 
-##### FATEBoard
+#### FATEBoard
 
  http://party9999.fateboard.example.com
 
@@ -239,9 +244,9 @@ Access to FATEBoard UI requires a login user name and password, which can be fou
 
 ![fate_board](../docs/tutorials/images/tkg_fate_board.png)
 
-##### Notebook
+#### Notebook
 
- http://party9999.fateboard.example.com
+ http://party9999.notebook.example.com
 
 ![notebook](../docs/tutorials/images/tkg_notebook.png)
 
@@ -250,7 +255,7 @@ Access to FATEBoard UI requires a login user name and password, which can be fou
 #### [Update and Delete a FATE Cluster](../docs/Update_and_Delete_a_FATE_Cluster.md)
 #### [KubeFATE Examples](examples)
 
-#### [KubeFATE Command Line User Guide](../docs/KubeFATE_command_line_user_guide.md)
+#### [KubeFATE Command Line User Guide](../docs/KubeFATE_CLI_user_guide.md)
 
 ## KubeFATE service RESTful APIs reference
 #### [API Reference](docs/KubeFATE_API_Reference_Swagger.md)

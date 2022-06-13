@@ -18,6 +18,7 @@ import (
 	"errors"
 
 	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/modules"
+	"github.com/fatih/color"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/rs/zerolog/log"
 	"github.com/urfave/cli/v2"
@@ -160,6 +161,18 @@ func ClusterInstallCommand() *cli.Command {
 			chartName, ok := m["chartName"]
 			if !ok {
 				chartName = ""
+			}
+
+			if template, err := GetValueTemplateExample(chartName.(string), chartVersion.(string)); err != nil {
+				color.Yellow("Config Warning: %s", err.Error())
+			} else {
+				skippedKeys := getSkippedKeys(m)
+				errs := ValidateYaml(template, string(clusterConfig), skippedKeys)
+				for _, err := range errs {
+					if err != nil {
+						color.Yellow("Config Warning: %s", err.Error())
+					}
+				}
 			}
 
 			var json = jsoniter.ConfigCompatibleWithStandardLibrary

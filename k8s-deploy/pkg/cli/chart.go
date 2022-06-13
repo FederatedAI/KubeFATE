@@ -52,6 +52,11 @@ type ChartResultErr struct {
 	Error string
 }
 
+type ValueResult struct {
+	Data string
+	Msg  string
+}
+
 func (c *Chart) getResult(Type int) (result interface{}, err error) {
 	switch Type {
 	case LIST:
@@ -62,6 +67,8 @@ func (c *Chart) getResult(Type int) (result interface{}, err error) {
 		result = new(ChartResultMsg)
 	case ERROR:
 		result = new(ChartResultErr)
+	case VALUE:
+		result = new(ValueResult)
 	default:
 		err = fmt.Errorf("no type %d", Type)
 	}
