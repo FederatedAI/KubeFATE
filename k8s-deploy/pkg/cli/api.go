@@ -28,6 +28,7 @@ const (
 	ERROR
 	MSG
 	JOB
+	VALUE
 )
 
 type Item interface {
@@ -159,6 +160,38 @@ func GetItem(i Item, UUID string) error {
 		return err
 	}
 	return nil
+}
+
+func GetResponse(i Item, req *Request, respType int) (msg interface{}, err error) {
+	rep, err := Send(req)
+	if err != nil {
+		return
+	}
+
+	log.Debug().Int("rep.Code", rep.Code).Msg("rep.Code")
+
+	if rep.Code != 200 {
+		msg, err = i.getResult(ERROR)
+		if err != nil {
+			return
+		}
+		err = json.Unmarshal(rep.Body, &msg)
+		if err != nil {
+			return
+		}
+		err = i.output(msg, ERROR)
+		if err != nil {
+			return
+		}
+		return
+	}
+
+	msg, err = i.getResult(respType)
+	if err != nil {
+		return
+	}
+	err = json.Unmarshal(rep.Body, &msg)
+	return
 }
 
 func GetItemList(i Item) error {

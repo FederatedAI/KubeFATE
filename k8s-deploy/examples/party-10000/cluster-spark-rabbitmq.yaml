@@ -68,7 +68,5 @@ rabbitmq:
       host: 192.168.9.1
       port: 30094
     10000:
-      host: pulsar
-      port: 6650
-      sslPort: 6651
-      
+      host: rabbitmq
+      port: 5672
