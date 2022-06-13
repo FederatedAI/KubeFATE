@@ -1,23 +1,23 @@
-# KubeFATE Command Line User Guide
+# KubeFATE CLI User Guide
 
-### What is KubeFATE command line
+## What is KubeFATE CLI
 
-KubeFATE command line is a command line tool that connects KubeFATE  service to deploy FATE on Kubernetes.
+KubeFATE CLI is a CLI tool that connects KubeFATE service to deploy FATE on Kubernetes.
 
-### Install KubeFATE command line
+## Install KubeFATE CLI
 
-Before using `kubefate` command line, you need to deploy KubeFATE  service.
+Before using `kubefate` CLI, you need to deploy KubeFATE service.
 
-#### Deploy KubeFATE service on Kubernetes
+### Deploy KubeFATE service on Kubernetes
 
-Get the code
+Get the source code from GitHub:
 
 ```bash
 git clone https://github.com/FederatedAI/KubeFATE.git
 cd KubeFATE/k8s-deploy
 ```
 
-Deploy KubeFATE service on Kubernetes
+Deploy KubeFATE service on Kubernetes:
 
 ```
 kubectl apply -f ./rbac-config.yaml
@@ -26,25 +26,25 @@ kubectl apply -f ./kubefate.yaml
 
 *A more detailed deployment process is here([deploy KubeFATE in Kubernetes](https://github.com/FederatedAI/KubeFATE/tree/master/k8s-deploy#initial-a-new-fate-deployment)).*
 
-#### Install command line
+### Install CLI
 
-`kubefate` command line is developed by go and can run easily on Linux, Mac OS and Windows.
+`kubefate` CLI is developed by go and can run easily on Linux, Mac OS and Windows.
 
 In addition to downloading and using the release package, it can also be compiled and installed on different platforms.
 
-##### Linux
+#### Linux
 
 ```bash
 go build -o bin/kubefate kubefate.go
 ```
 
-##### Mac OS
+#### Mac OS
 
 ```bash
 go build -o bin/kubefate kubefate.go
 ```
 
-##### Windows
+#### Windows
 
 ```bash
 go build -o bin/kubefate.exe -buildmode=exe kubefate.go
@@ -52,7 +52,7 @@ go build -o bin/kubefate.exe -buildmode=exe kubefate.go
 
 Add `./bin` to the 'PATH' environment variable.
 
-#### Modify configuration
+### Modify configuration
 
 Configuration in current working directory `config.yaml` file.
 
@@ -66,21 +66,19 @@ user:
 serviceurl: example.com
 ```
 
-#### Check
+### Verify the KubeFATE CLI works properly
 
 Use `kubefate version` to verify that the installation is successful.
 
-### KubeFATE command line
+## KubeFATE CLI commands
 
-If you have successfully installed `kubefate` command line, you can use these commands.
+If you have successfully installed `kubefate` CLI, you can use these commands.
 
 The `kubefate` command contains command actions and parameters.
 
-#### cluster
+### cluster operations
 
-Related operations of cluster command
-
-##### install
+#### install
 
 Install a cluster
 
@@ -100,7 +98,9 @@ If it runs successfully, a job_UUID will be returned. The cluster installation s
 
 *`<cluster_config_yaml>` means `cluster.yaml` `cluster- spart.yaml`  `cluster- serving.yaml` and so on.*
 
-##### update
+Note that although this command can return a job UUID, it doesn't mean that the job runs successfully.
+
+#### update
 
 Update a cluster
 
@@ -117,7 +117,7 @@ OPTIONS:
 
 If it runs successfully, a job_UUID will be returned. According to the job_UUID, the cluster update status can be obtained. 
 
-##### delete
+#### delete
 
 Delete a cluster
 
@@ -126,7 +126,7 @@ kubefate cluster delete <cluster_uuid>
 ```
 If it runs successfully, a job_UUID  will be returned. According to the job_UUID, the cluster deletion status can be obtained.
 
-##### list
+#### list
 
 Get the list of currently running clusters.
 
@@ -139,7 +139,7 @@ OPTIONS:
    --all, -A   List all clusters including deleted ones (default: false)
    --help, -h  show help (default: false)
 ```
-##### describe
+#### describe
 
 Get the description information of the given cluster.
 
@@ -147,7 +147,7 @@ Get the description information of the given cluster.
 kubefate cluster describe <cluster_uuid>
 ```
 
-##### logs
+#### logs
 
 Gets the component log for a given cluster. (If no component is specified, all logs will be obtained.)
 
@@ -170,11 +170,11 @@ rwise 10, if a selector is provided. (default: -1)
    --limit-bytes value  Maximum bytes of logs to return. Defaults to no limit. (default: 0)
    --help, -h           show help (default: false)
 ```
-#### job
+### job
 
 Through the install, update and delete of the cluster, the corresponding jobs will be generated.
 
-##### list
+#### list
 
 Get the list of all jobs
 
@@ -182,7 +182,7 @@ Get the list of all jobs
 kubefate job list
 ```
 
-##### stop
+#### stop
 
 Cancel the Running job
 
@@ -192,7 +192,7 @@ kubefate job stop <job_uuid>
 
 *This only works for Running jobs of type ClusterInstall*
 
-##### describe
+#### describe
 
 Get the description information of the given job
 
@@ -200,7 +200,7 @@ Get the description information of the given job
 kubefate job describe <job_uuid>
 ```
 
-##### delete
+#### delete
 
 Delete the record of the given job
 
@@ -208,11 +208,11 @@ Delete the record of the given job
 kubefate job delete <job_uuid>
 ```
 
-#### chart 
+### chart 
 
 Chart is the management of the chart needed to install cluster.
 
-##### upload
+#### upload
 
 Upload chart file to KubeFATE service. The chart file must be generated by the `helm package`
 
@@ -220,7 +220,7 @@ Upload chart file to KubeFATE service. The chart file must be generated by the `
 kubefate chart upload -f <chart_file>
 ```
 
-##### list
+#### list
 
 Get the chart list of existing KubeFATE services.
 
@@ -228,7 +228,7 @@ Get the chart list of existing KubeFATE services.
 kubefate chart list
 ```
 
-##### delete
+#### delete
 
 Delete chart file from KubeFATE service.
 
@@ -236,9 +236,9 @@ Delete chart file from KubeFATE service.
 kubefate chart delete <chart_uuid>
 ```
 
-#### namespace
+### namespace
 
-##### list
+#### list
 
 Get the namespace list of Kubernetes.
 
@@ -246,9 +246,9 @@ Get the namespace list of Kubernetes.
 kubefate namespace list
 ```
 
-#### user
+### user
 
-##### list
+#### list
 
 Get the user list of KubeFATE service.
 
@@ -256,7 +256,7 @@ Get the user list of KubeFATE service.
 kubefate user list
 ```
 
-##### describe
+#### describe
 
 Obtain the specific user description information of KubeFATE service.
 
@@ -264,26 +264,23 @@ Obtain the specific user description information of KubeFATE service.
 kubefate user describe <user_uuid>
 ```
 
-#### version
+### version
 
-View the corresponding version of KubeFATE service of the current command line and connection.
+View the corresponding version of KubeFATE service of the current CLI and connection.
 
 ```bash
 kubefate version
 ```
 
-#### help
+### help
 
-Get command line help.
+Get CLI help.
 
 ```bash
 kubefate help
 ```
 
-All commands can be add OPTIONS of  `--help` to view help information.
+All commands supports adding `--help` to show help information.
 
 
-
-
-
-If you have any questions, you can get help through issue.
+If you have any questions with regarding to KubeFATE CLI, you can get help through creating an issue [here](https://github.com/FederatedAI/KubeFATE/issues/new/choose).

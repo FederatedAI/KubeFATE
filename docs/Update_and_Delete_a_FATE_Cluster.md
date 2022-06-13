@@ -1,8 +1,8 @@
 # Update and Delete a FATE Cluster
-Besides install a new cluster, KubeFATE provides command to update, delete and describe a cluster. And the cluster being managed, not only FATE, but also FATE-Serving, even other clusters to add supports with chart(Refer to [Manage FATE and FATE-Serving Version](./Manage_FATE_and_FATE-Serving_Version.md)).
+In addition to installing a new cluster, KubeFATE provides command to update, delete and describe a cluster. And the cluster being managed, not only FATE, but also FATE-Serving, even other clusters to add supports with chart(Refer to [Manage FATE and FATE-Serving Version](./Manage_FATE_and_FATE-Serving_Version.md)).
 
 ## Show the detail of a cluster
-With the command `kubefate cluster describe ${cluster_id}`, the details of cluster deployed can be shown, including information of how to access the cluster.
+With the command `kubefate cluster describe ${cluster_id}`, the details of cluster deployed can be seen, including information of how to access the cluster.
 
 ```
 $ kubefate cluster ls
@@ -100,6 +100,8 @@ UUID                                    NAME            NAMESPACE       REVISION
 ```
 
 and find the nodemanager has been scaled out to 2 instances. And the revision have been updated to 2. 
+
+**Note: The Update cluster functionality will not work when there is no change in the cluster.yaml file. For example, only change the helm chart will not make update happen.**
 
 ## Delete a cluster
 To delete a cluster can be use command `kubefate cluster delete ${cluster_id}`
