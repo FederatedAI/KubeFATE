@@ -18,7 +18,7 @@ KubeFATE is responsible for:
 * Day 2 operations: Provides RESTful APIs to manage FATE clusters
 
 ## High-level architecture of KubeFATE
-The high-level architecture of KubeFATE is shwon as follows:
+The high-level architecture of KubeFATE is shown as follows:
 <div align="center">
   <img src="./images/kfha.PNG">
 </div>
