@@ -246,7 +246,7 @@ Access to FATEBoard UI requires a login user name and password, which can be fou
 
 #### Notebook
 
- http://party9999.fateboard.example.com
+ http://party9999.notebook.example.com
 
 ![notebook](../docs/tutorials/images/tkg_notebook.png)
 
