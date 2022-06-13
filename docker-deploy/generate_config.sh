@@ -51,11 +51,11 @@ GenerateConfig() {
 
 		eval nodemanager_ip=nodemanager
 		eval nodemanager_port=4671
-		eval nodemanager_port_db=9461
+		eval nodemanager_port_db=4671
 
 		eval clustermanager_ip=clustermanager
 		eval clustermanager_port=4670
-		eval clustermanager_port_db=9460
+		eval clustermanager_port_db=4670
 
 		eval proxy_ip=rollsite
 		eval proxy_port=9370
