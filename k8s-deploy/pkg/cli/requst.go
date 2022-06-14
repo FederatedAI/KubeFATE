@@ -31,8 +31,12 @@ import (
 func getToken() (string, error) {
 
 	serviceurl := viper.GetString("serviceurl")
-
-	loginUrl := "http://" + serviceurl + "/v1/user/login"
+	safeconnect := viper.GetString("safeconnect")
+	scheme := "http://"
+	if safeconnect == "true" {
+		scheme = "https://"
+	}
+	loginUrl := scheme + serviceurl + "/v1/user/login"
 
 	login := map[string]string{
 		"username": viper.GetString("user.username"),
@@ -101,7 +105,12 @@ func Send(r *Request) (*Response, error) {
 	if serviceUrl == "" {
 		serviceUrl = "localhost:8080/"
 	}
-	Url := "http://" + serviceUrl + "/" + apiVersion + r.Path
+	safeconnect := viper.GetString("safeconnect")
+	scheme := "http://"
+	if safeconnect == "true" {
+		scheme = "https://"
+	}
+	Url := scheme + serviceUrl + "/" + apiVersion + r.Path
 	body := bytes.NewReader(r.Body)
 	log.Debug().Str("Type", r.Type).Str("url", Url).Str("Body", string(r.Body)).Msg("Request")
 	request, err := http.NewRequest(r.Type, Url, body)
