@@ -94,6 +94,7 @@ serviceurl: example.com
 |log        |scalars |命令行的log级别.debug级别包含REST通信信息                    |
 |user       |mappings|KubeFATE的认证用户名、密码                                  |
 |serviceurl |scalars |KubeFATE服务使用的域名                                     |
+|safeconnect|scalars |是否使用https访问KubeFATE服务URL                       |
 
 我们的配置样例里还包含了`cluster.yaml`，是FATE集群的部署计划。更多自定义内容参考：[FATE Cluster Configuration Guild](../docs/configurations/FATE_cluster_configuration.md)
 
