@@ -9,7 +9,9 @@ The nodes (target nodes) to install FATE must meet the following requirements:
 1. A Linux host
 2. Docker: 18+
 3. Docker-Compose: 1.24+
-4. Network connection to Internet to pull container images from Docker Hub. If network connection to Internet is not available, consider to set up [Harbor as a local registry](../registry/README.md) or use [offline images](https://github.com/FederatedAI/FATE/tree/master/docker-build).
+4. The deployment machine have access to the Internet, so the hosts can communicate with each other;
+5. Network connection to Internet to pull container images from Docker Hub. If network connection to Internet is not available, consider to set up [Harbor as a local registry](../registry/README.md) or use [offline images](https://github.com/FederatedAI/FATE/tree/master/build/docker-build).
+6. A host running FATE is recommended to be with 8 CPUs and 16G RAM.
 
 ## Deploying FATE
 
@@ -40,7 +42,7 @@ RegistryURI=192.168.10.1/federatedai
 ...
 ```
 
-**NOTE:** For Chinese user who has difficulty to access docker hub, you can set `RegistryURI` to `hub.c.163.com` to use the mirror of the registry within China.
+**NOTE:** For Chinese user who has difficulty to access docker hub, you can set `RegistryURI` to `hub.c.163.com` to use the mirror of the registry within China, we have already pushed the images to the 163 registry.
 
 ### Configuring multiple parties of FATE
 
@@ -50,7 +52,7 @@ The following steps illustrate how to generate necessary configuration files and
 
 Before deploying the FATE system, multiple parties should be defined in the configuration file: `docker-deploy/parties.conf`.
 
-In the following sample of `docker-deploy/parties.conf` , two parities are specified by id as `10000` and `9999`. Their cluster are going to be deployed on hosts with IP addresses of *192.168.7.1* and *192.168.7.2*. By default, to save time for downloading images, KubeFATE will use images without neural network dependencies, set the `enabled_nn` to `true` in "parties.conf" if neural network workflow is required.
+In the following sample of `docker-deploy/parties.conf` , two parities are specified by id as `10000` and `9999`. Their clusters are going to be deployed on hosts with IP addresses of *192.168.7.1* and *192.168.7.2*. By default, to save time for downloading images, KubeFATE will use images without neural network dependencies, set the `enabled_nn` to `true` in "parties.conf" if neural network workflow is required.
 
 ```bash
 user=fate
@@ -85,8 +87,13 @@ serving_admin_username=admin
 serving_admin_password=admin
 ```
 
-Spark was introduced in FATE v1.5 as the underlying computing backend, for more details
-about FATE on Spark please refer to this [document](../docs/FATE_On_Spark.md).
+* For more details about FATE on Spark with Rebbitmq please refer to this [document](../docs/FATE_On_Spark.md).
+* For more details about FATE on Spark with Pulsar, refer to this [document](../docs/FATE_On_Spark_With_Pulsar.md)
+* For more details about FATE on Spark with local pulsar, refer to this [document](placeholder)
+
+Using Docker-compose to deploy FATE can support four different types, corresponding to four types of backends. They are eggroll, spark_rabbitmq, spark_pulsar and spark_local_pulsar. For more details on the different types of FATE see: [Introduction to FATE Backend Architecture](../docs/Introduction_to_Backend_Architecture.md).
+
+**Note**: Exchange components are not deployed by default. For deployment, users can fill in the server IP into the `exchangeip` of the above configuration file. The default listening port of this component is 9371.
 
 On the host running FATE, the non-root user needs the owner permission of `/data/projects/fate` folder and Docker permission. No other action is required if the user is root.
 
@@ -112,7 +119,7 @@ drwxr-xr-x. 2 fate docker 6 May 27 00:51 fate
 
 By default, the exchange service is not deployed. The exchange service runs on port 9371. If an exchange (co-locates on the host of the same party or runs standalone) service is needed, update the value of `exchangeip` to the IP address of the desired host.
 
-After editting the above configuration file, use the following commands to generate configuration of target hosts.  
+After editing the above configuration file, use the following commands to generate configuration of target hosts.
 
 ```bash
 cd docker-deploy
@@ -125,7 +132,7 @@ Now, tar files have been generated for each party including the exchange node (p
 
 **Note:** Before running the below commands, all target hosts must
 
-* allow password-less SSH access with SSH key;
+* allow password-less SSH access with SSH key (Otherwise we will need to enter the password for each host for multiple times).
 * meet the requirements specified in [Prerequisites](#Prerequisites).
 
 To deploy FATE to all configured target hosts, use the below command:
