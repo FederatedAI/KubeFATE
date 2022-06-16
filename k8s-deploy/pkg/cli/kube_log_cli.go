@@ -135,7 +135,12 @@ func GetModuleLog(uuid, args string) (string, error) {
 	if serviceUrl == "" {
 		serviceUrl = "localhost:8080/"
 	}
-	Url := "http://" + serviceUrl + "/" + apiVersion + r.Path + fmt.Sprintf("/%s?%s", uuid, args)
+	safeconnect := viper.GetString("safeconnect")
+	scheme := "http://"
+	if safeconnect == "true" {
+		scheme = "https://"
+	}
+	Url := scheme + serviceUrl + "/" + apiVersion + r.Path + fmt.Sprintf("/%s?%s", uuid, args)
 
 	body := bytes.NewReader(r.Body)
 	log.Debug().Str("Type", r.Type).Str("url", Url).Msg("Request")
@@ -206,10 +211,15 @@ func GetModuleLogFollow(uuid, args string) error {
 	if serviceUrl == "" {
 		serviceUrl = "localhost:8080/"
 	}
-	Url := "ws://" + serviceUrl + "/" + apiVersion + r.Path + fmt.Sprintf("/%s/ws?%s", uuid, args)
+	safeconnect := viper.GetString("safeconnect")
+	scheme := "ws://"
+	if safeconnect == "true" {
+		scheme = "wss://"
+	}
+	Url := scheme + serviceUrl + "/" + apiVersion + r.Path + fmt.Sprintf("/%s/ws?%s", uuid, args)
 	log.Debug().Str("Url", Url).Msg("ok")
 
-	config, err := websocket.NewConfig(Url, "http://"+serviceUrl+"/")
+	config, err := websocket.NewConfig(Url, scheme+serviceUrl+"/")
 	config.Header.Add("user-agent", "kubefate")
 	token, err := getToken()
 	if err != nil {

@@ -160,7 +160,12 @@ func ChartCreateCommand() *cli.Command {
 			if serviceUrl == "" {
 				serviceUrl = "localhost:8080/"
 			}
-			Url := "http://" + serviceUrl + "/" + apiVersion + r.Path
+			safeconnect := viper.GetString("safeconnect")
+			scheme := "http://"
+			if safeconnect == "true" {
+				scheme = "https://"
+			}
+			Url := scheme + serviceUrl + "/" + apiVersion + r.Path
 			body := bytes.NewReader(r.Body)
 			log.Debug().Str("Type", r.Type).Str("url", Url).Msg("Request")
 			request, err := http.NewRequest(r.Type, Url, body)
