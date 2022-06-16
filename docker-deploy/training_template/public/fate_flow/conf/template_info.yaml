@@ -1,0 +1,10 @@
+# base dir: fateflow
+template_path:
+  fate_examples: ../examples
+  fateflow_examples: examples
+template_data:
+  base_dir: ../examples/data
+  min_data: ['breast_hetero_guest.csv', 'breast_hetero_host.csv', 'default_credit_hetero_guest.csv', 'default_credit_hetero_host.csv']
+
+delete_path:
+  fateflow_examples: [data]
