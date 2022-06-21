@@ -130,7 +130,12 @@ func JobStopCommand() *cli.Command {
 			if serviceURL == "" {
 				serviceURL = "localhost:8080/"
 			}
-			URL := "http://" + serviceURL + "/" + apiVersion + r.Path + "/" + uuid + "?jobStatus=stop"
+			safeconnect := viper.GetString("safeconnect")
+			scheme := "http://"
+			if safeconnect == "true" {
+				scheme = "https://"
+			}
+			URL := scheme + serviceURL + "/" + apiVersion + r.Path + "/" + uuid + "?jobStatus=stop"
 			body := bytes.NewReader(r.Body)
 			log.Debug().Str("Type", r.Type).Str("url", URL).Msg("Request")
 			request, err := http.NewRequest(r.Type, URL, body)
