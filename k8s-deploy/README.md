@@ -96,7 +96,7 @@ safeconnect: false
 |log        |scalars |The log level of command line.                                    |
 |user       |mappings|User name and password when logging into KubeFATE service.        |
 |serviceurl |scalars |KubeFATE service's ingress domain name, defined in kubefate.yaml. |
-|safeconnect|scalars |Whether use HTTPS to connect the KubeFATE service URL.            |
+|safeconnect|scalars |Whether use HTTPS to connect the KubeFATE service URL. You can refer to: [kubefate_service_tls_enable](../docs/configurations/kubefate_service_tls_enable.md)           |
 
 Create a `cluster.yaml` for FATE cluster configuration. The details of configuration can be found here: [FATE Cluster Configuration Guide](../docs/configurations/FATE_cluster_configuration.md). 
 

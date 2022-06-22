@@ -74,6 +74,8 @@ rules:
 | host    | Defining the domain name of ingress. |
 | backend | Backend depends on KubeFATE service. |
 
+You can config the nginx-ingress to enable the service with TLS. More info please refer to [kubefate_service_tls_enable](./kubefate_service_tls_enable.md)
+
 ## MySQL
 ### Deployment
 ```
