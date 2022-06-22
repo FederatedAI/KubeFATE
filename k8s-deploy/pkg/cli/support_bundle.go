@@ -15,23 +15,17 @@
 package cli
 
 import (
-	"archive/zip"
-	"bytes"
 	"errors"
 	"fmt"
-	"io/ioutil"
-	"os"
-	"os/exec"
-	"path"
-	"strings"
 
 	"github.com/AlecAivazis/survey/v2"
+	client "github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/utils/k8sclient"
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/utils/supportbundle"
 	"github.com/urfave/cli/v2"
 )
 
-const (
-	bundleDir         = "./"
-	temporaryFilesDir = "./kubefate-supportbundle"
+var (
+	bundler *supportbundle.Bundler
 )
 
 func SupportBundleCommand() *cli.Command {
@@ -56,228 +50,132 @@ func SupportBundleCollectCommand() *cli.Command {
 				Value:   200,
 				Usage:   "Specify how many rows to record.",
 			},
+			&cli.StringFlag{
+				Name:    "kubeconfig",
+				Aliases: []string{"c"},
+				Value:   "",
+				Usage:   "Specify the kubeconfig.",
+			},
+			&cli.StringFlag{
+				Name:  "collectDir",
+				Value: "./kubefate-supportbundle",
+				Usage: "Specify where to save temporary data.",
+			},
+			&cli.StringFlag{
+				Name:  "packDir",
+				Value: "./",
+				Usage: "Specify where to pack zip file.",
+			},
 		},
 		Usage: "Collect data",
 		Action: func(c *cli.Context) error {
 			tail := c.Int("tail")
-			return Collect(tail)
+			kubeconfig := c.String("kubeconfig")
+			if kubeconfig == "" {
+				kubeconfig = client.GetKubeconfig()
+			}
+			collectDir := c.String("collectDir")
+			packDir := c.String("packDir")
+			if err := initBundler(kubeconfig, collectDir, packDir); err != nil {
+				return err
+			}
+			namespaceList, err := bundler.Client.GetNamespaceList()
+			if err != nil {
+				return err
+			}
+			var namespaces []string
+			namespacePrompt := &survey.MultiSelect{
+				Message: "Choose namespaces to troubleShooting:",
+				Options: client.NamespaceListToNames(namespaceList),
+				Default: []string{"kube-fate"},
+			}
+			survey.AskOne(namespacePrompt, &namespaces)
+
+			for _, namespace := range namespaces {
+				err := CollectInNamespace(bundler, namespace, tail)
+				if err != nil {
+					fmt.Println(err)
+				}
+			}
+			fmt.Printf("You can attach additional files about this issue into %s\n", collectDir)
+			return nil
 		},
 	}
 }
 
 func SupportBundlePackCommand() *cli.Command {
 	return &cli.Command{
-		Name:  "pack",
-		Flags: []cli.Flag{},
+		Name: "pack",
+		Flags: []cli.Flag{
+			&cli.IntFlag{
+				Name:    "tail",
+				Aliases: []string{"t"},
+				Value:   200,
+				Usage:   "Specify how many rows to record.",
+			},
+			&cli.StringFlag{
+				Name:    "kubeconfig",
+				Aliases: []string{"c"},
+				Value:   "",
+				Usage:   "Specify the kubeconfig.",
+			},
+			&cli.StringFlag{
+				Name:  "collectDir",
+				Value: "./kubefate-supportbundle",
+				Usage: "Specify where to save temporary data.",
+			},
+			&cli.StringFlag{
+				Name:  "packDir",
+				Value: "./",
+				Usage: "Specify where to pack zip file.",
+			},
+		},
 		Usage: "Pack data",
 		Action: func(c *cli.Context) error {
-			return Pack()
+			kubeconfig := c.String("kubeconfig")
+			if kubeconfig == "" {
+				kubeconfig = client.GetKubeconfig()
+			}
+			collectDir := c.String("collectDir")
+			packDir := c.String("packDir")
+			if err := initBundler(kubeconfig, collectDir, packDir); err != nil {
+				return err
+			}
+
+			privacyAck := true
+			privacyPrompt := &survey.Confirm{
+				Message: "This program collects some data, please ensure that there is no any privacy issue.\n Enter y if you're willing to share these collected data with us.",
+			}
+			survey.AskOne(privacyPrompt, &privacyAck)
+			if !privacyAck {
+				return errors.New("please acknowledge the privacy agreement")
+			}
+			return bundler.Pack()
 		},
 	}
 }
 
-// RunCommand runs command and returns output
-func RunCommand(cmd string) ([]byte, error) {
-	c := exec.Command("bash", "-c", cmd)
-	return c.CombinedOutput()
-}
-
-type File struct {
-	Name string
-	Body []byte
-}
-
-// NewFile creates struct File with space-trimed and dash-joined name
-func NewFile(name string, body []byte) *File {
-	group := strings.Split(name, " ")
-	newGroup := make([]string, 0, len(group))
-	for _, s := range group {
-		if s != "" {
-			newGroup = append(newGroup, s)
-		}
-	}
-	newName := strings.Join(newGroup, "-")
-	return &File{newName, body}
-}
-
-func kubectlLogs(namespace, pod string, tail int) ([]byte, string, error) {
-	cmd := fmt.Sprintf("kubectl logs --tail=%d -n %s %s ", tail, namespace, pod)
-	log, err := RunCommand(cmd)
-	return log, cmd, err
-}
-
-// getShellOutputColumns returns values with the given column name
-func getShellOutputColumns(cmd, column string) ([][]byte, error) {
-	cmdFirstRow := fmt.Sprintf("%s | awk '{if (NR==1) print}'", cmd)
-	outputFirstRow, err := RunCommand(cmdFirstRow)
+func CollectInNamespace(b *supportbundle.Bundler, namespace string, tail int) (err error) {
+	podList, err := b.Client.GetPodList(namespace)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	columnIdx := -1
-	for idx, c := range bytes.Split(outputFirstRow, []byte(" ")) {
-		if string(c) == column {
-			columnIdx = idx
-		}
-	}
-	if columnIdx < 0 {
-		return nil, errors.New("column not found")
-	}
-	cmdColumn := fmt.Sprintf("%s | awk '{if (NR>1) {print $%d}}'", cmd, columnIdx+1)
-	outputColumn, err := RunCommand(cmdColumn)
-	if err != nil {
-		return nil, err
-	}
-	return bytes.Split(bytes.Trim(outputColumn, "\n"), []byte("\n")), nil
-}
-
-func collectPods() (files []*File, err error) {
-	cmdPods := "kubectl get pods -A"
-	podsNames, err := getShellOutputColumns(cmdPods, "NAME")
-	if err != nil {
-		return
-	}
-
-	var names []string
-	for _, name := range podsNames {
-		names = append(names, string(name))
-	}
-
-	pods := []string{}
+	var pods []string
 	podsPrompt := &survey.MultiSelect{
-		Message: "What pods do you want to share logs with us:",
-		Options: names,
+		Message: fmt.Sprintf("In namespace %s, choose pods to troubleShooting:", namespace),
+		Options: client.PodListToNames(podList),
 	}
 	survey.AskOne(podsPrompt, &pods)
-
-	for _, pod := range pods {
-		log, cmd, err := kubectlLogs("kube-fate", string(pod), 200)
-		if err != nil {
-			return nil, err
-		}
-		files = append(files, NewFile(cmd, log))
-	}
-	return
+	return b.CollectNamespace(namespace, tail, pods...)
 }
 
-// collectKubeFATE returns files related to KubeFATE
-func collectKubeFATE(tail int) (files []*File, err error) {
-	cmdAll := "kubectl get all -n kube-fate"
-	outputAll, err := RunCommand(cmdAll)
+func initBundler(kubeconfig, collectDir, packDir string) (err error) {
+	bundler, err = supportbundle.NewBundler(kubeconfig, collectDir, packDir)
 	if err != nil {
 		return
 	}
-	files = append(files, NewFile(cmdAll, outputAll))
-
-	cmdPods := "kubectl get pods  -n kube-fate"
-	podsNames, err := getShellOutputColumns(cmdPods, "NAME")
-	if err != nil {
-		return
-	}
-	for _, pod := range podsNames {
-		log, cmd, err := kubectlLogs("kube-fate", string(pod), tail)
-		if err != nil {
-			return nil, err
-		}
-		files = append(files, NewFile(cmd, log))
+	if bundler == nil {
+		err = errors.New("supportbundler not initialized sucessfully")
 	}
 	return
-}
-
-// saveFile saves a file
-func saveFile(file *File, dir string) error {
-	f, err := os.Create(path.Join(dir, file.Name))
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-	f.Write(file.Body)
-	return nil
-}
-
-// zipDir packs a directory into a zip file
-func zipDir(dir, dst string) error {
-	files, err := ioutil.ReadDir(dir)
-	if err != nil {
-		return err
-	}
-	fileDst, _ := os.Create(dst)
-	w := zip.NewWriter(fileDst)
-	defer w.Close()
-	for _, file := range files {
-		fw, err := w.Create(file.Name())
-		if err != nil {
-			return err
-		}
-		fileContent, err := ioutil.ReadFile(path.Join(dir, file.Name()))
-		if err != nil {
-			return err
-		}
-		_, err = fw.Write(fileContent)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-// pathExists check if path exists
-func pathExists(path string) (bool, error) {
-	_, err := os.Stat(path)
-	if err == nil {
-		return true, nil
-	}
-	if os.IsNotExist(err) {
-		return false, nil
-	}
-	return false, err
-}
-
-// Collect gathers and saves information into files
-func Collect(tail int) error {
-	var files []*File
-
-	deployMethod := ""
-	deployPrompt := &survey.Select{
-		Message: "Choose way of deploy:",
-		Options: []string{"k8s", "docker"},
-		Default: "k8s",
-	}
-	survey.AskOne(deployPrompt, &deployMethod)
-
-	if f, err := collectKubeFATE(tail); err != nil {
-		fmt.Println(err)
-		return err
-	} else {
-		files = append(files, f...)
-	}
-
-	if exist, _ := pathExists(temporaryFilesDir); !exist {
-		os.MkdirAll(temporaryFilesDir, os.ModePerm)
-	}
-	for _, file := range files {
-		if err := saveFile(file, temporaryFilesDir); err != nil {
-			fmt.Println(err)
-		}
-	}
-	fmt.Printf("You can attach additional files about this issue into %s\n", temporaryFilesDir)
-	return nil
-}
-
-// Pack packs files into one zip file and removes the temporary directory
-func Pack() error {
-	privacyAck := true
-	privacyPrompt := &survey.Confirm{
-		Message: "This program collects some data, please ensure that there is no any privacy issue.\n Enter y if you're willing to share these collected data with us.",
-	}
-	survey.AskOne(privacyPrompt, &privacyAck)
-	if !privacyAck {
-		return errors.New("Please acknowledge the privacy agreement")
-	}
-	dst := path.Join(bundleDir, "supportbundle.zip")
-	err := zipDir(temporaryFilesDir, dst)
-	if err != nil {
-		return err
-	}
-	err = os.RemoveAll(temporaryFilesDir)
-	return err
 }
