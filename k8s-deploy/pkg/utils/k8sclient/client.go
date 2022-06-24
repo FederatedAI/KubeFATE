@@ -251,7 +251,7 @@ func SprintlnServices(items []*Service) string {
 	table.AddRow("Name", "Type", "ClusterIP", "ExternalIPs", "Ports", "CreationTime")
 	for _, r := range items {
 		table.AddRow(r.Name, r.Type, r.ClusterIP,
-			r.ExternalIPs, r.CreationTimestamp.Format(time.RFC3339))
+			r.ExternalIPs, r.Ports, r.CreationTimestamp.Format(time.RFC3339))
 	}
 	table.AddRow("")
 	return fmt.Sprintln(table)
@@ -264,11 +264,19 @@ func (c *Client) GetIngressList(namespace string) (*networkingv1.IngressList, er
 
 // ToIngress tansforms networkingv1.Ingress to Ingress
 func ToIngress(i *networkingv1.Ingress) *Ingress {
+	// Only first Host from Spec.Rules and first IP Address
+	// from Status.LoadBalancer.Ingress are extracted here.
+	p := i.Status.LoadBalancer.Ingress[0].Ports
+	ports := make([]string, 0, len(p))
+	for _, portStatus := range p {
+		ports = append(ports, fmt.Sprintf("%d/%s", portStatus.Port, portStatus.Protocol))
+	}
 	return &Ingress{
 		Name:              i.Name,
 		Class:             *i.Spec.IngressClassName,
 		Host:              i.Spec.Rules[0].Host,
 		Address:           i.Status.LoadBalancer.Ingress[0].IP,
+		Ports:             ports,
 		CreationTimestamp: i.CreationTimestamp.Time,
 	}
 }
@@ -292,7 +300,8 @@ func SprintlnIngresses(items []*Ingress) string {
 	table.AddRow("Ingresses")
 	table.AddRow("Name", "Class", "Host", "Address", "Ports", "CreationTime")
 	for _, r := range items {
-		table.AddRow(r.Name, r.Class, r.Host, r.Ports, r.CreationTimestamp.Format(time.RFC3339))
+		table.AddRow(r.Name, r.Class, r.Host, r.Address,
+			r.Ports, r.CreationTimestamp.Format(time.RFC3339))
 	}
 	table.AddRow("")
 	return fmt.Sprintln(table)
@@ -325,11 +334,19 @@ func (c *Client) GetContainersFromPod(p *v1.Pod, tail int) ([]*Container, error)
 		status := p.Status.ContainerStatuses[i]
 		log, err := c.GetLog(p.Namespace, p.Name, container.Name, tail)
 		if err != nil {
-			continue
+			log = "<error>"
+		}
+		var state string
+		if status.State.Running != nil {
+			state = "Running"
+		} else if status.State.Waiting != nil {
+			state = "Waiting"
+		} else if status.State.Terminated != nil {
+			state = "Terminated"
 		}
 		_container := &Container{
 			Name:        container.Name,
-			Status:      status.State.String(),
+			Status:      state,
 			Ready:       status.Ready,
 			Image:       container.Image,
 			ImageID:     status.ImageID,
@@ -349,6 +366,13 @@ func (c *Client) DescribePod(namespace, podName string, tail int) (*Pod, error) 
 	}
 	pod := ToPod(p)
 	pod.Containers, _ = c.GetContainersFromPod(p, tail)
+	var ready int
+	for _, c := range pod.Containers {
+		if c.Ready {
+			ready++
+		}
+	}
+	pod.Ready = fmt.Sprintf("%d/%d", ready, len(pod.Containers))
 	return pod, nil
 }
 

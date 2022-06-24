@@ -76,8 +76,9 @@ func SupportBundleCollectCommand() *cli.Command {
 			}
 			collectDir := c.String("collectDir")
 			packDir := c.String("packDir")
-			if err := initBundler(kubeconfig, collectDir, packDir); err != nil {
-				return err
+			bundler, err := supportbundle.NewBundler(kubeconfig, collectDir, packDir)
+			if err != nil || bundler == nil {
+				return errors.New("supportbundler not initialized sucessfully. " + err.Error())
 			}
 			namespaceList, err := bundler.Client.GetNamespaceList()
 			if err != nil {
@@ -107,18 +108,6 @@ func SupportBundlePackCommand() *cli.Command {
 	return &cli.Command{
 		Name: "pack",
 		Flags: []cli.Flag{
-			&cli.IntFlag{
-				Name:    "tail",
-				Aliases: []string{"t"},
-				Value:   200,
-				Usage:   "Specify how many rows to record.",
-			},
-			&cli.StringFlag{
-				Name:    "kubeconfig",
-				Aliases: []string{"c"},
-				Value:   "",
-				Usage:   "Specify the kubeconfig.",
-			},
 			&cli.StringFlag{
 				Name:  "collectDir",
 				Value: "./kubefate-supportbundle",
@@ -132,19 +121,14 @@ func SupportBundlePackCommand() *cli.Command {
 		},
 		Usage: "Pack data",
 		Action: func(c *cli.Context) error {
-			kubeconfig := c.String("kubeconfig")
-			if kubeconfig == "" {
-				kubeconfig = client.GetKubeconfig()
-			}
 			collectDir := c.String("collectDir")
 			packDir := c.String("packDir")
-			if err := initBundler(kubeconfig, collectDir, packDir); err != nil {
-				return err
-			}
-
+			bundler = &supportbundle.Bundler{CollectDir: collectDir, PackDir: packDir}
 			privacyAck := true
 			privacyPrompt := &survey.Confirm{
-				Message: "This program collects some data, please ensure that there is no any privacy issue.\n Enter y if you're willing to share these collected data with us.",
+				Message: "This program collects some data, please ensure that" +
+					" there is no any privacy issue.\n Enter y" +
+					" if you're willing to share these collected data with us.",
 			}
 			survey.AskOne(privacyPrompt, &privacyAck)
 			if !privacyAck {
@@ -167,15 +151,4 @@ func CollectInNamespace(b *supportbundle.Bundler, namespace string, tail int) (e
 	}
 	survey.AskOne(podsPrompt, &pods)
 	return b.CollectNamespace(namespace, tail, pods...)
-}
-
-func initBundler(kubeconfig, collectDir, packDir string) (err error) {
-	bundler, err = supportbundle.NewBundler(kubeconfig, collectDir, packDir)
-	if err != nil {
-		return
-	}
-	if bundler == nil {
-		err = errors.New("supportbundler not initialized sucessfully")
-	}
-	return
 }
