@@ -46,7 +46,7 @@ func NewBundler(kubeconfig, collectDir, packDir string) (*Bundler, error) {
 	return &Bundler{kubeconfig, collectDir, packDir, c}, nil
 }
 
-// pathExists check if path exists
+// pathExists checks if path exists
 func pathExists(path string) (bool, error) {
 	_, err := os.Stat(path)
 	if err == nil {
