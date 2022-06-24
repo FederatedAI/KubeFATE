@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/fatih/color"
 	"sigs.k8s.io/yaml"
 )
 
@@ -141,12 +142,15 @@ func Contains(element interface{}, set interface{}) bool {
 }
 
 // compareTwoTrees recursively compares the two trees, walking through the nodes not skipped.
-func compareTwoTrees(rootTemp, rootTest *TreeNode, testLines, skippedKeys []string) (errs []error) {
+func compareTwoTrees(rootTemp, rootTest *TreeNode,
+	testLines, skippedKeys []string) (errs []error) {
 	valueTemp, valueTest := rootTemp.value, rootTest.value
 	typeTemp, typeTest := reflect.TypeOf(valueTemp), reflect.TypeOf(valueTest)
 	if typeTemp != typeTest {
 		route := strings.Join(rootTest.route, "/")
-		errs = append(errs, fmt.Errorf("Your yaml at '%s', line %d \n  '%s' may not match the type\n", route, rootTest.lineno, testLines[rootTest.lineno]))
+		errs = append(errs,
+			fmt.Errorf("your yaml at '%s', line %d \n  '%s' may not match the type",
+				route, rootTest.lineno, testLines[rootTest.lineno]))
 		return
 	}
 	switch valueTest := valueTest.(type) {
@@ -157,7 +161,9 @@ func compareTwoTrees(rootTemp, rootTest *TreeNode, testLines, skippedKeys []stri
 			}
 			if childTemp, ok := valueTemp.(KeyValue)[k]; !ok {
 				route := strings.Join(v.route, "/")
-				errs = append(errs, fmt.Errorf("Your yaml at '%s', line %d \n  '%s' may be redundant\n", route, v.lineno, testLines[v.lineno]))
+				errs = append(errs,
+					fmt.Errorf("your yaml at '%s', line %d \n  '%s' may be redundant",
+						route, v.lineno, testLines[v.lineno]))
 			} else {
 				errs = append(errs, compareTwoTrees(childTemp, v, testLines, skippedKeys)...)
 			}
@@ -197,7 +203,7 @@ func versionValid(chartVersion string, startVersion []int) (valid bool) {
 // GetValueTemplateExample gets the value template example from api.
 func GetValueTemplateExample(chartName, chartVersion string) (value string, err error) {
 	if !versionValid(chartVersion, []int{1, 9, 0}) {
-		err = errors.New("Yaml validation requires the chartVersion >= 1.9.0")
+		err = errors.New("yaml validation requires the chartVersion >= 1.9.0")
 		return
 	}
 
@@ -269,7 +275,8 @@ func bufferToMap(buffer []byte) (m map[string]interface{}, err error) {
 }
 
 // buildValidationTree builds the validation tree from yaml string.
-func buildValidationTree(yamlString string, restoreComments, markLineno bool) (*ValidationTree, error) {
+func buildValidationTree(yamlString string, restoreComments,
+	markLineno bool) (*ValidationTree, error) {
 	yamlBuffer, lines, err := yamlStringToBuffer(yamlString, restoreComments, markLineno)
 	if err != nil {
 		return nil, err
@@ -300,6 +307,61 @@ func getSkippedKeys(m map[string]interface{}) (skippedKeys []string) {
 	return skippedKeys
 }
 
+func alertUserIfModulesNotMatchBackend(yamlMap map[string]interface{}) {
+	var allModules = []string{"rollsite", "clustermanager", "nodemanager", "mysql", "python",
+		"fateboard", "client", "lbrollsite", "spark", "hdfs", "nginx", "rabbitmq", "pulsar"}
+	var backendModules = map[string][]string{
+		"eggroll": {"rollsite", "clustermanager", "nodemanager",
+			"mysql", "python", "fateboard", "client"},
+		"spark_rabbitmq": {"mysql", "python", "fateboard", "client",
+			"spark", "hdfs", "nginx", "rabbitmq"},
+		"spark_pulsar": {"mysql", "python", "fateboard", "client",
+			"spark", "hdfs", "nginx", "pulsar"},
+		"spark_local_pulsar": {"mysql", "python", "fateboard", "client",
+			"nginx", "pulsar"},
+	}
+
+	backend, ok := yamlMap["backend"].(string)
+	var backendOptions []string
+	for k := range backendModules {
+		backendOptions = append(backendOptions, k)
+	}
+	if !ok || !Contains(backend, backendOptions) {
+		color.Yellow("Config Warning: the backend in your yaml is not supported\n")
+		return
+	}
+
+	templateModules := backendModules[backend]
+	currentModules, ok := yamlMap["modules"].([]interface{})
+	if !ok {
+		color.Yellow("Config Warning: the modules in your yaml is not supported\n")
+		return
+	}
+
+	for _, m := range currentModules {
+		// if the module is not in the template modules,
+		// alert the user that the module is redundant.
+		module := m.(string)
+		if !Contains(module, templateModules) {
+			color.Yellow("Config Warning: the backend is %s,"+
+				" so the redundant module %s is not supported.\n", backend, module)
+		}
+	}
+	for rootKey := range yamlMap {
+		// traverse the first layer keys of yaml map to find the modules keys
+		// which are in allModules while not in the templateModules.
+		if Contains(rootKey, allModules) && !Contains(rootKey, templateModules) {
+			color.Yellow("Config Warning: the backend is %s, so whatever configuration "+
+				"you have defined about the redundant %s will be ignored.\n", backend, rootKey)
+		}
+	}
+}
+
+func (m *ValidationManager) preprocess() {
+	yamlMap := m.testTree.yamlMap
+	alertUserIfModulesNotMatchBackend(yamlMap)
+}
+
 // ValidateYaml validates the yaml file.
 func ValidateYaml(templateValue, testValue string, skippedKeys []string) (errs []error) {
 	if templateValue == "" || testValue == "" {
@@ -316,7 +378,8 @@ func ValidateYaml(templateValue, testValue string, skippedKeys []string) (errs [
 	m := &ValidationManager{templateTree, testTree, skippedKeys}
 
 	if m.templateTree == nil || m.testTree == nil {
-		return []error{errors.New("Building validation tree failed")}
+		return []error{errors.New("building validation tree failed")}
 	}
+	m.preprocess()
 	return m.compareTwoTrees()
 }

@@ -164,13 +164,13 @@ func ClusterInstallCommand() *cli.Command {
 			}
 
 			if template, err := GetValueTemplateExample(chartName.(string), chartVersion.(string)); err != nil {
-				color.Yellow("Config Warning: %s", err.Error())
+				color.Yellow("Config Warning: %s\n", err.Error())
 			} else {
 				skippedKeys := getSkippedKeys(m)
 				errs := ValidateYaml(template, string(clusterConfig), skippedKeys)
 				for _, err := range errs {
 					if err != nil {
-						color.Yellow("Config Warning: %s", err.Error())
+						color.Yellow("Config Warning: %s\n", err.Error())
 					}
 				}
 			}
