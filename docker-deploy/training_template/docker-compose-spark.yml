@@ -61,7 +61,12 @@ services:
       - 9360:9360
     volumes:
       - ./confs/spark/spark-defaults.conf:/data/projects/spark-2.4.1-bin-hadoop2.7/conf/spark-defaults.conf
-      - ./confs/fate_flow/conf:/data/projects/fate/conf
+      - ./confs/fate_flow/conf/service_conf.yaml:/data/projects/fate/conf/service_conf.yaml
+      - ./confs/fate_flow/conf/pulsar_route_table.yaml:/data/projects/fate/conf/pulsar_route_table.yaml
+      - ./confs/fate_flow/conf/rabbitmq_route_table.yaml:/data/projects/fate/conf/rabbitmq_route_table.yaml
+      - ./confs/fate_flow/conf/component_registry.json:/data/projects/fate/fateflow/conf/component_registry.json
+      - ./confs/fate_flow/conf/job_default_config.yaml:/data/projects/fate/fateflow/conf/job_default_config.yaml
+      - ./confs/fate_flow/conf/template_info.yaml:/data/projects/fate/fateflow/conf/template_info.yaml
       - shared_dir_federatedml:/data/projects/fate/fate/python/federatedml
       - shared_dir_examples:/data/projects/fate/examples
       - download_dir:/data/projects/fate/python/download_dir

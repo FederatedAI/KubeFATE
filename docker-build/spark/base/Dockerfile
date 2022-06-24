@@ -18,7 +18,7 @@ RUN set -eux && \
     yum -y install gcc gcc-c++ make openssl-devel gmp-devel mpfr-devel libmpc-devel\
     libmpcdevel libaio numactl autoconf automake libtool libffi-devel  \
     snappy snappy-devel zlib zlib-devel bzip2 bzip2-devel lz4-devel libasan lsof sysstat telnet psmisc wget && \
-    yum install -y which java-1.8.0-openjdk java-1.8.0-openjdk-devel && \
+    yum install -y which java-1.8.0-openjdk && \
     yum clean all && \
     wget https://archive.apache.org/dist/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz && \
     tar -xvzf spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz && \

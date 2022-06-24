@@ -176,27 +176,15 @@ modules:
     affinity:
   nodemanager:  
     include: true
-    list:
-    - name: nodemanager-0
-      nodeSelector:
-      tolerations:
-      affinity:
-      sessionProcessorsPerNode: 2
-      subPath: "nodemanager-0"
-      existingClaim: ""
-      storageClass: "nodemanager-0"
-      accessMode: ReadWriteOnce
-      size: 1Gi
-    - name: nodemanager-1
-      nodeSelector:
-      tolerations:
-      affinity:
-      sessionProcessorsPerNode: 2
-      subPath: "nodemanager-1"
-      existingClaim: ""
-      storageClass: "nodemanager-1"
-      accessMode: ReadWriteOnce
-      size: 1Gi
+    replicas: 2
+    nodeSelector:
+    tolerations:
+    affinity:
+    sessionProcessorsPerNode: 2
+    subPath: "nodemanager"
+    storageClass: "nodemanager"
+    accessMode: ReadWriteOnce
+    size: 1Gi
 
   client: 
     include: true
@@ -276,12 +264,20 @@ modules:
       affinity:
       type: ClusterIP
       nodePort: 30900
+      existingClaim:
+      storageClass:
+      accessMode:
+      size:
     datanode:
       replicas: 3
       nodeSelector:
       tolerations:
       affinity:
       type: ClusterIP
+      existingClaim:
+      storageClass:
+      accessMode:
+      size:
   nginx:
     include: true
     nodeSelector:

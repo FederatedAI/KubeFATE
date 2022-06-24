@@ -121,8 +121,8 @@ spec:
                 mkdir -p /data/projects/fate/conf/
                 cp /data/projects/fate/conf-tmp/transfer_conf.yaml /data/projects/fate/conf/transfer_conf.yaml
                 cp /data/projects/fate/conf-tmp/service_conf.yaml /data/projects/fate/conf/service_conf.yaml
-                cp /data/projects/fate/conf-tmp/component_registry.json /data/projects/fate/conf/component_registry.json
-                cp /data/projects/fate/conf-tmp/job_default_config.yaml /data/projects/fate/conf/job_default_config.yaml
+                cp /data/projects/fate/conf-tmp/component_registry.json /data/projects/fate/fateflow/conf/component_registry.json
+                cp /data/projects/fate/conf-tmp/job_default_config.yaml /data/projects/fate/fateflow/conf/job_default_config.yaml
                 # fix fateflow conf must use IP
                 sed -i "s/host: fateflow/host: ${POD_IP}/g" /data/projects/fate/conf/service_conf.yaml
                 
@@ -173,11 +173,10 @@ spec:
             - mountPath: /data/projects/fate/conf/pulsar_route_table
               name: pulsar-route-table
             {{- end }}
-            # TODO add mountPath of job and model-cache 
-            - mountPath: /data/projects/fate/jobs
+            - mountPath: /data/projects/fate/fateflow/jobs
               name: python-data
               subPath: jobs
-            - mountPath: /data/projects/fate/model_local_cache
+            - mountPath: /data/projects/fate/fateflow/model_local_cache
               name: python-data
               subPath: model-local-cache
         {{- if .Values.modules.fateboard.include }}
