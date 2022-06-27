@@ -6,11 +6,6 @@ import (
 	"testing"
 )
 
-const (
-	_templateFilename = "../../../helm-charts/FATE/values-template-example.yaml"
-	_testFilename     = "../../examples/party-10000/cluster.yaml"
-)
-
 var (
 	s0 = `
 chartName: fate
@@ -54,6 +49,22 @@ skippedKeys:
 a:
   b: 2
   d: 3
+`
+
+	s5 = `
+backend: eggroll
+modules:
+  - rollsite
+  - clustermanager
+python: 
+`
+
+	s6 = `
+backend: spark_rabbitmq
+modules:
+  - pulsar
+  - rabbitmq
+rollsite: 
 `
 )
 
@@ -243,7 +254,7 @@ func TestValidateYaml(t *testing.T) {
 		{"validateEmptyYaml", args{"", "", nil}, []error{errors.New("template or test yaml is empty")}},
 		{"validateSameYaml", args{s1, s1, nil}, []error{}},
 		{"validateValidYaml", args{s1, s2, nil}, []error{}},
-		{"validateNotValidYaml", args{s1, s3, nil}, []error{errors.New("Your yaml at '/a/d', line 8 \n  'd: 3' may be redundant\n")}},
+		{"validateNotValidYaml", args{s1, s3, nil}, []error{errors.New("your yaml at '/a/d', line 8 \n  'd: 3' may be redundant")}},
 		{"validateYamlWithskippedKeys", args{s1, s4, []string{"d"}}, []error{}},
 	}
 	for _, tt := range tests {
@@ -277,6 +288,26 @@ func Test_getSkippedKeys(t *testing.T) {
 			if gotSkippedKeys := getSkippedKeys(tt.args.m); !reflect.DeepEqual(gotSkippedKeys, tt.wantSkippedKeys) {
 				t.Errorf("getSkippedKeys() = %v, want %v", gotSkippedKeys, tt.wantSkippedKeys)
 			}
+		})
+	}
+}
+
+func Test_alertUserIfModulesNotMatchBackend(t *testing.T) {
+	type args struct {
+		yamlMap map[string]interface{}
+	}
+	yamlMap1, _ := bufferToMap([]byte(s5))
+	yamlMap2, _ := bufferToMap([]byte(s6))
+	tests := []struct {
+		name string
+		args args
+	}{
+		{"correct", args{yamlMap1}},
+		{"redundant", args{yamlMap2}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			alertUserIfModulesNotMatchBackend(tt.args.yamlMap)
 		})
 	}
 }
