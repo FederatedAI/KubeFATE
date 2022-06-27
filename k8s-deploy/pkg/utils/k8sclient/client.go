@@ -2,10 +2,10 @@ package k8sclient
 
 import (
 	"context"
-	"flag"
 	"fmt"
 	"io"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/gosuri/uitable"
@@ -13,6 +13,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 	networkingv1 "k8s.io/api/networking/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/util/homedir"
@@ -66,10 +67,21 @@ type Service struct {
 	CreationTimestamp time.Time
 }
 
+type HostPath struct {
+	Path     string
+	PathType string
+	Backend  string
+}
+
+type IngressRule struct {
+	Host string
+	Path []HostPath
+}
+
 type Ingress struct {
 	Name              string
 	Class             string
-	Host              string
+	Rules             []IngressRule
 	Address           string
 	Ports             []string
 	CreationTimestamp time.Time
@@ -199,10 +211,12 @@ func SprintlnDeployments(items []*Deployment) string {
 	return fmt.Sprintln(table)
 }
 
+// GetServiceList returns v1.ServiceList from k8s api
 func (c *Client) GetServiceList(namespace string) (*v1.ServiceList, error) {
 	return c.CoreV1().Services(namespace).List(context.TODO(), metav1.ListOptions{})
 }
 
+// GetService returns specific v1.Service from k8s api
 func (c *Client) GetService(namespace, service string) (*v1.Service, error) {
 	return c.CoreV1().Services(namespace).Get(context.TODO(), service, metav1.GetOptions{})
 }
@@ -262,21 +276,69 @@ func (c *Client) GetIngressList(namespace string) (*networkingv1.IngressList, er
 	return c.NetworkingV1().Ingresses(namespace).List(context.TODO(), metav1.ListOptions{})
 }
 
+// ToIngressAddress behaves mostly like a string interface and converts the given status to a string
+func ToIngressAddress(s *networkingv1.IngressStatus) string {
+	ingress := s.LoadBalancer.Ingress
+	result := sets.NewString()
+	for i := range ingress {
+		if ingress[i].IP != "" {
+			result.Insert(ingress[i].IP)
+		} else if ingress[i].Hostname != "" {
+			result.Insert(ingress[i].Hostname)
+		}
+	}
+	return strings.Join(result.List(), ",")
+}
+
+// backendStringer behaves just like a string interface and converts the given backend to a string
+func backendStringer(backend *networkingv1.IngressBackend) string {
+	if backend == nil {
+		return ""
+	}
+	return fmt.Sprintf("%v:%v", backend.Service.Name, backend.Service.Port.String())
+}
+
+// ToIngressRules returns a list of IngressRule
+func ToIngressRules(rules []networkingv1.IngressRule) []IngressRule {
+	var result []IngressRule
+	for _, rule := range rules {
+		if rule.HTTP == nil {
+			continue
+		}
+		host := rule.Host
+		if len(host) == 0 {
+			host = "*"
+		}
+		paths := []HostPath{}
+		for _, p := range rule.HTTP.Paths {
+			paths = append(paths, HostPath{Path: p.Path, PathType: string(*p.PathType), Backend: backendStringer(&p.Backend)})
+		}
+		result = append(result, IngressRule{Host: host, Path: paths})
+	}
+	return result
+}
+
+// ToIngressPorts returns a list of ports from the given []LoadBalancerIngress
+func ToIngressPorts(ingresses []v1.LoadBalancerIngress) (ingressPorts []string) {
+	for _, i := range ingresses {
+		p := i.Ports
+		ports := make([]string, 0, len(p))
+		for _, portStatus := range p {
+			ports = append(ports, fmt.Sprintf("%d/%s", portStatus.Port, portStatus.Protocol))
+		}
+		ingressPorts = append(ingressPorts, strings.Join(ports, ","))
+	}
+	return ingressPorts
+}
+
 // ToIngress tansforms networkingv1.Ingress to Ingress
 func ToIngress(i *networkingv1.Ingress) *Ingress {
-	// Only first Host from Spec.Rules and first IP Address
-	// from Status.LoadBalancer.Ingress are extracted here.
-	p := i.Status.LoadBalancer.Ingress[0].Ports
-	ports := make([]string, 0, len(p))
-	for _, portStatus := range p {
-		ports = append(ports, fmt.Sprintf("%d/%s", portStatus.Port, portStatus.Protocol))
-	}
 	return &Ingress{
 		Name:              i.Name,
 		Class:             *i.Spec.IngressClassName,
-		Host:              i.Spec.Rules[0].Host,
-		Address:           i.Status.LoadBalancer.Ingress[0].IP,
-		Ports:             ports,
+		Rules:             ToIngressRules(i.Spec.Rules),
+		Address:           ToIngressAddress(&i.Status),
+		Ports:             ToIngressPorts(i.Status.LoadBalancer.Ingress),
 		CreationTimestamp: i.CreationTimestamp.Time,
 	}
 }
@@ -297,11 +359,22 @@ func (c *Client) DescribeIngresses(namespace string) ([]*Ingress, error) {
 // SprintlnIngresses returns tabular output of IngressList
 func SprintlnIngresses(items []*Ingress) string {
 	table := uitable.New()
+	table.Wrap = true
 	table.AddRow("Ingresses")
-	table.AddRow("Name", "Class", "Host", "Address", "Ports", "CreationTime")
+	table.AddRow("Name", "Class", "Address", "Ports", "CreationTime", "Rules")
 	for _, r := range items {
-		table.AddRow(r.Name, r.Class, r.Host, r.Address,
-			r.Ports, r.CreationTimestamp.Format(time.RFC3339))
+		// subtable of rules
+		subTable := uitable.New()
+		subTable.Wrap = true
+		subTable.AddRow("Host", "Path", "PathType", "Backend")
+		for _, rule := range r.Rules {
+			host := rule.Host
+			for _, path := range rule.Path {
+				subTable.AddRow(host, path.Path, path.PathType, path.Backend)
+			}
+		}
+		table.AddRow(r.Name, r.Class, r.Address, r.Ports,
+			r.CreationTimestamp.Format(time.RFC3339), subTable.String())
 	}
 	table.AddRow("")
 	return fmt.Sprintln(table)
@@ -376,7 +449,7 @@ func (c *Client) DescribePod(namespace, podName string, tail int) (*Pod, error) 
 	return pod, nil
 }
 
-// DescribePod returns PodList
+// DescribePods returns PodList
 func (c *Client) DescribePods(namespace string, tail int) ([]*Pod, error) {
 	p, err := c.GetPodList(namespace)
 	if err != nil {
@@ -441,14 +514,8 @@ func (c *Client) GetLog(namespace, pod, container string, tail int) (string, err
 
 // GetKubeconfig gets default kubeconfig
 func GetKubeconfig() string {
-	var kubeconfig *string
 	if home := homedir.HomeDir(); home != "" {
-		kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"),
-			"(optional) absolute path to the kubeconfig file")
-	} else {
-		kubeconfig = flag.String("kubeconfig", "",
-			"absolute path to the kubeconfig file")
+		return filepath.Join(home, ".kube", "config")
 	}
-	flag.Parse()
-	return *kubeconfig
+	return ""
 }
