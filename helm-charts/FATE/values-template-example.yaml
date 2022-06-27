@@ -82,6 +82,13 @@ backend: eggroll
     # clientList:
     # - partID: 9999
     # concurrency: 49
+  # resources:
+    # requests:
+      # cpu: "2"
+      # memory: "4Gi"
+    # limits:
+      # cpu: "4"
+      # memory: "8Gi"
 
 
 # lbrollsite:
@@ -96,6 +103,13 @@ backend: eggroll
   # nodeSelector:
   # tolerations:
   # affinity:
+  # resources:
+    # requests:
+      # cpu: "1"
+      # memory: "1Gi"
+    # limits:
+      # cpu: "1"
+      # memory: "1Gi"
 
 # nodemanager:
 #   replicas: 2
@@ -107,6 +121,25 @@ backend: eggroll
 #   storageClass: "local-scsi"
 #   accessMode: ReadWriteOnce
 #   size: 1Gi
+  # resources:
+    # requests:
+      # cpu: "2"
+      # memory: "4Gi"
+    # limits:
+      # cpu: "4"
+      # memory: "8Gi"
+
+# clustermanager:
+#   nodeSelector:
+#   tolerations:
+#   affinity:
+  # resources:
+    # requests:
+      # cpu: "1"
+      # memory: "1Gi"
+    # limits:
+      # cpu: "1"
+      # memory: "1Gi"
 
 
 # python:
@@ -124,6 +157,13 @@ backend: eggroll
   # storageClass: "python"
   # accessMode: ReadWriteMany
   # size: 1Gi
+  # resources:
+    # requests:
+      # cpu: "2"
+      # memory: "4Gi"
+    # limits:
+      # cpu: "4"
+      # memory: "8Gi"
   # clustermanager:
     # cores_per_node: 16
     # nodes: 2
@@ -294,6 +334,13 @@ backend: eggroll
     # 10000:
       # host: 192.168.0.1
       # port: 30104
+  # resources:
+    # requests:
+      # cpu: "2"
+      # memory: "4Gi"
+    # limits:
+      # cpu: "4"
+      # memory: "8Gi"
 
 # pulsar:
   # nodeSelector:
@@ -319,3 +366,10 @@ backend: eggroll
       # port: 30105
       # sslPort: 30109
       # proxy: ""
+  # resources:
+    # requests:
+      # cpu: "2"
+      # memory: "4Gi"
+    # limits:
+      # cpu: "4"
+      # memory: "8Gi"

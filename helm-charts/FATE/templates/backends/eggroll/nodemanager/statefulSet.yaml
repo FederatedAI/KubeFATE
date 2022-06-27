@@ -48,6 +48,13 @@ spec:
             mountPath: /fluentd/etc/fluent.conf
         - image: {{ .Values.image.registry }}/eggroll:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if .Values.modules.nodemanager.resources}}
+          resources:
+          {{- range $key, $val := .Values.modules.nodemanager.resources }}
+            {{ $key }}:
+{{ toYaml $val | indent 14 }}
+          {{- end }}
+          {{- end }}
           name: nodemanager
           command:
           - bash

@@ -56,7 +56,27 @@ backend: eggroll
   # - partyId: 10000
     # partyIp: 192.168.0.1
     # partyPort: 30101
-  # nodeSelector: 
+  # nodeSelector:
+  # resources:
+    # requests:
+      # cpu: "1"
+      # memory: "1Gi"
+    # limits:
+      # cpu: "1"
+      # memory: "1Gi"
+
+# Specify clustermanager properties
+# clustermanager:
+#   nodeSelector:
+#   tolerations:
+#   affinity:
+  # resources:
+    # requests:
+      # cpu: "1"
+      # memory: "1Gi"
+    # limits:
+      # cpu: "1"
+      # memory: "1Gi"
 
 # Specify nodemanager properties
 # nodemanager:
@@ -69,6 +89,13 @@ backend: eggroll
 #   storageClass: "local-scsi"
 #   accessMode: ReadWriteOnce
 #   size: 1Gi
+  # resources:
+    # requests:
+      # cpu: "2"
+      # memory: "4Gi"
+    # limits:
+      # cpu: "4"
+      # memory: "8Gi"
 
 # Specify the fateflow service's properties
 # python:

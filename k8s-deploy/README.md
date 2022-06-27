@@ -115,6 +115,14 @@ create job success, job id=d92d7a56-7002-46a4-9363-da9c7346e05a
 
 Using KubeFATE to deploy FATE can support four different types, corresponding to four types of backends. They are eggroll, spark_rabbitmq, spark_pulsar and spark_local_pulsar. For more details on the different types of FATE see: [Introduction to FATE Backend Architecture](../docs/Introduction_to_Backend_Architecture.md).
 
+**If you have resource requirements (CPU and memory) for the components, please make sure to check [the example](../helm-charts/FATE/values-template-example.yaml), search for "resources" to know how to define the resource requirements.** 
+
+We support such definition for:
+1. Eggroll components: cluster manager, node manager and rollsite.
+2. Spark components: master and worker.
+3. Rabbitmq.
+4. Pulsar.
+
 ### Checking the status of "Installing Cluster" job
 After the above command has finished, a job is created for installing a FATE cluster. Run the command `kubefate job describe` to check the status of the job, until the "Status" turns to `Success`.
 

@@ -85,6 +85,10 @@ modules:
     affinity:
     polling:
       enabled: false
+    resources:
+      requests:
+        cpu: "1"
+        memory: "1Gi"
       
       # type: client
       # server:
@@ -106,6 +110,10 @@ modules:
     nodeSelector:
     tolerations:
     affinity:
+    resources:
+      requests:
+        cpu: "1"
+        memory: "1Gi"
   python: 
     include: true
     type: ClusterIP
@@ -174,6 +182,10 @@ modules:
     nodeSelector:
     tolerations:
     affinity:
+    resources:
+      requests:
+        cpu: "1"
+        memory: "1Gi"
   nodemanager:  
     include: true
     replicas: 2
@@ -245,13 +257,6 @@ modules:
       Image: ""
       ImageTag: ""
       replicas: 2
-      resources:
-        requests:
-          cpu: "2"
-          memory: "4Gi"
-        limits:
-          cpu: "4"
-          memory: "8Gi"
       nodeSelector:
       tolerations:
       affinity:
