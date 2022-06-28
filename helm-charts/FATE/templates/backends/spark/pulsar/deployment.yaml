@@ -35,6 +35,13 @@ spec:
         - name: pulsar
           image: {{ .Values.image.registry }}/pulsar:2.7.0
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if .Values.modules.pulsar.resources}}
+          resources:
+          {{- range $key, $val := .Values.modules.pulsar.resources }}
+            {{ $key }}:
+{{ toYaml $val | indent 14 }}
+          {{- end }}
+          {{- end }}
           command:
             - /bin/bash
             - -c

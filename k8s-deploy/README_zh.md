@@ -120,6 +120,14 @@ create job success, job id=d92d7a56-7002-46a4-9363-da9c7346e05a
 
 使用KubeFATE部署FATE可以支持四种不同的类型，对应四种backend。分别是eggroll、spark_rabbitmq、spark_pulsar和spark_local_pulsar。关于不同类型的FATE的更多细节查看: [不同类型FATE的架构介绍](../docs/Introduction_to_Backend_Architecture_zh.md)。
 
+**如果某个部件对计算机性能（CPU和内存）有所要求，可以查看[示例文件](../helm-charts/FATE/values-template-example.yaml), 在其中搜索"resources"关键字了解如何进行资源配置.**
+
+我们支持定义如下部件的资源需求:
+1. Eggroll部件：包括cluster manager，node manager和rollsite。
+2. Spark components：包括master和worker。
+3. Rabbitmq。
+4. Pulsar。
+
 ### 检查安装集群任务的状态
 上面的命令会创建一个安装FATE集群的任务，用于异步部署。使用```kubefate job describe```命令可以检查任务的状态，直到看到结果为`install success`
 
