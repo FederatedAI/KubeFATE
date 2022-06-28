@@ -85,10 +85,6 @@ modules:
     affinity:
     polling:
       enabled: false
-    resources:
-      requests:
-        cpu: "1"
-        memory: "1Gi"
       
       # type: client
       # server:
@@ -110,10 +106,6 @@ modules:
     nodeSelector:
     tolerations:
     affinity:
-    resources:
-      requests:
-        cpu: "1"
-        memory: "1Gi"
   python: 
     include: true
     type: ClusterIP
@@ -182,10 +174,6 @@ modules:
     nodeSelector:
     tolerations:
     affinity:
-    resources:
-      requests:
-        cpu: "1"
-        memory: "1Gi"
   nodemanager:  
     include: true
     replicas: 2
@@ -197,6 +185,10 @@ modules:
     storageClass: "nodemanager"
     accessMode: ReadWriteOnce
     size: 1Gi
+    resources:
+      requests:
+        cpu: "2"
+        memory: "4Gi"
 
   client: 
     include: true
@@ -261,6 +253,10 @@ modules:
       tolerations:
       affinity:
       type: ClusterIP
+      resources:
+        requests:
+          cpu: "2"
+          memory: "4Gi"
   hdfs:
     include: true
     namenode:
