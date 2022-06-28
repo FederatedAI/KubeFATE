@@ -87,7 +87,7 @@ backend: eggroll
       # cpu: "1"
       # memory: "1Gi"
     # limits:
-      # cpu: "41"
+      # cpu: "4"
       # memory: "1Gi"
 
 
