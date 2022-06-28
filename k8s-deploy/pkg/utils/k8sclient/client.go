@@ -292,7 +292,7 @@ func ToIngressAddress(s *networkingv1.IngressStatus) string {
 
 // backendStringer behaves just like a string interface and converts the given backend to a string
 func backendStringer(backend *networkingv1.IngressBackend) string {
-	if backend == nil {
+	if backend == nil || backend.Service == nil {
 		return ""
 	}
 	return fmt.Sprintf("%v:%v", backend.Service.Name, backend.Service.Port.String())
