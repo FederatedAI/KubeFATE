@@ -38,6 +38,15 @@ type ValidationManager struct {
 	skippedKeys            []string
 }
 
+type VersionNotValidError struct {
+	Version    string
+	LowerBound string
+}
+
+func (e VersionNotValidError) Error() string {
+	return fmt.Sprintf("version of %s does not meet the validation requirement that chartVersion >= %s", e.Version, e.LowerBound)
+}
+
 // // trimComments trims the comments started with "# ".
 func trimComments(t []byte) []byte {
 	pattern := regexp.MustCompile(`^ *# `)
@@ -203,7 +212,7 @@ func versionValid(chartVersion string, startVersion []int) (valid bool) {
 // GetValueTemplateExample gets the value template example from api.
 func GetValueTemplateExample(chartName, chartVersion string) (value string, err error) {
 	if !versionValid(chartVersion, []int{1, 9, 0}) {
-		err = errors.New("yaml validation requires the chartVersion >= 1.9.0")
+		err = VersionNotValidError{chartVersion, "1.9.0"}
 		return
 	}
 
