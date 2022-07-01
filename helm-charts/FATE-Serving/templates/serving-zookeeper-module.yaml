@@ -16,7 +16,7 @@ kind: Service
 metadata:
   name: serving-zookeeper
   labels:
-    fateMoudle: serving-zookeeper
+    fateModule: serving-zookeeper
     name: {{ .Values.partyName | quote  }}
     partyId: {{ .Values.partyId | quote  }}
     owner: kubefate
@@ -34,7 +34,7 @@ spec:
       port: 3888
       targetPort: election
   selector:
-    fateMoudle: serving-zookeeper
+    fateModule: serving-zookeeper
     name: {{ .Values.partyName | quote  }}
     partyId: {{ .Values.partyId | quote  }}
 ---
@@ -44,7 +44,7 @@ kind: StatefulSet
 metadata:
   name: serving-zookeeper
   labels:
-    fateMoudle: serving-zookeeper
+    fateModule: serving-zookeeper
     name: {{ .Values.partyName | quote  }}
     partyId: {{ .Values.partyId | quote  }}
     owner: kubefate
@@ -57,14 +57,14 @@ spec:
     type: RollingUpdate
   selector:
     matchLabels:
-      fateMoudle: serving-zookeeper
+      fateModule: serving-zookeeper
       name: {{ .Values.partyName | quote }}
       partyId: {{ .Values.partyId | quote }}
   template:
     metadata:
       name: serving-zookeeper
       labels:
-        fateMoudle: serving-zookeeper
+        fateModule: serving-zookeeper
         name: {{ .Values.partyName | quote }}
         partyId: {{ .Values.partyId | quote }}
         owner: kubefate
@@ -205,7 +205,7 @@ spec:
     - metadata:
         name: data
         labels:
-          fateMoudle: serving-zookeeper
+          fateModule: serving-zookeeper
           name: {{ .Values.partyName | quote }}
           partyId: {{ .Values.partyId | quote }}
           owner: kubefate

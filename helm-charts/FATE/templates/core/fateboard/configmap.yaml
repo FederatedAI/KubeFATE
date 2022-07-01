@@ -15,7 +15,7 @@ apiVersion: v1
 metadata:
   name: fateboard-config
   labels:
-    fateMoudle: fateboard
+    fateModule: fateboard
 {{ include "fate.labels" . | indent 4 }}
 data:
   application.properties: |

@@ -15,7 +15,7 @@ kind: ConfigMap
 metadata:
   name: mysql-config
   labels:
-    fateMoudle: mysql
+    fateModule: mysql
 {{ include "fate.labels" . | indent 4 }}
 data:
   {{- if eq .Values.modules.python.backend  "spark" }}

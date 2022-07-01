@@ -15,7 +15,7 @@ apiVersion: v1
 metadata:
   name: namenode-config
   labels:
-    fateMoudle: namenode
+    fateModule: namenode
 {{ include "fate.labels" . | indent 4 }}
 data:
   core-site.xml: |
@@ -31,7 +31,7 @@ apiVersion: v1
 metadata:
   name: namenode-env
   labels:
-    fateMoudle: namenode
+    fateModule: namenode
 {{ include "fate.labels" . | indent 4 }}
 data:
   MULTIHOMED_NETWORK: "0"
@@ -87,7 +87,7 @@ apiVersion: v1
 metadata:
   name: datanode-env
   labels:
-    fateMoudle: datanode
+    fateModule: datanode
 {{ include "fate.labels" . | indent 4 }}
 data:
   MULTIHOMED_NETWORK: "0"

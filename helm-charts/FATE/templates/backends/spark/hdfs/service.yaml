@@ -15,7 +15,7 @@ kind: Service
 metadata:
   name: datanode
   labels:
-    fateMoudle: datanode
+    fateModule: datanode
 {{ include "fate.labels" . | indent 4 }}
 spec:
   ports:
@@ -33,7 +33,7 @@ spec:
       protocol: TCP
   type: {{ .Values.modules.hdfs.datanode.type }}
   selector:
-    fateMoudle: datanode
+    fateModule: datanode
 {{ include "fate.matchLabels" . | indent 4 }}
 ---
 apiVersion: v1
@@ -41,7 +41,7 @@ kind: Service
 metadata:
   name: namenode
   labels:
-    fateMoudle: namenode
+    fateModule: namenode
 {{ include "fate.labels" . | indent 4 }}
 spec:
   ports:
@@ -62,7 +62,7 @@ spec:
       protocol: TCP
   type: {{ .Values.modules.hdfs.namenode.type }}
   selector:
-    fateMoudle: namenode
+    fateModule: namenode
 {{ include "fate.matchLabels" . | indent 4 }}
 
 {{ end }}

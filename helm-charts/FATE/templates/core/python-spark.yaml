@@ -15,7 +15,7 @@ kind: Deployment
 metadata:
   name: python
   labels:
-    fateMoudle: python
+    fateModule: python
 {{ include "fate.labels" . | indent 4 }}
 spec:
   replicas: 1
@@ -23,12 +23,12 @@ spec:
     type: Recreate
   selector:
     matchLabels:
-      fateMoudle: python
+      fateModule: python
 {{ include "fate.matchLabels" . | indent 6 }}
   template:
     metadata:
       labels:
-        fateMoudle: python
+        fateModule: python
 {{ include "fate.labels" . | indent 8 }}
     spec:
       {{- if .Values.istio.enabled }}

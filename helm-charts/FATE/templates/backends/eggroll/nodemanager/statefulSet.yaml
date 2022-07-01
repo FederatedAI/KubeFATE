@@ -16,7 +16,7 @@ kind: StatefulSet
 metadata:
   name: nodemanager
   labels:
-    fateMoudle: nodemanager
+    fateModule: nodemanager
     app: nodemanager
 {{ include "fate.labels" . | indent 4 }}
 spec:
@@ -24,12 +24,12 @@ spec:
   serviceName: nodemanager
   selector:
     matchLabels:
-      fateMoudle: nodemanager
+      fateModule: nodemanager
 {{ include "fate.matchLabels" . | indent 6 }}
   template:
     metadata:
       labels:
-        fateMoudle: nodemanager
+        fateModule: nodemanager
         app: nodemanager
 {{ include "fate.labels" . | indent 8 }}
     spec:

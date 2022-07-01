@@ -15,7 +15,7 @@ apiVersion: v1
 metadata:
   name: nginx-config
   labels:
-    fateMoudle: nginx
+    fateModule: nginx
 {{ include "fate.labels" . | indent 4 }}
 data:
   route_table.yaml: |
@@ -113,7 +113,7 @@ kind: Deployment
 metadata:
   name: nginx
   labels:
-    fateMoudle: nginx
+    fateModule: nginx
 {{ include "fate.labels" . | indent 4 }}
 spec:
   replicas: {{ default 1 .Values.modules.nginx.replicas }}
@@ -121,12 +121,12 @@ spec:
     type: Recreate
   selector:
     matchLabels:
-      fateMoudle: nginx
+      fateModule: nginx
 {{ include "fate.matchLabels" . | indent 6 }}
   template:
     metadata:
       labels:
-        fateMoudle: nginx
+        fateModule: nginx
 {{ include "fate.labels" . | indent 8 }}
     spec:
       containers:
@@ -177,7 +177,7 @@ kind: Service
 metadata:
   name: nginx
   labels:
-    fateMoudle: nginx
+    fateModule: nginx
 {{ include "fate.labels" . | indent 4 }}
 spec:
   ports:
@@ -200,7 +200,7 @@ spec:
   loadBalancerIP: "{{ .Values.modules.nginx.loadBalancerIP }}"
   {{- end }}
   selector:
-    fateMoudle: nginx
+    fateModule: nginx
 {{ include "fate.matchLabels" . | indent 4 }}
 ---
 {{ end }}

@@ -15,7 +15,7 @@ kind: Service
 metadata:
   name: notebook
   labels:
-    fateMoudle: client
+    fateModule: client
 {{ include "fate.labels" . | indent 4 }}
 spec:
   ports:
@@ -25,6 +25,6 @@ spec:
       protocol: TCP
   type: {{ .Values.modules.client.type }}
   selector:
-    fateMoudle: client
+    fateModule: client
 {{ include "fate.matchLabels" . | indent 4 }}
 {{- end }}

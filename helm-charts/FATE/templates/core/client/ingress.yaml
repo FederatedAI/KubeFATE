@@ -15,7 +15,7 @@ kind: Ingress
 metadata:
   name: client
   labels:
-    fateMoudle: client
+    fateModule: client
 {{ include "fate.labels" . | indent 4 }}
   {{- if .Values.ingress.client.annotations }}
   annotations:

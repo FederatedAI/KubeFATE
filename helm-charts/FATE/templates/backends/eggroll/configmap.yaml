@@ -15,7 +15,7 @@ apiVersion: v1
 metadata:
   name: eggroll-config
   labels:
-    fateMoudle: eggroll
+    fateModule: eggroll
     name: {{ .Values.partyName | quote  }}
     partyId: {{ .Values.partyId | quote  }}
     owner: kubefate

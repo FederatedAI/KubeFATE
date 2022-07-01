@@ -15,7 +15,7 @@ apiVersion: v1
 metadata:
   name: pulsar-config
   labels:
-    fateMoudle: pulsar
+    fateModule: pulsar
 {{ include "fate.labels" . | indent 4 }}
 data:
   standalone.conf: |

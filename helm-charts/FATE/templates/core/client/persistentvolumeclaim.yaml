@@ -16,7 +16,7 @@ apiVersion: v1
 metadata:
   name: client-data
   labels:
-    fateMoudle: client
+    fateModule: client
 {{ include "fate.labels" . | indent 4 }}
 spec:
   accessModes: 

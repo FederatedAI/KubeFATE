@@ -16,7 +16,7 @@ apiVersion: v1
 metadata:
   name: namenode-data
   labels:
-    fateMoudle: namenode
+    fateModule: namenode
 {{ include "fate.labels" . | indent 4 }}
 spec:
   accessModes:
