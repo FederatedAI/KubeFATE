@@ -16,7 +16,7 @@ apiVersion: v1
 metadata:
   name: python-data
   labels:
-    fateMoudle: python
+    fateModule: python
 {{ include "fate.labels" . | indent 4 }}
 spec:
   accessModes: 

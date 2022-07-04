@@ -15,7 +15,7 @@ apiVersion: v1
 metadata:
   name: spark-worker-config
   labels:
-    fateMoudle: spark-worker
+    fateModule: spark-worker
 {{ include "fate.labels" . | indent 4 }}
 data:
   service_conf.yaml: |

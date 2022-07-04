@@ -15,7 +15,7 @@ kind: Service
 metadata:
   name: rollsite
   labels:
-    fateMoudle: rollsite
+    fateModule: rollsite
 {{ include "fate.labels" . | indent 4 }}
 spec:
   ports:
@@ -31,7 +31,7 @@ spec:
   loadBalancerIP: "{{ .Values.modules.lbrollsite.loadBalancerIP }}"
 {{- end }}
   selector:
-    fateMoudle: rollsite
+    fateModule: rollsite
 {{ include "fate.matchLabels" . | indent 4 }}
 ---
 apiVersion: v1
@@ -39,7 +39,7 @@ kind: Service
 metadata:
   name: exchange
   labels:
-    fateMoudle: rollsite
+    fateModule: rollsite
 {{ include "fate.labels" . | indent 4 }}
 spec:
   ports:
@@ -52,7 +52,7 @@ spec:
       protocol: TCP
   type: {{ .Values.modules.lbrollsite.type }}
   selector:
-    fateMoudle: rollsite
+    fateModule: rollsite
 {{ include "fate.matchLabels" . | indent 4 }}
 ---
 {{ end }}

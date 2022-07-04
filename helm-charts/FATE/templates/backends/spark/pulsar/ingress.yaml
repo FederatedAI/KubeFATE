@@ -15,7 +15,7 @@ kind: Ingress
 metadata:
   name: pulsar
   labels:
-    fateMoudle: pulsar
+    fateModule: pulsar
 {{ include "fate.labels" . | indent 4 }}
 {{- if .Values.ingress.pulsar.annotations }}
   annotations:

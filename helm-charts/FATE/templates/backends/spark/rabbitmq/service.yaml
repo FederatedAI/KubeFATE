@@ -15,7 +15,7 @@ kind: Service
 metadata:
   name: rabbitmq
   labels:
-    fateMoudle: rabbitmq
+    fateModule: rabbitmq
 {{ include "fate.labels" . | indent 4 }}
 spec:
   ports:
@@ -35,7 +35,7 @@ spec:
   loadBalancerIP: "{{ .Values.modules.rabbitmq.loadBalancerIP }}"
   {{- end }}
   selector:
-    fateMoudle: rabbitmq
+    fateModule: rabbitmq
 {{ include "fate.matchLabels" . | indent 4 }}
 ---
 {{ end }}

@@ -15,7 +15,7 @@ kind: Service
 metadata:
   name: nginx
   labels:
-    fateMoudle: nginx
+    fateModule: nginx
 {{ include "fate.labels" . | indent 4 }}
 spec:
   ports:
@@ -40,6 +40,6 @@ spec:
   {{- end }}
   
   selector:
-    fateMoudle: nginx
+    fateModule: nginx
 {{ include "fate.matchLabels" . | indent 4 }}
 {{ end }}

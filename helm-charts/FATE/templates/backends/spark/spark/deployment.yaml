@@ -15,7 +15,7 @@ kind: Deployment
 metadata:
   name: spark-master
   labels:
-    fateMoudle: spark-master
+    fateModule: spark-master
 {{ include "fate.labels" . | indent 4 }}
 spec:
   replicas: {{ default 1 .Values.modules.spark.master.replicas }}
@@ -23,12 +23,12 @@ spec:
     type: Recreate
   selector:
     matchLabels:
-      fateMoudle: spark-master
+      fateModule: spark-master
 {{ include "fate.matchLabels" . | indent 6 }}
   template:
     metadata:
       labels:
-        fateMoudle: spark-master
+        fateModule: spark-master
 {{ include "fate.labels" . | indent 8 }}
     spec:
       containers:
@@ -103,7 +103,7 @@ kind: Deployment
 metadata:
   name: spark-worker
   labels:
-    fateMoudle: spark-worker
+    fateModule: spark-worker
 {{ include "fate.labels" . | indent 4 }}
 spec:
   replicas: {{ default 2 .Values.modules.spark.worker.replicas }}
@@ -111,12 +111,12 @@ spec:
     type: Recreate
   selector:
     matchLabels:
-      fateMoudle: spark-worker
+      fateModule: spark-worker
 {{ include "fate.matchLabels" . | indent 6 }}
   template:
     metadata:
       labels:
-        fateMoudle: spark-worker
+        fateModule: spark-worker
 {{ include "fate.labels" . | indent 8 }}
     spec:
       containers:

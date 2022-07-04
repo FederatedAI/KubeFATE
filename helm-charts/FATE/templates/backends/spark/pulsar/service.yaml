@@ -15,7 +15,7 @@ kind: Service
 metadata:
   name: pulsar
   labels:
-    fateMoudle: pulsar
+    fateModule: pulsar
 {{ include "fate.labels" . | indent 4 }}
 spec:
   ports:
@@ -48,7 +48,7 @@ spec:
   {{- end }}
   
   selector:
-    fateMoudle: pulsar
+    fateModule: pulsar
 {{ include "fate.matchLabels" . | indent 4 }}
 
 ---
@@ -59,7 +59,7 @@ kind: Service
 metadata:
   name: pulsar-public-tls
   labels:
-    fateMoudle: pulsar
+    fateModule: pulsar
 {{ include "fate.labels" . | indent 4 }}
 spec:
   ports:
@@ -69,7 +69,7 @@ spec:
     protocol: TCP
   type: LoadBalancer
   selector:
-    fateMoudle: pulsar
+    fateModule: pulsar
 {{ include "fate.matchLabels" . | indent 4 }}
 {{- end }}
 

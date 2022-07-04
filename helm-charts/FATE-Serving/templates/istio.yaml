@@ -31,7 +31,7 @@ kind: VirtualService
 metadata:
   name: fate-serving-ingress
   labels:
-      fateMoudle: serving-proxy
+      fateModule: serving-proxy
       name: {{ .Values.partyName | quote  }}
       partyId: {{ .Values.partyId | quote  }}
       owner: kubefate

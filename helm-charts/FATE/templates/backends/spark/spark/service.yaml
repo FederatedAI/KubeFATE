@@ -15,7 +15,7 @@ kind: Service
 metadata:
   name: spark-master
   labels:
-    fateMoudle: spark-master
+    fateModule: spark-master
 {{ include "fate.labels" . | indent 4 }}
 spec:
   ports:
@@ -34,7 +34,7 @@ spec:
   type: ClusterIP
   clusterIP: None
   selector:
-    fateMoudle: spark-master
+    fateModule: spark-master
 {{ include "fate.matchLabels" . | indent 4 }}
 ---
 apiVersion: v1
@@ -42,7 +42,7 @@ kind: Service
 metadata:
   name: spark-client
   labels:
-    fateMoudle: spark-master
+    fateModule: spark-master
 {{ include "fate.labels" . | indent 4 }}
 spec:
   ports:
@@ -64,7 +64,7 @@ spec:
   type: {{ .Values.modules.spark.master.type }}
   # clusterIP: None
   selector:
-    fateMoudle: spark-master
+    fateModule: spark-master
 {{ include "fate.matchLabels" . | indent 4 }}
 ---
 apiVersion: v1
@@ -72,7 +72,7 @@ kind: Service
 metadata:
   name: spark-worker-1
   labels:
-    fateMoudle: spark-worker
+    fateModule: spark-worker
 {{ include "fate.labels" . | indent 4 }}
 spec:
   ports:
@@ -83,7 +83,7 @@ spec:
   type: {{ .Values.modules.spark.worker.type }}
   clusterIP: None
   selector:
-    fateMoudle: spark-worker
+    fateModule: spark-worker
 {{ include "fate.matchLabels" . | indent 4 }}
 ---
 {{ end }}

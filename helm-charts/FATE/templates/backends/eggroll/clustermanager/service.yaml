@@ -15,7 +15,7 @@ kind: Service
 metadata:
   name: clustermanager
   labels:
-    fateMoudle: clustermanager
+    fateModule: clustermanager
 {{ include "fate.labels" . | indent 4 }}
 spec:
   ports:
@@ -26,6 +26,6 @@ spec:
   type: {{ .Values.modules.clustermanager.type }}
   clusterIP: None
   selector:
-    fateMoudle: clustermanager
+    fateModule: clustermanager
 {{ include "fate.matchLabels" . | indent 4 }}
 {{ end }}

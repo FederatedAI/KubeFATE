@@ -15,7 +15,7 @@ kind: Ingress
 metadata:
   name: serving-proxy
   labels:
-    fateMoudle: serving-proxy
+    fateModule: serving-proxy
     name: {{ .Values.partyName | quote  }}
     partyId: {{ .Values.partyId | quote  }}
     owner: kubefate
@@ -52,7 +52,7 @@ kind: Ingress
 metadata:
   name: serving-admin
   labels:
-    fateMoudle: serving-admin
+    fateModule: serving-admin
     name: {{ .Values.partyName | quote  }}
     partyId: {{ .Values.partyId | quote  }}
     owner: kubefate

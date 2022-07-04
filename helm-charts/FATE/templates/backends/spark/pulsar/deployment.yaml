@@ -15,7 +15,7 @@ kind: Deployment
 metadata:
   name: pulsar
   labels:
-    fateMoudle: pulsar
+    fateModule: pulsar
 {{ include "fate.labels" . | indent 4 }}
 spec:
   replicas: 1
@@ -23,12 +23,12 @@ spec:
     type: Recreate
   selector:
     matchLabels:
-      fateMoudle: pulsar
+      fateModule: pulsar
 {{ include "fate.matchLabels" . | indent 6 }}
   template:
     metadata:
       labels:
-        fateMoudle: pulsar
+        fateModule: pulsar
 {{ include "fate.labels" . | indent 8 }}
     spec:
       containers:

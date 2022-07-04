@@ -15,7 +15,7 @@ kind: Deployment
 metadata:
   name: mysql
   labels:
-    fateMoudle: mysql
+    fateModule: mysql
 {{ include "fate.labels" . | indent 4 }}
 spec:
   replicas: 1
@@ -23,12 +23,12 @@ spec:
     type: Recreate
   selector:
     matchLabels:
-      fateMoudle: mysql
+      fateModule: mysql
 {{ include "fate.matchLabels" . | indent 6 }}
   template:
     metadata:
       labels:
-        fateMoudle: mysql
+        fateModule: mysql
 {{ include "fate.labels" . | indent 8 }}
     spec:
       containers:
