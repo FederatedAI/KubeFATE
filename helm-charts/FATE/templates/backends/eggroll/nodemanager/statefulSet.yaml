@@ -136,10 +136,17 @@ spec:
         {{- if not .Values.persistence.enabled }}
         - name: data-dir
           emptyDir: {}
+        {{- else if and .Values.persistence.enabled (.Values.modules.nodemanager.existingClaim) }}
+        - name: data-dir
+          persistentVolumeClaim:
+            claimName: {{ .Values.modules.nodemanager.existingClaim }}
         {{- else }}
   volumeClaimTemplates:
   - metadata:
       name: data-dir
+      labels:
+        fateModule: nodemanager
+{{ include "fate.labels" . | indent 10 }}
     spec:
       accessModes: [ {{ .Values.modules.nodemanager.accessMode | quote }} ]
       storageClassName: {{ .Values.modules.nodemanager.storageClass }}

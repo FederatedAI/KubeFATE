@@ -121,13 +121,14 @@ backend: eggroll
 #   storageClass: "local-scsi"
 #   accessMode: ReadWriteOnce
 #   size: 1Gi
-  # resources:
-    # requests:
-      # cpu: "2"
-      # memory: "4Gi"
-    # limits:
-      # cpu: "4"
-      # memory: "8Gi"
+#   existingClaim: ""
+#   resources:
+#     requests:
+#       cpu: "2"
+#       memory: "4Gi"
+#     limits:
+#       cpu: "4"
+#       memory: "8Gi"
 
 # clustermanager:
 #   nodeSelector:
@@ -350,6 +351,7 @@ backend: eggroll
   # httpNodePort: 30094
   # httpsNodePort: 30099
   # loadBalancerIP:
+  # existingClaim:
   # publicLB:
     # enabled: false
   # exchange:

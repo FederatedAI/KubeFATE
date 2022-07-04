@@ -11,7 +11,7 @@
 
 {{ if .Values.modules.client.include }}
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: client
   labels:
@@ -19,8 +19,6 @@ metadata:
 {{ include "fate.labels" . | indent 4 }}
 spec:
   replicas: 1
-  strategy:
-    type: Recreate
   selector:
     matchLabels:
       fateModule: client
@@ -105,9 +103,22 @@ spec:
         {{- if not .Values.persistence.enabled }}
         - name: persistence
           emptyDir: {}
-        {{- else }}
+        {{- else if and .Values.persistence.enabled (.Values.modules.client.existingClaim) }}
         - name: persistence
           persistentVolumeClaim:
             claimName: {{ .Values.modules.client.existingClaim | default  "client-data" }}
+        {{- else }}
+  volumeClaimTemplates:
+    - metadata:
+        name: persistence
+        labels:
+          fateModule: client
+{{ include "fate.labels" . | indent 10 }}
+      spec:
+        accessModes: [{{ .Values.modules.hdfs.datanode.accessMode | quote }}]
+        storageClassName: {{ .Values.modules.client.storageClass }}
+        resources:
+          requests:
+            storage: {{ .Values.modules.client.size }}
         {{- end }}
 {{ end }}
