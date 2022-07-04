@@ -121,7 +121,7 @@ backend: eggroll
 #   storageClass: "local-scsi"
 #   accessMode: ReadWriteOnce
 #   size: 1Gi
-#   existingClaim: ""
+#   existingClaim: "nodemanager"
 #   resources:
 #     requests:
 #       cpu: "2"
@@ -281,18 +281,18 @@ backend: eggroll
     # affinity:
     # type: ClusterIP
     # nodePort: 30900
-    # existingClaim:
-    # storageClass:
-    # accessMode:
-    # size:
+    # existingClaim: ""
+    # storageClass: "namenode"
+    # accessMode: ReadWriteOnce
+    # size: 1Gi
   # datanode:
     # replicas:
     # nodeSelector:
     # tolerations:
     # affinity:
     # type: ClusterIP
-    # existingClaim:
-    # storageClass:
+    # existingClaim: ""
+    # storageClass: "datanode"
     # accessMode:
     # size:
 # nginx:
@@ -351,7 +351,10 @@ backend: eggroll
   # httpNodePort: 30094
   # httpsNodePort: 30099
   # loadBalancerIP:
+  # storageClass: "pulsar"
   # existingClaim:
+  # accessMode: ReadWriteOnce
+  # size: 1Gi
   # publicLB:
     # enabled: false
   # exchange:

@@ -46,9 +46,10 @@ backend: eggroll
     # - name: party9999.pulsar.example.com
   
 # Specify rollsite properties
-# rollsite: 
+# rollsite:
   # type: NodePort
   # nodePort: 30091
+  # loadBalancerIP:
   # exchange:
     # ip: 192.168.0.1
     # port: 30000
@@ -57,12 +58,23 @@ backend: eggroll
     # partyIp: 192.168.0.1
     # partyPort: 30101
   # nodeSelector:
+  # tolerations:
+  # affinity:
+  # polling:
+    # enabled: true
+    # type: server
+    # # server:
+      # # ip: 192.168.100.1
+      # # port: 9370
+    # clientList:
+    # - partID: 9999
+    # concurrency: 49
   # resources:
     # requests:
       # cpu: "1"
       # memory: "1Gi"
     # limits:
-      # cpu: "1"
+      # cpu: "4"
       # memory: "1Gi"
 
 # Specify clustermanager properties
@@ -102,6 +114,7 @@ backend: eggroll
   # type: NodePort
   # httpNodePort: 30097
   # grpcNodePort: 30092
+  # loadBalancerIP:
   # serviceAccountName: ""
   # nodeSelector:
   # tolerations:
@@ -112,36 +125,16 @@ backend: eggroll
   # storageClass: "python"
   # accessMode: ReadWriteMany
   # size: 1Gi
+  # resources:
+    # requests:
+      # cpu: "2"
+      # memory: "4Gi"
+    # limits:
+      # cpu: "4"
+      # memory: "8Gi"
   # clustermanager:
     # cores_per_node: 16
     # nodes: 2
-  # spark: 
-    # cores_per_node: 20
-    # nodes: 2
-    # master: spark://spark-master:7077
-    # driverHost: 
-    # driverHostType: 
-    # portMaxRetries: 
-    # driverStartPort: 
-    # blockManagerStartPort: 
-    # pysparkPython: 
-  # hdfs:
-    # name_node: hdfs://namenode:9000
-    # path_prefix:
-  # rabbitmq:
-    # host: rabbitmq
-    # mng_port: 15672
-    # port: 5672
-    # user: fate
-    # password: fate
-  # pulsar:
-    # host: pulsar
-    # mng_port: 8080
-    # port: 6650
-  # nginx:
-    # host: nginx
-    # http_port: 9300
-    # grpc_port: 9310
 
  # Specify the fateboard service's properties
 # fateboard: 
@@ -160,7 +153,9 @@ backend: eggroll
 
 # Specify the mysql properties
 # mysql: 
-  # nodeSelector: 
+  # nodeSelector:
+  # tolerations:
+  # affinity:
   # ip: mysql
   # port: 3306
   # database: eggroll_meta

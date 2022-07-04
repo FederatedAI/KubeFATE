@@ -115,7 +115,7 @@ spec:
           fateModule: client
 {{ include "fate.labels" . | indent 10 }}
       spec:
-        accessModes: [{{ .Values.modules.hdfs.datanode.accessMode | quote }}]
+        accessModes: [{{ .Values.modules.client.accessMode | quote }}]
         storageClassName: {{ .Values.modules.client.storageClass }}
         resources:
           requests:

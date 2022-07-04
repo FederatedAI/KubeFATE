@@ -285,7 +285,7 @@ spec:
           fateModule: python
 {{ include "fate.labels" . | indent 10 }}
       spec:
-        accessModes: [{{ .Values.modules.mysql.accessMode | quote }}]
+        accessModes: [{{ .Values.modules.python.accessMode | quote }}]
         storageClassName: {{ .Values.modules.python.storageClass }}
         resources:
           requests:
