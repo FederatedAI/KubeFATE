@@ -164,7 +164,10 @@ func ClusterInstallCommand() *cli.Command {
 			}
 
 			if template, err := GetValueTemplateExample(chartName.(string), chartVersion.(string)); err != nil {
-				color.Yellow("Config Warning: %s\n", err.Error())
+				if _, ok := err.(VersionNotValidError); !ok {
+					// if the error is not VersionNotValidError, warn user.
+					color.Yellow("Config Warning: %s\n", err.Error())
+				}
 			} else {
 				skippedKeys := getSkippedKeys(m)
 				errs := ValidateYaml(template, string(clusterConfig), skippedKeys)
