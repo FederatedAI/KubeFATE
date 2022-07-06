@@ -18,6 +18,7 @@ metadata:
     fateModule: python
 {{ include "fate.labels" . | indent 4 }}
 spec:
+  serviceName: fateflow
   replicas: 1
   selector:
     matchLabels:

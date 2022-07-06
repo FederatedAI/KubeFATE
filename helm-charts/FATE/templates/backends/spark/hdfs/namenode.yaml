@@ -18,6 +18,7 @@ metadata:
     fateModule: namenode
 {{ include "fate.labels" . | indent 4 }}
 spec:
+  serviceName: namenode
   replicas: 1
   selector:
     matchLabels:

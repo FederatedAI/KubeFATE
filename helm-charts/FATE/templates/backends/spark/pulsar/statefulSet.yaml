@@ -18,6 +18,7 @@ metadata:
     fateModule: pulsar
 {{ include "fate.labels" . | indent 4 }}
 spec:
+  serviceName: pulsar
   replicas: 1
   selector:
     matchLabels:

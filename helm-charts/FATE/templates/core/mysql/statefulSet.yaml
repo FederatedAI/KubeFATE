@@ -18,6 +18,7 @@ metadata:
     fateModule: mysql
 {{ include "fate.labels" . | indent 4 }}
 spec:
+  serviceName: mysql
   replicas: 1
   selector:
     matchLabels:
