@@ -142,16 +142,16 @@ spec:
             claimName: {{ .Values.modules.nodemanager.existingClaim }}
         {{- else }}
   volumeClaimTemplates:
-  - metadata:
-      name: data-dir
-      labels:
-        fateModule: nodemanager
+    - metadata:
+        name: data-dir
+        labels:
+          fateModule: nodemanager
 {{ include "fate.labels" . | indent 10 }}
-    spec:
-      accessModes: [ {{ .Values.modules.nodemanager.accessMode | quote }} ]
-      storageClassName: {{ .Values.modules.nodemanager.storageClass }}
-      resources:
-        requests:
-          storage: {{ .Values.modules.nodemanager.size }}
+      spec:
+        accessModes: [ {{ .Values.modules.nodemanager.accessMode | quote }} ]
+        storageClassName: {{ .Values.modules.nodemanager.storageClass }}
+        resources:
+          requests:
+            storage: {{ .Values.modules.nodemanager.size }}
         {{- end }}
 {{- end }}
