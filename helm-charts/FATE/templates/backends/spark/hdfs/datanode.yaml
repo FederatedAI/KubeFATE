@@ -19,7 +19,7 @@ metadata:
 {{ include "fate.labels" . | indent 4 }}
 spec:
   serviceName: datanode
-  replicas: {{ .Values.modules.hdfs.datanode.replicas }}
+  replicas: {{ .Values.modules.hdfs.datanode.replicas | default 3}}
   selector:
     matchLabels:
       fateModule: datanode
