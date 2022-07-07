@@ -472,9 +472,9 @@ modules:
       existingClaim: {{ .namenode.existingClaim }}
       storageClass: {{ .namenode.storageClass | default "" }}
       accessMode: {{ .namenode.accessMode  | default "ReadWriteOnce"  }}
-      size: {{ .namenode.size }}
+      size: {{ .namenode.size | default "1Gi" }}
     datanode:
-      replicas: {{ .datanode.replicas | default "3" }}
+      replicas: {{ .datanode.replicas | default 3 }}
       {{- with .datanode.nodeSelector }}
       nodeSelector: 
 {{ toYaml . | indent 8 }}
@@ -491,7 +491,7 @@ modules:
       existingClaim: {{ .datanode.existingClaim }}
       storageClass: {{ .datanode.storageClass | default "" }}
       accessMode: {{ .datanode.accessMode  | default "ReadWriteOnce"  }}
-      size: {{ .datanode.size }}
+      size: {{ .datanode.size ｜ default "1Gi" }}
     {{- end }}
 
 
