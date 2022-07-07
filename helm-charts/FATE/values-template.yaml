@@ -306,7 +306,7 @@ modules:
     include: {{ has "nodemanager" .modules }}
     {{- with .nodemanager }}
     sessionProcessorsPerNode: {{ .sessionProcessorsPerNode }}
-    replicas: {{ .replicas }}
+    replicas: {{ .replicas | default 2 }}
     subPath: {{ .subPath }}
     storageClass: {{ .storageClass  | default "client" }}
     accessMode: {{ .accessMode  | default "ReadWriteOnce" }}
@@ -603,7 +603,7 @@ modules:
     existingClaim: {{ .existingClaim }}
     storageClass: {{ .storageClass | default "" }}
     accessMode: {{ .accessMode  | default "ReadWriteOnce"  }}
-    size: {{ .size }}
+    size: {{ .size | default 1Gi }}
     {{- end }}
     
 externalMysqlIp: {{ .externalMysqlIp }}
