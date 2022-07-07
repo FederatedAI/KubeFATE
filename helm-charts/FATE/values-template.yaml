@@ -603,7 +603,7 @@ modules:
     existingClaim: {{ .existingClaim }}
     storageClass: {{ .storageClass | default "" }}
     accessMode: {{ .accessMode  | default "ReadWriteOnce"  }}
-    size: {{ .size | default 1Gi }}
+    size: {{ .size | default "1Gi" }}
     {{- end }}
     
 externalMysqlIp: {{ .externalMysqlIp }}
