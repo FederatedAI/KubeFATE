@@ -491,7 +491,7 @@ modules:
       existingClaim: {{ .datanode.existingClaim }}
       storageClass: {{ .datanode.storageClass | default "" }}
       accessMode: {{ .datanode.accessMode  | default "ReadWriteOnce"  }}
-      size: {{ .datanode.size ｜ default "1Gi" }}
+      size: {{ .datanode.size | default "1Gi" }}
     {{- end }}
 
 
