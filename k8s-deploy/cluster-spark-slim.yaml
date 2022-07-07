@@ -36,33 +36,17 @@ backend: spark_local_pulsar
   # spark:  
     # hosts:
     # - name: party9999.spark.example.com
-  # rabbitmq:  
-    # hosts:
-    # - name: party9999.rabbitmq.example.com
-  # pulsar:  
+  # pulsar:
     # hosts:
     # - name: party9999.pulsar.example.com
-
-# Specify rollsite properties
-# rollsite: 
-  # type: NodePort
-  # nodePort: 30091
-  # exchange:
-    # ip: 192.168.0.1
-    # port: 30000
-  # partyList:
-  # - partyId: 10000
-    # partyIp: 192.168.0.1
-    # partyPort: 30101
-  # nodeSelector: 
 
 # Specify the fateflow service's properties
 # python:
   # type: NodePort
   # nodePort: 30102
-  # nodeSelector: 
+  # nodeSelector:
   # logLevel: INFO
-  # spark: 
+  # spark:
     # cores_per_node: 20
     # nodes: 2
     # master: spark://spark-master:7077
@@ -87,7 +71,9 @@ backend: spark_local_pulsar
     
 # Specify the mysql properties
 # mysql: 
-  # nodeSelector: 
+  # nodeSelector:
+  # tolerations:
+  # affinity:
   # ip: mysql
   # port: 3306
   # database: eggroll_meta
@@ -110,41 +96,6 @@ backend: spark_local_pulsar
 # servingIp: 192.168.0.1
 # servingPort: 30095
 
-# FATE on spark configuration
-# spark:
-  # master:
-    # Image: "federatedai/spark-master"
-    # ImageTag: "1.6.0-release"
-    # replicas: 1
-    # resources:
-      # requests:
-        # cpu: "1"
-        # memory: "2Gi"
-      # limits:
-        # cpu: "1"
-        # memory: "2Gi"
-    # nodeSelector: 
-    # type: ClusterIP
-  # worker:
-    # Image: "federatedai/spark-worker"
-    # ImageTag: "1.6.0-release"
-    # replicas: 2
-    # resources:
-      # requests:
-        # cpu: "2"
-        # memory: "4Gi"
-      # limits:
-        # cpu: "4"
-        # memory: "8Gi"
-    # nodeSelector: 
-    # type: ClusterIP
-# hdfs:
-  # namenode:
-    # nodeSelector: 
-    # type: ClusterIP
-  # datanode:
-    # nodeSelector: 
-    # type: ClusterIP
 # nginx:
   # nodeSelector: 
   # type: ClusterIP

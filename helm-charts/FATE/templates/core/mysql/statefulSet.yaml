@@ -9,18 +9,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-{{ if .Values.modules.mysql.include }}
+{{- if .Values.modules.mysql.include }}
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: mysql
   labels:
     fateModule: mysql
 {{ include "fate.labels" . | indent 4 }}
 spec:
+  serviceName: mysql
   replicas: 1
-  strategy:
-    type: Recreate
   selector:
     matchLabels:
       fateModule: mysql
@@ -109,10 +108,22 @@ spec:
         {{- if not .Values.persistence.enabled }}
         - name: data
           emptyDir: {}
-        {{- else }}
+        {{- else if and .Values.persistence.enabled (.Values.modules.mysql.existingClaim) }}
         - name: data
           persistentVolumeClaim:
-            claimName: {{ .Values.modules.mysql.existingClaim | default  "mysql-data" }}
+            claimName: {{ .Values.modules.mysql.existingClaim | default  "mysql-data" }}\
+        {{- else }}
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+        labels:
+          fateModule: mysql
+{{ include "fate.labels" . | indent 10 }}
+      spec:
+        accessModes: [{{ .Values.modules.mysql.accessMode | quote }}]
+        storageClassName: {{ .Values.modules.mysql.storageClass }}
+        resources:
+          requests:
+            storage: {{ .Values.modules.mysql.size }}
         {{- end }}
----
-{{ end }}
+{{- end }}

@@ -9,18 +9,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-{{ if .Values.modules.pulsar.include }}
+{{- if .Values.modules.pulsar.include }}
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: pulsar
   labels:
     fateModule: pulsar
 {{ include "fate.labels" . | indent 4 }}
 spec:
+  serviceName: pulsar
   replicas: 1
-  strategy:
-    type: Recreate
   selector:
     matchLabels:
       fateModule: pulsar
@@ -122,11 +121,25 @@ spec:
           secret:
             secretName: pulsar-cert
         {{- end }}
+        {{- if not .Values.persistence.enabled }}
         - name: pulsar-data
-        {{ if .Values.persistence.enabled }}
+          emptyDir: {}
+        {{- else if and .Values.persistence.enabled (.Values.modules.pulsar.existingClaim) }}
+        - name: pulsar-data
           persistentVolumeClaim:
             claimName: {{ .Values.modules.pulsar.existingClaim | default  "pulsar-data" }}
-        {{ else }}
-          emptyDir: {}
-        {{ end }}
-{{ end }}
+        {{- else }}
+  volumeClaimTemplates:
+    - metadata:
+        name: pulsar-data
+        labels:
+          fateModule: pulsar
+{{ include "fate.labels" . | indent 10 }}
+      spec:
+        accessModes: [{{ .Values.modules.pulsar.accessMode | quote }}]
+        storageClassName: {{ .Values.modules.pulsar.storageClass }}
+        resources:
+          requests:
+            storage: {{ .Values.modules.pulsar.size }}
+        {{- end }}
+{{- end }}

@@ -9,18 +9,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-{{ if .Values.modules.hdfs.include }}
+{{- if .Values.modules.hdfs.include }}
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: namenode
   labels:
     fateModule: namenode
 {{ include "fate.labels" . | indent 4 }}
 spec:
+  serviceName: namenode
   replicas: 1
-  strategy:
-    type: Recreate
   selector:
     matchLabels:
       fateModule: namenode
@@ -112,11 +111,25 @@ spec:
         - name: namenode-confs
           configMap:
             name: namenode-config
+        {{- if not .Values.persistence.enabled }}
         - name: dfs
-        {{ if .Values.persistence.enabled }}
+          emptyDir: {}
+        {{- else if and .Values.persistence.enabled (.Values.modules.hdfs.namenode.existingClaim) }}
+        - name: dfs
           persistentVolumeClaim:
             claimName: {{ .Values.modules.hdfs.namenode.existingClaim | default  "namenode-data" }}
-        {{ else }}
-          emptyDir: {}
-        {{ end }}
-{{ end }}
+        {{- else }}
+  volumeClaimTemplates:
+    - metadata:
+        name: dfs
+        labels:
+          fateModule: namenode
+{{ include "fate.labels" . | indent 10 }}
+      spec:
+        accessModes: [{{ .Values.modules.hdfs.namenode.accessMode | quote }}]
+        storageClassName: {{ .Values.modules.hdfs.namenode.storageClass }}
+        resources:
+          requests:
+            storage: {{ .Values.modules.hdfs.namenode.size }}
+      {{- end }}
+{{- end }}

@@ -9,18 +9,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-{{ if .Values.modules.python.include }}
+{{- if .Values.modules.python.include }}
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: python
   labels:
     fateModule: python
 {{ include "fate.labels" . | indent 4 }}
 spec:
+  serviceName: fateflow
   replicas: 1
-  strategy:
-    type: Recreate
   selector:
     matchLabels:
       fateModule: python
@@ -275,10 +274,22 @@ spec:
         {{- if not .Values.persistence.enabled }}
         - name: python-data
           emptyDir: {}
-        {{- else }}
+        {{- else if and .Values.persistence.enabled (.Values.modules.python.existingClaim) }}
         - name: python-data
           persistentVolumeClaim:
             claimName: {{ .Values.modules.python.existingClaim | default  "python-data" }}
+        {{- else }}
+  volumeClaimTemplates:
+    - metadata:
+        name: python-data
+        labels:
+          fateModule: python
+{{ include "fate.labels" . | indent 10 }}
+      spec:
+        accessModes: [{{ .Values.modules.python.accessMode | quote }}]
+        storageClassName: {{ .Values.modules.python.storageClass }}
+        resources:
+          requests:
+            storage: {{ .Values.modules.mysql.size }}
         {{- end }}
-
-{{ end }}
+{{- end }}

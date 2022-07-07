@@ -38,50 +38,50 @@ backend: spark_pulsar
   # spark:
     # hosts:
     # - name: party9999.spark.example.com
-  # rabbitmq:
-    # hosts:
-    # - name: party9999.rabbitmq.example.com
   # pulsar:
     # hosts:
     # - name: party9999.pulsar.example.com
 
-# Specify rollsite properties
-# rollsite: 
-  # type: NodePort
-  # nodePort: 30091
-  # exchange:
-    # ip: 192.168.0.1
-    # port: 30000
-  # partyList:
-  # - partyId: 10000
-    # partyIp: 192.168.0.1
-    # partyPort: 30101
-  # nodeSelector: 
-
 # Specify the fateflow service's properties
 # python:
   # type: NodePort
-  # nodePort: 30102
-  # nodeSelector: 
+  # httpNodePort: 30097
+  # grpcNodePort: 30092
+  # loadBalancerIP:
+  # serviceAccountName: ""
+  # nodeSelector:
+  # tolerations:
+  # affinity:
+  # enabledNN: false
   # logLevel: INFO
-  # spark: 
+  # existingClaim: ""
+  # storageClass: "python"
+  # accessMode: ReadWriteMany
+  # size: 1Gi
+  # resources:
+    # requests:
+      # cpu: "2"
+      # memory: "4Gi"
+    # limits:
+      # cpu: "4"
+      # memory: "8Gi"
+  # spark:
     # cores_per_node: 20
     # nodes: 2
     # master: spark://spark-master:7077
-    # Only for using external Spark
-    ## driverHost:
-    ## driverHostType:
-    ## portMaxRetries:
-    ## driverStartPort:
-    ## blockManagerStartPort:
-    ## pysparkPython:
+    # driverHost:
+    # driverHostType:
+    # portMaxRetries:
+    # driverStartPort:
+    # blockManagerStartPort:
+    # pysparkPython:
   # hdfs:
     # name_node: hdfs://namenode:9000
     # path_prefix:
   # pulsar:
     # host: pulsar
-    # port: 6650
     # mng_port: 8080
+    # port: 6650
   # nginx:
     # host: nginx
     # http_port: 9300
@@ -116,7 +116,7 @@ backend: spark_pulsar
 # spark:
   # master:
     # Image: "federatedai/spark-master"
-    # ImageTag: "1.6.0-release"
+    # ImageTag: "1.6.1-release"
     # replicas: 1
     # resources:
       # requests:
@@ -125,11 +125,14 @@ backend: spark_pulsar
       # limits:
         # cpu: "1"
         # memory: "2Gi"
-    # nodeSelector: 
+    # nodeSelector:
+    # tolerations:
+    # affinity:
     # type: ClusterIP
+    # nodePort: 30977
   # worker:
     # Image: "federatedai/spark-worker"
-    # ImageTag: "1.6.0-release"
+    # ImageTag: "1.6.1-release"
     # replicas: 2
     # resources:
       # requests:
@@ -138,43 +141,107 @@ backend: spark_pulsar
       # limits:
         # cpu: "4"
         # memory: "8Gi"
-    # nodeSelector: 
+    # nodeSelector:
+    # tolerations:
+    # affinity:
     # type: ClusterIP
 # hdfs:
   # namenode:
-    # nodeSelector: 
+    # nodeSelector:
+    # tolerations:
+    # affinity:
     # type: ClusterIP
+    # nodePort: 30900
+    # existingClaim: ""
+    # storageClass: "namenode"
+    # accessMode: ReadWriteOnce
+    # size: 1Gi
   # datanode:
-    # nodeSelector: 
+    # replicas:
+    # nodeSelector:
+    # tolerations:
+    # affinity:
     # type: ClusterIP
+    # existingClaim: ""
+    # storageClass: "datanode"
+    # accessMode:
+    # size:
 # nginx:
-  # nodeSelector: 
+  # nodeSelector:
+  # tolerations:
+  # affinity:
   # type: ClusterIP
+  # loadBalancerIP:
   # httpNodePort: 30093
   # grpcNodePort: 30098
-  # route_table: 
-    # 10000: 
-      # proxy: 
-        # - host: 192.168.0.1 
+  # exchange:
+    # ip: 192.168.10.1
+    # httpPort: 30003
+    # grpcPort: 30008
+  # route_table:
+    # 10000:
+      # proxy:
+        # - host: 192.168.0.1
           # http_port: 30103
-          # grpc_port: 30108 
-      # fateflow: 
+          # grpc_port: 30108
+      # fateflow:
         # - host: 192.168.0.1
           # http_port: 30107
           # grpc_port: 30102
-# pulsar:
+# rabbitmq:
+  # nodeSelector:
+  # tolerations:
+  # affinity:
   # type: ClusterIP
   # nodePort: 30094
+  # loadBalancerIP:
+  # default_user: fate
+  # default_pass: fate
+  # user: fate
+  # password: fate
   # route_table:
+    # 9999:
+      # host: rabbitmq
+      # port: 5672
     # 10000:
       # host: 192.168.0.1
-      # port: 6650 
-      # sslPort:6651
-      # proxy: ""
+      # port: 30104
+  # resources:
+    # requests:
+      # cpu: "2"
+      # memory: "4Gi"
+    # limits:
+      # cpu: "4"
+      # memory: "8Gi"
+
+# pulsar:
+  # nodeSelector:
+  # tolerations:
+  # affinity:
+  # type: ClusterIP
+  # httpNodePort: 30094
+  # httpsNodePort: 30099
+  # loadBalancerIP:
+  # storageClass: "pulsar"
+  # existingClaim:
+  # accessMode: ReadWriteOnce
+  # size: 1Gi
+  # publicLB:
+    # enabled: false
+  # exchange:
+    # ip: 192.168.10.1
+    # port: 30000
+    # domain: fate.org
+  # route_table:
     # 9999:
       # host: pulsar
       # port: 6650
       # sslPort:6651
+    # 10000:
+      # host: 192.168.10.1
+      # port: 30105
+      # sslPort: 30109
+      # proxy: ""
   # resources:
     # requests:
       # cpu: "2"

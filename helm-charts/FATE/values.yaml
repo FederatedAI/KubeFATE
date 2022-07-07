@@ -120,9 +120,9 @@ modules:
     enabledNN: false
     logLevel: INFO
     # subPath: ""
-    existingClaim: ""
+    existingClaim:
     claimName: python-data
-    storageClass: "python"
+    storageClass:
     accessMode: ReadWriteOnce
     size: 1Gi
     clustermanager:
@@ -163,8 +163,8 @@ modules:
     tolerations:
     affinity:
     subPath: "client"
-    existingClaim: ""
-    storageClass: "nodemanager-0"
+    existingClaim:
+    storageClass:
     accessMode: ReadWriteOnce
     size: 1Gi
   clustermanager: 
@@ -182,9 +182,10 @@ modules:
     affinity:
     sessionProcessorsPerNode: 2
     subPath: "nodemanager"
-    storageClass: "nodemanager"
+    storageClass:
     accessMode: ReadWriteOnce
     size: 1Gi
+    existingClaim:
     resources:
       requests:
         cpu: "2"
@@ -198,8 +199,8 @@ modules:
     tolerations:
     affinity:
     subPath: "client"
-    existingClaim: ""
-    storageClass: "client"
+    existingClaim:
+    storageClass:
     accessMode: ReadWriteOnce
     size: 1Gi
 
@@ -215,9 +216,9 @@ modules:
     user: fate
     password: fate_dev
     subPath: "mysql"
-    existingClaim: ""
+    existingClaim:
     claimName: mysql-data
-    storageClass: "mysql"
+    storageClass:
     accessMode: ReadWriteOnce
     size: 1Gi
   serving:
@@ -267,8 +268,8 @@ modules:
       nodePort: 30900
       existingClaim:
       storageClass:
-      accessMode:
-      size:
+      accessMode: ReadWriteOnce
+      size: 1Gi
     datanode:
       replicas: 3
       nodeSelector:
@@ -277,8 +278,8 @@ modules:
       type: ClusterIP
       existingClaim:
       storageClass:
-      accessMode:
-      size:
+      accessMode: ReadWriteOnce
+      size: 1Gi
   nginx:
     include: true
     nodeSelector:
@@ -327,7 +328,11 @@ modules:
     type: ClusterIP
     httpNodePort: 30094
     httpsNodePort: 30099
-    loadBalancerIP: 
+    loadBalancerIP:
+    existingClaim:
+    accessMode: ReadWriteOnce
+    storageClass:
+    size: 1Gi
     publicLB:
       enabled: false
     # exchange:

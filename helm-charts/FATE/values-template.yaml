@@ -306,7 +306,7 @@ modules:
     include: {{ has "nodemanager" .modules }}
     {{- with .nodemanager }}
     sessionProcessorsPerNode: {{ .sessionProcessorsPerNode }}
-    replicas: {{ .replicas }}
+    replicas: {{ .replicas | default 2 }}
     subPath: {{ .subPath }}
     storageClass: {{ .storageClass  | default "client" }}
     accessMode: {{ .accessMode  | default "ReadWriteOnce" }}
@@ -472,9 +472,9 @@ modules:
       existingClaim: {{ .namenode.existingClaim }}
       storageClass: {{ .namenode.storageClass | default "" }}
       accessMode: {{ .namenode.accessMode  | default "ReadWriteOnce"  }}
-      size: {{ .namenode.size }}
+      size: {{ .namenode.size | default "1Gi" }}
     datanode:
-      replicas: {{ .datanode.replicas | default "3" }}
+      replicas: {{ .datanode.replicas | default 3 }}
       {{- with .datanode.nodeSelector }}
       nodeSelector: 
 {{ toYaml . | indent 8 }}
@@ -491,7 +491,7 @@ modules:
       existingClaim: {{ .datanode.existingClaim }}
       storageClass: {{ .datanode.storageClass | default "" }}
       accessMode: {{ .datanode.accessMode  | default "ReadWriteOnce"  }}
-      size: {{ .datanode.size }}
+      size: {{ .datanode.size | default "1Gi" }}
     {{- end }}
 
 
@@ -603,7 +603,7 @@ modules:
     existingClaim: {{ .existingClaim }}
     storageClass: {{ .storageClass | default "" }}
     accessMode: {{ .accessMode  | default "ReadWriteOnce"  }}
-    size: {{ .size }}
+    size: {{ .size | default "1Gi" }}
     {{- end }}
     
 externalMysqlIp: {{ .externalMysqlIp }}
