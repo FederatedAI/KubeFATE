@@ -17,6 +17,7 @@
 package job
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 	"time"
@@ -25,6 +26,58 @@ import (
 	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/service"
 	"github.com/rs/zerolog/log"
 )
+
+// getUpgradeScripts helps to return a list of the names of the .sql scripts which should
+// be executed in sequence in order to upgrade the FATE cluster.
+func getUpgradeScripts(startingVersion string, targetVersion string) ([]string, error) {
+	res := make([]string, 0)
+	if startingVersion == targetVersion {
+		// We never expect this logic can be reached, but this is for protection.
+		log.Warn().Msg("The versions are equal, no need do the upgrade")
+		return res, nil
+	}
+	supportedVersions := []string{"v1.7.0", "v1.7.1", "v1.7.2", "v1.8.0", "v1.9.0"}
+	startingVersionIndex := -1
+	targetVersionIndex := -1
+	for i, version := range supportedVersions {
+		if version == startingVersion {
+			startingVersionIndex = i
+		}
+		if version == targetVersion {
+			targetVersionIndex = i
+		}
+	}
+	if startingVersionIndex == -1 || targetVersionIndex == -1 {
+		errStr := "the original and target FATE versions do not support upgrade by this version of KubeFATE"
+		log.Error().Msg(errStr)
+		return res, errors.New(errStr)
+	}
+	for i := startingVersionIndex; i < targetVersionIndex; i++ {
+		res = append(res, supportedVersions[i]+"-to-"+supportedVersions[i+1])
+	}
+	return res, nil
+}
+
+// validateVersion helps make sure that the user set the right helm chart version and
+// the image version is equal to the chart version. For the versions not in the keys
+// of chartToImageVersionMap, we just skip the validation because this KubeFATE service
+// should also support some future versions.
+func validateVersion(chartVersion string, imageVersion string) bool {
+	chartToImageVersionMap := map[string]string{
+		"v1.7.0": "1.7.0-release",
+		"v1.7.1": "1.7.1-release",
+		"v1.7.2": "1.7.2-release",
+		"v1.8.0": "1.8.0-release",
+		"v1.9.0": "1.9.0-release",
+	}
+	if expectedImageVersion, ok := chartToImageVersionMap[chartVersion]; ok {
+		if expectedImageVersion == imageVersion {
+			return true
+		}
+		return false
+	}
+	return true
+}
 
 func stopJob(job *modules.Job, cluster *modules.Cluster) bool {
 	if !cluster.IsExisted(cluster.Name, cluster.NameSpace) {
@@ -134,6 +187,11 @@ func ClusterUpdate(clusterArgs *modules.ClusterArgs, creator string) (*modules.J
 		return nil, err
 	}
 
+	versionCorrect := validateVersion(c.ChartVersion, c.ChartValues["imageTag"].(string))
+	if !versionCorrect {
+		return nil, fmt.Errorf("the image tag is not consistent with the chart verison, which is unsupported")
+	}
+
 	clusterNew, err := modules.NewCluster(clusterArgs.Name, clusterArgs.Namespace, clusterArgs.ChartName, clusterArgs.ChartVersion, string(clusterArgs.Data))
 	if err != nil {
 		log.Error().Err(err).Msg("NewCluster")
@@ -150,6 +208,15 @@ func ClusterUpdate(clusterArgs *modules.ClusterArgs, creator string) (*modules.J
 		cluster.ChartVersion == clusterArgs.ChartVersion {
 		return nil, fmt.Errorf("the configuration file did not change")
 	}
+	upgradeScripts := []string{}
+	if cluster.ChartVersion != clusterArgs.ChartVersion {
+		upgradeScripts, err = getUpgradeScripts(cluster.ChartVersion, clusterArgs.ChartVersion)
+		if err != nil {
+			return nil, fmt.Errorf("the version change indicates the upgrade cannot be supported")
+		}
+	}
+	log.Info().Msgf("Going to upgrade from %s to %s", cluster.ChartVersion, clusterArgs.ChartVersion)
+	log.Debug().Msgf("Will execute scripts: %v", upgradeScripts)
 
 	job := modules.NewJob(clusterArgs, "ClusterUpdate", creator, cluster.Uuid)
 	//  save job to modules
