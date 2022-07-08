@@ -53,7 +53,7 @@ func getUpgradeScripts(startingVersion string, targetVersion string) ([]string, 
 		return res, errors.New(errStr)
 	}
 	for i := startingVersionIndex; i < targetVersionIndex; i++ {
-		res = append(res, supportedVersions[i]+"-to-"+supportedVersions[i+1])
+		res = append(res, supportedVersions[i]+"-to-"+supportedVersions[i+1]+".sql")
 	}
 	return res, nil
 }
@@ -187,11 +187,6 @@ func ClusterUpdate(clusterArgs *modules.ClusterArgs, creator string) (*modules.J
 		return nil, err
 	}
 
-	versionCorrect := validateVersion(c.ChartVersion, c.ChartValues["imageTag"].(string))
-	if !versionCorrect {
-		return nil, fmt.Errorf("the image tag is not consistent with the chart verison, which is unsupported")
-	}
-
 	clusterNew, err := modules.NewCluster(clusterArgs.Name, clusterArgs.Namespace, clusterArgs.ChartName, clusterArgs.ChartVersion, string(clusterArgs.Data))
 	if err != nil {
 		log.Error().Err(err).Msg("NewCluster")
@@ -202,6 +197,11 @@ func ClusterUpdate(clusterArgs *modules.ClusterArgs, creator string) (*modules.J
 	var specNew = clusterNew.Spec
 	var valuesOld = cluster.Values
 	var valuesNew = clusterNew.Values
+
+	versionCorrect := validateVersion(c.ChartVersion, specNew["imageTag"].(string))
+	if !versionCorrect {
+		return nil, fmt.Errorf("the image tag is not consistent with the chart verison, which is unsupported")
+	}
 
 	if reflect.DeepEqual(specOld, specNew) &&
 		cluster.ChartName == clusterArgs.ChartName &&
@@ -216,7 +216,7 @@ func ClusterUpdate(clusterArgs *modules.ClusterArgs, creator string) (*modules.J
 		}
 	}
 	log.Info().Msgf("Going to upgrade from %s to %s", cluster.ChartVersion, clusterArgs.ChartVersion)
-	log.Debug().Msgf("Will execute scripts: %v", upgradeScripts)
+	log.Info().Msgf("Will execute scripts: %v", upgradeScripts)
 
 	job := modules.NewJob(clusterArgs, "ClusterUpdate", creator, cluster.Uuid)
 	//  save job to modules

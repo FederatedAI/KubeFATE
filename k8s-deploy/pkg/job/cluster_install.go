@@ -219,7 +219,7 @@ func createCluster(job *modules.Job) (*modules.Cluster, error) {
 		return nil, err
 	}
 
-	versionCorrect := validateVersion(cluster.ChartVersion, cluster.ChartValues["imageTag"].(string))
+	versionCorrect := validateVersion(cluster.ChartVersion, cluster.Spec["imageTag"].(string))
 	if !versionCorrect {
 		return nil, fmt.Errorf("the image tag is not consistent with the chart verison, which is unsupported")
 	}
