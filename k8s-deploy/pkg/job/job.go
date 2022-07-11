@@ -218,7 +218,7 @@ func ClusterUpdate(clusterArgs *modules.ClusterArgs, creator string) (*modules.J
 	if cluster.ChartVersion != clusterArgs.ChartVersion {
 		upgradeScripts, err = getUpgradeScripts(cluster.ChartVersion, clusterArgs.ChartVersion)
 		if err != nil {
-			return nil, fmt.Errorf("the version change indicates the upgrade cannot be supported")
+			return nil, err
 		}
 	}
 	log.Info().Msgf("going to upgrade from %s to %s", cluster.ChartVersion, clusterArgs.ChartVersion)
