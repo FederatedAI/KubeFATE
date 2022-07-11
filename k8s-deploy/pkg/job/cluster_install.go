@@ -25,6 +25,8 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+const fateChartName = "FATE"
+
 // ClusterInstall Cluster Install New, Create and run job
 func ClusterInstall(clusterArgs *modules.ClusterArgs, creator string) (*modules.Job, error) {
 
@@ -219,9 +221,11 @@ func createCluster(job *modules.Job) (*modules.Cluster, error) {
 		return nil, err
 	}
 
-	versionCorrect := validateVersion(cluster.ChartVersion, cluster.Spec["imageTag"].(string))
-	if !versionCorrect {
-		return nil, fmt.Errorf("the image tag is not consistent with the chart verison, which is unsupported")
+	if cluster.ChartName == fateChartName {
+		err = validateFateVersion(cluster.ChartVersion, cluster.Spec["imageTag"].(string))
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	// Save Cluster to database

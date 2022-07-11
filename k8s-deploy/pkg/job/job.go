@@ -58,11 +58,11 @@ func getUpgradeScripts(startingVersion string, targetVersion string) ([]string, 
 	return res, nil
 }
 
-// validateVersion helps make sure that the user set the right helm chart version and
+// validateFateVersion helps make sure that the user set the right helm chart version and
 // the image version is equal to the chart version. For the versions not in the keys
 // of chartToImageVersionMap, we just skip the validation because this KubeFATE service
 // should also support some future versions.
-func validateVersion(chartVersion string, imageVersion string) bool {
+func validateFateVersion(chartVersion string, imageVersion string) error {
 	chartToImageVersionMap := map[string]string{
 		"v1.7.0": "1.7.0-release",
 		"v1.7.1": "1.7.1-release",
@@ -72,11 +72,12 @@ func validateVersion(chartVersion string, imageVersion string) bool {
 	}
 	if expectedImageVersion, ok := chartToImageVersionMap[chartVersion]; ok {
 		if expectedImageVersion == imageVersion {
-			return true
+			return nil
 		}
-		return false
+		log.Error().Msgf("the chart version is %s but the image version is %s", chartVersion, imageVersion)
+		return errors.New("the image tag is not consistent with the chart version, which is unsupported")
 	}
-	return true
+	return nil
 }
 
 func stopJob(job *modules.Job, cluster *modules.Cluster) bool {
@@ -198,9 +199,14 @@ func ClusterUpdate(clusterArgs *modules.ClusterArgs, creator string) (*modules.J
 	var valuesOld = cluster.Values
 	var valuesNew = clusterNew.Values
 
-	versionCorrect := validateVersion(c.ChartVersion, specNew["imageTag"].(string))
-	if !versionCorrect {
-		return nil, fmt.Errorf("the image tag is not consistent with the chart verison, which is unsupported")
+	if cluster.ChartName != clusterNew.ChartName {
+		return nil, fmt.Errorf("doesn't support upgrade between different charts")
+	}
+	if clusterNew.ChartName == fateChartName {
+		err = validateFateVersion(cluster.ChartVersion, specNew["imageTag"].(string))
+		if err != nil {
+			return nil, fmt.Errorf("the image tag is not consistent with the chart verison, which is unsupported")
+		}
 	}
 
 	if reflect.DeepEqual(specOld, specNew) &&
@@ -208,15 +214,15 @@ func ClusterUpdate(clusterArgs *modules.ClusterArgs, creator string) (*modules.J
 		cluster.ChartVersion == clusterArgs.ChartVersion {
 		return nil, fmt.Errorf("the configuration file did not change")
 	}
-	upgradeScripts := []string{}
+	var upgradeScripts []string
 	if cluster.ChartVersion != clusterArgs.ChartVersion {
 		upgradeScripts, err = getUpgradeScripts(cluster.ChartVersion, clusterArgs.ChartVersion)
 		if err != nil {
 			return nil, fmt.Errorf("the version change indicates the upgrade cannot be supported")
 		}
 	}
-	log.Info().Msgf("Going to upgrade from %s to %s", cluster.ChartVersion, clusterArgs.ChartVersion)
-	log.Info().Msgf("Will execute scripts: %v", upgradeScripts)
+	log.Info().Msgf("going to upgrade from %s to %s", cluster.ChartVersion, clusterArgs.ChartVersion)
+	log.Info().Msgf("will execute scripts: %v", upgradeScripts)
 
 	job := modules.NewJob(clusterArgs, "ClusterUpdate", creator, cluster.Uuid)
 	//  save job to modules

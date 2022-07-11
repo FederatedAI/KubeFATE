@@ -6,14 +6,14 @@ import (
 )
 
 func Test_validateVersion(t *testing.T) {
-	actual := validateVersion("v1.7.0", "1.7.0-release")
-	assert.True(t, actual)
+	err := validateFateVersion("v1.7.0", "1.7.0-release")
+	assert.Nil(t, err)
 
-	actual = validateVersion("v1.7.0", "1.7.1-release")
-	assert.False(t, actual)
+	err = validateFateVersion("v1.7.0", "1.7.1-release")
+	assert.NotNil(t, err)
 
-	actual = validateVersion("v1.6.0", "1.6.0-release")
-	assert.True(t, actual)
+	err = validateFateVersion("v1.6.0", "1.6.0-release")
+	assert.Nil(t, err)
 }
 
 func Test_getUpgradeScripts(t *testing.T) {
