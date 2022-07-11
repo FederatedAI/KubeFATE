@@ -215,14 +215,16 @@ func ClusterUpdate(clusterArgs *modules.ClusterArgs, creator string) (*modules.J
 		return nil, fmt.Errorf("the configuration file did not change")
 	}
 	var upgradeScripts []string
-	if cluster.ChartVersion != clusterArgs.ChartVersion {
-		upgradeScripts, err = getUpgradeScripts(cluster.ChartVersion, clusterArgs.ChartVersion)
-		if err != nil {
-			return nil, err
+	if clusterNew.ChartName == fateChartName {
+		if cluster.ChartVersion != clusterArgs.ChartVersion {
+			upgradeScripts, err = getUpgradeScripts(cluster.ChartVersion, clusterArgs.ChartVersion)
+			if err != nil {
+				return nil, err
+			}
 		}
+		log.Info().Msgf("going to upgrade from %s to %s", cluster.ChartVersion, clusterArgs.ChartVersion)
+		log.Info().Msgf("will execute scripts: %v", upgradeScripts)
 	}
-	log.Info().Msgf("going to upgrade from %s to %s", cluster.ChartVersion, clusterArgs.ChartVersion)
-	log.Info().Msgf("will execute scripts: %v", upgradeScripts)
 
 	job := modules.NewJob(clusterArgs, "ClusterUpdate", creator, cluster.Uuid)
 	//  save job to modules
