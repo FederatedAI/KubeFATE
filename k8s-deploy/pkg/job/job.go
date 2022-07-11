@@ -203,7 +203,7 @@ func ClusterUpdate(clusterArgs *modules.ClusterArgs, creator string) (*modules.J
 		return nil, fmt.Errorf("doesn't support upgrade between different charts")
 	}
 	if clusterNew.ChartName == fateChartName {
-		err = validateFateVersion(cluster.ChartVersion, specNew["imageTag"].(string))
+		err = validateFateVersion(c.ChartVersion, specNew["imageTag"].(string))
 		if err != nil {
 			return nil, fmt.Errorf("the image tag is not consistent with the chart verison, which is unsupported")
 		}
