@@ -25,7 +25,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-const fateChartName = "FATE"
+const fateChartName = "fate"
 
 // ClusterInstall Cluster Install New, Create and run job
 func ClusterInstall(clusterArgs *modules.ClusterArgs, creator string) (*modules.Job, error) {
