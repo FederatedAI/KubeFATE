@@ -53,7 +53,9 @@ func getUpgradeScripts(startingVersion string, targetVersion string) ([]string, 
 		}
 	}
 	if startingVersionIndex == -1 || targetVersionIndex == -1 {
-		errStr := "the original and target FATE versions do not support upgrade by this version of KubeFATE"
+		errStr := "the original or target FATE versions do not support upgrade by this version of KubeFATE, " +
+			"this could happen when you are using a lower-version KubeFATE to conduct upgrade for a higher-version" +
+			"FATE cluster. Try to explicitly set 'upgradesupportedfateversions:' in the config.yaml file"
 		log.Error().Msg(errStr)
 		return res, errors.New(errStr)
 	}
