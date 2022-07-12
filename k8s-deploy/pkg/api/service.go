@@ -93,6 +93,7 @@ func Run() error {
 	log.Info().Msgf("DbType: %v", viper.GetString("db.type"))
 	log.Info().Msgf("LogNocolor: %v", viper.GetString("log.nocolor"))
 	log.Info().Msgf("server: [%s:%s]", viper.GetString("server.address"), viper.GetString("server.port"))
+	log.Info().Msgf("upgrade supported FATE versions %v", viper.GetStringSlice("upgradesupportedfateversions"))
 
 	err := initDb()
 	if err != nil {

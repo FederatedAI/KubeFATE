@@ -17,9 +17,12 @@
 package job
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/spf13/viper"
 	"reflect"
+	"strings"
 	"time"
 
 	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/modules"
@@ -36,7 +39,9 @@ func getUpgradeScripts(startingVersion string, targetVersion string) ([]string, 
 		log.Warn().Msg("The versions are equal, no need do the upgrade")
 		return res, nil
 	}
-	supportedVersions := []string{"v1.7.0", "v1.7.1", "v1.7.2", "v1.8.0", "v1.9.0"}
+	startingVersion = strings.ReplaceAll(startingVersion, "v", "")
+	targetVersion = strings.ReplaceAll(targetVersion, "v", "")
+	supportedVersions := viper.GetStringSlice("upgradesupportedfateversions")
 	startingVersionIndex := -1
 	targetVersionIndex := -1
 	for i, version := range supportedVersions {
@@ -188,6 +193,10 @@ func ClusterUpdate(clusterArgs *modules.ClusterArgs, creator string) (*modules.J
 		return nil, err
 	}
 
+	if cluster.ChartName != clusterArgs.ChartName {
+		return nil, fmt.Errorf("doesn't support upgrade between different charts")
+	}
+
 	clusterNew, err := modules.NewCluster(clusterArgs.Name, clusterArgs.Namespace, clusterArgs.ChartName, clusterArgs.ChartVersion, string(clusterArgs.Data))
 	if err != nil {
 		log.Error().Err(err).Msg("NewCluster")
@@ -199,9 +208,6 @@ func ClusterUpdate(clusterArgs *modules.ClusterArgs, creator string) (*modules.J
 	var valuesOld = cluster.Values
 	var valuesNew = clusterNew.Values
 
-	if cluster.ChartName != clusterNew.ChartName {
-		return nil, fmt.Errorf("doesn't support upgrade between different charts")
-	}
 	if clusterNew.ChartName == fateChartName {
 		err = validateFateVersion(c.ChartVersion, specNew["imageTag"].(string))
 		if err != nil {
@@ -214,18 +220,31 @@ func ClusterUpdate(clusterArgs *modules.ClusterArgs, creator string) (*modules.J
 		cluster.ChartVersion == clusterArgs.ChartVersion {
 		return nil, fmt.Errorf("the configuration file did not change")
 	}
+
 	var upgradeScripts []string
 	if clusterNew.ChartName == fateChartName {
 		if cluster.ChartVersion != clusterArgs.ChartVersion {
 			upgradeScripts, err = getUpgradeScripts(cluster.ChartVersion, clusterArgs.ChartVersion)
 			if err != nil {
+				msg := "failed to put the upgrade script file names to the new cluster spec"
+				log.Error().Err(err).Msg(msg)
 				return nil, err
 			}
+			clusterNew.Spec["upgradeScripts"] = upgradeScripts
+			byteValues, err := json.Marshal(clusterNew.Spec)
+			if err != nil {
+				msg := "failed to concatenate the upgrade script file names to the new cluster value"
+				log.Error().Err(err).Msg(msg)
+				return nil, err
+			}
+			clusterNew.Values = string(byteValues)
+			valuesNew = clusterNew.Values
+			specNew = clusterNew.Spec
 		}
 		log.Info().Msgf("going to upgrade from %s to %s", cluster.ChartVersion, clusterArgs.ChartVersion)
-		log.Info().Msgf("will execute scripts: %v", upgradeScripts)
-	}
+		log.Info().Msgf("before launching the newer version fateflow, will execute scripts: %v", upgradeScripts)
 
+	}
 	job := modules.NewJob(clusterArgs, "ClusterUpdate", creator, cluster.Uuid)
 	//  save job to modules
 	_, err = job.Insert()

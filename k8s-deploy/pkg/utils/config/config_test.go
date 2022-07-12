@@ -39,6 +39,12 @@ server:
   address: 0.0.0.0
   port: "8080"
 serviceurl: localhost:8080
+upgradesupportedfateversions:
+- 1.7.0
+- 1.7.1
+- 1.7.2
+- 1.8.0
+- 1.9.0
 user:
   password: admin
   username: admin
