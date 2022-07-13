@@ -9,6 +9,7 @@ spec:
       containers:
         - name: fate-mysql-upgrader
           image: federatedai/fate-upgrade-manager:latest
+          imagePullPolicy: IfNotPresent
           {{- with .Values }}
           command: ["python", "upgrade-mysql.py", "{{ .username }}",
                     "{{ .password }}", "{{ .start }}", "{{ .target }}"]
