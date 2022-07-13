@@ -1,0 +1,16 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: fate-mysql-upgrade-job
+spec:
+  backoffLimit: 1
+  template:
+    spec:
+      containers:
+        - name: fate-mysql-upgrader
+          image: federatedai/fate-upgrade-manager:latest
+          {{- with .Values }}
+          command: ["python", "upgrade-mysql.py", "{{ .username }}",
+                    "{{ .password }}", "{{ .start }}", "{{ .target }}"]
+          {{- end }}
+      restartPolicy: Never
