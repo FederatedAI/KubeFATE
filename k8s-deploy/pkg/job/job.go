@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2021 VMware, Inc.
+ * Copyright 2019-2022 VMware, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,43 +20,14 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"strings"
 	"time"
 
 	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/modules"
 	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/service"
+	"github.com/hashicorp/go-version"
 	"github.com/rs/zerolog/log"
 )
-
-// getUpgradeScripts helps to return a list of the names of the .sql scripts which should
-// be executed in sequence in order to upgrade the FATE cluster.
-func getUpgradeScripts(startingVersion string, targetVersion string) ([]string, error) {
-	res := make([]string, 0)
-	if startingVersion == targetVersion {
-		// We never expect this logic can be reached, but this is for protection.
-		log.Warn().Msg("The versions are equal, no need do the upgrade")
-		return res, nil
-	}
-	supportedVersions := []string{"v1.7.0", "v1.7.1", "v1.7.2", "v1.8.0", "v1.9.0"}
-	startingVersionIndex := -1
-	targetVersionIndex := -1
-	for i, version := range supportedVersions {
-		if version == startingVersion {
-			startingVersionIndex = i
-		}
-		if version == targetVersion {
-			targetVersionIndex = i
-		}
-	}
-	if startingVersionIndex == -1 || targetVersionIndex == -1 {
-		errStr := "the original and target FATE versions do not support upgrade by this version of KubeFATE"
-		log.Error().Msg(errStr)
-		return res, errors.New(errStr)
-	}
-	for i := startingVersionIndex; i < targetVersionIndex; i++ {
-		res = append(res, supportedVersions[i]+"-to-"+supportedVersions[i+1]+".sql")
-	}
-	return res, nil
-}
 
 // validateFateVersion helps make sure that the user set the right helm chart version and
 // the image version is equal to the chart version. For the versions not in the keys
@@ -202,30 +173,34 @@ func ClusterUpdate(clusterArgs *modules.ClusterArgs, creator string) (*modules.J
 	if cluster.ChartName != clusterNew.ChartName {
 		return nil, fmt.Errorf("doesn't support upgrade between different charts")
 	}
-	if clusterNew.ChartName == fateChartName {
-		err = validateFateVersion(c.ChartVersion, specNew["imageTag"].(string))
-		if err != nil {
-			return nil, fmt.Errorf("the image tag is not consistent with the chart verison, which is unsupported")
-		}
-	}
 
 	if reflect.DeepEqual(specOld, specNew) &&
 		cluster.ChartName == clusterArgs.ChartName &&
 		cluster.ChartVersion == clusterArgs.ChartVersion {
 		return nil, fmt.Errorf("the configuration file did not change")
 	}
-	var upgradeScripts []string
-	if clusterNew.ChartName == fateChartName {
-		if cluster.ChartVersion != clusterArgs.ChartVersion {
-			upgradeScripts, err = getUpgradeScripts(cluster.ChartVersion, clusterArgs.ChartVersion)
+
+	oldVersion, err := version.NewVersion(strings.ReplaceAll(cluster.ChartVersion, "v", ""))
+	newVersion, err := version.NewVersion(strings.ReplaceAll(clusterArgs.ChartVersion, "v", ""))
+	// Comparison example. There is also GreaterThan, Equal, and just
+	// a simple Compare that returns an int allowing easy >=, <=, etc.
+	if newVersion.LessThan(oldVersion) {
+		return nil, fmt.Errorf("using kubefate to downgrading a cluster is not supported")
+	}
+	var upgradeManagerChartName, upgradeManagerChartVersion string
+	if newVersion.GreaterThan(oldVersion) {
+		switch clusterNew.ChartName {
+		case fateChartName:
+			err = validateFateVersion(c.ChartVersion, specNew["imageTag"].(string))
 			if err != nil {
 				return nil, err
 			}
+			upgradeManagerChartName = fateUpgradeManagerChartName
+			upgradeManagerChartVersion = "v1.0.0"
+		default:
+			log.Warn().Msgf("the chart %s doesn't have an upgrade manager", clusterNew.ChartName)
 		}
-		log.Info().Msgf("going to upgrade from %s to %s", cluster.ChartVersion, clusterArgs.ChartVersion)
-		log.Info().Msgf("will execute scripts: %v", upgradeScripts)
 	}
-
 	job := modules.NewJob(clusterArgs, "ClusterUpdate", creator, cluster.Uuid)
 	//  save job to modules
 	_, err = job.Insert()
@@ -247,6 +222,18 @@ func ClusterUpdate(clusterArgs *modules.ClusterArgs, creator string) (*modules.J
 		dbErr = cluster.SetStatus(modules.ClusterStatusUpdating)
 		if dbErr != nil {
 			log.Error().Err(dbErr).Msg("Cluster.SetStatus error")
+		}
+
+		// If the chart version changed, we should get
+		if upgradeManagerChartName != nil {
+			umCluster := modules.ClusterArgs{
+				Name:         upgradeManagerChartName + "-" + oldVersion.String() + "to-" + newVersion.String(),
+				ChartName:    upgradeManagerChartName,
+				Namespace:    clusterArgs.Namespace,
+				ChartVersion: upgradeManagerChartVersion,
+				Cover:        false,
+				Data:         "",
+			}
 		}
 
 		dbErr = cluster.SetValues(valuesNew)

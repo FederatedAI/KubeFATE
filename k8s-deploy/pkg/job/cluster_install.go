@@ -25,7 +25,10 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-const fateChartName = "fate"
+const (
+	fateChartName               = "fate"
+	fateUpgradeManagerChartName = "fate-upgrade-manager"
+)
 
 // ClusterInstall Cluster Install New, Create and run job
 func ClusterInstall(clusterArgs *modules.ClusterArgs, creator string) (*modules.Job, error) {
