@@ -7,6 +7,7 @@ spec:
   backoffLimit: 1
   template:
     spec:
+      serviceAccountName: fum
       containers:
         - name: fate-mysql-upgrader
           image: federatedai/fate-upgrade-manager:latest
