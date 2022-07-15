@@ -1,6 +1,5 @@
 apiVersion: batch/v1
 kind: Job
-{{- with .Values }}
 metadata:
   name: fate-mysql-upgrade-job-{{ .start }}-to-{{ .target }}
 spec:
@@ -16,7 +15,8 @@ spec:
             - "/bin/bash"
             - "-c"
             - |
-              python shutdown-flow.py {{ .namespace }}
-              python upgrade-mysql.py {{ .username }} {{ .password }} {{ .start }} {{ .target }}
+              python shutdown-flow.py {{ .Release.Namespace }}
+              {{- with .Values }}
+              python upgrade-mysql.py {{ .username }} {{ .password }} {{ .start }} {{ .target }}w
+              {{- end }}
       restartPolicy: Never
-{{- end }}
