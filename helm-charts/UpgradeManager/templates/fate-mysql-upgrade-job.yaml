@@ -3,7 +3,7 @@ kind: Job
 metadata:
   name: fate-mysql-upgrade-job-{{ .start }}-to-{{ .target }}
 spec:
-  backoffLimit: 1
+  backoffLimit: 0
   template:
     spec:
       serviceAccountName: fum

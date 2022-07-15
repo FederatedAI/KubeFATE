@@ -1,80 +1,59 @@
 import sys
 import time
 from kubernetes import client, config
-from enum import Enum
 
 APP_NAME = "python"
 
-
-class AppType(Enum):
-    DEPLOYMENT = 1
-    STS = 2
-
-
-def shutdown_flow(namespace, api, app_type):
-    if app_type == AppType.DEPLOYMENT:
-        resp = update_deployment(namespace, api)
+def shutdown_flow(namespace, api, app):
+    if type(app) == client.V1Deployment:
+        update_deployment(namespace, api, app)
     else:
-        resp = update_sts(namespace, api)
-    if resp.status.replicas == 0:
-        print("Shut down flow succeed")
+        update_sts(namespace, api, app)
+    app = get_flow_app(namespace, api)
+    if app.spec.replicas == 0:
+        print("change the replicas to 0 successfully")
+        # The default grace period is 30 seconds.
+        time.sleep(30)
+        return 0
     else:
-        print("Shut down flow failed")
-        exit(-1)
+        print("failed to change the replicas to 0")
+        return -1
 
 
-def check_flow_type(namespace, api):
+def get_flow_app(namespace, api):
     deployments = api.list_namespaced_deployment(namespace)
+    stss = api.list_namespaced_stateful_set(namespace)
     for deployment in deployments.items:
         if deployment.metadata.name == APP_NAME:
-            return AppType.DEPLOYMENT
-    return AppType.STS
+            return deployment
+    for sts in stss.items:
+        if sts.metadata.name == APP_NAME:
+            return sts
+    return None
 
 
-def update_deployment(namespace, api):
+def update_deployment(namespace, api, app):
     # Update container image
-    body = client.V1Deployment(
-        spec=client.V1DeploymentSpec(
-            replicas=0
-        )
-    )
-    return api.patch_namespaced_deployment(
-        name=APP_NAME, namespace=namespace, body=body
+    app.spec.replicas = 0
+    api.patch_namespaced_deployment(
+        name=APP_NAME, namespace=namespace, body=app
     )
 
 
-def update_sts(namespace, api):
-    body = client.V1StatefulSet(
-        spec=client.V1StatefulSetSpec(
-            replicas=0
-        )
+def update_sts(namespace, api, app):
+    app.spec.replicas = 0
+    api.patch_namespaced_stateful_set(
+        name=APP_NAME, namespace=namespace, body=app
     )
-    return api.patch_namespaced_stateful_set(
-        name=APP_NAME, namespace=namespace, body=body
-    )
-
-
-def wait_flow_down(namespace, api):
-    flow_down = False
-    while True:
-        if flow_down:
-            return
-        rss = api.list_namespaced_replica_set(namespace)
-        for rs in rss.items:
-            if rs.metadata.name.startwith(APP_NAME):
-                if rs.status.ready_replicas == 0:
-                    flow_down = True
-                else:
-                    print("flow is still up, will check 10 seconds later")
-                    time.sleep(10)
-                break
-    return
 
 
 if __name__ == '__main__':
     _, namespace = sys.argv
-    config.load_kube_config()
+    config.load_incluster_config()
     apps_v1 = client.AppsV1Api()
-    app_type = check_flow_type(namespace, apps_v1)
-    shutdown_flow(namespace, apps_v1, app_type)
-    wait_flow_down(namespace, apps_v1)
+    app = get_flow_app(namespace, apps_v1)
+    if not app:
+        print("cannot find any deployment/sts whose name is 'python'")
+        exit()
+    return_code = shutdown_flow(namespace, apps_v1, app)
+    exit(return_code)
