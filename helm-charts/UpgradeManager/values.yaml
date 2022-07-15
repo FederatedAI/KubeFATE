@@ -1,3 +1,4 @@
+namespace: fate-9999
 username: fate
 password: fate_dev
 start: 1.9.0

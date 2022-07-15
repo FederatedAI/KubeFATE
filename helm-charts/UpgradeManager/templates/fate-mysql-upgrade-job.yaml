@@ -12,7 +12,11 @@ spec:
         - name: fate-mysql-upgrader
           image: federatedai/fate-upgrade-manager:latest
           imagePullPolicy: IfNotPresent
-          command: ["python", "upgrade-mysql.py", "{{ .username }}",
-                    "{{ .password }}", "{{ .start }}", "{{ .target }}"]
+          command:
+            - "/bin/bash"
+            - "-c"
+            - |
+              python shutdown-flow.py {{ .namespace }}
+              python upgrade-mysql.py {{ .username }} {{ .password }} {{ .start }} {{ .target }}
       restartPolicy: Never
 {{- end }}
