@@ -25,7 +25,7 @@ def shutdown_flow(namespace, api, app):
             print("wait for 10 seconds and will recheck")
             time.sleep(10)
     print("cannot shutdown the flow's pod")
-    return -1
+    return 1
 
 
 def get_flow_app(namespace, api):

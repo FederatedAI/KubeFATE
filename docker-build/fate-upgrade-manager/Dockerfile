@@ -2,7 +2,7 @@ FROM centos/python-36-centos7
 
 WORKDIR /
 
-COPY sql/ .
+COPY sql/ ./sql/
 COPY upgrade-mysql.py .
 COPY shutdown-flow.py .
 

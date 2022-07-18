@@ -16,12 +16,12 @@ spec:
             - "-c"
             - |
               python shutdown-flow.py {{ .Release.Namespace }}
-              retVal = $?
+              retVal=$?
               if [ $retVal -ne 0 ]; then
                 echo "failed to terminate the flow's pod"
               else
                 {{- with .Values }}
-                python upgrade-mysql.py {{ .username }} {{ .password }} {{ .start }} {{ .target }}w
+                python upgrade-mysql.py {{ .username }} {{ .password }} {{ .start }} {{ .target }}
                 {{- end }}
               fi
       restartPolicy: Never
