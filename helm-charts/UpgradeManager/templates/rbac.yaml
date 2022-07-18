@@ -11,7 +11,7 @@ metadata:
   namespace: {{ .Release.Namespace }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
+  kind: Role
   name: fum-role
 subjects:
   - kind: ServiceAccount
@@ -19,7 +19,7 @@ subjects:
     namespace: {{ .Release.Namespace }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
+kind: Role
 metadata:
   name: fum-role
   namespace: {{ .Release.Namespace }}
