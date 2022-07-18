@@ -4,20 +4,28 @@ from kubernetes import client, config
 
 APP_NAME = "python"
 
+
 def shutdown_flow(namespace, api, app):
     if type(app) == client.V1Deployment:
         update_deployment(namespace, api, app)
     else:
         update_sts(namespace, api, app)
-    app = get_flow_app(namespace, api)
-    if app.spec.replicas == 0:
-        print("change the replicas to 0 successfully")
-        # The default grace period is 30 seconds.
-        time.sleep(30)
-        return 0
-    else:
-        print("failed to change the replicas to 0")
-        return -1
+    for _ in range(60):
+        if type(app) == client.V1Deployment:
+            app = api.read_namespaced_deployment_status(APP_NAME, namespace)
+        else:
+            app = api.read_namespaced_stateful_set_status(APP_NAME, namespace)
+        print("the ready replicas number is %s" % app.status.ready_replicas)
+        if not app.status.ready_replicas:
+            # The default grace time period is 30 seconds
+            print("sleep for another 30 seconds, make sure the flow's pod is down")
+            time.sleep(30)
+            return 0
+        else:
+            print("wait for 10 seconds and will recheck")
+            time.sleep(10)
+    print("cannot shutdown the flow's pod")
+    return -1
 
 
 def get_flow_app(namespace, api):

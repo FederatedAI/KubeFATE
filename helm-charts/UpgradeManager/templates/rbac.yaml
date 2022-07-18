@@ -5,7 +5,7 @@ metadata:
   namespace: {{ .Release.Namespace }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
+kind: RoleBinding
 metadata:
   name: fum
   namespace: {{ .Release.Namespace }}
@@ -28,6 +28,7 @@ rules:
   - apps
   resources:
   - deployments
+  - deployments/status
   - statefulsets
   verbs:
   - update

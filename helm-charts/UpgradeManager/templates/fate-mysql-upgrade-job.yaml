@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: fate-mysql-upgrade-job-{{ .start }}-to-{{ .target }}
+  name: fate-mysql-upgrade-job
 spec:
   backoffLimit: 0
   template:
@@ -16,7 +16,12 @@ spec:
             - "-c"
             - |
               python shutdown-flow.py {{ .Release.Namespace }}
-              {{- with .Values }}
-              python upgrade-mysql.py {{ .username }} {{ .password }} {{ .start }} {{ .target }}w
-              {{- end }}
+              retVal = $?
+              if [ $retVal -ne 0 ]; then
+                echo "failed to terminate the flow's pod"
+              else
+                {{- with .Values }}
+                python upgrade-mysql.py {{ .username }} {{ .password }} {{ .start }} {{ .target }}w
+                {{- end }}
+              fi
       restartPolicy: Never
