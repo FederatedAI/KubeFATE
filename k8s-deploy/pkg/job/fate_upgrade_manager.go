@@ -22,7 +22,7 @@ import (
 )
 
 func GetMysqlCredFromSpec(clusterSpec modules.MapStringInterface) (username, password string) {
-	mysqlSpec := clusterSpec["mysql"].(map[string]interface{})
+	mysqlSpec := clusterSpec["mysql"].(modules.MapStringInterface)
 	fmt.Println(clusterSpec)
 	if mysqlSpec["user"] == nil {
 		username = "fate"
