@@ -33,6 +33,7 @@ type kubeClient interface {
 	kube.Services
 	kube.Log
 	kube.Deployment
+	kube.Job
 }
 
 var KubeClient kubeClient = &kube.KUBE
@@ -49,6 +50,5 @@ func GetSettings(namespace string) (*cli.EnvSettings, error) {
 		return nil, err
 	}
 	EnvCs.Unlock()
-
 	return settings, nil
 }

@@ -55,12 +55,13 @@ func (s *States) Scan(v interface{}) error {
 }
 
 type ClusterArgs struct {
-	Name         string `json:"name"`
-	Namespace    string `json:"namespace"`
-	ChartName    string `json:"chart_name"`
-	ChartVersion string `json:"chart_version"`
-	Cover        bool   `json:"cover"`
-	Data         []byte `json:"data"`
+	Name           string `json:"name"`
+	Namespace      string `json:"namespace"`
+	ChartName      string `json:"chart_name"`
+	ChartVersion   string `json:"chart_version"`
+	Cover          bool   `json:"cover"`
+	Data           []byte `json:"data"`
+	KeepUpgradeJob bool   `json:"Keep_upgrade_job"`
 }
 
 type SubJobs map[string]SubJob

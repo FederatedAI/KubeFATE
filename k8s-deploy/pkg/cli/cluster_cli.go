@@ -215,16 +215,23 @@ func ClusterUpdateCommand() *cli.Command {
 				Usage:    "Enter your own configured Cluster.yaml file",
 				Required: true,
 			},
+			&cli.BoolFlag{
+				Name:  "keepUpgradeJob",
+				Value: false,
+				Usage: "Only useful when upgrading the FML framework's version. If true, will keep the" +
+					"upgrade manager's job on the k8s cluster. Otherwise, will clean up the job",
+			},
 		},
 		Usage: "Update a Cluster",
 		Action: func(c *cli.Context) error {
-			valTemValPath := c.String("file")
+			keepUpgradeJob := c.Bool("keepUpgradeJob")
+			log.Debug().Bool("keepUpgradeJob", keepUpgradeJob).Msg("install flag")
 
+			valTemValPath := c.String("file")
 			clusterConfig, err := ioutil.ReadFile(valTemValPath)
 			if err != nil {
 				return err
 			}
-
 			log.Debug().Str("yaml", string(clusterConfig)).Msg("ReadFile Success")
 
 			var m map[string]interface{}
@@ -262,12 +269,13 @@ func ClusterUpdateCommand() *cli.Command {
 
 			cluster := new(Cluster)
 			args := &modules.ClusterArgs{
-				Name:         name.(string),
-				Namespace:    namespace.(string),
-				ChartVersion: chartVersion.(string),
-				ChartName:    chartName.(string),
-				Cover:        false,
-				Data:         valBJ,
+				Name:           name.(string),
+				Namespace:      namespace.(string),
+				ChartVersion:   chartVersion.(string),
+				ChartName:      chartName.(string),
+				Cover:          false,
+				Data:           valBJ,
+				KeepUpgradeJob: keepUpgradeJob,
 			}
 
 			body, err := json.Marshal(args)

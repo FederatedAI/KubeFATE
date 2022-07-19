@@ -15,16 +15,37 @@
 
 package job
 
-import "fmt"
+import (
+	"fmt"
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/modules"
+	"strings"
+)
 
-func ConstructFumClusterData(username, password, startVersion, targetVersion string) []byte {
-	template := `
-username: %s
-password: %s
-start: %s
-target: %s
-`
-	resStr := fmt.Sprintf(template, username, password, startVersion, targetVersion)
-	res := []byte(resStr)
+func GetMysqlCredFromSpec(clusterSpec modules.MapStringInterface) (username, password string) {
+	mysqlSpec := clusterSpec["mysql"].(map[string]interface{})
+	fmt.Println(clusterSpec)
+	if mysqlSpec["user"] == nil {
+		username = "fate"
+	} else {
+		username = mysqlSpec["user"].(string)
+	}
+	if mysqlSpec["password"] == nil {
+		password = "fate_dev"
+	} else {
+		password = mysqlSpec["password"].(string)
+	}
+	return
+}
+
+func ConstructFumSpec(oldSpec, newSpec modules.MapStringInterface) (fumSpec modules.MapStringInterface) {
+	oldVersion := strings.ReplaceAll(oldSpec["chartVersion"].(string), "v", "")
+	newVersion := strings.ReplaceAll(newSpec["chartVersion"].(string), "v", "")
+	mysqlUsername, mysqlPassword := GetMysqlCredFromSpec(newSpec)
+	res := modules.MapStringInterface{
+		"username": mysqlUsername,
+		"password": mysqlPassword,
+		"start":    oldVersion,
+		"target":   newVersion,
+	}
 	return res
 }

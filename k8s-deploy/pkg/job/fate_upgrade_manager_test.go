@@ -1,8 +1,29 @@
 package job
 
-import "testing"
+import (
+	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/modules"
+	"github.com/stretchr/testify/assert"
+	"reflect"
+	"testing"
+)
 
-func Test_ConstructFumClusterData(t *testing.T) {
-	actual := ConstructFumClusterData("fate", "fate_dev", "1.8.0", "1.9.0")
-	println(string(actual))
+func TestConstructFumSpec(t *testing.T) {
+	oldSpec := modules.MapStringInterface{
+		"chartVersion": "v1.7.2",
+	}
+	newSpec := modules.MapStringInterface{
+		"chartVersion": "v1.8.0",
+		"mysql": modules.MapStringInterface{
+			"user":     "fate",
+			"password": "fate_dev",
+		},
+	}
+	actual := ConstructFumSpec(oldSpec, newSpec)
+	expect := modules.MapStringInterface{
+		"password": "fate_dev",
+		"username": "fate",
+		"start":    "1.7.2",
+		"target":   "1.8.0",
+	}
+	assert.True(t, reflect.DeepEqual(actual, expect))
 }
