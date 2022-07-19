@@ -39,7 +39,7 @@ const (
 // the image version is equal to the chart version. For the versions not in the keys
 // of chartToImageVersionMap, we just skip the validation because this KubeFATE service
 // should also support some future versions.
-func validateFateVersion(chartVersion string, imageVersion string) error {
+func validateFateVersion(startVersion, chartVersion, imageVersion string) error {
 	chartToImageVersionMap := map[string]string{
 		"v1.7.0": "1.7.0-release",
 		"v1.7.1": "1.7.1-release",
@@ -48,12 +48,19 @@ func validateFateVersion(chartVersion string, imageVersion string) error {
 		"v1.9.0": "1.9.0-release",
 	}
 	if expectedImageVersion, ok := chartToImageVersionMap[chartVersion]; ok {
-		if expectedImageVersion == imageVersion {
-			return nil
+		if expectedImageVersion != imageVersion {
+			log.Error().Msgf("the chart version is %s but the image version is %s", chartVersion, imageVersion)
+			return errors.New("the image tag is inconsistent with the chart version, which is unsupported")
 		}
-		log.Error().Msgf("the chart version is %s but the image version is %s", chartVersion, imageVersion)
-		return errors.New("the image tag is not consistent with the chart version, which is unsupported")
 	}
+	if startVersion != "" {
+		startVer, _ := version.NewVersion(startVersion)
+		ver171, _ := version.NewVersion("1.7.1")
+		if startVer.LessThanOrEqual(ver171) {
+			return errors.New("upgrade from FATE version <= 1.7.1 is not supported by KubeFATE")
+		}
+	}
+	log.Info().Msg("the validation for FATE cluster.yaml passed")
 	return nil
 }
 
@@ -188,31 +195,38 @@ func ClusterUpdate(clusterArgs *modules.ClusterArgs, creator string) (*modules.J
 
 	oldVersion, err := version.NewVersion(strings.ReplaceAll(cluster.ChartVersion, "v", ""))
 	newVersion, err := version.NewVersion(strings.ReplaceAll(clusterArgs.ChartVersion, "v", ""))
-	// Comparison example. There is also GreaterThan, Equal, and just
-	// a simple Compare that returns an int allowing easy >=, <=, etc.
 	if newVersion.LessThan(oldVersion) {
-		return nil, fmt.Errorf("using kubefate to downgrading a cluster is not supported")
+		return nil, fmt.Errorf("using kubefate to downgrade cluster is not supported yet")
 	}
-	// FmlFrameWorkNameToUmStuffMap is a map, whose keys are the fml framework names, such as fate.
+	// FmlFrameworkNameToUmStuffMap is a map, whose keys are the fml framework names, such as fate.
 	// Its values are the Information of the corresponding upgrade manager's chart.
-	FmlFrameWorkNameToUmInfoMap := modules.MapStringInterface{
+	// In the future we may extend this map to add more other fml frameworks
+	FmlFrameworkNameToUmInfoMap := modules.MapStringInterface{
 		fateChartName: modules.MapStringInterface{
 			"chartName":             fateUpgradeManagerChartName,
 			"chartVersion":          "v1.0.0",
 			"specConstructFunction": ConstructFumSpec,
+			"validationFunction":    validateFateVersion,
 		},
 	}
 	var upgradeManagerChartName string
 	if newVersion.GreaterThan(oldVersion) {
-		switch clusterNew.ChartName {
-		case fateChartName:
-			err = validateFateVersion(c.ChartVersion, specNew["imageTag"].(string))
-			if err != nil {
-				return nil, err
+		umInfo, ok := FmlFrameworkNameToUmInfoMap[clusterNew.ChartName]
+		if !ok {
+			log.Warn().Msgf("the fml framework %s doesn't have an upgrade manager", clusterNew.ChartName)
+		} else {
+			umSpecFuncName := reflect.ValueOf(umInfo.(modules.MapStringInterface)["validationFunction"])
+			params := []reflect.Value{reflect.ValueOf(cluster.ChartVersion),
+				reflect.ValueOf(clusterArgs.ChartVersion),
+				reflect.ValueOf(specNew["imageTag"].(string))}
+			res := umSpecFuncName.Call(params)
+			errInterface := res[0].Interface()
+			if errInterface != nil {
+				return nil, errInterface.(error)
 			}
-			upgradeManagerChartName = fateUpgradeManagerChartName
-		default:
-			log.Warn().Msgf("the chart %s doesn't have an upgrade manager", clusterNew.ChartName)
+			// If the validation passed, we will get an upgrade manager chart name here, and if we have the
+			// name, later the upgrade manager's helm chart will be installed
+			upgradeManagerChartName = umInfo.(modules.MapStringInterface)["chartName"].(string)
 		}
 	}
 	job := modules.NewJob(clusterArgs, "ClusterUpdate", creator, cluster.Uuid)
@@ -241,7 +255,7 @@ func ClusterUpdate(clusterArgs *modules.ClusterArgs, creator string) (*modules.J
 		// If the chart version changed, we will get a not nil chart name here
 		// We will implicitly install a new cluster for the upgrade manager, and delete it after it finishes its job
 		if upgradeManagerChartName != "" {
-			umInfo := FmlFrameWorkNameToUmInfoMap[cluster.ChartName].(modules.MapStringInterface)
+			umInfo := FmlFrameworkNameToUmInfoMap[cluster.ChartName].(modules.MapStringInterface)
 			// Use reflection to run the special logic of the upgrade manager for each fml framework
 			umSpecFuncName := reflect.ValueOf(umInfo["specConstructFunction"])
 			params := []reflect.Value{reflect.ValueOf(specOld), reflect.ValueOf(specNew)}
@@ -264,6 +278,7 @@ func ClusterUpdate(clusterArgs *modules.ClusterArgs, creator string) (*modules.J
 			}
 			var cycle int
 			interval := 30
+			// TODO: make the total cycle a configurable number, because for other FML frameworks 20*30 may not enough.
 			for cycle = 0; cycle < 20; cycle++ {
 				jobDone, err := service.CheckJobReadiness(umCluster.NameSpace, fateUpgradeJobName)
 				if err != nil {

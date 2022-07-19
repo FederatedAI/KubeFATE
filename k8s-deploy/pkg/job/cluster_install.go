@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2021 VMware, Inc.
+ * Copyright 2019-2022 VMware, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -220,7 +220,7 @@ func createCluster(job *modules.Job) (*modules.Cluster, error) {
 	}
 
 	if cluster.ChartName == fateChartName {
-		err = validateFateVersion(cluster.ChartVersion, cluster.Spec["imageTag"].(string))
+		err = validateFateVersion("", cluster.ChartVersion, cluster.Spec["imageTag"].(string))
 		if err != nil {
 			return nil, err
 		}

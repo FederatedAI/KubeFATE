@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2021 VMware, Inc.
+ * Copyright 2019-2022 VMware, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,6 +12,7 @@
  * limitations under the License.
  *
  */
+
 package service
 
 import (
@@ -50,5 +51,6 @@ func GetSettings(namespace string) (*cli.EnvSettings, error) {
 		return nil, err
 	}
 	EnvCs.Unlock()
+
 	return settings, nil
 }
