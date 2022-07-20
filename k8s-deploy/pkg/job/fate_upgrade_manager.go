@@ -16,14 +16,12 @@
 package job
 
 import (
-	"fmt"
 	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/modules"
 	"strings"
 )
 
-func GetMysqlCredFromSpec(clusterSpec modules.MapStringInterface) (username, password string) {
+func getMysqlCredFromSpec(clusterSpec modules.MapStringInterface) (username, password string) {
 	mysqlSpec := clusterSpec["mysql"].(modules.MapStringInterface)
-	fmt.Println(clusterSpec)
 	if mysqlSpec["user"] == nil {
 		username = "fate"
 	} else {
@@ -37,10 +35,10 @@ func GetMysqlCredFromSpec(clusterSpec modules.MapStringInterface) (username, pas
 	return
 }
 
-func ConstructFumSpec(oldSpec, newSpec modules.MapStringInterface) (fumSpec modules.MapStringInterface) {
+func constructFumSpec(oldSpec, newSpec modules.MapStringInterface) (fumSpec modules.MapStringInterface) {
 	oldVersion := strings.ReplaceAll(oldSpec["chartVersion"].(string), "v", "")
 	newVersion := strings.ReplaceAll(newSpec["chartVersion"].(string), "v", "")
-	mysqlUsername, mysqlPassword := GetMysqlCredFromSpec(newSpec)
+	mysqlUsername, mysqlPassword := getMysqlCredFromSpec(newSpec)
 	res := modules.MapStringInterface{
 		"username": mysqlUsername,
 		"password": mysqlPassword,

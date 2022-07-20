@@ -38,7 +38,10 @@ const (
 // validateFateVersion helps make sure that the user set the right helm chart version and
 // the image version is equal to the chart version. For the versions not in the keys
 // of chartToImageVersionMap, we just skip the validation because this KubeFATE service
-// should also support some future versions.
+// should also support some future versions. charVersion and imageVersion are for this purpose.
+// Also, for startVersion, it is used to check it the rolling upgrade is applicable. Currently
+// version <= 1.7.1 cannot be supported for rolling upgrade.
+// Note that the format of starVersion is without 'v', and the format of chartVersion is with 'v'
 func validateFateVersion(startVersion, chartVersion, imageVersion string) error {
 	chartToImageVersionMap := map[string]string{
 		"v1.7.0": "1.7.0-release",
@@ -60,7 +63,7 @@ func validateFateVersion(startVersion, chartVersion, imageVersion string) error 
 			return errors.New("upgrade from FATE version <= 1.7.1 is not supported by KubeFATE")
 		}
 	}
-	log.Info().Msg("the validation for FATE cluster.yaml passed")
+	log.Info().Msg("version validation for FATE cluster yaml passed")
 	return nil
 }
 
@@ -205,7 +208,7 @@ func ClusterUpdate(clusterArgs *modules.ClusterArgs, creator string) (*modules.J
 		fateChartName: modules.MapStringInterface{
 			"chartName":             fateUpgradeManagerChartName,
 			"chartVersion":          "v1.0.0",
-			"specConstructFunction": ConstructFumSpec,
+			"specConstructFunction": constructFumSpec,
 			"validationFunction":    validateFateVersion,
 		},
 	}
@@ -275,6 +278,9 @@ func ClusterUpdate(clusterArgs *modules.ClusterArgs, creator string) (*modules.J
 				if dbErr != nil {
 					log.Error().Err(dbErr).Msg("job.SetStatus error")
 				}
+				job.Status = modules.JobStatusFailed
+				log.Error().Msg("abort upgrade because failed to install upgrade manager")
+				return
 			}
 			var cycle int
 			interval := 30
@@ -302,12 +308,17 @@ func ClusterUpdate(clusterArgs *modules.ClusterArgs, creator string) (*modules.J
 				if dbErr != nil {
 					log.Error().Err(dbErr).Msg("job.SetStatus error")
 				}
+				job.Status = modules.JobStatusFailed
 			}
 			if !clusterArgs.KeepUpgradeJob {
 				err = umCluster.HelmDelete()
 				if err != nil {
 					log.Error().Err(err).Msg("failed to delete the upgrade manager cluster, need a person to investigate why")
 				}
+			}
+			if job.Status == modules.JobStatusFailed {
+				log.Error().Msg("abort upgrade because installing upgrade manager time out")
+				return
 			}
 		}
 
@@ -330,7 +341,7 @@ func ClusterUpdate(clusterArgs *modules.ClusterArgs, creator string) (*modules.J
 		cluster.HelmRevision += 1
 
 		_, dbErr = cluster.UpdateByUuid(job.ClusterId)
-		if err != nil {
+		if dbErr != nil {
 			log.Error().Err(dbErr).Interface("cluster", cluster).Msg("Update Cluster error")
 		}
 
@@ -345,6 +356,7 @@ func ClusterUpdate(clusterArgs *modules.ClusterArgs, creator string) (*modules.J
 			if dbErr != nil {
 				log.Error().Err(dbErr).Msg("job.SetStatus error")
 			}
+			job.Status = modules.JobStatusFailed
 		} else {
 			log.Debug().Str("ClusterId", cluster.Uuid).Msg("helm upgrade Cluster Success")
 
@@ -356,9 +368,9 @@ func ClusterUpdate(clusterArgs *modules.ClusterArgs, creator string) (*modules.J
 			if dbErr != nil {
 				log.Error().Err(dbErr).Msg("job.SetStatus error")
 			}
+			job.Status = modules.JobStatusRunning
 		}
 
-		//
 		for job.Status == modules.JobStatusRunning {
 			if stopJob(job, &cluster) {
 				continue

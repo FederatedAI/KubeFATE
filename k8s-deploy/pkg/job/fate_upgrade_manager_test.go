@@ -33,7 +33,7 @@ func TestConstructFumSpec(t *testing.T) {
 			"password": "fate_dev",
 		},
 	}
-	actual := ConstructFumSpec(oldSpec, newSpec)
+	actual := constructFumSpec(oldSpec, newSpec)
 	expect := modules.MapStringInterface{
 		"password": "fate_dev",
 		"username": "fate",
