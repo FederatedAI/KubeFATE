@@ -15,42 +15,13 @@
 
 package service
 
-import (
-	"os"
-	"sync"
-
-	"helm.sh/helm/v3/pkg/cli"
-
-	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/service/kube"
-)
-
-var EnvCs sync.Mutex
-
-type kubeClient interface {
-	kube.Pod
-	kube.Namespace
-	kube.Ingress
-	kube.Node
-	kube.Services
-	kube.Log
-	kube.Deployment
-	kube.Job
-}
-
-var KubeClient kubeClient = &kube.KUBE
-
-func GetSettings(namespace string) (*cli.EnvSettings, error) {
-	EnvCs.Lock()
-	err := os.Setenv("HELM_NAMESPACE", namespace)
+func CheckJobReadiness(namespace, jobName string) (bool, error) {
+	job, err := KubeClient.GetJobByName(namespace, jobName)
 	if err != nil {
-		return nil, err
+		return false, err
 	}
-	settings := cli.New()
-	err = os.Unsetenv("HELM_NAMESPACE")
-	if err != nil {
-		return nil, err
+	if job.Status.Succeeded > 0 {
+		return true, err
 	}
-	EnvCs.Unlock()
-
-	return settings, nil
+	return false, err
 }

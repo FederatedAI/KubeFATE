@@ -13,23 +13,19 @@
  *
  */
 
-package job
+package kube
 
 import (
-	"github.com/stretchr/testify/assert"
-	"testing"
+	"context"
+	v1 "k8s.io/api/batch/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func Test_validateVersion(t *testing.T) {
-	err := validateFateVersion("", "v1.7.0", "1.7.0-release")
-	assert.Nil(t, err)
+type Job interface {
+	GetJobByName(namespace, jobName string) (*v1.Job, error)
+}
 
-	err = validateFateVersion("", "v1.7.0", "1.7.1-release")
-	assert.NotNil(t, err)
-
-	err = validateFateVersion("", "v1.6.0", "1.6.0-release")
-	assert.Nil(t, err)
-
-	err = validateFateVersion("1.7.1", "v1.7.2", "1.7.2-release")
-	assert.NotNil(t, err)
+func (e *Kube) GetJobByName(namespace, jobName string) (*v1.Job, error) {
+	job, err := e.client.BatchV1().Jobs(namespace).Get(context.Background(), jobName, metav1.GetOptions{})
+	return job, err
 }
