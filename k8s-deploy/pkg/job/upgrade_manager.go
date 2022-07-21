@@ -15,21 +15,10 @@
 
 package job
 
-import (
-	"github.com/stretchr/testify/assert"
-	"testing"
-)
+import "github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/modules"
 
-func Test_validateVersion(t *testing.T) {
-	err := validateFateVersion("", "v1.7.0", "1.7.0-release")
-	assert.Nil(t, err)
-
-	err = validateFateVersion("", "v1.7.0", "1.7.1-release")
-	assert.NotNil(t, err)
-
-	err = validateFateVersion("", "v1.6.0", "1.6.0-release")
-	assert.Nil(t, err)
-
-	err = validateFateVersion("1.7.1", "v1.7.2", "1.7.2-release")
-	assert.NotNil(t, err)
+type UpgradeManager interface {
+	validate(specOld, specNew modules.MapStringInterface) error
+	getCluster(specOld, specNew modules.MapStringInterface) modules.Cluster
+	waitFinish(interval, round int) bool
 }
