@@ -17,55 +17,17 @@
 package job
 
 import (
-	"errors"
 	"fmt"
-	"reflect"
-	"strings"
 	"time"
 
 	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/modules"
 	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/service"
-	"github.com/hashicorp/go-version"
 	"github.com/rs/zerolog/log"
 )
 
 const (
-	fateChartName               = "fate"
-	fateUpgradeManagerChartName = "fate-upgrade-manager"
-	fateUpgradeJobName          = "fate-mysql-upgrade-job"
+	fateChartName = "fate"
 )
-
-// validateFateVersion helps make sure that the user set the right helm chart version and
-// the image version is equal to the chart version. For the versions not in the keys
-// of chartToImageVersionMap, we just skip the validation because this KubeFATE service
-// should also support some future versions. charVersion and imageVersion are for this purpose.
-// Also, for startVersion, it is used to check it the rolling upgrade is applicable. Currently
-// version <= 1.7.1 cannot be supported for rolling upgrade.
-// Note that the format of starVersion is without 'v', and the format of chartVersion is with 'v'
-func validateFateVersion(startVersion, chartVersion, imageVersion string) error {
-	chartToImageVersionMap := map[string]string{
-		"v1.7.0": "1.7.0-release",
-		"v1.7.1": "1.7.1-release",
-		"v1.7.2": "1.7.2-release",
-		"v1.8.0": "1.8.0-release",
-		"v1.9.0": "1.9.0-release",
-	}
-	if expectedImageVersion, ok := chartToImageVersionMap[chartVersion]; ok {
-		if expectedImageVersion != imageVersion {
-			log.Error().Msgf("the chart version is %s but the image version is %s", chartVersion, imageVersion)
-			return errors.New("the image tag is inconsistent with the chart version, which is unsupported")
-		}
-	}
-	if startVersion != "" {
-		startVer, _ := version.NewVersion(startVersion)
-		ver171, _ := version.NewVersion("1.7.1")
-		if startVer.LessThanOrEqual(ver171) {
-			return errors.New("upgrade from FATE version <= 1.7.1 is not supported by KubeFATE")
-		}
-	}
-	log.Info().Msg("version validation for FATE cluster yaml passed")
-	return nil
-}
 
 func stopJob(job *modules.Job, cluster *modules.Cluster) bool {
 	if !cluster.IsExisted(cluster.Name, cluster.NameSpace) {
@@ -186,52 +148,18 @@ func ClusterUpdate(clusterArgs *modules.ClusterArgs, creator string) (*modules.J
 	var valuesOld = cluster.Values
 	var valuesNew = clusterNew.Values
 
-	if cluster.ChartName != clusterNew.ChartName {
-		return nil, fmt.Errorf("doesn't support upgrade between different charts")
-	}
-
-	if reflect.DeepEqual(specOld, specNew) &&
-		cluster.ChartName == clusterArgs.ChartName &&
-		cluster.ChartVersion == clusterArgs.ChartVersion {
-		return nil, fmt.Errorf("the configuration file did not change")
-	}
-
-	oldVersion, err := version.NewVersion(strings.ReplaceAll(cluster.ChartVersion, "v", ""))
-	newVersion, err := version.NewVersion(strings.ReplaceAll(clusterArgs.ChartVersion, "v", ""))
-	if newVersion.LessThan(oldVersion) {
-		return nil, fmt.Errorf("using kubefate to downgrade cluster is not supported yet")
-	}
-	// FmlFrameworkNameToUmStuffMap is a map, whose keys are the fml framework names, such as fate.
-	// Its values are the Information of the corresponding upgrade manager's chart.
-	// In the future we may extend this map to add more other fml frameworks
-	FmlFrameworkNameToUmInfoMap := modules.MapStringInterface{
-		fateChartName: modules.MapStringInterface{
-			"chartName":             fateUpgradeManagerChartName,
-			"chartVersion":          "v1.0.0",
-			"specConstructFunction": constructFumSpec,
-			"validationFunction":    validateFateVersion,
-		},
-	}
-	var upgradeManagerChartName string
-	if newVersion.GreaterThan(oldVersion) {
-		umInfo, ok := FmlFrameworkNameToUmInfoMap[clusterNew.ChartName]
-		if !ok {
-			log.Warn().Msgf("the fml framework %s doesn't have an upgrade manager", clusterNew.ChartName)
-		} else {
-			umSpecFuncName := reflect.ValueOf(umInfo.(modules.MapStringInterface)["validationFunction"])
-			params := []reflect.Value{reflect.ValueOf(cluster.ChartVersion),
-				reflect.ValueOf(clusterArgs.ChartVersion),
-				reflect.ValueOf(specNew["imageTag"].(string))}
-			res := umSpecFuncName.Call(params)
-			errInterface := res[0].Interface()
-			if errInterface != nil {
-				return nil, errInterface.(error)
-			}
-			// If the validation passed, we will get an upgrade manager chart name here, and if we have the
-			// name, later the upgrade manager's helm chart will be installed
-			upgradeManagerChartName = umInfo.(modules.MapStringInterface)["chartName"].(string)
+	var um UpgradeManager
+	switch cluster.ChartName {
+	case fateChartName:
+		um = &FateUpgradeManager{
+			namespace: clusterArgs.Namespace,
 		}
 	}
+	err = um.validate(specOld, specNew)
+	if err != nil {
+		return nil, err
+	}
+
 	job := modules.NewJob(clusterArgs, "ClusterUpdate", creator, cluster.Uuid)
 	//  save job to modules
 	_, err = job.Insert()
@@ -255,22 +183,9 @@ func ClusterUpdate(clusterArgs *modules.ClusterArgs, creator string) (*modules.J
 			log.Error().Err(dbErr).Msg("Cluster.SetStatus error")
 		}
 
-		// If the chart version changed, we will get a not nil chart name here
-		// We will implicitly install a new cluster for the upgrade manager, and delete it after it finishes its job
-		if upgradeManagerChartName != "" {
-			umInfo := FmlFrameworkNameToUmInfoMap[cluster.ChartName].(modules.MapStringInterface)
-			// Use reflection to run the special logic of the upgrade manager for each fml framework
-			umSpecFuncName := reflect.ValueOf(umInfo["specConstructFunction"])
-			params := []reflect.Value{reflect.ValueOf(specOld), reflect.ValueOf(specNew)}
-			res := umSpecFuncName.Call(params)
-			umSpec := res[0].Interface().(modules.MapStringInterface)
-			umCluster := modules.Cluster{
-				Name:         upgradeManagerChartName,
-				NameSpace:    cluster.NameSpace,
-				ChartName:    upgradeManagerChartName,
-				ChartVersion: umInfo["chartVersion"].(string),
-				Spec:         umSpec,
-			}
+		if specOld["chartVersion"].(string) != specNew["chartVersion"].(string) {
+			umCluster := um.getCluster(specOld, specNew)
+			// We will implicitly install a new cluster for the upgrade manager, and delete it after it finishes its job
 			err := umCluster.HelmInstall()
 			if err != nil {
 				log.Error().Err(err).Msgf("failed to install the upgrade manager's helm chart for cluster %s", cluster.ChartName)
@@ -282,33 +197,12 @@ func ClusterUpdate(clusterArgs *modules.ClusterArgs, creator string) (*modules.J
 				log.Error().Msg("abort upgrade because failed to install upgrade manager")
 				return
 			}
-			var cycle int
-			interval := 30
-			// TODO: make the total cycle a configurable number, because for other FML frameworks 20*30 may not enough.
-			for cycle = 0; cycle < 20; cycle++ {
-				jobDone, err := service.CheckJobReadiness(umCluster.NameSpace, fateUpgradeJobName)
-				if err != nil {
-					log.Error().Err(err).Msg("failed to check the upgrade job status")
-				}
-				if jobDone {
-					log.Info().Msgf("the upgrade manager finished its job in %d seconds", interval*cycle)
-					break
-				}
-				log.Info().Msgf("the upgrade manager's job is not done yet, will recheck in %d seconds", interval)
-				time.Sleep(time.Second * time.Duration(interval))
-			}
-			if cycle == 20 {
-				errMsg := fmt.Sprintf("the upgrade manager cannot finish the job in %d seconds", 30*cycle)
-				err := errors.New(errMsg)
-				log.Error().Err(err)
-				// we will do helm delete to the upgrade manager if this time out is triggered, then
-				// we just need to set the job to failed, and later there is a logic will handle
-				// the rollback of the FML pods
+			finished := um.waitFinish(30, 20)
+			if !finished {
 				dbErr := job.SetStatus(modules.JobStatusFailed)
 				if dbErr != nil {
 					log.Error().Err(dbErr).Msg("job.SetStatus error")
 				}
-				job.Status = modules.JobStatusFailed
 			}
 			if !clusterArgs.KeepUpgradeJob {
 				err = umCluster.HelmDelete()
@@ -317,7 +211,7 @@ func ClusterUpdate(clusterArgs *modules.ClusterArgs, creator string) (*modules.J
 				}
 			}
 			if job.Status == modules.JobStatusFailed {
-				log.Error().Msg("abort upgrade because installing upgrade manager time out")
+				log.Error().Msg("abort upgrade because upgrade manager cannot finish its job")
 				return
 			}
 		}
@@ -356,7 +250,6 @@ func ClusterUpdate(clusterArgs *modules.ClusterArgs, creator string) (*modules.J
 			if dbErr != nil {
 				log.Error().Err(dbErr).Msg("job.SetStatus error")
 			}
-			job.Status = modules.JobStatusFailed
 		} else {
 			log.Debug().Str("ClusterId", cluster.Uuid).Msg("helm upgrade Cluster Success")
 
@@ -368,7 +261,6 @@ func ClusterUpdate(clusterArgs *modules.ClusterArgs, creator string) (*modules.J
 			if dbErr != nil {
 				log.Error().Err(dbErr).Msg("job.SetStatus error")
 			}
-			job.Status = modules.JobStatusRunning
 		}
 
 		for job.Status == modules.JobStatusRunning {

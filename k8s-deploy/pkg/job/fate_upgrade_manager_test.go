@@ -22,23 +22,90 @@ import (
 	"testing"
 )
 
-func TestConstructFumSpec(t *testing.T) {
-	oldSpec := modules.MapStringInterface{
+func TestValidate(t *testing.T) {
+	ogSpecOld := modules.MapStringInterface{
+		"chartName":    "fate",
 		"chartVersion": "v1.7.2",
+		"imageTag":     "1.7.2-release",
 	}
-	newSpec := modules.MapStringInterface{
+	ogSpecNew := modules.MapStringInterface{
+		"chartName":    "fate",
 		"chartVersion": "v1.8.0",
-		"mysql": modules.MapStringInterface{
+		"imageTag":     "1.8.0-release",
+	}
+	fum := FateUpgradeManager{
+		namespace: "blabla",
+	}
+	// Happy path
+	specOld := ogSpecOld
+	specNew := ogSpecNew
+	err := fum.validate(specOld, specNew)
+	assert.Nil(t, err)
+
+	// framework different
+	specNew["chartName"] = "openfl"
+	err = fum.validate(specOld, specNew)
+	assert.NotNil(t, err)
+
+	// spec identical
+	specNew = ogSpecNew
+	specNew["chartVersion"] = "v1.7.2"
+	specNew["imageTag"] = "1.7.2-release"
+	err = fum.validate(specOld, specNew)
+	assert.NotNil(t, err)
+
+	// image version do not consistent with the chart version
+	specNew = ogSpecNew
+	specNew["imageTag"] = "1.9.0-release"
+	err = fum.validate(specOld, specNew)
+	assert.NotNil(t, err)
+
+	// do not support downgrade
+	specNew = ogSpecNew
+	specNew["chartVersion"] = "v1.6.0"
+	specNew["imageTag"] = "1.6.0-release"
+	err = fum.validate(specOld, specNew)
+	assert.NotNil(t, err)
+
+	// fate version < 1.7.1
+	specNew = ogSpecNew
+	specOld = ogSpecOld
+	specOld["chartVersion"] = "v1.7.0"
+	specNew["imageTag"] = "1.7.0-release"
+	err = fum.validate(specOld, specNew)
+	assert.NotNil(t, err)
+}
+
+func TestGetCluster(t *testing.T) {
+	specOld := modules.MapStringInterface{
+		"chartName":    "fate",
+		"chartVersion": "v1.7.2",
+		"imageTag":     "1.7.2-release",
+	}
+	specNew := modules.MapStringInterface{
+		"chartName":    "fate",
+		"chartVersion": "v1.8.0",
+		"imageTag":     "1.8.0-release",
+		"mysql": map[string]interface{}{
 			"user":     "fate",
 			"password": "fate_dev",
 		},
 	}
-	actual := constructFumSpec(oldSpec, newSpec)
-	expect := modules.MapStringInterface{
-		"password": "fate_dev",
-		"username": "fate",
-		"start":    "1.7.2",
-		"target":   "1.8.0",
+	fum := FateUpgradeManager{
+		namespace: "blabla",
+	}
+	actual := fum.getCluster(specOld, specNew)
+	expect := modules.Cluster{
+		Name:         "fate-upgrade-manager",
+		NameSpace:    "blabla",
+		ChartName:    "fate-upgrade-manager",
+		ChartVersion: "v1.0.0",
+		Spec: modules.MapStringInterface{
+			"password": "fate_dev",
+			"username": "fate",
+			"start":    "1.7.2",
+			"target":   "1.8.0",
+		},
 	}
 	assert.True(t, reflect.DeepEqual(actual, expect))
 }
