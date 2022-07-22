@@ -27,7 +27,12 @@ echo "Info:"
 echo "  RegistryURI: ${RegistryURI}"
 echo "  Tag: ${TAG}"
 echo "  Serving_Tag: ${SERVING_TAG}"
-echo "  Backend: ${backend}"
+echo "  Computing: ${computing}"
+echo "  Federation: ${federation}"
+echo "  Storage: ${storage}"
+echo "  Algorithm: ${algorithm}"
+echo "  Device: ${device}"
+echo "  Compute_core: ${compute_core}"
 
 echo "  Party_List:"
 for ((i = 0; i < ${#party_list[*]}; i++)); do
@@ -38,13 +43,85 @@ echo ""
 echo ""
 cd ${WORKINGDIR}
 
+# list_include_item "10 11 12" "2"
+function list_include_item {
+  local list="$1"
+  local item="$2"
+  if [[ $list =~ (^|[[:space:]])"$item"($|[[:space:]]) ]] ; then
+    result=0
+  else
+    result=1
+  fi
+  return $result
+}
+
+function CheckConfig(){
+	# Check config start
+	computing_list="Eggroll Spark Spark_local"
+	spark_federation_list="RabbitMQ Pulsar"
+	algorithm_list="Basic NN"
+	device_list="CPU IPCL"
+
+	if ! `list_include_item "$computing_list" "$computing"`; then
+		echo "[ERROR]: Please check whether computing is one of $computing_list"
+		exit 1
+	fi
+
+	if [ $computing == "Eggroll" ]; then
+		if [ $federation != "Eggroll" ] ||  [ $storage != "Eggroll" ]; then
+			echo "[ERROR]: Please select the correct engine. When eggroll is selected as the computing engine, both Federation and storage must be eggroll engines!"
+			exit 1
+		fi
+	fi
+
+	if [ $computing == "Spark" ]; then
+		if ! `list_include_item "$spark_federation_list" "$federation"`; then
+			echo "[ERROR]: If you choose the Spark computing engine, the federation component must be Pulsar or RabbitMQ!"
+			exit 1
+		fi
+		if [ $storage != "HDFS" ]; then
+			echo "[ERROR]: If you choose the Spark computing engine, the storage component must be HDFS!"
+			exit 1
+		fi
+	fi
+
+	if [ $computing == "Spark_local" ]; then
+		if ! `list_include_item "$spark_federation_list" "$federation"`; then
+			echo "[ERROR]: If you choose the Spark_local computing engine, the federation component must be Pulsar or RabbitMQ!"
+			exit 1
+		fi
+		if [ $storage != "LocalFS" ]; then
+			echo "[ERROR]: If you choose the Spark computing engine, the storage component must be LocalFS!"
+			exit 1
+		fi
+	fi
+
+	if ! `list_include_item "$algorithm_list" "$algorithm"`; then
+		echo "[ERROR]: Please check whether algorithm is one of $algorithm_list"
+		exit 1
+	fi
+
+	if ! `list_include_item "$device_list" "$device"`; then
+		echo "[ERROR]: Please check whether algorithm is one of $device_list"
+		exit 1
+	fi
+
+	echo "Configuration check done!"
+	# Check config end
+}
+
+
+
+
+
+
 GenerateConfig() {
 	for ((i = 0; i < ${#party_list[*]}; i++)); do
+
 		eval party_id=\${party_list[${i}]}
 		eval party_ip=\${party_ip_list[${i}]}
 		eval serving_ip=\${serving_ip_list[${i}]}
 
-		eval processor_count=2
 		eval venv_dir=/data/projects/python/venv
 		eval python_path=${deploy_dir}/python:${deploy_dir}/eggroll/python
 		eval data_dir=${deploy_dir}/data-dir
@@ -65,7 +142,7 @@ GenerateConfig() {
 		eval fateboard_username=${fateboard_username}
 		eval fateboard_password=${fateboard_password}
 
-		eval fate_flow_ip=python
+		eval fate_flow_ip=fateflow
 		eval fate_flow_grpc_port=9360
 		eval fate_flow_http_port=9380
 		eval fml_agent_port=8484
@@ -77,38 +154,16 @@ GenerateConfig() {
 
 		eval exchange_ip=${exchangeip}
 
+		echo package $party_id start!
+
 		rm -rf confs-$party_id/
 		mkdir -p confs-$party_id/confs
 		cp -r training_template/public/* confs-$party_id/confs/
-		# handle spark backend here
-		if [ "$backend" == "spark_rabbitmq" ]; then
-			cp -r training_template/backends/spark/hadoop confs-$party_id/confs/
-			cp -r training_template/backends/spark/nginx confs-$party_id/confs/
-			cp -r training_template/backends/spark/spark confs-$party_id/confs/
-			cp -r training_template/backends/spark/rabbitmq confs-$party_id/confs/
-			
-			cp training_template/docker-compose-spark.yml confs-$party_id/docker-compose.yml
-			sed -i '186,203d' confs-$party_id/docker-compose.yml
-		fi
 
-		if [ "$backend" == "spark_pulsar" ]; then
-			cp -r training_template/backends/spark/hadoop confs-$party_id/confs/
-			cp -r training_template/backends/spark/nginx confs-$party_id/confs/
-			cp -r training_template/backends/spark/spark confs-$party_id/confs/
-			cp -r training_template/backends/spark/pulsar confs-$party_id/confs/
-			
-			cp training_template/docker-compose-spark.yml confs-$party_id/docker-compose.yml
-			sed -i '168,185d' confs-$party_id/docker-compose.yml
-		fi
+		# Generate confs packages
 
-		if [ "$backend" == "spark_local_pulsar" ]; then
-			cp -r training_template/backends/spark/nginx confs-$party_id/confs/
-			cp -r training_template/backends/spark/pulsar confs-$party_id/confs/
-			cp training_template/docker-compose-spark-slim.yml confs-$party_id/docker-compose.yml
-		fi
-
-		if [ "$backend" == "eggroll" ]; then
-			# if the computing backend is not spark, use eggroll anyway
+		if [ "$computing" == "Eggroll" ]; then
+			# if the computing is Eggroll, use eggroll anyway
 			cp -r training_template/backends/eggroll confs-$party_id/confs/
 			cp training_template/docker-compose-eggroll.yml confs-$party_id/docker-compose.yml
 
@@ -136,14 +191,73 @@ GenerateConfig() {
 			sed -i "s#<rollsite.port>#${proxy_port}#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
 		fi
 
-		# generate conf dir
-		cp ${WORKINGDIR}/.env ./confs-$party_id
-		
-		# check if use python-nn
-		if [ "$enabled_nn" = "true" ]; then
-			sed -i 's#image: "federatedai/python:${TAG}"#image: "federatedai/python-nn:${TAG}"#g' ./confs-$party_id/docker-compose.yml
+		if [ "$computing" == "Spark" ]; then
+			# computing
+			cp -r training_template/backends/spark/nginx confs-$party_id/confs/
+			cp -r training_template/backends/spark/spark confs-$party_id/confs/
+			# storage
+			if [ "$storage" == "HDFS" ]; then
+				cp training_template/docker-compose-spark.yml confs-$party_id/docker-compose.yml
+				cp -r training_template/backends/spark/hadoop confs-$party_id/confs/
+				# federation
+				if [ "$federation" == "RabbitMQ" ]; then
+					cp -r training_template/backends/spark/rabbitmq confs-$party_id/confs/
+					sed -i '193,206d' confs-$party_id/docker-compose.yml
+				elif [ "$federation" == "Pulsar" ]; then
+					cp -r training_template/backends/spark/pulsar confs-$party_id/confs/
+					sed -i '175,191d' confs-$party_id/docker-compose.yml
+				fi
+			fi
 		fi
 
+		if [ "$computing" == "Spark_local" ]; then
+			# computing
+			cp -r training_template/backends/spark/nginx confs-$party_id/confs/
+			cp -r training_template/backends/spark/spark confs-$party_id/confs/
+			# storage
+			if  [ "$storage" == "LocalFS" ]; then
+				cp training_template/docker-compose-spark-slim.yml confs-$party_id/docker-compose.yml
+				# federation
+				if [ "$federation" == "RabbitMQ" ]; then
+					cp -r training_template/backends/spark/rabbitmq confs-$party_id/confs/
+					sed -i '143,156d' confs-$party_id/docker-compose.yml
+				elif [ "$federation" == "Pulsar" ]; then
+					cp -r training_template/backends/spark/pulsar confs-$party_id/confs/
+					sed -i '125,141d' confs-$party_id/docker-compose.yml
+				fi
+			fi
+		fi
+
+		cp ${WORKINGDIR}/.env ./confs-$party_id
+
+		# Modify the configuration file
+
+		# Images choose 
+		Suffix=""
+		# computing
+		if [ "$computing" == "Spark" ] || [ "$computing" == "Spark_local" ]; then
+			Suffix=$Suffix"-spark"
+		fi
+		# algorithm 
+		if [ "$algorithm" == "NN" ]; then
+			Suffix=$Suffix"-nn"
+		fi
+		# device
+		if [ "$device" == "IPCL" ]; then
+			Suffix=$Suffix"-ipcl"
+		fi
+		
+		# federatedai/fateflow-${component}-${clgorithm}-${device}:${version}
+		sed -i "s#image: \"federatedai/fateflow:\${TAG}\"#image: \"federatedai/fateflow${Suffix}:\${TAG}\"#g" ./confs-$party_id/docker-compose.yml
+		
+		# eggroll or spark-worker
+		if [ "$computing" == "Eggroll" ]; then
+			sed -i "s#image: \"federatedai/eggroll:\${TAG}\"#image: \"federatedai/eggroll${Suffix}:\${TAG}\"#g" ./confs-$party_id/docker-compose.yml
+		elif [ "$computing" == "Spark" ]; then
+			sed -i "s#image: \"federatedai/spark-worker:\${TAG}\"#image: \"federatedai/spark-worker${Suffix}:\${TAG}\"#g" ./confs-$party_id/docker-compose.yml
+		fi
+
+		# RegistryURI
 		if [ "$RegistryURI" != "" ]; then
 			sed -i 's#federatedai#${RegistryURI}/federatedai#g' ./confs-$party_id/docker-compose.yml
 			sed -i 's#image: "mysql:8"#image: ${RegistryURI}/federatedai/mysql:8#g' ./confs-$party_id/docker-compose.yml
@@ -182,7 +296,7 @@ GenerateConfig() {
 		echo "CREATE USER '${db_user}'@'%' IDENTIFIED BY '${db_password}';" >>./confs-$party_id/confs/mysql/init/insert-node.sql
 		echo "GRANT ALL ON *.* TO '${db_user}'@'%';" >>./confs-$party_id/confs/mysql/init/insert-node.sql
 		
-		if [[ "$backend" == "eggroll" ]]; then
+		if [[ "$computing" == "Eggroll" ]]; then
 			echo 'USE `'${db_name}'`;' >>./confs-$party_id/confs/mysql/init/insert-node.sql
 			echo "INSERT INTO server_node (host, port, node_type, status) values ('${clustermanager_ip}', '${clustermanager_port_db}', 'CLUSTER_MANAGER', 'HEALTHY');" >>./confs-$party_id/confs/mysql/init/insert-node.sql
 			for ((j = 0; j < ${#nodemanager_ip[*]}; j++)); do
@@ -205,35 +319,41 @@ GenerateConfig() {
 		sed -i "s/127.0.0.1:8000/${serving_ip}:8000/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
 
 
-		if [[ "$backend" == "spark_rabbitmq" ]]; then
+		if [[ "$computing" == "Spark" ]] || [[ "$computing" == "Spark_local" ]] ; then
 			sed -i "s/proxy: rollsite/proxy: nginx/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
-			# 
-			sed -i "s/  computing: eggroll/  computing: spark/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
-			sed -i "s/  federation: eggroll/  federation: rabbitmq/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
-			sed -i "s/  storage: eggroll/  storage: hdfs/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
+			sed -i "s/computing: eggroll/computing: spark/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
+		fi
+		if [[ "$federation" == "Pulsar" ]]; then
+			sed -i "s/  federation: eggroll/  federation: pulsar/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
+		elif [[ "$federation" == "RabbitMQ" ]]; then
+			sed -i "s/  federation: eggroll/  federation: RabbitMQ/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
 		fi
 
-		if [[ "$backend" == "spark_pulsar" ]]; then
-			sed -i "s/proxy: rollsite/proxy: nginx/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
-			# 
-			sed -i "s/  computing: eggroll/  computing: spark/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
-			sed -i "s/  federation: eggroll/  federation: pulsar/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
+		if [[ "$storage" == "HDFS" ]]; then
 			sed -i "s/  storage: eggroll/  storage: hdfs/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
-		fi
-
-		if [ "$backend" == "spark_local_pulsar" ]; then
-			sed -i 's/proxy: rollsite/proxy: nginx/g' ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
-
-			sed -i "s/  computing: eggroll/  computing: spark/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
-			sed -i "s/  federation: eggroll/  federation: pulsar/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
+		elif [[ "$storage" == "LocalFS" ]]; then
 			sed -i "s/  storage: eggroll/  storage: localfs/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
 		fi
 
+		if [[ "$computing" == "Spark_local" ]] ; then
+			sed -i "s#spark.master .*#spark.master                      local[*]#g" ./confs-$party_id/confs/spark/spark-defaults.conf
+		fi
+
+		# compute_core
+		sed -i "s/nodes: .*/nodes: 1/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
+		sed -i "s/cores_per_node: .*/cores_per_node: $compute_core/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
+
+		if [[ "$federation" == "Eggroll" ]]; then
+			sed -i "s/eggroll.session.processors.per.node=.*/eggroll.session.processors.per.node=$compute_core/g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
+		fi
+		if [[ "$computing" == "Spark"* ]]; then
+			sed -i "s/spark.cores.max .*/spark.cores.max                   $compute_core/g" ./confs-$party_id/confs/spark/spark-defaults.conf
+		fi
 		echo fate_flow module of $party_id done!
 
-		# now we handles the route table
+		# federation config
 		# eggroll
-		if [[ "$backend" == "eggroll" ]]; then
+		if [[ "$federation" == "Eggroll" ]]; then
 			cat >./confs-$party_id/confs/eggroll/conf/route_table.json <<EOF
 {
 	"route_table": {
@@ -287,7 +407,7 @@ EOF
 
 		# nginx
         # TODO nginx 不需要对方fateflow IP PORT
-		if [[ "$backend" == "spark"* ]]; then
+		if [[ "$computing" == "Spark"* ]]; then
 			cat >./confs-$party_id/confs/nginx/route_table.yaml <<EOF
 default:
   proxy:
@@ -321,27 +441,8 @@ ${party_id}:
 EOF
 		fi
 
-		# spark_pulsar
-		if [[ "$backend" == "spark_pulsar" ]]; then
-			cat >./confs-$party_id/confs/fate_flow/conf/pulsar_route_table.yaml <<EOF
-$(for ((j = 0; j < ${#party_list[*]}; j++)); do
-				if [ "${party_id}" == "${party_list[${j}]}" ]; then
-					continue
-				fi
-				echo "${party_list[${j}]}:
-    host: ${party_ip_list[${j}]}
-    port: 6650
-"
-			done)
-${party_id}:
-    host: pulsar
-    port: 6650
-EOF
-
-		fi
-
 		# spark_rabbitmq
-		if [[ "$backend" == "spark_rabbitmq" ]]; then
+		if [[ "$federation" == "RabbitMQ" ]]; then
 			cat >./confs-$party_id/confs/fate_flow/conf/rabbitmq_route_table.yaml <<EOF
 $(for ((j = 0; j < ${#party_list[*]}; j++)); do
 				if [ "${party_id}" == "${party_list[${j}]}" ]; then
@@ -358,8 +459,8 @@ ${party_id}:
 EOF
 		fi
         
-        		# spark_local_pulsar
-		if [[ "$backend" == "spark_local_pulsar" ]]; then
+        # spark_pulsar
+		if [[ "$federation" == "Pulsar" ]]; then
 			cat >./confs-$party_id/confs/fate_flow/conf/pulsar_route_table.yaml <<EOF
 $(for ((j = 0; j < ${#party_list[*]}; j++)); do
 				if [ "${party_id}" == "${party_list[${j}]}" ]; then
@@ -387,7 +488,7 @@ EOF
 
 		if [ "$exchange_ip" != "" ]; then
 			# handle exchange
-			echo "handle exchange"
+			echo exchange module start!
 			module_name=exchange
 			cd ${WORKINGDIR}
 			rm -rf confs-exchange/
@@ -438,8 +539,10 @@ EOF
 	done
 
 	# handle serving
-	echo "handle serving"
+
 	for ((i = 0; i < ${#serving_ip_list[*]}; i++)); do
+		echo serving of $party_id start!
+
 		eval party_id=\${party_list[${i}]}
 		eval party_ip=\${party_ip_list[${i}]}
 		eval serving_ip=\${serving_ip_list[${i}]}
@@ -537,6 +640,7 @@ main() {
 		exit 1
 	else
 		CleanOutputDir
+		CheckConfig
 		GenerateConfig
 	fi
 

@@ -96,7 +96,6 @@ RegistryURI=192.168.10.1/federatedai
 
 下面是修改好的文件，`party 10000`的集群将部署在*192.168.7.1*上，而`party 9999`的集群将部署在*192.168.7.2*上。为了减少所需拉取镜像的大小，KubeFATE在默认情况下，会使用不带神经网络的“python”容器，若需要跑神经网络的算法则需把“parties.conf”中的`enabled_nn`设置成`true`。
 
-
 ```bash
 user=fate
 dir=/data/projects/fate
@@ -104,30 +103,17 @@ party_list=(10000 9999)
 party_ip_list=(192.168.7.1 192.168.7.2)
 serving_ip_list=(192.168.7.1 192.168.7.2)
 
-# backend could be eggroll, spark_rabbitmq and spark_pulsar spark_local_pulsar
-backend=eggroll
+computing=Eggroll
+federation=Eggroll
+storage=Eggroll
 
-# true if you need python-nn else false, the default value will be false
-enabled_nn=false
+algorithm=Basic
+device=CPU
 
-# default
-exchangeip=
+compute_core=4
 
-# modify if you are going to use an external db
-mysql_ip=mysql
-mysql_user=fate
-mysql_password=fate_dev
-mysql_db=fate_flow
+......
 
-name_node=hdfs://namenode:9000
-
-# Define fateboard login information
-fateboard_username=admin
-fateboard_password=admin
-
-# Define serving admin login information
-serving_admin_username=admin
-serving_admin_password=admin
 ```
 
 * 使用Spark+Rabbitmq的部署方式的文档可以参考[这里](../docs/FATE_On_Spark.md).
