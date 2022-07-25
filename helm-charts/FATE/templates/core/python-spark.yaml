@@ -26,6 +26,8 @@ spec:
 {{ include "fate.matchLabels" . | indent 6 }}
   template:
     metadata:
+      annotations:
+        sidecar.istio.io/rewriteAppHTTPProbers: "false"
       labels:
         fateModule: python
 {{ include "fate.labels" . | indent 8 }}
