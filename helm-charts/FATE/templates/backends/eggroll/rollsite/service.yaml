@@ -15,7 +15,7 @@ kind: Service
 metadata:
   name: rollsite
   labels:
-    fateModule: rollsite
+    fateMoudle: rollsite
 {{ include "fate.labels" . | indent 4 }}
 spec:
   ports:
@@ -31,6 +31,6 @@ spec:
   loadBalancerIP: "{{ .Values.modules.rollsite.loadBalancerIP }}"
   {{- end }}
   selector:
-    fateModule: rollsite
+    fateMoudle: rollsite
 {{ include "fate.matchLabels" . | indent 4 }}
 {{ end }}

@@ -15,7 +15,7 @@ apiVersion: v1
 metadata:
   name: python-config
   labels:
-    fateModule: python
+    fateMoudle: python
 {{ include "fate.labels" . | indent 4 }}
 data:
   spark-defaults.conf: |
@@ -255,7 +255,7 @@ apiVersion: v1
 metadata:
   name: pulsar-route-table
   labels:
-    fateModule: python
+    fateMoudle: python
 {{ include "fate.labels" . | indent 4 }}
 data:
   pulsar_route_table.yaml: |
@@ -282,7 +282,7 @@ apiVersion: v1
 metadata:
   name: rabbitmq-route-table
   labels:
-    fateModule: python
+    fateMoudle: python
 {{ include "fate.labels" . | indent 4 }}
 data:
   rabbitmq_route_table.yaml: |

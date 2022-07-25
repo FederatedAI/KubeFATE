@@ -15,7 +15,7 @@ kind: Deployment
 metadata:
   name: rabbitmq
   labels:
-    fateModule: rabbitmq
+    fateMoudle: rabbitmq
 {{ include "fate.labels" . | indent 4 }}
 spec:
   replicas: 1
@@ -23,12 +23,12 @@ spec:
     type: Recreate
   selector:
     matchLabels:
-      fateModule: rabbitmq
+      fateMoudle: rabbitmq
 {{ include "fate.matchLabels" . | indent 6 }}
   template:
     metadata:
       labels:
-        fateModule: rabbitmq
+        fateMoudle: rabbitmq
 {{ include "fate.labels" . | indent 8 }}
     spec:
       containers:

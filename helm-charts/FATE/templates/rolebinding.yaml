@@ -14,7 +14,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   labels:
-    fateModule: serviceAccount
+    fateMoudle: serviceAccount
 {{ include "fate.labels" . | indent 4 }}
   name: {{ .Values.partyName }}
 roleRef:

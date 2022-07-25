@@ -15,7 +15,7 @@ apiVersion: v1
 metadata:
   name: nginx-config
   labels:
-    fateModule: nginx
+    fateMoudle: nginx
 {{ include "fate.labels" . | indent 4 }}
 data:
   route_table.yaml: |

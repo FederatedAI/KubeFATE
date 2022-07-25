@@ -15,7 +15,7 @@ apiVersion: v1
 metadata:
   name: rollsite-config
   labels:
-    fateModule: rollsite
+    fateMoudle: rollsite
 {{ include "fate.labels" . | indent 4 }}
 data:
   route_table.json: |

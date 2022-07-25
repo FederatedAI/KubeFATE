@@ -15,19 +15,19 @@ kind: StatefulSet
 metadata:
   name: mysql
   labels:
-    fateModule: mysql
+    fateMoudle: mysql
 {{ include "fate.labels" . | indent 4 }}
 spec:
   serviceName: mysql
   replicas: 1
   selector:
     matchLabels:
-      fateModule: mysql
+      fateMoudle: mysql
 {{ include "fate.matchLabels" . | indent 6 }}
   template:
     metadata:
       labels:
-        fateModule: mysql
+        fateMoudle: mysql
 {{ include "fate.labels" . | indent 8 }}
     spec:
       containers:
@@ -111,13 +111,13 @@ spec:
         {{- else if and .Values.persistence.enabled (.Values.modules.mysql.existingClaim) }}
         - name: data
           persistentVolumeClaim:
-            claimName: {{ .Values.modules.mysql.existingClaim | default  "mysql-data" }}\
+            claimName: {{ .Values.modules.mysql.existingClaim | default  "mysql-data" }}
         {{- else }}
   volumeClaimTemplates:
     - metadata:
         name: data
         labels:
-          fateModule: mysql
+          fateMoudle: mysql
 {{ include "fate.labels" . | indent 10 }}
       spec:
         accessModes: [{{ .Values.modules.mysql.accessMode | quote }}]

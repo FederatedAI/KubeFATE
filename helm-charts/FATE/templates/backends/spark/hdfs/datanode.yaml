@@ -15,19 +15,19 @@ kind: StatefulSet
 metadata:
   name: datanode
   labels:
-    fateModule: datanode
+    fateMoudle: datanode
 {{ include "fate.labels" . | indent 4 }}
 spec:
   serviceName: datanode
   replicas: {{ .Values.modules.hdfs.datanode.replicas | default 3}}
   selector:
     matchLabels:
-      fateModule: datanode
+      fateMoudle: datanode
 {{ include "fate.matchLabels" . | indent 6 }}
   template:
     metadata:
       labels:
-        fateModule: datanode
+        fateMoudle: datanode
 {{ include "fate.labels" . | indent 8 }}
     spec:
       containers:
@@ -109,7 +109,7 @@ spec:
     - metadata:
         name: dfs
         labels:
-          fateModule: datanode
+          fateMoudle: datanode
 {{ include "fate.labels" . | indent 10 }}
       spec:
         accessModes: [{{ .Values.modules.hdfs.datanode.accessMode | quote }}]
