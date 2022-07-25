@@ -111,8 +111,8 @@ rules:
 - apiGroups:
   - networking.istio.io
   resources:
-  - gateway
-  - virtualservice
+  - gateways
+  - virtualservices
   verbs:
   - get
   - create
