@@ -23,12 +23,12 @@ import (
 )
 
 func TestValidate(t *testing.T) {
-	ogSpecOld := modules.MapStringInterface{
+	specOld := modules.MapStringInterface{
 		"chartName":    "fate",
 		"chartVersion": "v1.7.2",
 		"imageTag":     "1.7.2-release",
 	}
-	ogSpecNew := modules.MapStringInterface{
+	specNew := modules.MapStringInterface{
 		"chartName":    "fate",
 		"chartVersion": "v1.8.0",
 		"imageTag":     "1.8.0-release",
@@ -37,8 +37,6 @@ func TestValidate(t *testing.T) {
 		namespace: "blabla",
 	}
 	// Happy path
-	specOld := ogSpecOld
-	specNew := ogSpecNew
 	err := fum.validate(specOld, specNew)
 	assert.Nil(t, err)
 
@@ -46,32 +44,33 @@ func TestValidate(t *testing.T) {
 	specNew["chartName"] = "openfl"
 	err = fum.validate(specOld, specNew)
 	assert.NotNil(t, err)
+	specNew["chartName"] = "fate"
 
 	// spec identical
-	specNew = ogSpecNew
 	specNew["chartVersion"] = "v1.7.2"
 	specNew["imageTag"] = "1.7.2-release"
 	err = fum.validate(specOld, specNew)
 	assert.NotNil(t, err)
+	specNew["chartVersion"] = "v1.8.0"
+	specNew["imageTag"] = "1.8.0-release"
 
 	// image version do not consistent with the chart version
-	specNew = ogSpecNew
 	specNew["imageTag"] = "1.9.0-release"
 	err = fum.validate(specOld, specNew)
 	assert.NotNil(t, err)
+	specNew["imageTag"] = "1.8.0-release"
 
 	// do not support downgrade
-	specNew = ogSpecNew
 	specNew["chartVersion"] = "v1.6.0"
 	specNew["imageTag"] = "1.6.0-release"
 	err = fum.validate(specOld, specNew)
 	assert.NotNil(t, err)
+	specNew["chartVersion"] = "v1.8.0"
+	specNew["imageTag"] = "1.8.0-release"
 
 	// fate version < 1.7.1
-	specNew = ogSpecNew
-	specOld = ogSpecOld
 	specOld["chartVersion"] = "v1.7.0"
-	specNew["imageTag"] = "1.7.0-release"
+	specOld["imageTag"] = "1.7.0-release"
 	err = fum.validate(specOld, specNew)
 	assert.NotNil(t, err)
 }
