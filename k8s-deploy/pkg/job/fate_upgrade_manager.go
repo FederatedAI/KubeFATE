@@ -69,7 +69,7 @@ func (fum *FateUpgradeManager) validate(specOld, specNew modules.MapStringInterf
 	}
 
 	// KubeFATE cannot support rolling upgrade for FATE version <= 1.7.1
-	if newVersion == oldVersion {
+	if newVersion != oldVersion {
 		ver171, _ := version.NewVersion("1.7.1")
 		if oldVerFormatted.LessThanOrEqual(ver171) {
 			return errors.New("upgrade from FATE version <= 1.7.1 is not supported by KubeFATE")
