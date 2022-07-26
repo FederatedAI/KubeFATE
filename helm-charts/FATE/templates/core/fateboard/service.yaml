@@ -15,7 +15,7 @@ kind: Service
 metadata:
   name: fateboard
   labels:
-    fateModule: python
+    fateMoudle: python
 {{ include "fate.labels" . | indent 4 }}
 spec:
   ports:
@@ -25,6 +25,6 @@ spec:
       protocol: TCP
   type: {{ .Values.modules.fateboard.type }}
   selector:
-    fateModule: python
+    fateMoudle: python
 {{ include "fate.matchLabels" . | indent 4 }}
 {{- end }}

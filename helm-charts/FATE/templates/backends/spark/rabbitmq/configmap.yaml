@@ -15,7 +15,7 @@ apiVersion: v1
 metadata:
   name: rabbitmq-config
   labels:
-    fateModule: rabbitmq
+    fateMoudle: rabbitmq
 {{ include "fate.labels" . | indent 4 }}
 data:
   enabled_plugins: |

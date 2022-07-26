@@ -15,7 +15,7 @@ kind: Ingress
 metadata:
   name: fateboard
   labels:
-    fateModule: fateboard
+    fateMoudle: fateboard
 {{ include "fate.labels" . | indent 4 }}
 {{- if .Values.ingress.fateboard.annotations }}
   annotations:

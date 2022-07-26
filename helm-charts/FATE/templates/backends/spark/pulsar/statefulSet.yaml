@@ -15,19 +15,19 @@ kind: StatefulSet
 metadata:
   name: pulsar
   labels:
-    fateModule: pulsar
+    fateMoudle: pulsar
 {{ include "fate.labels" . | indent 4 }}
 spec:
   serviceName: pulsar
   replicas: 1
   selector:
     matchLabels:
-      fateModule: pulsar
+      fateMoudle: pulsar
 {{ include "fate.matchLabels" . | indent 6 }}
   template:
     metadata:
       labels:
-        fateModule: pulsar
+        fateMoudle: pulsar
 {{ include "fate.labels" . | indent 8 }}
     spec:
       containers:
@@ -133,7 +133,7 @@ spec:
     - metadata:
         name: pulsar-data
         labels:
-          fateModule: pulsar
+          fateMoudle: pulsar
 {{ include "fate.labels" . | indent 10 }}
       spec:
         accessModes: [{{ .Values.modules.pulsar.accessMode | quote }}]

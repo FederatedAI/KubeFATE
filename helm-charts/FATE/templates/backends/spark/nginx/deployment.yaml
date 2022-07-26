@@ -15,7 +15,7 @@ kind: Deployment
 metadata:
   name: nginx
   labels:
-    fateModule: nginx
+    fateMoudle: nginx
 {{ include "fate.labels" . | indent 4 }}
 spec:
   replicas: 1
@@ -23,12 +23,12 @@ spec:
     type: Recreate
   selector:
     matchLabels:
-      fateModule: nginx
+      fateMoudle: nginx
 {{ include "fate.matchLabels" . | indent 6 }}
   template:
     metadata:
       labels:
-        fateModule: nginx
+        fateMoudle: nginx
 {{ include "fate.labels" . | indent 8 }}
     spec:
       containers:

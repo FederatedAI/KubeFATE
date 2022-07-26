@@ -15,7 +15,7 @@ kind: Ingress
 metadata:
   name: rabbitmq
   labels:
-    fateModule: rabbitmq
+    fateMoudle: rabbitmq
 {{ include "fate.labels" . | indent 4 }}
 {{- if .Values.ingress.rabbitmq.annotations }}
   annotations:

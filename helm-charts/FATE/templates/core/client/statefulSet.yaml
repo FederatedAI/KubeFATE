@@ -15,19 +15,19 @@ kind: StatefulSet
 metadata:
   name: client
   labels:
-    fateModule: client
+    fateMoudle: client
 {{ include "fate.labels" . | indent 4 }}
 spec:
   serviceName: notebook
   replicas: 1
   selector:
     matchLabels:
-      fateModule: client
+      fateMoudle: client
 {{ include "fate.matchLabels" . | indent 6 }}
   template:
     metadata:
       labels:
-        fateModule: client
+        fateMoudle: client
 {{ include "fate.labels" . | indent 8 }}
     spec:
       containers:
@@ -113,7 +113,7 @@ spec:
     - metadata:
         name: persistence
         labels:
-          fateModule: client
+          fateMoudle: client
 {{ include "fate.labels" . | indent 10 }}
       spec:
         accessModes: [{{ .Values.modules.client.accessMode | quote }}]

@@ -15,7 +15,7 @@ kind: Service
 metadata:
   name: fateflow
   labels:
-    fateModule: fateflow
+    fateMoudle: fateflow
 {{ include "fate.labels" . | indent 4 }}
 spec:
   ports:
@@ -30,7 +30,7 @@ spec:
   type: ClusterIP
   clusterIP: None
   selector:
-    fateModule: python
+    fateMoudle: python
 {{ include "fate.matchLabels" . | indent 4 }}
 ---
 apiVersion: v1
@@ -38,7 +38,7 @@ kind: Service
 metadata:
   name: fateflow-client
   labels:
-    fateModule: fateflow
+    fateMoudle: fateflow
 {{ include "fate.labels" . | indent 4 }}
 spec:
   ports:
@@ -63,7 +63,7 @@ spec:
   {{- end }}
   
   selector:
-    fateModule: python
+    fateMoudle: python
 {{ include "fate.matchLabels" . | indent 4 }}
 ---
 {{- if and .Values.modules.python.spark.portMaxRetries (ne (print .Values.modules.python.spark.driverHost) "fateflow") }}
@@ -72,7 +72,7 @@ kind: Service
 metadata:
   name: fateflow-sparkdriver
   labels:
-    fateModule: python
+    fateMoudle: python
 {{ include "fate.labels" . | indent 4 }}
 spec:
   ports:
@@ -95,7 +95,7 @@ spec:
     {{- end }}
   type: {{ .Values.modules.python.spark.driverHostType }}
   selector:
-    fateModule: python
+    fateMoudle: python
 {{ include "fate.matchLabels" . | indent 4 }}
 ---
 {{- end }}

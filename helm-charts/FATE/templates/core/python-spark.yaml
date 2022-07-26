@@ -15,14 +15,14 @@ kind: StatefulSet
 metadata:
   name: python
   labels:
-    fateModule: python
+    fateMoudle: python
 {{ include "fate.labels" . | indent 4 }}
 spec:
   serviceName: fateflow
   replicas: 1
   selector:
     matchLabels:
-      fateModule: python
+      fateMoudle: python
 {{ include "fate.matchLabels" . | indent 6 }}
   template:
     metadata:
@@ -31,7 +31,7 @@ spec:
         sidecar.istio.io/rewriteAppHTTPProbers: "false"
         {{- end }}
       labels:
-        fateModule: python
+        fateMoudle: python
 {{ include "fate.labels" . | indent 8 }}
     spec:
       {{- if .Values.istio.enabled }}
@@ -287,7 +287,7 @@ spec:
     - metadata:
         name: python-data
         labels:
-          fateModule: python
+          fateMoudle: python
 {{ include "fate.labels" . | indent 10 }}
       spec:
         accessModes: [{{ .Values.modules.python.accessMode | quote }}]
