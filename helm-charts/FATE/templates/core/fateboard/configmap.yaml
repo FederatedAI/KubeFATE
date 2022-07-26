@@ -20,7 +20,7 @@ metadata:
 data:
   application.properties: |
     server.port=8080
-    fateflow.url=http://{{ if .Values.istio.enabled }}127.0.0.1{{ else }}fateflow{{ end }}:9380
+    fateflow.url=http://fateflow:9380
     fateflow.http_app_key=
     fateflow.http_secret_key=
     spring.http.encoding.charset=UTF-8
