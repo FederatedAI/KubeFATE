@@ -74,12 +74,8 @@ spec:
           checkMySQL
       {{- end }}
       containers:
-        - name: python
-          {{- if eq .Values.modules.python.backend "spark_pulsar" "spark_rabbitmq" "spark_local_pulsar" }}
-          image: {{ .Values.image.registry }}/python-spark:{{ .Values.image.tag }}
-          {{- else }}
-          image: {{ .Values.image.registry }}/{{ if .Values.modules.python.enabledNN }}python-nn{{ else }}python{{ end }}:{{ .Values.image.tag }}
-          {{- end }}
+        - name: fateflow
+          image: {{ .Values.image.registry }}/fateflow{{ include "images.fateflow.suffix" . }}:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           {{- if .Values.modules.python.resources}}
           resources:
@@ -101,7 +97,7 @@ spec:
             value: "$PYTHONPATH:/data/projects/fate/fate/python:/data/projects/fate/eggroll/python:/data/projects/fate/fateflow/python:/data/projects/fate/fate/python/fate_client"
           - name: FATE_PROJECT_BASE
             value: "/data/projects/fate"
-          {{- if eq .Values.modules.python.backend "spark_pulsar" "spark_rabbitmq" }}
+          {{- if eq .Values.computing "Spark" }}
           - name: FATE_FLOW_UPLOAD_MAX_NUM
             value: "1000000"
           - name: FATE_FLOW_UPLOAD_MAX_BYTES
@@ -151,7 +147,7 @@ spec:
             failureThreshold: 12
             periodSeconds: 10
           volumeMounts:
-            {{- if eq .Values.modules.python.backend "eggroll" }}
+            {{- if eq .Values.computing "Eggroll" }}
             - mountPath: /data/projects/fate/eggroll/conf/eggroll.properties
               name: eggroll-confs
               subPath: eggroll.properties
@@ -164,11 +160,11 @@ spec:
             - mountPath: /data/projects/spark-2.4.1-bin-hadoop2.7/conf/spark-defaults-template.conf
               name: python-confs
               subPath: spark-defaults.conf
-            {{- if eq .Values.modules.python.backend "spark_rabbitmq" }}
+            {{- if eq .Values.federation "RabbitMQ" }}
             - mountPath: /data/projects/fate/conf/rabbitmq_route_table
               name: rabbitmq-route-table
             {{- end }}
-            {{- if eq .Values.modules.python.backend "spark_pulsar" "spark_local_pulsar" }}
+            {{- if eq .Values.federation "Pulsar" }}
             - mountPath: /data/projects/fate/conf/pulsar_route_table
               name: pulsar-route-table
             {{- end }}
@@ -248,7 +244,7 @@ spec:
     {{- end }}
       restartPolicy: Always
       volumes:
-        {{- if eq .Values.modules.python.backend "eggroll" }}
+        {{- if eq .Values.computing "Eggroll" }}
         - name: eggroll-confs
           configMap:
             name: eggroll-config
@@ -256,12 +252,12 @@ spec:
         - name: python-confs
           configMap:
             name: python-config
-        {{- if eq .Values.modules.python.backend "spark_rabbitmq" }}
+        {{- if eq .Values.federation "RabbitMQ" }}
         - name: rabbitmq-route-table
           configMap:
             name: rabbitmq-route-table
         {{- end }}
-        {{- if eq .Values.modules.python.backend "spark_pulsar" "spark_local_pulsar" }}
+        {{- if eq .Values.federation "Pulsar" }}
         - name: pulsar-route-table
           configMap:
             name: pulsar-route-table

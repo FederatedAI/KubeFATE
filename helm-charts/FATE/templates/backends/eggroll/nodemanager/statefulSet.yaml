@@ -46,7 +46,7 @@ spec:
           - name: fluentd-conf
             subPath: fluent.conf
             mountPath: /fluentd/etc/fluent.conf
-        - image: {{ .Values.image.registry }}/eggroll:{{ .Values.image.tag }}
+        - image: {{ .Values.image.registry }}/eggroll{{ include "images.eggroll.suffix" . }}:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           {{- if .Values.modules.nodemanager.resources}}
           resources:

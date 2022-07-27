@@ -23,9 +23,16 @@ modules:
   - fateboard
   - client
   
-  
-# backend could be eggroll, spark_rabbitmq and spark_pulsar spark_local_pulsar
-backend: eggroll
+# Computing : Eggroll, Spark, Sparl_local
+computing: Eggroll
+# Federation: Eggroll(computing: Eggroll), Pulsar/RabbitMQ(computing: Spark/Spark_local)
+federation: Eggroll
+# Storage: Eggroll(computing: Eggroll), HDFS(computing: Spark), LocalFS(computing: Spark_local)
+storage: Eggroll
+# Algorithm: Basic, NN
+algorithm: Basic
+# Device: CPU, IPCL
+device: CPU
 
 # Specify domain name for service
 # ingress:

@@ -51,6 +51,13 @@ $SED -i "s/192.168.0.1/${party_exchange_IP}/g" ./party-9999/cluster-spark-rabbit
 $SED -i "s/192.168.0.1/${party_exchange_IP}/g" ./party-9999/cluster-spark-pulsar.yaml
 $SED -i "s/192.168.0.1/${party_exchange_IP}/g" ./party-9999/cluster-spark-local-pulsar.yaml
 
+
+for item in `ls party-9999`
+do
+    $SED -i "s/algorithm: .*/algorithm: ${algorithm}/g" ./party-9999/$item
+    $SED -i "s/device: .*/device: ${device}/g" ./party-9999/$item
+done
+
 # 10000 config
 
 $SED -i "s/chartVersion: .*/chartVersion: ${fate_chartVersion}/g" ./party-10000/cluster.yaml
@@ -82,6 +89,12 @@ $SED -i "s/192.168.0.1/${party_exchange_IP}/g" ./party-10000/cluster-serving.yam
 $SED -i "s/192.168.0.1/${party_exchange_IP}/g" ./party-10000/cluster-spark-rabbitmq.yaml
 $SED -i "s/192.168.0.1/${party_exchange_IP}/g" ./party-10000/cluster-spark-pulsar.yaml
 $SED -i "s/192.168.0.1/${party_exchange_IP}/g" ./party-10000/cluster-spark-local-pulsar.yaml
+
+for item in `ls party-10000`
+do
+    $SED -i "s/algorithm: .*/algorithm: ${algorithm}/g" ./party-10000/$item
+    $SED -i "s/device: .*/device: ${device}/g" ./party-10000/$item
+done
 
 # exchange config
 

@@ -36,3 +36,7 @@ Create the name of the controller service account to use
     {{ default "default" }}
 {{- end -}}
 {{- end -}}
+
+{{- define "images.registry" -}}
+{{- .Values.image.registry | default "federatedai" -}}
+{{- end -}}

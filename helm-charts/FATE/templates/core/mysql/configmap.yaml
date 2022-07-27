@@ -18,7 +18,7 @@ metadata:
     fateModule: mysql
 {{ include "fate.labels" . | indent 4 }}
 data:
-  {{- if eq .Values.modules.python.backend  "spark" }}
+  {{- if eq .Values.computing  "Spark" }}
   {{- else }}
   create-eggroll-meta-tables.sql: |
     -- create database if not exists, default database is eggroll_meta
