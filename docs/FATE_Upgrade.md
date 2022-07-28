@@ -10,7 +10,7 @@ This document is going to illustrate how to do that, and also show the limitatio
 
 The supporting matrices depend on the configuration of the data persistence of the FATE cluster, in specific:
 
-### Case 1: When using existing claim for MySQL
+### Case 1: When using existing persistence volume claim for MySQL
 Support FATE versions
 
 | From/To         | v1.7.2 | v1.8.0 | v1.9.0 | future versions |
@@ -179,10 +179,12 @@ Before any upgrade, we should back up the database. Currently, KubeFATE doesn't 
 There are several ways to do the backup work, in this example, we do that in the mysql pod:
 
 ```
-$ k exec -it mysql-77f95d4844-8dfjj -n fate-9999 bash                       
+$ kubectl exec -it mysql-77f95d4844-8dfjj -n fate-9999 bash                       
 kubectl exec [POD] [COMMAND] is DEPRECATED and will be removed in a future version. Use kubectl exec [POD] -- [COMMAND] instead.
 root@mysql-77f95d4844-8dfjj:/# 
 ```
+
+Note that "mysql-77f95d4844-8dfjj" is the pod id which must be different in your FATE cluster. Check the pod id by ```kubectl get pods -n <your namespace>```.
 
 We need to change the directory to "/var/lib/mysql/", because that is where the PV is mounted to.
 If we generate a mysql snapshot there, the file will be persisted in the nfs server even the pod is gone.
@@ -248,7 +250,7 @@ As mentioned, due to a historical reason, upgrading from a FATE cluster whose ve
 
 Suppose we have a v1.7.1 FATE cluster, how to upgrade to v1.7.2 manually without data loss in the MySQL database?
 ### Export the data in the MySQL database
-Get into the container of MySQL, go to "/var/lib/mysql" and run below command:
+Get into the container of MySQL by ```kubectl exec -it <mysql_pod_id> -n <your_name_space> bash```, go to "/var/lib/mysql" and run below command:
 
 ```
 mysqldump -h localhost -u root --no-create-info \
@@ -270,7 +272,7 @@ mysqldump -h localhost -u root eggroll_meta > snapshot.sql
 Use ```kubefate cluster delete <uuid>``` and ```kubefate cluster install -f cluster.yaml``` to make this happen.
 
 ### Import the data into the new MySQL database
-Get into the container of MySQL. Make sure before that the dumped data file "data.sql" has been put into the corresponding nfs folder.
+Get into the container of MySQL by ```kubectl exec -it <mysql_pod_id> -n <your_name_space> bash```. Make sure before that the dumped data file "data.sql" has been put into the corresponding nfs folder.
 
 Change directory to "/var/lib/mysql" and run below command:
 ```
