@@ -48,6 +48,7 @@ services:
     volumes:
       - ./confs/fateboard/conf:/data/projects/fate/fateboard/conf
       - fate_flow_logs:/data/projects/fate/fateflow/logs
+      - /etc/localtime:/etc/localtime:ro
     restart: always
     networks:
       - fate-network
@@ -73,6 +74,7 @@ services:
       - download_dir:/data/projects/fate/python/download_dir
       - fate_flow_logs:/data/projects/fate/fateflow/logs
       - ./shared_dir/data/model_local_cache:/data/projects/fate/fateflow/model_local_cache
+      - /etc/localtime:/etc/localtime:ro
     networks:
       fate-network:
         ipv4_address: 192.167.0.100
@@ -101,6 +103,7 @@ services:
     volumes:
       - ./confs/mysql/init:/docker-entrypoint-initdb.d/
       - ./shared_dir/data/mysql:/var/lib/mysql
+      - /etc/localtime:/etc/localtime:ro
     restart: always
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
@@ -115,6 +118,7 @@ services:
     volumes:
       - ./confs/nginx/route_table.yaml:/data/projects/fate/proxy/nginx/conf/route_table.yaml
       - ./confs/nginx/nginx.conf:/data/projects/fate/proxy/nginx/conf/nginx.conf
+      - /etc/localtime:/etc/localtime:ro
     restart: always
     networks:
       - fate-network
@@ -130,6 +134,7 @@ services:
     volumes:
       - ./confs/pulsar/standalone.conf:/pulsar/conf/standalone.conf
       - ./shared_dir/data/pulsar:/pulsar/data
+      - /etc/localtime:/etc/localtime:ro
     command:
       ["/bin/bash", "-c", "bin/pulsar standalone -nss"]
     restart: always
@@ -148,6 +153,7 @@ services:
     volumes:
       - download_dir:/data/projects/fate/download_dir
       - shared_dir_examples:/data/projects/fate/examples
+      - /etc/localtime:/etc/localtime:ro
     depends_on:
       - python
     networks:

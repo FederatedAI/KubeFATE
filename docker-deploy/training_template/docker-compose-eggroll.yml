@@ -49,6 +49,7 @@ services:
       PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION: python
     volumes:
       - ./confs/eggroll/conf:/data/projects/fate/eggroll/conf
+      - /etc/localtime:/etc/localtime:ro
       - shared_dir_federatedml:/data/projects/fate/fate/python/federatedml
     networks:
       - fate-network
@@ -62,6 +63,7 @@ services:
     volumes:
       - ./confs/fateboard/conf:/data/projects/fate/fateboard/conf
       - fate_flow_logs:/data/projects/fate/fateflow/logs
+      - /etc/localtime:/etc/localtime:ro
     networks:
       - fate-network
     depends_on:
@@ -74,6 +76,7 @@ services:
       - 4670 
     volumes:
       - ./confs/eggroll/conf:/data/projects/fate/eggroll/conf
+      - /etc/localtime:/etc/localtime:ro
       - shared_dir_federatedml:/data/projects/fate/fate/python/federatedml
     environment:
       PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION: python
@@ -90,6 +93,7 @@ services:
       - ./confs/eggroll/conf:/data/projects/fate/eggroll/conf
       - ./confs/fate_flow/conf/service_conf.yaml:/data/projects/fate/conf/service_conf.yaml
       - ./shared_dir/data/nodemanager:/data/projects/fate/eggroll/data
+      - /etc/localtime:/etc/localtime:ro
       - shared_dir_federatedml:/data/projects/fate/fate/python/federatedml
     networks:
       - fate-network
@@ -117,6 +121,7 @@ services:
       - ./confs/eggroll/conf:/data/projects/fate/eggroll/conf
       - fate_flow_logs:/data/projects/fate/fateflow/logs
       - ./shared_dir/data/model_local_cache:/data/projects/fate/fateflow/model_local_cache
+      - /etc/localtime:/etc/localtime:ro
     depends_on:
       - mysql
       - rollsite
@@ -150,6 +155,7 @@ services:
     volumes:
       - download_dir:/data/projects/fate/download_dir
       - shared_dir_examples:/data/projects/fate/examples
+      - /etc/localtime:/etc/localtime:ro
     depends_on:
       - python
     networks:
@@ -162,6 +168,7 @@ services:
     volumes:
       - ./confs/mysql/init:/docker-entrypoint-initdb.d/
       - ./shared_dir/data/mysql:/var/lib/mysql
+      - /etc/localtime:/etc/localtime:ro
     restart: always
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
