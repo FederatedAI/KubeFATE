@@ -1,5 +1,5 @@
-# Copyright 2019-2020 VMware, Inc.
-# 
+# Copyright 2019-2022 VMware, Inc.
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # you may obtain a copy of the License at
@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-version: '3'
+version: '3.7'
 networks:
   fate-network:
     ipam:
@@ -50,6 +50,7 @@ services:
     volumes:
       - ./confs/eggroll/conf:/data/projects/fate/eggroll/conf
       - /etc/localtime:/etc/localtime:ro
+      - shared_dir_federatedml:/data/projects/fate/fate/python/federatedml
     networks:
       - fate-network
     command: ["bash", "-c", "java -Dlog4j.configurationFile=$${EGGROLL_HOME}/conf/log4j2.properties -cp $${EGGROLL_HOME}/lib/*:$${EGGROLL_HOME}/conf/ com.webank.eggroll.rollsite.EggSiteBootstrap -c $${EGGROLL_HOME}/conf/eggroll.properties"]
@@ -76,6 +77,7 @@ services:
     volumes:
       - ./confs/eggroll/conf:/data/projects/fate/eggroll/conf
       - /etc/localtime:/etc/localtime:ro
+      - shared_dir_federatedml:/data/projects/fate/fate/python/federatedml
     environment:
       PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION: python
     networks:
@@ -92,6 +94,7 @@ services:
       - ./confs/fate_flow/conf/service_conf.yaml:/data/projects/fate/conf/service_conf.yaml
       - ./shared_dir/data/nodemanager:/data/projects/fate/eggroll/data
       - /etc/localtime:/etc/localtime:ro
+      - shared_dir_federatedml:/data/projects/fate/fate/python/federatedml
     networks:
       - fate-network
     command: ["bash", "-c", "java -Dlog4j.configurationFile=$${EGGROLL_HOME}/conf/log4j2.properties -cp $${EGGROLL_HOME}/lib/*: com.webank.eggroll.core.Bootstrap --bootstraps com.webank.eggroll.core.resourcemanager.NodeManagerBootstrap -c $${EGGROLL_HOME}/conf/eggroll.properties -p 4671 -s 'EGGROLL_DEAMON'"]
@@ -109,7 +112,12 @@ services:
       - shared_dir_federatedml:/data/projects/fate/fate/python/federatedml
       - shared_dir_examples:/data/projects/fate/examples
       - download_dir:/data/projects/fate/python/download_dir
-      - ./confs/fate_flow/conf:/data/projects/fate/conf
+      - ./confs/fate_flow/conf/service_conf.yaml:/data/projects/fate/conf/service_conf.yaml
+      - ./confs/fate_flow/conf/pulsar_route_table.yaml:/data/projects/fate/conf/pulsar_route_table.yaml
+      - ./confs/fate_flow/conf/rabbitmq_route_table.yaml:/data/projects/fate/conf/rabbitmq_route_table.yaml
+      - ./confs/fate_flow/conf/component_registry.json:/data/projects/fate/fateflow/conf/component_registry.json
+      - ./confs/fate_flow/conf/job_default_config.yaml:/data/projects/fate/fateflow/conf/job_default_config.yaml
+      - ./confs/fate_flow/conf/template_info.yaml:/data/projects/fate/fateflow/conf/template_info.yaml
       - ./confs/eggroll/conf:/data/projects/fate/eggroll/conf
       - fate_flow_logs:/data/projects/fate/fateflow/logs
       - ./shared_dir/data/model_local_cache:/data/projects/fate/fateflow/model_local_cache

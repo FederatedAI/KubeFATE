@@ -9,24 +9,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-{{ if .Values.modules.python.include }}
+{{- if .Values.modules.python.include }}
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: python
   labels:
     fateMoudle: python
 {{ include "fate.labels" . | indent 4 }}
 spec:
+  serviceName: fateflow
   replicas: 1
-  strategy:
-    type: Recreate
   selector:
     matchLabels:
       fateMoudle: python
 {{ include "fate.matchLabels" . | indent 6 }}
   template:
     metadata:
+      annotations:
+        {{- if .Values.istio.enabled }}
+        sidecar.istio.io/rewriteAppHTTPProbers: "false"
+        {{- end }}
       labels:
         fateMoudle: python
 {{ include "fate.labels" . | indent 8 }}
@@ -121,18 +124,13 @@ spec:
                 mkdir -p /data/projects/fate/conf/
                 cp /data/projects/fate/conf-tmp/transfer_conf.yaml /data/projects/fate/conf/transfer_conf.yaml
                 cp /data/projects/fate/conf-tmp/service_conf.yaml /data/projects/fate/conf/service_conf.yaml
-                cp /data/projects/fate/conf-tmp/component_registry.json /data/projects/fate/conf/component_registry.json
-                cp /data/projects/fate/conf-tmp/job_default_config.yaml /data/projects/fate/conf/job_default_config.yaml
+                cp /data/projects/fate/conf-tmp/component_registry.json /data/projects/fate/fateflow/conf/component_registry.json
+                cp /data/projects/fate/conf-tmp/job_default_config.yaml /data/projects/fate/fateflow/conf/job_default_config.yaml
                 # fix fateflow conf must use IP
                 sed -i "s/host: fateflow/host: ${POD_IP}/g" /data/projects/fate/conf/service_conf.yaml
                 
                 cp /data/projects/spark-2.4.1-bin-hadoop2.7/conf/spark-defaults-template.conf /data/projects/spark-2.4.1-bin-hadoop2.7/conf/spark-defaults.conf
                 sed -i "s/fateflow/${POD_IP}/g" /data/projects/spark-2.4.1-bin-hadoop2.7/conf/spark-defaults.conf
-                
-                # logs
-                mkdir -p /data/projects/fate/fateflow/logs/fate_flow/
-                touch /data/projects/fate/fateflow/logs/fate_flow/INFO.log
-                ln -sf /dev/stdout /data/projects/fate/fateflow/logs/fate_flow/INFO.log
                 
                 sleep 5 && python fateflow/python/fate_flow/fate_flow_server.py
           livenessProbe:
@@ -178,11 +176,10 @@ spec:
             - mountPath: /data/projects/fate/conf/pulsar_route_table
               name: pulsar-route-table
             {{- end }}
-            # TODO add mountPath of job and model-cache 
-            - mountPath: /data/projects/fate/jobs
+            - mountPath: /data/projects/fate/fateflow/jobs
               name: python-data
               subPath: jobs
-            - mountPath: /data/projects/fate/model_local_cache
+            - mountPath: /data/projects/fate/fateflow/model_local_cache
               name: python-data
               subPath: model-local-cache
         {{- if .Values.modules.fateboard.include }}
@@ -281,10 +278,22 @@ spec:
         {{- if not .Values.persistence.enabled }}
         - name: python-data
           emptyDir: {}
-        {{- else }}
+        {{- else if and .Values.persistence.enabled (.Values.modules.python.existingClaim) }}
         - name: python-data
           persistentVolumeClaim:
             claimName: {{ .Values.modules.python.existingClaim | default  "python-data" }}
+        {{- else }}
+  volumeClaimTemplates:
+    - metadata:
+        name: python-data
+        labels:
+          fateMoudle: python
+{{ include "fate.labels" . | indent 10 }}
+      spec:
+        accessModes: [{{ .Values.modules.python.accessMode | quote }}]
+        storageClassName: {{ .Values.modules.python.storageClass }}
+        resources:
+          requests:
+            storage: {{ .Values.modules.mysql.size }}
         {{- end }}
-
-{{ end }}
+{{- end }}

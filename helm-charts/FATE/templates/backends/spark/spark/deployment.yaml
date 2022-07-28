@@ -35,7 +35,7 @@ spec:
         - name: spark-master
           image: {{ if .Values.modules.spark.master.Image }}{{ .Values.modules.spark.master.Image }}{{ else }}{{ .Values.image.registry }}/spark-master{{ end }}:{{ default .Values.image.tag .Values.modules.spark.master.ImageTag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          {{- if .Values.modules.spark.master.resources}}
+          {{- if .Values.modules.spark.master.resources }}
           resources:
           {{- range $key, $val := .Values.modules.spark.master.resources }}
             {{ $key }}:

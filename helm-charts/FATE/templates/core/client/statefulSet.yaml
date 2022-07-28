@@ -1,0 +1,125 @@
+# Copyright 2019-2022 VMware, Inc.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+{{- if .Values.modules.client.include }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: client
+  labels:
+    fateMoudle: client
+{{ include "fate.labels" . | indent 4 }}
+spec:
+  serviceName: notebook
+  replicas: 1
+  selector:
+    matchLabels:
+      fateMoudle: client
+{{ include "fate.matchLabels" . | indent 6 }}
+  template:
+    metadata:
+      labels:
+        fateMoudle: client
+{{ include "fate.labels" . | indent 8 }}
+    spec:
+      containers:
+        - image: {{ .Values.image.registry }}/client:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          name: client
+          env:
+            - name: partyId
+              value: {{ .Values.partyId | quote  }}
+            - name: FATE_FLOW_IP
+              value: "fateflow"
+            - name: FATE_FLOW_PORT
+              value: "9380"
+            - name: FATE_SERVING_HOST
+              value: "{{.Values.modules.serving.ip}}:{{.Values.modules.serving.port}}"
+          ports:
+            - containerPort: 20000
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 20000
+              httpHeaders:
+                - name: X-Custom-Header
+                  value: livenessProbe
+            initialDelaySeconds: 1
+            periodSeconds: 10
+            timeoutSeconds: 3
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 20000
+              httpHeaders:
+                - name: X-Custom-Header
+                  value: readinessProbe
+            initialDelaySeconds: 1
+            periodSeconds: 10
+            timeoutSeconds: 3
+            successThreshold: 1
+            failureThreshold: 3
+          startupProbe:
+            httpGet:
+              path: /
+              port: 20000
+              httpHeaders:
+                - name: X-Custom-Header
+                  value: startupProbe
+            failureThreshold: 12
+            periodSeconds: 10
+          volumeMounts:
+            - mountPath: /data/projects/fate/persistence/
+              name: persistence
+              subPath: {{ .Values.modules.client.subPath }}
+      {{- with .Values.modules.client.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.modules.client.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.modules.client.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.image.imagePullSecrets }}
+      imagePullSecrets:
+{{ toYaml . | indent 6 }}
+      {{- end }}
+      serviceAccountName: {{ template "serviceAccountName" . }}
+      restartPolicy: Always
+      volumes:
+        {{- if not .Values.persistence.enabled }}
+        - name: persistence
+          emptyDir: {}
+        {{- else if and .Values.persistence.enabled (.Values.modules.client.existingClaim) }}
+        - name: persistence
+          persistentVolumeClaim:
+            claimName: {{ .Values.modules.client.existingClaim | default  "client-data" }}
+        {{- else }}
+  volumeClaimTemplates:
+    - metadata:
+        name: persistence
+        labels:
+          fateMoudle: client
+{{ include "fate.labels" . | indent 10 }}
+      spec:
+        accessModes: [{{ .Values.modules.client.accessMode | quote }}]
+        storageClassName: {{ .Values.modules.client.storageClass }}
+        resources:
+          requests:
+            storage: {{ .Values.modules.client.size }}
+        {{- end }}
+{{- end }}

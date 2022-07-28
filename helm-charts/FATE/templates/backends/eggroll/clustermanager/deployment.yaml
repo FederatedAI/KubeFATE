@@ -37,6 +37,13 @@ spec:
             value: python 
           image: {{ .Values.image.registry }}/eggroll:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if .Values.modules.clustermanager.resources}}
+          resources:
+          {{- range $key, $val := .Values.modules.clustermanager.resources }}
+            {{ $key }}:
+{{ toYaml $val | indent 14 }}
+          {{- end }}
+          {{- end }}
           name: clustermanager
           command:
           - bash

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2021 VMware, Inc.
+ * Copyright 2019-2022 VMware, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package job
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/modules"
@@ -217,6 +218,12 @@ func createCluster(job *modules.Job) (*modules.Cluster, error) {
 	if err != nil {
 		log.Error().Err(err).Interface("clusterArgs", job.Metadata).Msg("NewCluster")
 		return nil, err
+	}
+
+	if cluster.ChartName == fateChartName {
+		if !strings.Contains(cluster.Spec["imageTag"].(string), strings.ReplaceAll(cluster.ChartVersion, "v", "")) {
+			return nil, errors.New("the image tag is inconsistent with the chart version, which is unsupported")
+		}
 	}
 
 	// Save Cluster to database

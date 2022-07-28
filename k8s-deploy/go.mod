@@ -9,6 +9,7 @@ require (
 	github.com/gin-gonic/gin v1.7.7
 	github.com/gofrs/flock v0.8.1
 	github.com/gosuri/uitable v0.0.4
+	github.com/hashicorp/go-version v1.6.0
 	github.com/json-iterator/go v1.1.12
 	github.com/naoina/toml v0.1.1
 	github.com/pkg/errors v0.9.1
@@ -34,6 +35,7 @@ require (
 )
 
 require (
+	github.com/AlecAivazis/survey/v2 v2.3.5
 	github.com/Azure/go-ansiterm v0.0.0-20210617225240-d185dfc1b5a1 // indirect
 	github.com/BurntSushi/toml v1.0.0 // indirect
 	github.com/KyleBanks/depth v1.2.1 // indirect
@@ -60,7 +62,7 @@ require (
 	github.com/docker/go-units v0.4.0 // indirect
 	github.com/evanphx/json-patch v5.6.0+incompatible // indirect
 	github.com/exponent-io/jsonpath v0.0.0-20210407135951-1de76d718b3f // indirect
-	github.com/fatih/color v1.13.0 // indirect
+	github.com/fatih/color v1.13.0
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-errors/errors v1.4.2 // indirect
@@ -140,7 +142,7 @@ require (
 	github.com/spf13/cobra v1.3.0 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	github.com/stretchr/testify v1.7.0 // indirect
+	github.com/stretchr/testify v1.7.0
 	github.com/subosito/gotenv v1.2.0 // indirect
 	github.com/ugorji/go/codec v1.2.7 // indirect
 	github.com/xeipuuv/gojsonpointer v0.0.0-20190905194746-02993c407bfb // indirect
@@ -150,7 +152,7 @@ require (
 	go.starlark.net v0.0.0-20220302181546-5411bad688d1 // indirect
 	golang.org/x/oauth2 v0.0.0-20220309155454-6242fa91716a // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
-	golang.org/x/sys v0.0.0-20220310020820-b874c991c1a5 // indirect
+	golang.org/x/sys v0.0.0-20220422013727-9388b58f7150 // indirect
 	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/time v0.0.0-20220224211638-0e9765cccd65 // indirect
@@ -174,4 +176,9 @@ require (
 	sigs.k8s.io/kustomize/api v0.11.2 // indirect
 	sigs.k8s.io/kustomize/kyaml v0.13.3 // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.2.1 // indirect
+)
+
+require (
+	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
+	github.com/mgutz/ansi v0.0.0-20170206155736-9520e82c474b // indirect
 )

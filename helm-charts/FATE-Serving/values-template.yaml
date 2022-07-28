@@ -71,6 +71,7 @@ servingProxy:
   type: {{ .type }}
   nodePort: {{ .nodePort }}
   loadBalancerIP: {{ .loadBalancerIP }}
+
   {{- with .partyList }}
   partyList:
   {{- range . }}

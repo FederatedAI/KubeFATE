@@ -145,6 +145,7 @@ func (e *Job) Delete() (bool, error) {
 }
 
 func (e *Job) SetStatus(status JobStatus) error {
+	e.Status = status
 	if err := DB.Model(e).Update("status", status).Error; err != nil {
 		return err
 	}

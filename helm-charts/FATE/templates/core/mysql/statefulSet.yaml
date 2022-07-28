@@ -1,0 +1,129 @@
+# Copyright 2019-2022 VMware, Inc.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+{{- if .Values.modules.mysql.include }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql
+  labels:
+    fateMoudle: mysql
+{{ include "fate.labels" . | indent 4 }}
+spec:
+  serviceName: mysql
+  replicas: 1
+  selector:
+    matchLabels:
+      fateMoudle: mysql
+{{ include "fate.matchLabels" . | indent 6 }}
+  template:
+    metadata:
+      labels:
+        fateMoudle: mysql
+{{ include "fate.labels" . | indent 8 }}
+    spec:
+      containers:
+        {{- if .Values.image.isThridParty }}
+        - image: {{ .Values.image.registry }}/mysql:8.0.28
+        {{- else }}
+        - image: mysql:8.0.28
+        {{- end }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          name: mysql
+          env:
+            - name: MYSQL_ALLOW_EMPTY_PASSWORD 
+              value: "1"
+            - name: MYSQL_DATABASE
+              value: {{ .Values.modules.mysql.database | quote }}
+            - name: MYSQL_USER
+              value: {{ .Values.modules.mysql.user | quote }}
+            - name: MYSQL_PASSWORD
+              value: {{ .Values.modules.mysql.password | quote }}
+            - name: user
+              value: root
+          ports:
+            - containerPort: 3306
+          livenessProbe:
+            exec:
+              command:
+              - mysqladmin
+              - ping
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            timeoutSeconds: 3
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            exec:
+              command:
+              - mysqladmin
+              - ping
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 3
+            successThreshold: 1
+            failureThreshold: 3
+          startupProbe:
+            exec:
+              command:
+              - mysqladmin
+              - ping
+            failureThreshold: 12
+            periodSeconds: 10
+          volumeMounts:
+            - name: mysql-confs
+              mountPath: /docker-entrypoint-initdb.d/
+            - name: data
+              mountPath: /var/lib/mysql
+              subPath: {{ .Values.modules.mysql.subPath }}
+      {{- with .Values.modules.mysql.nodeSelector }}
+      nodeSelector: 
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.modules.mysql.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.modules.mysql.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.image.imagePullSecrets }}
+      imagePullSecrets:
+{{ toYaml . | indent 6 }}
+      {{- end }}
+      serviceAccountName: {{ template "serviceAccountName" . }}
+      volumes:
+        - name: mysql-confs
+          configMap:
+            name: mysql-config
+        {{- if not .Values.persistence.enabled }}
+        - name: data
+          emptyDir: {}
+        {{- else if and .Values.persistence.enabled (.Values.modules.mysql.existingClaim) }}
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ .Values.modules.mysql.existingClaim | default  "mysql-data" }}
+        {{- else }}
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+        labels:
+          fateMoudle: mysql
+{{ include "fate.labels" . | indent 10 }}
+      spec:
+        accessModes: [{{ .Values.modules.mysql.accessMode | quote }}]
+        storageClassName: {{ .Values.modules.mysql.storageClass }}
+        resources:
+          requests:
+            storage: {{ .Values.modules.mysql.size }}
+        {{- end }}
+{{- end }}

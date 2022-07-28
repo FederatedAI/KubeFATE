@@ -1,4 +1,4 @@
-# Copyright 2019-2020 VMware, Inc.
+# Copyright 2019-2022 VMware, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-version: "3"
+version: "3.7"
 
 networks:
   fate-network:
@@ -62,7 +62,12 @@ services:
       - 9360:9360
     volumes:
       - ./confs/spark/spark-defaults.conf:/data/projects/spark-2.4.1-bin-hadoop2.7/conf/spark-defaults.conf
-      - ./confs/fate_flow/conf:/data/projects/fate/conf
+      - ./confs/fate_flow/conf/service_conf.yaml:/data/projects/fate/conf/service_conf.yaml
+      - ./confs/fate_flow/conf/pulsar_route_table.yaml:/data/projects/fate/conf/pulsar_route_table.yaml
+      - ./confs/fate_flow/conf/rabbitmq_route_table.yaml:/data/projects/fate/conf/rabbitmq_route_table.yaml
+      - ./confs/fate_flow/conf/component_registry.json:/data/projects/fate/fateflow/conf/component_registry.json
+      - ./confs/fate_flow/conf/job_default_config.yaml:/data/projects/fate/fateflow/conf/job_default_config.yaml
+      - ./confs/fate_flow/conf/template_info.yaml:/data/projects/fate/fateflow/conf/template_info.yaml
       - shared_dir_federatedml:/data/projects/fate/fate/python/federatedml
       - shared_dir_examples:/data/projects/fate/examples
       - download_dir:/data/projects/fate/python/download_dir
@@ -108,12 +113,37 @@ services:
     networks:
       - fate-network
 
-  datanode:
+  datanode-0:
+    image: federatedai/hadoop-datanode:2.0.0-hadoop2.7.4-java8
+    restart: always
+    volumes:
+      - ./shared_dir/data/datanode-0:/hadoop/dfs/data
+    environment:
+      SERVICE_PRECONDITION: "namenode:9000"
+    env_file:
+      - ./confs/hadoop/hadoop.env
+    networks:
+      - fate-network
+
+  datanode-1:
+    image: federatedai/hadoop-datanode:2.0.0-hadoop2.7.4-java8
+    restart: always
+    volumes:
+      - ./shared_dir/data/datanode-1:/hadoop/dfs/data
+    environment:
+      SERVICE_PRECONDITION: "namenode:9000"
+    env_file:
+      - ./confs/hadoop/hadoop.env
+    networks:
+      - fate-network
+
+  datanode-2:
     image: federatedai/hadoop-datanode:2.0.0-hadoop2.7.4-java8
     restart: always
     volumes:
       - ./shared_dir/data/datanode:/hadoop/dfs/data
       - /etc/localtime:/etc/localtime:ro
+      - ./shared_dir/data/datanode-2:/hadoop/dfs/data
     environment:
       SERVICE_PRECONDITION: "namenode:9000"
     env_file:
@@ -174,9 +204,6 @@ services:
       - "6650:6650"
       - "6651:6651"
       - "8001:8080"
-    deploy:
-      restart_policy:
-        condition: any
     volumes:
       - ./confs/pulsar/standalone.conf:/pulsar/conf/standalone.conf
       - ./shared_dir/data/pulsar:/pulsar/data

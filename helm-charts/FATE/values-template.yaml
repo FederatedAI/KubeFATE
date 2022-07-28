@@ -174,6 +174,10 @@ modules:
       {{- end }}
       concurrency: {{ .concurrency }}
     {{- end }}
+    {{- with .resources }}
+    resources:
+{{ toYaml . | indent 6 }}
+    {{- end }}
     {{- end }}
 
 
@@ -197,6 +201,10 @@ modules:
     affinity:
 {{ toYaml . | indent 6 }}
     {{- end }}
+    {{- with .resources }}
+    resources:
+{{ toYaml . | indent 6 }}
+    {{- end }}
     {{- end }}
 
 
@@ -208,7 +216,7 @@ modules:
     resources:
 {{ toYaml . | indent 6 }}
     {{- end }}
-    logLevel: {{ .logLevel }}
+    logLevel: {{ .logLevel | default "INFO" }}
     type: {{ .type | default "ClusterIP" }}
     httpNodePort: {{ .httpNodePort }}
     grpcNodePort: {{ .grpcNodePort }}
@@ -287,34 +295,37 @@ modules:
     affinity:
 {{ toYaml . | indent 6 }}
     {{- end }}
+    {{- with .resources }}
+    resources:
+{{ toYaml . | indent 6 }}
+    {{- end }}
     {{- end }}
 
 
   nodemanager:  
     include: {{ has "nodemanager" .modules }}
     {{- with .nodemanager }}
-    list:
-    {{- $nodemanager := . }}
-    {{- range .count | int | until }}
-    - name: nodemanager-{{ . }}
-      {{- with $nodemanager.nodeSelector }}
-      nodeSelector: 
-{{ toYaml . | indent 8 }}
-      {{- end}}
-      {{- with $nodemanager.tolerations }}
-      tolerations:
-{{ toYaml . | indent 8 }}
-      {{- end}}
-      {{- with $nodemanager.affinity }}
-      affinity:
-{{ toYaml . | indent 8 }}
-      {{- end}}
-      sessionProcessorsPerNode: {{ $nodemanager.sessionProcessorsPerNode }}
-      subPath: "nodemanager-{{ . }}"
-      existingClaim: ""
-      storageClass: "{{ $nodemanager.storageClass }}"
-      accessMode: {{ $nodemanager.accessMode }}
-      size: {{ $nodemanager.size }}
+    sessionProcessorsPerNode: {{ .sessionProcessorsPerNode }}
+    replicas: {{ .replicas | default 2 }}
+    subPath: {{ .subPath }}
+    storageClass: {{ .storageClass  | default "client" }}
+    accessMode: {{ .accessMode  | default "ReadWriteOnce" }}
+    size: {{ .size  | default "1Gi" }}
+    {{- with .nodeSelector }}
+    nodeSelector: 
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    {{- with .tolerations }}
+    tolerations:
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    {{- with .affinity }}
+    affinity:
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    {{- with .resources }}
+    resources:
+{{ toYaml . | indent 6 }}
     {{- end }}
     {{- end }}
 
@@ -461,8 +472,9 @@ modules:
       existingClaim: {{ .namenode.existingClaim }}
       storageClass: {{ .namenode.storageClass | default "" }}
       accessMode: {{ .namenode.accessMode  | default "ReadWriteOnce"  }}
-      size: {{ .namenode.size }}
+      size: {{ .namenode.size | default "1Gi" }}
     datanode:
+      replicas: {{ .datanode.replicas | default 3 }}
       {{- with .datanode.nodeSelector }}
       nodeSelector: 
 {{ toYaml . | indent 8 }}
@@ -479,7 +491,7 @@ modules:
       existingClaim: {{ .datanode.existingClaim }}
       storageClass: {{ .datanode.storageClass | default "" }}
       accessMode: {{ .datanode.accessMode  | default "ReadWriteOnce"  }}
-      size: {{ .datanode.size }}
+      size: {{ .datanode.size | default "1Gi" }}
     {{- end }}
 
 
@@ -519,6 +531,10 @@ modules:
   rabbitmq:
     include: {{ has "rabbitmq" .modules }}
     {{- with .rabbitmq }}
+    {{- with .resources }}
+    resources:
+{{ toYaml . | indent 6 }}
+    {{- end }}
     {{- with .nodeSelector }}
     nodeSelector:
 {{ toYaml . | indent 6 }}
@@ -549,6 +565,10 @@ modules:
   pulsar:
     include: {{ has "pulsar" .modules }}
     {{- with .pulsar }}
+    {{- with .resources }}
+    resources:
+{{ toYaml . | indent 6 }}
+    {{- end }}
     {{- with .nodeSelector }}
     nodeSelector:
 {{ toYaml . | indent 6 }}
@@ -583,7 +603,7 @@ modules:
     existingClaim: {{ .existingClaim }}
     storageClass: {{ .storageClass | default "" }}
     accessMode: {{ .accessMode  | default "ReadWriteOnce"  }}
-    size: {{ .size }}
+    size: {{ .size | default "1Gi" }}
     {{- end }}
     
 externalMysqlIp: {{ .externalMysqlIp }}

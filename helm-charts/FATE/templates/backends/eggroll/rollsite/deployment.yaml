@@ -42,6 +42,13 @@ spec:
             value: python
           image: {{ .Values.image.registry }}/eggroll:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if .Values.modules.rollsite.resources}}
+          resources:
+          {{- range $key, $val := .Values.modules.rollsite.resources }}
+            {{ $key }}:
+{{ toYaml $val | indent 14 }}
+          {{- end }}
+          {{- end }}
           command:
           - bash
           - -c
