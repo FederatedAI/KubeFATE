@@ -2,8 +2,7 @@
 
 ## Overview
 Since KubeFATE v1.4.5, KubeFATE can help to upgrade a FATE cluster.
-This document is going to illustrate how to do that, and also confess the limitations
-for this new feature due to historical reasons.
+This document is going to illustrate how to do that, and also show the limitations for this new feature due to historical reasons.
 
 ## Which versions are supported?
 
@@ -23,13 +22,9 @@ Support FATE versions
 
 #### Q&A
 1. What does "yes" or "no" means in the form?
-   1. "yes" means that the FATE cluster can work properly after upgrading, also, the data produced during the previous version,
-      such as the job info or model info, can still be accessed in the new version's FATE cluster.
+   1. "yes" means that the FATE cluster can work properly after upgrading, also, the data produced during the previous version, such as the job info or model info, can still be accessed in the new version's FATE cluster.
 2. Why "v1.7.1 or lower" is not supported?
-   1. This is because in v1.7.1 and previous versions, the MySQL image version in our helm chart is set to 8,
-      which is like setting to the latest version of the MySQL 8 series. Since v1.7.2, we set the MySQL image version
-      to 8.0.28. So for example if you install a v1.7.1 cluster now, your MySQL version should be larger than 8.0.28,
-      however, downgrade a MySQL database is not supported. [reference](https://dev.mysql.com/doc/refman/8.0/en/downgrading.html).
+   1. This is because in v1.7.1 and previous versions, the MySQL image version in our helm chart is set to 8, which is like setting to the latest version of the MySQL 8 series. Since v1.7.2, we set the MySQL image version to 8.0.28. So for example if you install a v1.7.1 cluster now, your MySQL version should be larger than 8.0.28, however, downgrade a MySQL database is not supported. [reference](https://dev.mysql.com/doc/refman/8.0/en/downgrading.html).
 3. Is there a workaround for "v1.7.1 or lower"?
    1. Yes, please check [workaround](#workarounds).
 
@@ -48,10 +43,7 @@ Support FATE versions
 1. Why "v1.7.1 or lower" is not supported?
    1. Same with above.
 2. Why upgrade from v1.7.2 to v1.8.0 is supported, but upgrade from v1.8.0 to v1.9.0 is not supported?
-   1. In v1.9.0, we make some adjustments to the app type of several FATE K8s components. Basically, for each "deployment"
-      who will have a PVC/PV when persistence is enabled, we change the app type from "deployment" to "statefulSet". We believe
-      this is the right thing to do, but the side effect is that the data from v1.8.0 cannot be carried forward. The good thing
-      is, in the future versions we will not change the app type once again, so this gap will happen only once.
+   1. In v1.9.0, we make some adjustments to the app type of several FATE K8s components. Basically, for each "deployment" who will have a PVC/PV when persistence is enabled, we change the app type from "deployment" to "statefulSet". We believe this is the right thing to do, but the side effect is that the data from v1.8.0 cannot be carried forward. The good thing is, in the future versions we will not change the app type once again, so this gap will happen only once.
 
 ### Case 3: When disabling persistence
 
@@ -146,8 +138,7 @@ nodemanager:
         size: 1Gi
 ```
 
-In this example, we have already installed [nfs-subdir-external-provisioner](https://github.com/kubernetes-sigs/nfs-subdir-external-provisioner)
-as the storage class.
+In this example, we have already installed [nfs-subdir-external-provisioner](https://github.com/kubernetes-sigs/nfs-subdir-external-provisioner) as the storage class.
 For the background of how to set up a nfs server, you could check [here](https://www.itzgeek.com/how-tos/linux/centos-how-tos/how-to-setup-nfs-server-on-centos-7-rhel-7-fedora-22.html)
 
 After installation, the pods are like:
@@ -183,10 +174,9 @@ pvc-eed13a83-442e-4c9d-bb00-e6a7ce7c05f2   2Gi        RWO            Retain     
 ```
 
 ### Backup the Mysql database
-Before any upgrade, we should back up the database. Currently, KubeFATE doesn't support back up the database automatically. This need to be done
-by the mysqldump tool manually. In the future this could be another feature of KubeFATE.
+Before any upgrade, we should back up the database. Currently, KubeFATE doesn't support back up the database automatically. This need to be done by the mysqldump tool manually. In the future this could be another feature of KubeFATE.
 
-There are a lot of ways to do the backup work, in this example, we do that in the mysql pod:
+There are several ways to do the backup work, in this example, we do that in the mysql pod:
 
 ```
 $ k exec -it mysql-77f95d4844-8dfjj -n fate-9999 bash                       
@@ -194,7 +184,7 @@ kubectl exec [POD] [COMMAND] is DEPRECATED and will be removed in a future versi
 root@mysql-77f95d4844-8dfjj:/# 
 ```
 
-We need to change the directory to "/var/lib/mysql/", because that is where the PV is mounted.
+We need to change the directory to "/var/lib/mysql/", because that is where the PV is mounted to.
 If we generate a mysql snapshot there, the file will be persisted in the nfs server even the pod is gone.
 ```
 root@mysql-77f95d4844-8dfjj:/# cd /var/lib/mysql/
@@ -227,7 +217,7 @@ Then execute:
 ```
 kubefate cluster update -f cluster.yaml
 ```
-A KubeFATE job will be created. Actually at this time, a K8s one-time job will be launched, it does 2 things:
+A KubeFATE job will be created. At this time, a K8s one-time job will be launched, it will do 2 things:
 1. Shut down the "python" pod, which includes FATE-Flow and FATE-Board.
 2. It executes one or more .sql script(s) to help upgrade the schema of the MySQL database.
 
@@ -254,8 +244,7 @@ UUID                                    NAME            NAMESPACE       REVISION
 
 ## Workarounds
 
-As mentioned, due to a historical reason, upgrading from a FATE cluster whose version is less or equal than v1.7.1 is
-not supported by KubeFATE. However, there is a manual workaround for that purpose:
+As mentioned, due to a historical reason, upgrading from a FATE cluster whose version is less or equal than v1.7.1 is not supported by KubeFATE. However, there is a manual workaround for that purpose:
 
 Suppose we have a v1.7.1 FATE cluster, how to upgrade to v1.7.2 manually without data loss in the MySQL database?
 ### Export the data in the MySQL database
@@ -270,10 +259,9 @@ mysqldump -h localhost -u root --no-create-info \
 --ignore-table=eggroll_meta.t_engine_registry \
 eggroll_meta > data.sql
 ```
-The reason we ignore the tables is: the information are version-specific. The data in those tables will be re-generated when a new "python"
-container of the new version spawn. It means nothing to carry those data from v1.7.1 to v.1.7.2.
+The reason we ignore the tables is: the information are version-specific. The data in those tables will be re-generated when a new "python" container of the new version is spawned. It means nothing to carry these data from v1.7.1 to v1.7.2.
 
-Also, we can prepare the snapshot by the way:
+Also, we need to prepare the snapshot for rollback, in case of upgrade failure:
 ```
 mysqldump -h localhost -u root eggroll_meta > snapshot.sql
 ```
@@ -291,10 +279,6 @@ mysql -u root eggroll_meta < data.sql
 After that, we have "upgraded" the FATE cluster from v1.7.1 to v1.7.2.
 
 ## Other notes
-1. We also support upgrade over multiple versions, just simply change the version number in the cluster.yaml file,
-then the K8s job can figure out which sql scripts it needs to execute for the MySQL database. Currently, if you try to upgrade
-from v1.7.2 to v1.9.0, skipping v1.8.0, this will only work when you have an existing PVC/PV. However, in the future, if you would
-like to upgrade from v1.9.0 and skip several in-the-middle versions, it will work even when you are using a storage class.
-2. We support changing the architecture during upgrade, for example, you can upgrade from an Eggroll based FATE cluster of version v1.7.2
-to a Spark based FATE cluster of version v1.8.0. The new cluster will work properly, although the temporary data in the Eggroll PV will be lost.
-3. Again, at current stage, KubeFATE v1.4.5, you need to do the backup of the MySQL database before any kind of upgrade.
+1. We also support upgrade over multiple versions, just simply change the version number in the cluster.yaml file, then KubeFATE can figure out which sql scripts it needs to execute for the MySQL database. Currently, if you try to upgrade from v1.7.2 to v1.9.0, skipping v1.8.0, this will only work when you have configured an existing PVC/PV. However, in the future, if you would like to upgrade from v1.9.0 and skip several in-the-middle versions, it will also work even when you are using a storage class.
+2. We support changing the architecture during upgrade, for example, you can upgrade from an Eggroll based FATE cluster of version v1.7.2 to a Spark based FATE cluster of version v1.8.0. The new cluster will work properly, although the temporary data in the Eggroll PV will be lost.
+3. Again, at current stage, KubeFATE v1.4.5, you are responsible to do the backup of the MySQL database before any kind of upgrade.
