@@ -1,5 +1,0 @@
-ARG SOURCE_PREFIX=federatedai
-ARG SOURCE_TAG=1.5.1-release
-FROM ${SOURCE_PREFIX}/client:${SOURCE_TAG}
-
-COPY job.py .
