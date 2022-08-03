@@ -25,7 +25,7 @@ Modify the `parties.conf` configuration when using docker-compose:
 backend=eggroll
 ```
 
-Modify the `parties.conf` configuration when using Kubernetes:
+Modify the `cluster.yaml` configuration when using Kubernetes:
 
 ```yaml
 backend: eggroll
@@ -36,6 +36,8 @@ Architecture diagram:
 <div align="center">
   <img src="./images/arch_eggroll.png" />
 </div>
+
+To enabled TLS for the eggroll backend between different FATE parties, check this [doc](/docs/Eggroll_with_TLS.md).
 
 ### spark_rabbitmq
 
@@ -49,7 +51,7 @@ Modify the `parties.conf` configuration when using docker-compose:
 backend=spark_rabbitmq
 ```
 
-Modify the `parties.conf` configuration when using Kubernetes:
+Modify the `cluster.yaml` configuration when using Kubernetes:
 
 ```yaml
 backend: spark_rabbitmq
@@ -73,7 +75,7 @@ Modify the `parties.conf` configuration when using docker-compose:
 backend=spark_pulsar
 ```
 
-Modify the `parties.conf` configuration when using Kubernetes:
+Modify the `cluster.yaml` configuration when using Kubernetes:
 
 ```yaml
 backend: spark_pulsar
@@ -97,7 +99,7 @@ Modify the `parties.conf` configuration when using docker-compose:
 backend=spark_local_pulsar
 ```
 
-Modify the `parties.conf` configuration when using Kubernetes:
+Modify the `cluster.yaml` configuration when using Kubernetes:
 
 ```yaml
 backend: spark_local_pulsar
