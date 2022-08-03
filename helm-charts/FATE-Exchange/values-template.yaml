@@ -50,6 +50,7 @@ modules:
 {{ toYaml . | indent 6 }}
     {{- end }}
     type: {{ .type }}
+    enableTLS: {{ .enableTLS | default false }}
     nodePort: {{ .nodePort }}
     partyList:
     {{- range .partyList }}

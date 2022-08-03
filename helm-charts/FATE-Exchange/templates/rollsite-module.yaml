@@ -34,6 +34,17 @@ data:
     eggroll.rollsite.push.batches.per.stream=10
     eggroll.rollsite.adapter.sendbuf.size=100000
 
+    {{- if .Values.modules.rollsite.enableTLS }}
+    eggroll.core.security.secure.cluster.enabled=true
+    eggroll.core.security.secure.client.auth.enabled=true
+    eggroll.core.security.ca.crt.path=conf/cert/ca.pem
+    eggroll.core.security.crt.path=conf/cert/server.crt
+    eggroll.core.security.key.path=conf/cert/server.key
+    eggroll.core.security.client.ca.crt.path=conf/cert/ca.pem
+    eggroll.core.security.client.crt.path=conf/cert/client.crt
+    eggroll.core.security.client.key.path=conf/cert/client.key
+    {{- end }}
+
   route_table.json: |
     {
         "route_table": {
@@ -133,6 +144,10 @@ spec:
             - mountPath: /data/projects/fate/eggroll/conf/eggroll.properties
               name: rollsite-confs
               subPath: eggroll.properties
+            {{- if .Values.modules.rollsite.enableTLS }}
+            - mountPath: /data/projects/fate/eggroll/conf/cert/
+              name: eggroll-certs
+            {{- end }}
       {{- with .Values.modules.rollsite.nodeSelector }}
       nodeSelector: 
 {{ toYaml . | indent 8 }}
@@ -155,6 +170,11 @@ spec:
         - name: rollsite-confs
           configMap:
             name: rollsite-config
+        {{- if .Values.modules.rollsite.enableTLS }}
+        - name: eggroll-certs
+          secret:
+            secretName: eggroll-certs
+        {{- end}}
 ---
 apiVersion: v1
 kind: Service
