@@ -147,6 +147,7 @@ modules:
     type: {{ .type | default "ClusterIP" }}
     nodePort: {{ .nodePort }}
     loadBalancerIP: {{ .loadBalancerIP }}
+    enableTLS: {{ .enableTLS | default false}}
     {{- with .nodeSelector }}
     nodeSelector: 
 {{ toYaml . | indent 6 }}
@@ -283,7 +284,8 @@ modules:
     {{- with .clustermanager }}
     ip: clustermanager
     type: "ClusterIP"
-    {{- with .nodeSelector }}
+    enableTLS: {{ .enableTLS | default false }}
+  {{- with .nodeSelector }}
     nodeSelector: 
 {{ toYaml . | indent 6 }}
     {{- end }}

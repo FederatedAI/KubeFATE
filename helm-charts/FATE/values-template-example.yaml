@@ -65,6 +65,7 @@ backend: eggroll
   # - partyId: 10000
     # partyIp: 192.168.0.1
     # partyPort: 30101
+  # enableTLS: true
   # nodeSelector:
   # - disktype: ssd
   # tolerations:
