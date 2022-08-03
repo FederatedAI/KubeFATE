@@ -1,7 +1,7 @@
 name: fate-exchange
 namespace: fate-exchange
 chartName: fate-exchange
-chartVersion: 
+chartVersion: v1.8.0
 partyId: 1
 registry: ""
 imageTag: 1.8.0-release
@@ -19,6 +19,7 @@ modules:
 rollsite: 
   type: NodePort
   nodePort: 30000
+  enableTLS: false
   partyList:
   - partyId: 10000
     partyIp: 192.168.10.1

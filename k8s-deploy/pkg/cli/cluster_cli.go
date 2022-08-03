@@ -154,15 +154,14 @@ func ClusterInstallCommand() *cli.Command {
 			}
 
 			chartVersion, ok := m["chartVersion"]
-			if !ok {
-				return errors.New("chartVersion not found, check your Cluster file")
+			if !ok || chartVersion == "" {
+				return errors.New("chartVersion not found, check your cluster.yaml file")
 			}
 
 			chartName, ok := m["chartName"]
-			if !ok {
-				chartName = ""
+			if !ok || chartName == "" {
+				return errors.New("chartName not found, check your cluster.yaml file")
 			}
-
 			if template, err := GetValueTemplateExample(chartName.(string), chartVersion.(string)); err != nil {
 				if _, ok := err.(VersionNotValidError); !ok {
 					// if the error is not VersionNotValidError, warn user.
