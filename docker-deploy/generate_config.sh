@@ -247,7 +247,7 @@ GenerateConfig() {
 			Suffix=$Suffix"-ipcl"
 		fi
 		
-		# federatedai/fateflow-${component}-${clgorithm}-${device}:${version}
+		# federatedai/fateflow-${computing}-${algorithm}-${device}:${version}
 		sed -i "s#image: \"federatedai/fateflow:\${TAG}\"#image: \"federatedai/fateflow${Suffix}:\${TAG}\"#g" ./confs-$party_id/docker-compose.yml
 		
 		# eggroll or spark-worker
