@@ -125,7 +125,7 @@ Enter the following command to create a directory for the CA, and put the openss
 ``` bash
 $ mkdir my-ca
 $ cd my-ca
-$ wget https://raw.githubusercontent.com/apache/pulsar/master/site2/website/static/examples/openssl.cnf
+$ wget https://raw.githubusercontent.com/apache/pulsar/master/tests/certificate-authority/openssl.cnf
 $ export CA_HOME=$(pwd)
 ```
 

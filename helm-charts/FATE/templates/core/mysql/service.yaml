@@ -15,7 +15,7 @@ kind: Service
 metadata:
   name: mysql
   labels:
-    fateModule: mysql
+    fateMoudle: mysql
 {{ include "fate.labels" . | indent 4 }}
 spec:
   ports:
@@ -25,6 +25,6 @@ spec:
       protocol: TCP
   type: {{ .Values.modules.mysql.type }}
   selector:
-    fateModule: mysql
+    fateMoudle: mysql
 {{ include "fate.matchLabels" . | indent 4 }}
 {{ end }}

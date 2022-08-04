@@ -15,7 +15,7 @@ apiVersion: v1
 metadata:
   name: python-config
   labels:
-    fateModule: python
+    fateMoudle: python
 {{ include "fate.labels" . | indent 4 }}
 data:
   spark-defaults.conf: |
@@ -50,7 +50,7 @@ data:
     private_key:
     fateflow:
       # you must set real ip address, 127.0.0.1 and 0.0.0.0 is not supported
-      host: {{ if .Values.istio.enabled }}127.0.0.1{{ else }}fateflow{{ end }}
+      host: fateflow
       http_port: 9380
       grpc_port: 9360
       # http_app_key:
@@ -241,7 +241,7 @@ apiVersion: v1
 metadata:
   name: pulsar-route-table
   labels:
-    fateModule: python
+    fateMoudle: python
 {{ include "fate.labels" . | indent 4 }}
 data:
   pulsar_route_table.yaml: |
@@ -268,7 +268,7 @@ apiVersion: v1
 metadata:
   name: rabbitmq-route-table
   labels:
-    fateModule: python
+    fateMoudle: python
 {{ include "fate.labels" . | indent 4 }}
 data:
   rabbitmq_route_table.yaml: |

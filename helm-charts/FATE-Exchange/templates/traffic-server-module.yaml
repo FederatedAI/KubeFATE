@@ -15,7 +15,7 @@ apiVersion: v1
 metadata:
   name: traffic-server-config
   labels:
-    fateModule: traffic-server
+    fateMoudle: traffic-server
     name: {{ .Values.partyName | quote  }}
     partyId: {{ .Values.partyId | quote }}
     owner: kubefate
@@ -46,7 +46,7 @@ apiVersion: v1
 metadata:
   name: traffic-server-sni
   labels:
-    fateModule: traffic-server
+    fateMoudle: traffic-server
     name: {{ .Values.partyName | quote  }}
     partyId: {{ .Values.partyId | quote }}
     owner: kubefate
@@ -64,7 +64,7 @@ kind: Deployment
 metadata:
   name: traffic-server
   labels:
-    fateModule: traffic-server
+    fateMoudle: traffic-server
     name: {{ .Values.partyName  | quote  }}
     partyId: {{ .Values.partyId | quote  }}
     owner: kubefate
@@ -75,13 +75,13 @@ spec:
     type: Recreate
   selector:
     matchLabels:
-      fateModule: traffic-server
+      fateMoudle: traffic-server
       name: {{ .Values.partyName  | quote }}
       partyId: {{ .Values.partyId | quote  }}
   template:
     metadata:
       labels:
-        fateModule: traffic-server
+        fateMoudle: traffic-server
         name: {{ .Values.partyName | quote  }}
         partyId: {{ .Values.partyId | quote  }}
         owner: kubefate
@@ -148,7 +148,7 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    fateModule: traffic-server
+    fateMoudle: traffic-server
     name: {{ .Values.partyName | quote  }}
     partyId: {{ .Values.partyId | quote }}
     owner: kubefate
@@ -166,7 +166,7 @@ spec:
   loadBalancerIP: "{{ .Values.modules.trafficServer.loadBalancerIP }}"
   {{- end }}
   selector:
-    fateModule: traffic-server
+    fateMoudle: traffic-server
     name: {{ .Values.partyName | quote }}
     partyId: {{ .Values.partyId | quote  }}
 ---

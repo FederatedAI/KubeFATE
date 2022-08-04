@@ -29,7 +29,8 @@ modules:
     ip: rollsite
     type: ClusterIP
     nodePort: 30001
-    loadBalancerIP: 
+    loadBalancerIP:
+    enableTLS: false
     nodeSelector:
     tolerations:
     affinity:

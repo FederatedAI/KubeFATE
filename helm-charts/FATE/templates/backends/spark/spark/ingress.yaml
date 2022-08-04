@@ -15,7 +15,7 @@ kind: Ingress
 metadata:
   name: spark
   labels:
-    fateModule: spark
+    fateMoudle: spark
 {{ include "fate.labels" . | indent 4 }}
 {{- if .Values.ingress.spark.annotations }}
   annotations:

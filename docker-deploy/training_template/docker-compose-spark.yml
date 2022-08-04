@@ -47,6 +47,7 @@ services:
     volumes:
       - ./confs/fateboard/conf:/data/projects/fate/fateboard/conf
       - fate_flow_logs:/data/projects/fate/fateflow/logs
+      - /etc/localtime:/etc/localtime:ro
     networks:
       - fate-network
     restart: always
@@ -72,6 +73,7 @@ services:
       - download_dir:/data/projects/fate/python/download_dir
       - fate_flow_logs:/data/projects/fate/fateflow/logs
       - ./shared_dir/data/model_local_cache:/data/projects/fate/fateflow/model_local_cache
+      - /etc/localtime:/etc/localtime:ro
     networks:
       fate-network:
         ipv4_address: 192.167.0.100
@@ -104,6 +106,7 @@ services:
     volumes:
       - ./shared_dir/data/namenode:/hadoop/dfs/name
       - ./confs/hadoop/core-site.xml:/etc/hadoop/core-site.xml
+      - /etc/localtime:/etc/localtime:ro
     env_file:
       - ./confs/hadoop/hadoop.env
     environment:
@@ -139,6 +142,8 @@ services:
     image: federatedai/hadoop-datanode:2.0.0-hadoop2.7.4-java8
     restart: always
     volumes:
+      - ./shared_dir/data/datanode:/hadoop/dfs/data
+      - /etc/localtime:/etc/localtime:ro
       - ./shared_dir/data/datanode-2:/hadoop/dfs/data
     environment:
       SERVICE_PRECONDITION: "namenode:9000"
@@ -153,6 +158,8 @@ services:
     ports:
       - "8888:8080"
       - "7077:7077"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
     environment:
       INIT_DAEMON_STEP: setup_spark
     networks:
@@ -169,6 +176,7 @@ services:
       SPARK_MASTER: "spark://spark-master:7077"
     volumes:
       - ./confs/fate_flow/conf:/data/projects/fate/conf
+      - /etc/localtime:/etc/localtime:ro
     networks:
       - fate-network
 
@@ -186,6 +194,7 @@ services:
     volumes:
       - ./confs/rabbitmq/enabled_plugins:/etc/rabbitmq/enabled_plugins
       - ./shared_dir/data/rabbitmq:/var/lib/rabbitmq
+      - /etc/localtime:/etc/localtime:ro
     restart: always
     networks:
       - fate-network
@@ -199,6 +208,7 @@ services:
     volumes:
       - ./confs/pulsar/standalone.conf:/pulsar/conf/standalone.conf
       - ./shared_dir/data/pulsar:/pulsar/data
+      - /etc/localtime:/etc/localtime:ro
     command:
       ["/bin/bash", "-c", "bin/pulsar standalone -nss"]
     restart: always
@@ -212,6 +222,7 @@ services:
     volumes:
       - ./confs/mysql/init:/docker-entrypoint-initdb.d/
       - ./shared_dir/data/mysql:/var/lib/mysql
+      - /etc/localtime:/etc/localtime:ro
     restart: always
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
@@ -226,6 +237,7 @@ services:
     volumes:
       - ./confs/nginx/route_table.yaml:/data/projects/fate/proxy/nginx/conf/route_table.yaml
       - ./confs/nginx/nginx.conf:/data/projects/fate/proxy/nginx/conf/nginx.conf
+      - /etc/localtime:/etc/localtime:ro
     restart: always
     networks:
       - fate-network
@@ -244,6 +256,7 @@ services:
     volumes:
       - download_dir:/data/projects/fate/download_dir
       - shared_dir_examples:/data/projects/fate/examples
+      - /etc/localtime:/etc/localtime:ro
     depends_on:
       - fateflow
     networks:
