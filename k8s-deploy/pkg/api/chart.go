@@ -58,7 +58,7 @@ type HelmUUID struct {
 // @Failure 401 {object} JSONERRORResult "Unauthorized operation"
 // @Failure 500 {object} JSONERRORResult "Internal server error"
 // @Router /valueTemplateExample/{chartName}/{chartVersion} [get]
-// @Param Authorization header string true "Authentication header"
+// @Param Authorization header string true "Authentication header" default(Bearer <Token>)
 // @Security ApiKeyAuth
 func (*Chart) getValueTemplateExample(c *gin.Context) {
 	name, version := c.Param("chartName"), c.Param("chartVersion")
@@ -89,7 +89,7 @@ func (*Chart) getValueTemplateExample(c *gin.Context) {
 // @Failure 401 {object} JSONERRORResult "Unauthorized operation"
 // @Failure 500 {object} JSONERRORResult "Internal server error"
 // @Router /chart [post]
-// @Param Authorization header string true "Authentication header"
+// @Param Authorization header string true "Authentication header" default(Bearer <Token>)
 // @Security ApiKeyAuth
 func (*Chart) createChart(c *gin.Context) {
 	// single file
@@ -142,7 +142,7 @@ func (*Chart) createChart(c *gin.Context) {
 // @Failure 401 {object} JSONERRORResult "Unauthorized operation"
 // @Failure 500 {object} JSONERRORResult "Internal server error"
 // @Router /chart [get]
-// @Param Authorization header string true "Authentication header"
+// @Param Authorization header string true "Authentication header" default(Bearer <Token>)
 // @Security ApiKeyAuth
 func (*Chart) getChartList(c *gin.Context) {
 
@@ -166,7 +166,7 @@ func (*Chart) getChartList(c *gin.Context) {
 // @Failure 401 {object} JSONERRORResult "Unauthorized operation"
 // @Failure 500 {object} JSONERRORResult "Internal server error"
 // @Router /chart/{chartId} [get]
-// @Param Authorization header string true "Authentication header"
+// @Param Authorization header string true "Authentication header" default(Bearer <Token>)
 // @Security ApiKeyAuth
 func (*Chart) getChart(c *gin.Context) {
 
@@ -198,7 +198,7 @@ func (*Chart) getChart(c *gin.Context) {
 // @Failure 401 {object} JSONEMSGResult "Unauthorized operation"
 // @Failure 500 {object} JSONERRORResult "Internal server error"
 // @Router /chart/{chartId} [delete]
-// @Param Authorization header string true "Authentication header"
+// @Param Authorization header string true "Authentication header" default(Bearer <Token>)
 // @Security ApiKeyAuth
 func (*Chart) deleteChart(c *gin.Context) {
 	chartID := c.Param("chartId")

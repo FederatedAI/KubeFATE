@@ -32,6 +32,7 @@
                 "parameters": [
                     {
                         "type": "string",
+                        "default": "Bearer \u003cToken\u003e",
                         "description": "Authentication header",
                         "name": "Authorization",
                         "in": "header",
@@ -97,6 +98,7 @@
                     },
                     {
                         "type": "string",
+                        "default": "Bearer \u003cToken\u003e",
                         "description": "Authentication header",
                         "name": "Authorization",
                         "in": "header",
@@ -167,6 +169,7 @@
                     },
                     {
                         "type": "string",
+                        "default": "Bearer \u003cToken\u003e",
                         "description": "Authentication header",
                         "name": "Authorization",
                         "in": "header",
@@ -235,6 +238,7 @@
                     },
                     {
                         "type": "string",
+                        "default": "Bearer \u003cToken\u003e",
                         "description": "Authentication header",
                         "name": "Authorization",
                         "in": "header",
@@ -301,6 +305,7 @@
                     },
                     {
                         "type": "string",
+                        "default": "Bearer \u003cToken\u003e",
                         "description": "Authentication header",
                         "name": "Authorization",
                         "in": "header",
@@ -377,6 +382,7 @@
                     },
                     {
                         "type": "string",
+                        "default": "Bearer \u003cToken\u003e",
                         "description": "Authentication header",
                         "name": "Authorization",
                         "in": "header",
@@ -454,6 +460,7 @@
                     },
                     {
                         "type": "string",
+                        "default": "Bearer \u003cToken\u003e",
                         "description": "Authentication header",
                         "name": "Authorization",
                         "in": "header",
@@ -533,6 +540,7 @@
                     },
                     {
                         "type": "string",
+                        "default": "Bearer \u003cToken\u003e",
                         "description": "Authentication header",
                         "name": "Authorization",
                         "in": "header",
@@ -607,6 +615,7 @@
                     },
                     {
                         "type": "string",
+                        "default": "Bearer \u003cToken\u003e",
                         "description": "Authentication header",
                         "name": "Authorization",
                         "in": "header",
@@ -670,6 +679,7 @@
                 "parameters": [
                     {
                         "type": "string",
+                        "default": "Bearer \u003cToken\u003e",
                         "description": "Authentication header",
                         "name": "Authorization",
                         "in": "header",
@@ -737,6 +747,7 @@
                     },
                     {
                         "type": "string",
+                        "default": "Bearer \u003cToken\u003e",
                         "description": "Authentication header",
                         "name": "Authorization",
                         "in": "header",
@@ -813,6 +824,7 @@
                     },
                     {
                         "type": "string",
+                        "default": "Bearer \u003cToken\u003e",
                         "description": "Authentication header",
                         "name": "Authorization",
                         "in": "header",
@@ -881,6 +893,7 @@
                     },
                     {
                         "type": "string",
+                        "default": "Bearer \u003cToken\u003e",
                         "description": "Authentication header",
                         "name": "Authorization",
                         "in": "header",
@@ -991,6 +1004,7 @@
                     },
                     {
                         "type": "string",
+                        "default": "Bearer \u003cToken\u003e",
                         "description": "Authentication header",
                         "name": "Authorization",
                         "in": "header",
@@ -1110,6 +1124,7 @@
                     },
                     {
                         "type": "string",
+                        "default": "Bearer \u003cToken\u003e",
                         "description": "Authentication header",
                         "name": "Authorization",
                         "in": "header",
@@ -1161,6 +1176,7 @@
                 "parameters": [
                     {
                         "type": "string",
+                        "default": "Bearer \u003cToken\u003e",
                         "description": "Authentication header",
                         "name": "Authorization",
                         "in": "header",
@@ -1224,6 +1240,7 @@
                 "parameters": [
                     {
                         "type": "string",
+                        "default": "Bearer \u003cToken\u003e",
                         "description": "Authentication header",
                         "name": "Authorization",
                         "in": "header",
@@ -1297,6 +1314,7 @@
                     },
                     {
                         "type": "string",
+                        "default": "Bearer \u003cToken\u003e",
                         "description": "Authentication header",
                         "name": "Authorization",
                         "in": "header",
@@ -1367,6 +1385,7 @@
                     },
                     {
                         "type": "string",
+                        "default": "Bearer \u003cToken\u003e",
                         "description": "Authentication header",
                         "name": "Authorization",
                         "in": "header",
@@ -1469,6 +1488,7 @@
                 "parameters": [
                     {
                         "type": "string",
+                        "default": "Bearer \u003cToken\u003e",
                         "description": "Authentication header",
                         "name": "Authorization",
                         "in": "header",
@@ -1515,6 +1535,7 @@
                     },
                     {
                         "type": "string",
+                        "default": "Bearer \u003cToken\u003e",
                         "description": "Authentication header",
                         "name": "Authorization",
                         "in": "header",
@@ -1583,6 +1604,7 @@
                     },
                     {
                         "type": "string",
+                        "default": "Bearer \u003cToken\u003e",
                         "description": "Authentication header",
                         "name": "Authorization",
                         "in": "header",
@@ -1648,6 +1670,7 @@
                     },
                     {
                         "type": "string",
+                        "default": "Bearer \u003cToken\u003e",
                         "description": "Authentication header",
                         "name": "Authorization",
                         "in": "header",
@@ -1890,6 +1913,9 @@
         "modules.ClusterArgs": {
             "type": "object",
             "properties": {
+                "Keep_upgrade_job": {
+                    "type": "boolean"
+                },
                 "chart_name": {
                     "type": "string"
                 },

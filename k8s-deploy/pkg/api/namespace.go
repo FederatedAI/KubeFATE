@@ -45,7 +45,7 @@ func (j *Namespace) Router(r *gin.RouterGroup) {
 // @Failure 401 {object} JSONERRORResult "Unauthorized operation"
 // @Failure 500 {object} JSONERRORResult "Internal server error"
 // @Router /namespace/ [get]
-// @Param Authorization header string true "Authentication header"
+// @Param Authorization header string true "Authentication header" default(Bearer <Token>)
 // @Security ApiKeyAuth
 func (*Namespace) getNamespaceList(c *gin.Context) {
 
