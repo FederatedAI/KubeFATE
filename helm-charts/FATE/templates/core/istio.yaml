@@ -26,4 +26,26 @@ spec:
       protocol: HTTP
     hosts:
     - "*"
+  - port:
+      number: 443
+      name: fateboard-https
+      protocol: HTTPS
+    tls:
+      mode: SIMPLE
+      credentialName: {{ .Values.ingress.fateboard.tls.secretName | default "fateboard-credential" }} # must be the same as secret
+    hosts:
+    {{- range .Values.ingress.fateboard.hosts }}
+    - {{ .name }}
+    {{- end }}
+  - port:
+      number: 443
+      name: client-https
+      protocol: HTTPS
+    tls:
+      mode: SIMPLE
+      credentialName: {{ .Values.ingress.client.tls.secretName | default "client-credential" }} # must be the same as secret
+    hosts:
+    {{- range .Values.ingress.client.hosts }}
+    - {{ .name }}
+    {{- end }}
 {{ end }}
