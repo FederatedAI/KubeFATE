@@ -70,7 +70,7 @@ func (e *kubeLog) Router(r *gin.RouterGroup) {
 // @Failure 401 {object} JSONERRORResult "Unauthorized operation"
 // @Failure 500 {object} JSONERRORResult "Internal server error"
 // @Router /log/{clusterID} [get]
-// @Param Authorization header string true "Authentication header"
+// @Param Authorization header string true "Authentication header" default(Bearer <Token>)
 // @Security ApiKeyAuth
 func (*kubeLog) getClusterLog(c *gin.Context) {
 
@@ -138,7 +138,7 @@ func (*kubeLog) getClusterLog(c *gin.Context) {
 // @Failure 401 {object} JSONERRORResult "Unauthorized operation"
 // @Failure 500 {object} JSONERRORResult "Internal server error"
 // @Router /log/{clusterID}/ws [get]
-// @Param Authorization header string true "Authentication header"
+// @Param Authorization header string true "Authentication header" default(Bearer <Token>)
 // @Security ApiKeyAuth
 func (*kubeLog) getClusterLogWs(c *gin.Context) {
 

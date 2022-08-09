@@ -75,7 +75,7 @@ func (authMiddleware *authMiddleware) login(c *gin.Context) {
 // @Success 200 {object} string
 // @Failure 401 {object} JSONEMSGResult
 // @Router /user/logout [post]
-// @Param Authorization header string true "Authentication header"
+// @Param Authorization header string true "Authentication header" default(Bearer <Token>)
 // @Security ApiKeyAuth
 func (authMiddleware *authMiddleware) logout(c *gin.Context) {
 	authMiddleware.LogoutHandler(c)
@@ -116,7 +116,7 @@ func generateAdminUser() error {
 // @Failure 401 {object} JSONERRORResult Unauthorized operation"
 // @Failure 500 {object} JSONERRORResult "Internal server error"
 // @Router /user [post]
-// @Param Authorization header string true "Authentication header"
+// @Param Authorization header string true "Authentication header" default(Bearer <Token>)
 // @Security ApiKeyAuth
 func (*User) createUser(c *gin.Context) {
 
@@ -153,7 +153,7 @@ func (*User) createUser(c *gin.Context) {
 // @Failure 401 {object} JSONERRORResult "Unauthorized operation"
 // @Failure 500 {object} JSONERRORResult "Internal server error"
 // @Router /user [put]
-// @Param Authorization header string true "Authentication header"
+// @Param Authorization header string true "Authentication header" default(Bearer <Token>)
 // @Security ApiKeyAuth
 func (*User) setUser(c *gin.Context) {
 
@@ -184,7 +184,7 @@ func (*User) setUser(c *gin.Context) {
 // @Failure 401 {object} JSONERRORResult "Unauthorized operation"
 // @Failure 500 {object} JSONERRORResult "Internal server error"
 // @Router /user/{userId} [get]
-// @Param Authorization header string true "Authentication header"
+// @Param Authorization header string true "Authentication header" default(Bearer <Token>)
 // @Security ApiKeyAuth
 func (*User) getUser(c *gin.Context) {
 
@@ -211,7 +211,7 @@ func (*User) getUser(c *gin.Context) {
 // @Failure 401 {object} JSONERRORResult "Unauthorized operation"
 // @Failure 500 {object} JSONERRORResult "Internal server error"
 // @Router /user [get]
-// @Param Authorization header string true "Authentication header"
+// @Param Authorization header string true "Authentication header" default(Bearer <Token>)
 // @Security ApiKeyAuth
 func (*User) getUserList(c *gin.Context) {
 
@@ -241,7 +241,7 @@ func getUserFindByUUID(uuid string) (modules.User, error) {
 // @Failure 401 {object} JSONERRORResult "Unauthorized operation"
 // @Failure 500 {object} JSONERRORResult "Internal server error"
 // @Router /user/{userId} [delete]
-// @Param Authorization header string true "Authentication header"
+// @Param Authorization header string true "Authentication header" default(Bearer <Token>)
 // @Security ApiKeyAuth
 func (*User) deleteUser(c *gin.Context) {
 
