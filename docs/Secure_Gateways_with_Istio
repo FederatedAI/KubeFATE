@@ -1,0 +1,124 @@
+# Secure Gateways with Istio
+
+## Prerequisite
+
+### Enable Istio
+
+Before installing a cluster yaml file with kubefate, please make sure you have enabled istio.
+
+```yaml
+istio:
+  enabled: false
+```
+
+
+
+### Prepare root certificate
+
+Create a root certificate and private key to sign the certificates for your services.
+
+`$ openssl req -x509 -sha256 -nodes -days 365 -newkey rsa:2048 -subj '/O=example Inc./CN=example.com' -keyout example.com.key -out example.com.crt`
+
+Now we get `example.com.key` and `example.com.crt` as CA to sign the certificates.
+
+### Set ingress IP and port
+
+If your environment has an external load balancer, set the ingress IP and ports:
+
+```bash
+$ export INGRESS_HOST=$(kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+$ export INGRESS_PORT=$(kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.spec.ports[?(@.name=="http2")].port}')
+$ export SECURE_INGRESS_PORT=$(kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.spec.ports[?(@.name=="https")].port}')
+```
+
+If you're using node port, run:
+
+```bash
+$ export INGRESS_HOST=$(minikube ip)
+$ export INGRESS_PORT=$(kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.spec.ports[?(@.name=="http2")].nodePort}')
+$ export SECURE_INGRESS_PORT=$(kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.spec.ports[?(@.name=="https")].nodePort}')
+```
+
+Please NOTE: enable istio will disable nginx-ingress for fateboard and notebook, so you have to access them with $INGRESS_HOST and $SECURE_INGRESS_PORT.
+
+## Generate credential for your services
+
+1. Create a certificate and a private key for `*.fateboard.example.com`:
+
+   ```bash
+   $ openssl req -out fateboard.example.com.csr -newkey rsa:2048 -nodes -keyout fateboard.example.com.key -subj "/CN=*.fateboard.example.com/O=example organization"
+   $ openssl x509 -req -sha256 -days 365 -CA example.com.crt -CAkey example.com.key -set_serial 0 -in fateboard.example.com.csr -out fateboard.example.com.crt
+   ```
+
+   Now that we signed a wildcard certificate for fateboard.example.com, they could be used as the certificate and private key of all the *.fateboard.example.com  subdomains.
+
+2. Create a certificate and a private key for `*.notebook.example.com`:
+
+   ```bash
+   $ openssl req -out notebook.example.com.csr -newkey rsa:2048 -nodes -keyout notebook.example.com.key -subj "/CN=*.notebook.example.com/O=example organization"
+   $ openssl x509 -req -sha256 -days 365 -CA example.com.crt -CAkey example.com.key -set_serial 0 -in notebook.example.com.csr -out notebook.example.com.crt
+   ```
+
+3. Create a tls secret for the fateboard gateway
+
+   ```bash
+   $ kubectl create -n istio-system secret tls fateboard-credential --key=fateboard.example.com.key --cert=fateboard.example.com.crt
+   ```
+
+   The name of the secret of fateboard is fixed to `fateboard-credential` 
+
+4. Create a tls secret for the client gateway
+
+   ```bash
+   kubectl create -n istio-system secret tls client-credential --key=notebook.example.com.key --cert=notebook.example.com.crt
+   ```
+
+   The name of the secret of notebook is fixed to `client-credential` 
+
+Now you have enabled https access for the services gateways! 
+
+## Access Service with HTTPS
+
+If your partyID is 9999,  access fateboard with istio $SECURE_INGRESS_PORT and cacert which signed certificates for your services.
+
+Test https accessibility of fateboard:
+
+```bash
+❯ curl https://party9999.fateboard.example.com:$SECURE_INGRESS_PORT/  --cacert example.com.crt -I
+HTTP/1.1 200 OK
+x-frame-options: DENY
+last-modified: Mon, 18 Apr 2022 14:26:51 GMT
+accept-ranges: bytes
+vary: accept-encoding
+content-type: text/html;charset=UTF-8
+content-language: en-US
+content-length: 3734
+date: Tue, 09 Aug 2022 07:19:25 GMT
+x-envoy-upstream-service-time: 8
+server: istio-envoy
+```
+
+Test https accessibility of client:
+
+```bash
+❯ curl https://party9999.notebook.example.com:$SECURE_INGRESS_PORT/  --cacert example.com.crt -I
+HTTP/1.1 405 Method Not Allowed
+server: istio-envoy
+content-type: text/html; charset=UTF-8
+date: Tue, 09 Aug 2022 07:24:18 GMT
+content-length: 87
+x-envoy-upstream-service-time: 6
+```
+
+The above results show that the HTTPS connection has been established.
+
+
+
+If you have not set `party9999.fateboard.example.com` and `$INGRESS_HOST` the same IP, you have to access gateway with resolve option:
+
+```bash
+$ curl https://party9999.fateboard.example.com:$SECURE_INGRESS_PORT/  --cacert example.com.crt -I --resolve "party9999.fateboard.example.com:$SECURE_INGRESS_PORT:$INGRESS_HOST"
+```
+
+
+
