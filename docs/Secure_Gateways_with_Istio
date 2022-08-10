@@ -53,7 +53,7 @@ export INGRESS_PORT=$(kubectl -n istio-system get service istio-ingressgateway -
 export SECURE_INGRESS_PORT=$(kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.spec.ports[?(@.name=="https")].nodePort}')
 ```
 
-Please NOTE: enable istio will disable nginx-ingress for fateboard and notebook, so you have to access them with $INGRESS_HOST and $SECURE_INGRESS_PORT.
+Please NOTE: enable istio will disable the ingresses for fateboard and notebook, so you have to access them with $INGRESS_HOST and $SECURE_INGRESS_PORT.
 
 ## Generate credential for your services
 
