@@ -8,8 +8,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-{{ if .Values.modules.fateboard.include }}
+{{- if not .Values.istio.enabled }}
+{{- if .Values.modules.fateboard.include }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -41,4 +41,5 @@ spec:
 {{ toYaml .Values.ingress.fateboard.tls | indent 4 }}
   {{- end }}
 
-{{ end }}
+{{- end }}
+{{- end }}
