@@ -45,8 +45,8 @@ For client:
 Generate the private key for the rollsite party, because rollsite doesn't support RSA formatted private key, we need to change to format to pkcs8.
 ```bash
 mkdir fate-9999
-openssl genrsa -out fate-9999/client.key 2048
-openssl pkcs8 -topk8 -inform PEM -in fate-9999/client.key -outform PEM -out fate-9999/client.key -nocrypt
+openssl genrsa -out fate-9999/client_rsa.key 2048
+openssl pkcs8 -topk8 -inform PEM -in fate-9999/client_rsa.key -outform PEM -out fate-9999/client.key -nocrypt
 ```
 Generate the certificate request with the private key:
 ```
@@ -63,8 +63,8 @@ For server:
 
 The steps are similar, example:
 ```bash
-openssl genrsa -out fate-9999/server.key 2048
-openssl pkcs8 -topk8 -inform PEM -in fate-9999/server.key -outform PEM -out fate-9999/server.key -nocrypt
+openssl genrsa -out fate-9999/server_rsa.key 2048
+openssl pkcs8 -topk8 -inform PEM -in fate-9999/server_rsa.key -outform PEM -out fate-9999/server.key -nocrypt
 openssl req -config openssl.cnf -key fate-9999/server.key -new -sha256 -out fate-9999/server.csr
 ```
 Type ```party-9999-server.example.com``` as the common name.
@@ -112,8 +112,8 @@ For client cert:
 ```bash
 mkdir fate-exchange
 
-openssl genrsa -out fate-exchange/client.key 2048
-openssl pkcs8 -topk8 -inform PEM -in fate-9999/client.key -outform PEM -out fate-exchange/client.key -nocrypt
+openssl genrsa -out fate-exchange/client_rsa.key 2048
+openssl pkcs8 -topk8 -inform PEM -in fate-exchange/client_rsa.key -outform PEM -out fate-exchange/client.key -nocrypt
 openssl req -config openssl.cnf -key fate-exchange/client.key -new -sha256 -out fate-exchange/client.csr
 ```
 Type in for example, ```exchange-client.example.com``` as the common name.
@@ -123,8 +123,8 @@ openssl ca -config openssl.cnf -days 10000 -notext -md sha256 -in fate-exchange/
 
 For server cert:
 ```bash
-openssl genrsa -out fate-exchange/server.key 2048
-openssl pkcs8 -topk8 -inform PEM -in fate-9999/server.key -outform PEM -out fate-exchange/server.key -nocrypt
+openssl genrsa -out fate-exchange/server_rsa.key 2048
+openssl pkcs8 -topk8 -inform PEM -in fate-exchange/server_rsa.key -outform PEM -out fate-exchange/server.key -nocrypt
 openssl req -config openssl.cnf -key fate-exchange/server.key -new -sha256 -out fate-exchange/server.csr
 ```
 Type in for example, ```exchange-server.example.com``` as the common name.
