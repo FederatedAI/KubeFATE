@@ -48,13 +48,28 @@ data:
     encrypt_password: false
     encrypt_module: fate_arch.common.encrypt_utils#pwdecrypt
     private_key:
+    party_id:
+    hook_module:
+      client_authentication: fate_flow.hook.flow.client_authentication
+      site_authentication: fate_flow.hook.flow.site_authentication
+      permission: fate_flow.hook.flow.permission
+    hook_server_name:
+    authentication:
+      client:
+        switch: false
+        http_app_key:
+        http_secret_key:
+      site:
+        switch: false
+    permission:
+      switch: false
+      component: false
+      dataset: false
     fateflow:
       # you must set real ip address, 127.0.0.1 and 0.0.0.0 is not supported
       host: fateflow
       http_port: 9380
       grpc_port: 9360
-      # http_app_key:
-      # http_secret_key:
       # support rollsite/nginx/fateflow as a coordination proxy
       # rollsite support fate on eggroll, use grpc protocol
       # nginx support fate on eggroll and fate on spark, use http or grpc protocol, default is http
@@ -154,6 +169,9 @@ data:
         password: {{ .Values.modules.python.rabbitmq.password }}
         # default conf/rabbitmq_route_table.yaml
         route_table: conf/rabbitmq_route_table/rabbitmq_route_table.yaml
+        # mode: replication / client, default: replication
+        mode: replication
+        max_message_size: 1048576
       pulsar:
         host: {{ .Values.modules.python.pulsar.host }}
         port: {{ .Values.modules.python.pulsar.port }}
@@ -161,6 +179,9 @@ data:
         topic_ttl: 3
         # default conf/pulsar_route_table.yaml
         route_table: conf/pulsar_route_table/pulsar_route_table.yaml
+        # mode: replication / client, default: replication
+        mode: replication
+        max_message_size: 1048576
       nginx:
         host: {{ .Values.modules.python.nginx.host }}
         http_port: {{ .Values.modules.python.nginx.http_port }}
@@ -168,10 +189,6 @@ data:
     fateboard:
       host: fateboard
       port: 8080
-    # on API `/model/load` and `/model/load/do`
-    # automatic upload models to the model store if it exists locally but does not exist in the model storage
-    # or download models from the model store if it does not exist locally but exists in the model storage
-    # this config will not affect API `/model/store` or `/model/restore`
     enable_model_store: false
     model_store_address:
       storage: mysql
@@ -245,7 +262,7 @@ data:
     federated_status_collect_type: PUSH
     
     # upload
-    upload_max_bytes: 4194304000 # bytes
+    upload_max_bytes: 104857600 # bytes
     
     #component output
     output_data_summary_count_limit: 100

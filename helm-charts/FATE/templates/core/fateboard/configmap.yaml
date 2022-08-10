@@ -21,6 +21,9 @@ data:
   application.properties: |
     server.port=8080
     fateflow.url=http://fateflow:9380
+    #priority is higher than {fateflow.url}, split by ;
+    #below config can support configuring more than one fate flow for this fate board
+    fateflow.url-list=
     fateflow.http_app_key=
     fateflow.http_secret_key=
     spring.http.encoding.charset=UTF-8
@@ -39,4 +42,6 @@ data:
     server.servlet.session.timeout=4h
     server.servlet.session.cookie.max-age=4h
     management.endpoints.web.exposure.exclude=*
+    feign.client.config.default.connectTimeout=10000
+    feign.client.config.default.readTimeout=10000
 {{- end }}

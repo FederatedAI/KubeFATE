@@ -21,7 +21,7 @@ auto_retry_delay: 1  #seconds
 federated_status_collect_type: PUSH
 
 # upload
-upload_max_bytes: 4194304000 # bytes
+upload_max_bytes: 104857600 # bytes
 
 #component output
 output_data_summary_count_limit: 100

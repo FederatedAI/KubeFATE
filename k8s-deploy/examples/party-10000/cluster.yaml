@@ -1,10 +1,10 @@
 name: fate-10000
 namespace: fate-10000
 chartName: fate
-chartVersion: v1.8.0
+chartVersion: v1.9.0
 partyId: 10000
 registry: ""
-imageTag: 1.8.0-release
+imageTag: 1.9.0-release
 pullPolicy: 
 imagePullSecrets: 
 - name: myregistrykey
@@ -36,10 +36,10 @@ ingress:
 rollsite: 
   type: NodePort
   nodePort: 30101
-  partyList:
-  - partyId: 9999
-    partyIp: 192.168.9.1
-    partyPort: 30091
+  enableTLS: true
+  exchange:
+    ip: 10.168.216.235
+    port: 30000
 
 python:
   type: NodePort
@@ -47,5 +47,5 @@ python:
   grpcNodePort: 30102
   logLevel: INFO
 
-servingIp: 192.168.10.1
+servingIp: 10.168.216.235
 servingPort: 30105
