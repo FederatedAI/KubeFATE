@@ -19,7 +19,7 @@ metadata:
 {{ include "fate.labels" . | indent 4 }}
 data:
   spark-defaults.conf: |
-    spark.master                      {{ if eq .Values.computing "Sparl_local" }}local[*]{{ else }}{{ .Values.modules.python.spark.master | default "spark://spark-master:7077"}}{{ end }}
+    spark.master                      {{ if eq .Values.computing "Spark_local" }}local[*]{{ else }}{{ .Values.modules.python.spark.master | default "spark://spark-master:7077"}}{{ end }}
     spark.driver.host                 {{  .Values.modules.python.spark.driverHost | default "fateflow" }}
     {{- if .Values.modules.python.spark.driverStartPort }}
     spark.driver.port                 {{  .Values.modules.python.spark.driverStartPort }}
