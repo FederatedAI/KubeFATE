@@ -224,6 +224,7 @@ func GetValueTemplateExample(chartName, chartVersion string) (value string, err 
 	}
 	msg, err := GetResponse(c, req, VALUE)
 	if err != nil {
+		err = fmt.Errorf("get value template example for validation failed\n %v, you may need to upgrade KubeFATE service", err)
 		return
 	}
 
@@ -232,7 +233,7 @@ func GetValueTemplateExample(chartName, chartVersion string) (value string, err 
 	}
 
 	if result, ok := msg.(*ChartResultErr); ok {
-		err = errors.New(result.Error)
+		err = fmt.Errorf("get value template example failed\n %v", errors.New(result.Error))
 	}
 	return
 }
