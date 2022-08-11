@@ -54,7 +54,7 @@ func (c *Cluster) Router(r *gin.RouterGroup) {
 // @Failure 401 {object} JSONERRORResult "Unauthorized operation"
 // @Failure 500 {object} JSONERRORResult "Internal server error"
 // @Router /cluster [post]
-// @Param Authorization header string true "Authentication header"
+// @Param Authorization header string true "Authentication header" default(Bearer <Token>)
 // @Security ApiKeyAuth
 // @Security OAuth2Application[write, admin]
 func (*Cluster) createCluster(c *gin.Context) {
@@ -91,7 +91,7 @@ func (*Cluster) createCluster(c *gin.Context) {
 // @Failure 401 {object} JSONERRORResult "Unauthorized operation"
 // @Failure 500 {object} JSONERRORResult "Internal server error"
 // @Router /cluster [put]
-// @Param Authorization header string true "Authentication header"
+// @Param Authorization header string true "Authentication header" default(Bearer <Token>)
 // @Security ApiKeyAuth
 // @Security OAuth2Application[write, admin]
 func (*Cluster) setCluster(c *gin.Context) {
@@ -134,7 +134,7 @@ func (*Cluster) setCluster(c *gin.Context) {
 // @Failure 401 {object} JSONERRORResult "Unauthorized operation"
 // @Failure 500 {object} JSONERRORResult "Internal server error"
 // @Router /cluster/{clusterId} [get]
-// @Param Authorization header string true "Authentication header"
+// @Param Authorization header string true "Authentication header" default(Bearer <Token>)
 // @Security ApiKeyAuth
 // @Security OAuth2Application[write, admin]
 func (*Cluster) getCluster(c *gin.Context) {
@@ -202,7 +202,7 @@ func (*Cluster) getCluster(c *gin.Context) {
 // @Failure 401 {object} JSONERRORResult "Unauthorized operation"
 // @Failure 500 {object} JSONERRORResult "Internal server error"
 // @Router /cluster/ [get]
-// @Param Authorization header string true "Authentication header"
+// @Param Authorization header string true "Authentication header" default(Bearer <Token>)
 // @Security ApiKeyAuth
 // @Security OAuth2Application[write, admin]
 func (*Cluster) getClusterList(c *gin.Context) {
@@ -236,7 +236,7 @@ func (*Cluster) getClusterList(c *gin.Context) {
 // @Failure 401 {object} JSONERRORResult "Unauthorized operation"
 // @Failure 500 {object} JSONERRORResult "Internal server error"
 // @Router /cluster/{clusterId} [delete]
-// @Param Authorization header string true "Authentication header"
+// @Param Authorization header string true "Authentication header" default(Bearer <Token>)
 // @Security ApiKeyAuth
 // @Security OAuth2Application[write, admin]
 func (*Cluster) deleteCluster(c *gin.Context) {
