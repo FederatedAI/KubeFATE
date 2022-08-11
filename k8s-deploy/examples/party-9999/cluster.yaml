@@ -33,13 +33,13 @@ ingress:
     hosts:
     - name: party9999.notebook.example.com
 
-rollsite: 
+rollsite:
   type: NodePort
   nodePort: 30091
-  enableTLS: true
-  exchange:
-    ip: 10.168.216.235
-    port: 30000
+  partyList:
+    - partyId: 10000
+      partyIp: 192.168.10.1
+      partyPort: 30101
 
 python:
   type: NodePort
@@ -47,5 +47,5 @@ python:
   grpcNodePort: 30092
   logLevel: INFO
 
-servingIp: 10.168.216.235
+servingIp: 192.168.9.1
 servingPort: 30095

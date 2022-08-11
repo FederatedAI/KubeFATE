@@ -36,10 +36,10 @@ ingress:
 rollsite: 
   type: NodePort
   nodePort: 30101
-  enableTLS: true
-  exchange:
-    ip: 10.168.216.235
-    port: 30000
+  partyList:
+    - partyId: 9999
+      partyIp: 192.168.9.1
+      partyPort: 30091
 
 python:
   type: NodePort
@@ -47,5 +47,5 @@ python:
   grpcNodePort: 30102
   logLevel: INFO
 
-servingIp: 10.168.216.235
+servingIp: 192.168.10.1
 servingPort: 30105
