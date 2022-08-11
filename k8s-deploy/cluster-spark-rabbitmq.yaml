@@ -24,7 +24,7 @@ modules:
   - nginx
   - rabbitmq
 
-# Computing : Eggroll, Spark, Sparl_local
+# Computing : Eggroll, Spark, Spark_local
 computing: Spark
 # Federation: Eggroll(computing: Eggroll), Pulsar/RabbitMQ(computing: Spark/Spark_local)
 federation: RabbitMQ

@@ -22,7 +22,7 @@ modules:
   - nginx
   - pulsar
 
-# Computing : Eggroll, Spark, Sparl_local
+# Computing : Eggroll, Spark, Spark_local
 computing: Spark_local
 # Federation: Eggroll(computing: Eggroll), Pulsar/RabbitMQ(computing: Spark/Spark_local)
 federation: Pulsar

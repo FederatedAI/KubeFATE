@@ -23,7 +23,7 @@ modules:
   - fateboard
   - client
   
-# Computing : Eggroll, Spark, Sparl_local
+# Computing : Eggroll, Spark, Spark_local
 computing: Eggroll
 # Federation: Eggroll(computing: Eggroll), Pulsar/RabbitMQ(computing: Spark/Spark_local)
 federation: Eggroll
