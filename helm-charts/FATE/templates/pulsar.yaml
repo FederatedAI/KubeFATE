@@ -125,7 +125,8 @@ data:
     backlogQuotaCheckIntervalInSeconds=60
     
     # Default per-topic backlog quota limit
-    backlogQuotaDefaultLimitGB=10
+    backlogQuotaDefaultLimitGB=-1
+    backlogQuotaDefaultLimitBytes=-1
     
     # Default ttl for namespaces if ttl is not already configured at namespace policies. (disable default-ttl with value 0)
     ttlDurationDefaultInSeconds=0
@@ -134,7 +135,7 @@ data:
     brokerDeleteInactiveTopicsEnabled=true
     
     # How often to check for inactive topics
-    brokerDeleteInactiveTopicsFrequencySeconds=60
+    brokerDeleteInactiveTopicsFrequencySeconds=86400
     
     # Max pending publish requests per connection to avoid keeping large number of pending
     # requests in memory. Default: 1000
