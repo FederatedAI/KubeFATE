@@ -126,7 +126,6 @@ data:
     
     # Default per-topic backlog quota limit
     backlogQuotaDefaultLimitGB=-1
-    backlogQuotaDefaultLimitBytes=-1
     
     # Default ttl for namespaces if ttl is not already configured at namespace policies. (disable default-ttl with value 0)
     ttlDurationDefaultInSeconds=0
