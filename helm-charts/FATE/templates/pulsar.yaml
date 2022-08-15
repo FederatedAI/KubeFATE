@@ -134,7 +134,7 @@ data:
     brokerDeleteInactiveTopicsEnabled=true
     
     # How often to check for inactive topics
-    brokerDeleteInactiveTopicsFrequencySeconds=10800
+    brokerDeleteInactiveTopicsFrequencySeconds=36000
     
     # Max pending publish requests per connection to avoid keeping large number of pending
     # requests in memory. Default: 1000
