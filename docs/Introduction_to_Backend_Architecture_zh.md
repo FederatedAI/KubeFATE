@@ -9,9 +9,10 @@ FATE支持选择不同的计算引擎，存储引擎和数据传输引擎，现�
 目前支持的组合包括以下几种：
 
 - **Eggroll**
-- **Spark + hdfs + RabbitMQ**
-- **Spark + hdfs + Pulsar**
-- **Spark-local + localfs + Pulsar**
+- **Spark + HDFS + RabbitMQ**
+- **Spark + HDFS + Pulsar**
+- **Spark-local + LocalFS + Pulsar**
+- **Spark-local + LocalFS + RabbitMQ**
 
 ### Eggroll
 
@@ -22,13 +23,19 @@ rollsite负责数据传输，nodemanager负责存储和计算，clustermanager�
 docker-compose使用的时候修改`parties.conf`配置
 
 ```bash
-backend=eggroll
+computing=Eggroll
+federation=Eggroll
+storage=Eggroll
 ```
+
+***当使用Eggroll计算引擎的时候，federation和storage也必须是Eggroll***
 
 k8s使用的时候修改`cluster.yaml`配置
 
 ```yaml
-backend: eggroll
+computing: Eggroll
+federation: Eggroll
+storage: Eggroll
 ```
 
 架构图：
@@ -39,20 +46,24 @@ backend: eggroll
 
 ### spark_rabbitmq
 
-当backend使用spark_rabbitmq的时候，会部署spark + hdfs + rabbitmq的引擎组合的FATE集群。
+当使用Spark + HDFS + RabbitMQ的时候，会部署Spark + HDFS + RabbitMQ的引擎组合的FATE集群。
 
-spark是计算组件，hdfs是存储组件，rabbitmq是数据传输组件。
+spark是计算组件，HDFS是存储组件，RabbitMQ是数据传输组件。
 
 docker-compose使用的时候修改`parties.conf`配置
 
 ```bash
-backend=spark_rabbitmq
+computing=Spark
+federation=RabbitMQ
+storage=HDFS
 ```
 
 k8s使用的时候修改`cluster.yaml`配置
 
 ```yaml
-backend: spark_rabbitmq
+computing: Spark
+federation: RabbitMQ
+storage: HDFS
 ```
 
 架构图：
@@ -63,20 +74,24 @@ backend: spark_rabbitmq
 
 ### spark_pulsar
 
-当backend使用spark_pulsar的时候，会部署Spark + Hdfs + Pulsar的引擎组合的FATE集群。
+当使用Spark + HDFS + Pulsar的时候，会部署Spark + HDFS + Pulsar的引擎组合的FATE集群。
 
-Spark是计算组件，Hdfs是存储组件，Pulsar是数据传输组件。
+Spark是计算组件，HDFS是存储组件，Pulsar是数据传输组件。
 
 docker-compose使用的时候修改`parties.conf`配置
 
 ```bash
-backend=spark_pulsar
+computing=Spark
+federation=Pulsar
+storage=HDFS
 ```
 
 k8s使用的时候修改`cluster.yaml`配置
 
 ```yaml
-backend: spark_pulsar
+computing: Spark
+federation: Pulsar
+storage: HDFS
 ```
 
 架构图：
@@ -85,22 +100,28 @@ backend: spark_pulsar
   <img src="./images/arch_spark_pulsar.png">
 </div>
 
-### spark_local_pulsar (slim FATE)
+### spark_local (Slim FATE)
 
-当backend使用spark_local_pulsar的时候，会部署一个slim的FATE集群。所有的计算和存储部分都在一起，通过Spark local和localfs来实现，数据传输是通过Pulsar完成。
+当使用Spark-local + LocalFS + Pulsar/RabbitMQ的时候，会部署一个slim的FATE集群。所有的计算和存储部分都在一起，通过Spark local和localfs来实现，数据传输是通过Pulsar或者RabbitMQ完成。
 
-Spark local是计算组件，localfs是存储组件，Pulsar是数据传输组件。
+Spark local是计算组件，localfs是存储组件，Pulsar或者RabbitMQ是数据传输组件。
 
 docker-compose使用的时候修改`parties.conf`配置
 
 ```bash
-backend=spark_local_pulsar
+computing=Spark
+federation=Pulsar
+storage=HDFS
 ```
+
+***这里federation也可以替换为RabbitMQ***
 
 k8s使用的时候修改`cluster.yaml`配置
 
 ```yaml
-backend: spark_local_pulsar
+computing: Spark_local
+federation: Pulsar
+storage: HDFS
 ```
 
 架构图：
@@ -114,11 +135,11 @@ backend: spark_local_pulsar
 Eggroll可以作为FATE的计算，存储和传输引擎，Eggroll是一个简单高性能[联邦]机器学习的计算框架，支持多种联邦网络架构：直链模式、星型和环形等，支持不同组织之间使用证书加密，Eggroll是微众银行主导的github的开源项目。
 项目地址：<https://github.com/WeBankFinTech/eggroll.git>
 
-Rabbitmq是一个简单易上手的MQ(Message Queue)，发展较早，有较多的云平台支持，适合上手Spark计算引擎的FATE进行联邦学习的时候使用。
+RabbitMQ是一个简单易上手的MQ(Message Queue)，发展较早，有较多的云平台支持，适合上手Spark计算引擎的FATE进行联邦学习的时候使用。
 
-Pulsar相比Rabbitmq，可以支持更大规模的集群化部署，也支持exchange模式的网络结构。使用集群化部署，适合较大规模的联邦学习计算。
+Pulsar相比RabbitMQ，可以支持更大规模的集群化部署，也支持exchange模式的网络结构。使用集群化部署，适合较大规模的联邦学习计算。
 
-spark_local_pulsar相比其他模式，使用这个模式可以最大化减少集群所需的组件，在较少资源多情况下也可以运行FATE集群，可以使用在小规模联邦学习计算，IOT设备等情况。
+Slim FATE相比其他模式，使用这个模式可以最大化减少集群所需的组件，在较少资源多情况下也可以运行FATE集群，可以使用在小规模联邦学习计算，IOT设备等情况。
 
 ## Exchange架构模式
 
@@ -127,7 +148,6 @@ spark_local_pulsar相比其他模式，使用这个模式可以最大化减少�
 也就是说backend是eggroll、spark_pulsar和spark_local_pulsar三种模式的时候可以支持Exchange的使用。
 
 **rollsite只能和其他rollsite的FATE通过exchange链接，Pulsar也只能和其他Pulsar的FATE通过exchange链接。**
-
 
 参考文档：
 

@@ -52,10 +52,10 @@ services:
       - fate-network
     restart: always
     depends_on:
-      - python
+      - fateflow
 
-  python:
-    image: "federatedai/python-spark:${TAG}"
+  fateflow:
+    image: "federatedai/fateflow:${TAG}"
     restart: always
     ports:
       - 9380:9380
@@ -90,10 +90,11 @@ services:
         set -x
         sleep 5 && python fateflow/python/fate_flow/fate_flow_server.py
     environment:
-      PYTHONPATH: "$PYTHONPATH:/data/projects/fate/fate/python:/data/projects/fate/eggroll/python:/data/projects/fate/fateflow/python:/data/projects/fate/fate/python/fate_client"
+      PYTHONPATH: "$$PYTHONPATH:/data/projects/fate/fate/python:/data/projects/fate/eggroll/python:/data/projects/fate/fateflow/python:/data/projects/fate/fate/python/fate_client"
       FATE_PROJECT_BASE: "/data/projects/fate"
       FATE_FLOW_UPLOAD_MAX_NUM: "1000000"
       FATE_FLOW_UPLOAD_MAX_BYTES: "104868093952"
+      FATE_LOG_LEVEL: "INFO"
 
   namenode:
     image: federatedai/hadoop-namenode:2.0.0-hadoop2.7.4-java8
@@ -241,7 +242,7 @@ services:
     networks:
       - fate-network
     depends_on:
-      - python
+      - fateflow
   
   client:
     image: "federatedai/client:${TAG}"
@@ -249,7 +250,7 @@ services:
       - "20000:20000"
     restart: always
     environment:
-      FATE_FLOW_IP: "python"
+      FATE_FLOW_IP: "fateflow"
       FATE_FLOW_PORT: "9380"
       FATE_SERVING_HOST: "fate-serving:8059"
     volumes:
@@ -257,6 +258,6 @@ services:
       - shared_dir_examples:/data/projects/fate/examples
       - /etc/localtime:/etc/localtime:ro
     depends_on:
-      - python
+      - fateflow
     networks:
       - fate-network

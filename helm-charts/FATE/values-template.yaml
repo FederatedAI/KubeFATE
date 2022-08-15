@@ -12,6 +12,12 @@ image:
 partyId: {{ .partyId | int64 | toString }}
 partyName: {{ .name }}
 
+computing: {{ .computing }}
+federation: {{ .federation }}
+storage: {{ .storage }}
+algorithm: {{ .algorithm }}
+device: {{ .device }}
+
 {{- $partyId := (.partyId | int64 | toString) }}
 
 {{- with .ingress }}
@@ -211,7 +217,6 @@ modules:
 
   python: 
     include: {{ has "python" .modules }}
-    backend: {{ default "eggroll" .backend }}
     {{- with .python }}
     {{- with .resources }}
     resources:
@@ -235,7 +240,6 @@ modules:
     affinity:
 {{ toYaml . | indent 6 }}
     {{- end }}
-    enabledNN: {{ .enabledNN | default false }}
     existingClaim: {{ .existingClaim  }}
     claimName: {{ .claimName | default "python-data" }}
     storageClass: {{ .storageClass | default "python" }}
@@ -426,6 +430,7 @@ modules:
 {{ toYaml . | indent 8 }}
       {{- end }}
       type: {{ .master.type }}
+      nodePort: {{ .master.nodePort }}
     {{- end }}
     {{- if .worker }}
     worker:
@@ -449,6 +454,7 @@ modules:
 {{ toYaml . | indent 8 }}
       {{- end }}
       type: {{ .worker.type | default "ClusterIP" }}
+      nodePort: {{ .master.nodePort }}
     {{- end }}
     {{- end }}
 

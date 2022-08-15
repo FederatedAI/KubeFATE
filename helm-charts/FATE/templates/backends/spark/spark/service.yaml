@@ -50,13 +50,13 @@ spec:
     protocol: TCP
     port: 8080
     targetPort: 8080
+    {{- if eq .Values.modules.spark.master.type "NodePort" "LoadBalancer" }}
+    nodePort: {{ .Values.modules.spark.master.nodePort }}
+    {{- end }}
   - name: master
     protocol: TCP
     port: 7077
     targetPort: 7077
-    {{- if eq .Values.modules.spark.master.type "NodePort" "LoadBalancer" }}
-    nodePort: {{ .Values.modules.spark.master.nodePort }}
-    {{- end }}
   - name: master-rest
     protocol: TCP
     port: 6066
