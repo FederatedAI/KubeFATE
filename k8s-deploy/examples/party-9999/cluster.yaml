@@ -23,7 +23,11 @@ modules:
   - fateboard
   - client
 
-backend: eggroll
+computing: Eggroll
+federation: Eggroll
+storage: Eggroll
+algorithm: Basic
+device: CPU
 
 ingress:
   fateboard:

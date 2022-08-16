@@ -22,7 +22,11 @@ modules:
   - nginx
   - pulsar
 
-backend: spark_local_pulsar
+computing: Spark_local
+federation: Pulsar
+storage: HDFS
+algorithm: Basic
+device: CPU
 
 ingress:
   fateboard: 

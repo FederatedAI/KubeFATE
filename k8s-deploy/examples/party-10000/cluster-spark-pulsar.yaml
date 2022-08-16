@@ -24,7 +24,11 @@ modules:
   - nginx
   - pulsar
 
-backend: spark_pulsar
+computing: Spark
+federation: Pulsar
+storage: HDFS
+algorithm: Basic
+device: CPU
 
 ingress:
   fateboard: 

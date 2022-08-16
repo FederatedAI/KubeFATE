@@ -327,7 +327,7 @@ main() {
    Use  ${party_ip_list[$i]}:8080 to access fateboard of party: ${party_list[$i]}
    Use  ${party_ip_list[$i]}:20000 to access notebook of party: ${party_list[$i]}"
       fi
-      if [[ "$backend" == "spark"* ]]; then
+      if [[ "$computing" == "spark"* ]]; then
         echo "   Use  ${party_ip_list[$i]}:8888 to access Spark of party: ${party_list[$i]}"
       fi
       if [ ${serving_ip_list[$i]} ]; then

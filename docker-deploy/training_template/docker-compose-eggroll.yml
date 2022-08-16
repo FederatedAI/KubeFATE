@@ -67,7 +67,7 @@ services:
     networks:
       - fate-network
     depends_on:
-      - python
+      - fateflow
   
   clustermanager:
     image: "federatedai/eggroll:${TAG}"
@@ -99,11 +99,12 @@ services:
       - fate-network
     command: ["bash", "-c", "java -Dlog4j.configurationFile=$${EGGROLL_HOME}/conf/log4j2.properties -cp $${EGGROLL_HOME}/lib/*: com.webank.eggroll.core.Bootstrap --bootstraps com.webank.eggroll.core.resourcemanager.NodeManagerBootstrap -c $${EGGROLL_HOME}/conf/eggroll.properties -p 4671 -s 'EGGROLL_DEAMON'"]
   
-  python:
-    image: "federatedai/python:${TAG}"
+  fateflow:
+    image: "federatedai/fateflow:${TAG}"
     environment:
-      PYTHONPATH: "$PYTHONPATH:/data/projects/fate/fate/python:/data/projects/fate/eggroll/python:/data/projects/fate/fateflow/python:/data/projects/fate/fate/python/fate_client"
+      PYTHONPATH: "$$PYTHONPATH:/data/projects/fate/fate/python:/data/projects/fate/eggroll/python:/data/projects/fate/fateflow/python:/data/projects/fate/fate/python/fate_client"
       FATE_PROJECT_BASE: "/data/projects/fate"
+      FATE_LOG_LEVEL: "INFO"
     ports:
       - "9360:9360"
       - "9380:9380"
@@ -149,7 +150,7 @@ services:
       - "20000:20000"
     restart: always
     environment:
-      FATE_FLOW_IP: "python"
+      FATE_FLOW_IP: "fateflow"
       FATE_FLOW_PORT: "9380"
       FATE_SERVING_HOST: "fate-serving:8059"
     volumes:
@@ -157,7 +158,7 @@ services:
       - shared_dir_examples:/data/projects/fate/examples
       - /etc/localtime:/etc/localtime:ro
     depends_on:
-      - python
+      - fateflow
     networks:
       - fate-network
 

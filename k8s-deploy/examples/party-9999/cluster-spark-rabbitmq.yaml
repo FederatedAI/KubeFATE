@@ -24,7 +24,11 @@ modules:
   - nginx
   - rabbitmq
 
-backend: spark_rabbitmq
+computing: Spark
+federation: RabbitMQ
+storage: HDFS
+algorithm: Basic
+device: CPU
 
 ingress:
   fateboard: 
