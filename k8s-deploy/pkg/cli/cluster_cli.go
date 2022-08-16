@@ -162,14 +162,13 @@ func ClusterInstallCommand() *cli.Command {
 			if !ok || chartName == "" {
 				return errors.New("chartName not found, check your cluster.yaml file")
 			}
-			if template, err := GetValueTemplateExample(chartName.(string), chartVersion.(string)); err != nil {
-				if _, ok := err.(VersionNotValidError); !ok {
-					// if the error is not VersionNotValidError, warn user.
-					color.Yellow("Config Warning: %s\n", err.Error())
-				}
-			} else {
-				skippedKeys := getSkippedKeys(m)
-				errs := ValidateYaml(template, string(clusterConfig), skippedKeys)
+
+			var errs []error
+			template, err := GetValueTemplateExample(chartName.(string), chartVersion.(string))
+			errs = append(errs, err)
+			skippedKeys := getSkippedKeys(m)
+			errs = append(errs, ValidateYaml(template, string(clusterConfig), skippedKeys, nil)...)
+			if !ContainsSkipError(errs) {
 				for _, err := range errs {
 					if err != nil {
 						color.Yellow("Config Warning: %s\n", err.Error())

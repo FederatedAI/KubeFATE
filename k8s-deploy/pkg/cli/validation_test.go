@@ -291,23 +291,3 @@ func Test_getSkippedKeys(t *testing.T) {
 		})
 	}
 }
-
-func Test_alertUserIfModulesNotMatchBackend(t *testing.T) {
-	type args struct {
-		yamlMap map[string]interface{}
-	}
-	yamlMap1, _ := bufferToMap([]byte(s5))
-	yamlMap2, _ := bufferToMap([]byte(s6))
-	tests := []struct {
-		name string
-		args args
-	}{
-		{"correct", args{yamlMap1}},
-		{"redundant", args{yamlMap2}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			alertUserIfModulesNotMatchBackend(tt.args.yamlMap)
-		})
-	}
-}
