@@ -22,7 +22,7 @@ func GetNodeIP() ([]string, error) {
 
 	svcs, err := KubeClient.GetNodes("")
 	if err != nil {
-		return nil, errors.New("Get node ip failed. Please check if user has the privilege to list resource \"nodes\" at the cluster scope")
+		return nil, errors.Wrap(err, "Get node ip failed. Please check if user has the privilege to list resource \"nodes\" at the cluster scope")
 	}
 
 	var nodeIP []string

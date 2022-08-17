@@ -24,7 +24,7 @@ import (
 func GetNamespaces() ([]v1.Namespace, error) {
 	namespaceList, err := KubeClient.GetNamespaces()
 	if err != nil {
-		return nil, errors.New("Get namespaces failed. Please check if user has the privilege to list resource \"namespaces\" at the cluster scope")
+		return nil, errors.Wrap(err, "Get namespaces failed. Please check if user has the privilege to list resource \"namespaces\" at the cluster scope")
 	}
 	return namespaceList.Items, nil
 }
