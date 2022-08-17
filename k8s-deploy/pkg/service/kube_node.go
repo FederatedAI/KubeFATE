@@ -15,12 +15,14 @@
 
 package service
 
+import "github.com/pkg/errors"
+
 // GetNodeIP get a node ip
 func GetNodeIP() ([]string, error) {
 
 	svcs, err := KubeClient.GetNodes("")
 	if err != nil {
-		return nil, err
+		return nil, errors.New("Get node ip failed. Please check if user has the privilege to list resource \"nodes\" at the cluster scope")
 	}
 
 	var nodeIP []string

@@ -22,7 +22,7 @@ func GetClusterInfo(name, namespace string) (map[string]interface{}, error) {
 	ip, err := GetNodeIP()
 	if err != nil {
 		log.Error().Str("func", "GetNodeIP()").Err(err).Msg("GetNodeIP error")
-		return nil, err
+		ip = []string{err.Error()}
 	}
 	port, err := GetProxySvcNodePorts(name, getDefaultNamespace(namespace))
 	if err != nil {
