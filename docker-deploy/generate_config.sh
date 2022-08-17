@@ -554,6 +554,12 @@ EOF
 		cp -r serving_template/docker-serving/* serving-$party_id/confs/
 
 		cp serving_template/docker-compose-serving.yml serving-$party_id/docker-compose.yml
+
+
+		mkdir -p serving-$party_id/data
+		sed -i "s|<path-to-host-dir>|serving-$party_id|g" ./serving-$party_id/docker-compose.yml
+
+
 		if [ "$RegistryURI" != "" ]; then
 			sed -i 's#federatedai#${RegistryURI}/federatedai#g' ./serving-$party_id/docker-compose.yml
 		fi
