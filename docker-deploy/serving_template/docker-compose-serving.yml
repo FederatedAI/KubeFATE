@@ -24,7 +24,7 @@ services:
       - "8000:8000"
     volumes:
       - ./confs/serving-server/conf/serving-server.properties:/data/projects/fate-serving/serving-server/conf/serving-server.properties
-      - ./confs/serving-server/cache:/root/.fate
+      - ./confs/serving-server/cache:/data/projects/fate-serving/serving-server/.fate
       - /etc/localtime:/etc/localtime:ro
     networks:
       - fate-serving-network
@@ -50,6 +50,7 @@ services:
       - "2888"
       - "3888"
     volumes:
+      - ./confs/serving-server/zookeeper:/bitnami/zookeeper
       - /etc/localtime:/etc/localtime:ro
     environment:
       ALLOW_ANONYMOUS_LOGIN: "yes"
