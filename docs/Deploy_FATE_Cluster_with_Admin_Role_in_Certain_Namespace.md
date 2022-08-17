@@ -2,7 +2,7 @@
 
 ## Background
 
-When deploying KubeFATE and FATE cluster with Kubernetes, users don't always have the cluster-admin privilege of the whole K8s cluster. To deploy KubeFATE and run FATE jobs, [admin]([admin](https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles)) role provided by Kubernetes is necessary in certain namespace. And in this case, some configuration files need to be modified.
+When deploying KubeFATE and FATE cluster with Kubernetes, user may not have full control over every resource in the cluster. Kubernetes provides [Role-based access control(RBAC) authorization](https://kubernetes.io/docs/reference/access-authn-authz/rbac/) to restrict the actions a user can take. In default case, we ask user to create a new role with a wide set of permissions and create clusterrolebinding to grant access within the whole cluster. But it may not work when user only has access to some limited resources in particular namespace. We studied all the [user-facing roles](https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles)(`cluster-admin`, `admin`, `edit`, `view`) in Kubernetes and found that to deploy KubeFATE and run FATE jobs, `admin` is necessary because of the privilege to create roles and role bindings within the namespace. And in this case, some configuration files need to be modified.
 
 ## Deploy Steps
 
@@ -74,6 +74,8 @@ stringData:
   mariadbUsername: kubefate
   mariadbPassword: kubefate
 ```
+
+Compare to default `rbac-config.yaml`, all the namespaces should be modified because KubeFATE should be deployed to user's own namespace. In general, we need to remove any clusterrole or clusterrolebinding and create only role and rolebinding in the corresponding namespaces. PodSecurityPolicy was also removed because `admin` role cannot access the resource at cluster scope.
 
 User `10000` use the `rbac-config.yaml` similar to user `9999` but doesn't create rolebinding in `fate-exchange` namespace.
 
