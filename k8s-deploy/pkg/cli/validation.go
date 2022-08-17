@@ -27,9 +27,9 @@ type TreeNode struct {
 }
 
 type ValidationTree struct {
-	root    *TreeNode
-	yamlMap map[string]interface{}
-	lines   []string
+	root                *TreeNode
+	yamlMap, rawYamlMap map[string]interface{}
+	lines               []string
 }
 
 type ValidationManager struct {
@@ -154,7 +154,8 @@ func Contains(element interface{}, set interface{}) bool {
 // GetValueTemplateExample gets the value template example from api.
 func GetValueTemplateExample(chartName, chartVersion string) (value string, err error) {
 	if !versionValid(chartVersion, []int{1, 9, 0}) {
-		err = SkipError(fmt.Sprintf("version of %s does not meet the validation requirement that chartVersion >= %s", chartVersion, "1.9.0"))
+		err = SkipError(fmt.Sprintf("version of %s does not meet the validation"+
+			" requirement that chartVersion >= %s", chartVersion, "1.9.0"))
 		return
 	}
 
@@ -166,7 +167,8 @@ func GetValueTemplateExample(chartName, chartVersion string) (value string, err 
 	}
 	msg, err := GetResponse(c, req, VALUE)
 	if err != nil {
-		err = SkipError(fmt.Sprintf("get value template example for validation failed\n %v, you may need to upgrade KubeFATE service", err))
+		err = SkipError(fmt.Sprintf("get value template example for validation failed %v,"+
+			", you may need to upgrade KubeFATE service", err))
 		return
 	}
 
@@ -296,8 +298,12 @@ func buildValidationTree(yamlString string, restoreComments,
 	if err != nil {
 		return nil, err
 	}
+	rawYamlMap, err := bufferToMap([]byte(yamlString))
+	if err != nil {
+		return nil, err
+	}
 	root := mapToTreeNode(yamlMap, []string{""})
-	return &ValidationTree{root, yamlMap, lines}, nil
+	return &ValidationTree{root, yamlMap, rawYamlMap, lines}, nil
 }
 
 // getSkippedKeys returns the skippedKeys in a map.
@@ -322,7 +328,7 @@ func getSkippedKeys(m map[string]interface{}) (skippedKeys []string) {
 func getModules(yamlMap map[string]interface{}) ([]string, error) {
 	modules, ok := yamlMap["modules"].([]interface{})
 	if !ok {
-		return nil, ConfigError("the modules in your yaml is not supported")
+		return nil, ConfigError("the modules in your yaml is not valid")
 	}
 	var s []string
 	for _, module := range modules {
@@ -338,51 +344,185 @@ func getBackend(yamlMap map[string]interface{}) (map[string]string, error) {
 	if computing, ok := yamlMap["computing"].(string); ok {
 		m["computing"] = computing
 	} else {
-		return nil, ConfigError("computing error")
+		return nil, ConfigError("computing error, not found")
 	}
 	if federation, ok := yamlMap["federation"].(string); ok {
 		m["federation"] = federation
 	} else {
-		return nil, ConfigError("federation error")
+		return nil, ConfigError("federation error, not found")
 	}
 	if storage, ok := yamlMap["storage"].(string); ok {
 		m["storage"] = storage
 	} else {
-		return nil, ConfigError("storage error")
+		return nil, ConfigError("storage error, not found")
 	}
 	return m, nil
 }
 
-func moduleValidator(m *ValidationManager) (errors []error) {
-	yamlMap := m.testTree.yamlMap
-
-	backend, err := getBackend(yamlMap)
-	if err != nil {
-		return []error{err}
+// checkCommonModules checks common modules' presence
+func checkCommonModules(modules []string) (errs []error) {
+	common := []string{"mysql", "python", "fateboard", "client"}
+	for _, c := range common {
+		if !Contains(c, modules) {
+			errs = append(errs, ConfigError(fmt.Sprintf("common module %s not enabled", c)))
+		}
 	}
-	if modules, err := getModules(yamlMap); err != nil {
-		return []error{err}
-	} else {
-		for _, m := range modules {
-			switch m {
-			case "spark":
-				if !Contains(backend["computing"], []string{"Spark"}) {
-					errors = append(errors, ConfigError("the computing in your yaml is not supported"))
-				}
-				if !Contains(backend["federation"], []string{"Pulsar", "RabbitMQ"}) {
-					errors = append(errors, ConfigError("the federation in your yaml is not supported"))
-				}
-				if !Contains(backend["storage"], []string{"HDFS"}) {
-					errors = append(errors, ConfigError("the storage in your yaml is not supported"))
-				}
+	return
+}
+
+// checkModuleBackend checks each module has correct backend mapping
+func checkModuleBackend(modules []string, backend map[string]string) (errs []error) {
+	for _, m := range modules {
+		switch m {
+		case "spark":
+			if c := backend["computing"]; c != "Spark" {
+				errs = append(errs,
+					ConfigError("module spark shall work with computing Spark but "+c))
+			}
+		case "hdfs":
+			if s := backend["storage"]; s != "HDFS" {
+				errs = append(errs,
+					ConfigError("module hdfs shall work with computing HDFS but "+s))
+			}
+		case "nginx":
+			if c := backend["computing"]; !Contains(c, []string{"Spark", "Spark_local"}) {
+				errs = append(errs,
+					ConfigError("module nginx shall work with computing Spark/Spark_local but "+c))
+			}
+		case "pulsar":
+			if f := backend["federation"]; f != "Pulsar" {
+				errs = append(errs,
+					ConfigError("module pulsar shall work with federation Pulsar but "+f))
+			}
+		case "rabbitmq":
+			if f := backend["federation"]; f != "RabbitMQ" {
+				errs = append(errs,
+					ConfigError("module rabbitmq shall work with federation RabbitMQ but "+f))
 			}
 		}
 	}
 	return
 }
 
-func backendValidator(m *ValidationManager) (errors []error) {
-	yamlMap := m.testTree.yamlMap
+// moduleValidator validates yaml from modules' view
+func moduleValidator(m *ValidationManager) (errs []error) {
+	yamlMap := m.testTree.rawYamlMap
+
+	backend, err := getBackend(yamlMap)
+	if err != nil {
+		return []error{err}
+	}
+	modules, err := getModules(yamlMap)
+	if err != nil {
+		return []error{err}
+	}
+	errs = append(errs, checkCommonModules(modules)...)
+	errs = append(errs, checkModuleBackend(modules, backend)...)
+	return
+}
+
+// checkComputing checks computing has correct modules enabled
+func checkComputing(backend map[string]string, modules []string) (errs []error) {
+	key := "computing"
+	switch c := backend[key]; c {
+	case "Eggroll":
+		if !Contains("rollsite", modules) {
+			errs = append(errs, ConfigError(fmt.Sprintf("%s %s shall work with module %s",
+				key, c, "rollsite")))
+		}
+		if !Contains("clustermanager", modules) {
+			errs = append(errs, ConfigError(fmt.Sprintf("%s %s shall work with module %s",
+				key, c, "clustermanager")))
+		}
+		if !Contains("nodemanager", modules) {
+			errs = append(errs, ConfigError(fmt.Sprintf("%s %s shall work with module %s",
+				key, c, "nodemanager")))
+		}
+	case "Spark":
+		if !Contains("spark", modules) {
+			errs = append(errs, ConfigError(fmt.Sprintf("%s %s shall work with module %s",
+				key, c, "spark")))
+		}
+		if !Contains("nginx", modules) {
+			errs = append(errs, ConfigError(fmt.Sprintf("%s %s shall work with module %s",
+				key, c, "nginx")))
+		}
+	case "Spark_local":
+		if !Contains("nginx", modules) {
+			errs = append(errs, ConfigError(fmt.Sprintf("%s %s shall work with module %s",
+				key, c, "nginx")))
+		}
+	default:
+		errs = append(errs, ConfigError(fmt.Sprintf("%s module %s is not supported", key, c)))
+	}
+	return
+}
+
+// checkFederation checks federation has correct modules enabled
+func checkFederation(backend map[string]string, modules []string) (errs []error) {
+	key := "federation"
+	switch f := backend[key]; f {
+	case "Eggroll":
+		if !Contains("rollsite", modules) {
+			errs = append(errs, ConfigError(fmt.Sprintf("%s %s shall work with module %s",
+				key, f, "rollsite")))
+		}
+		if !Contains("clustermanager", modules) {
+			errs = append(errs, ConfigError(fmt.Sprintf("%s %s shall work with module %s",
+				key, f, "clustermanager")))
+		}
+		if !Contains("nodemanager", modules) {
+			errs = append(errs, ConfigError(fmt.Sprintf("%s %s shall work with module %s",
+				key, f, "nodemanager")))
+		}
+	case "Pulsar":
+		if !Contains("pulsar", modules) {
+			errs = append(errs, ConfigError(fmt.Sprintf("%s %s shall work with module %s",
+				key, f, "pulsar")))
+		}
+	case "RabbitMQ":
+		if !Contains("rabbitMQ", modules) {
+			errs = append(errs, ConfigError(fmt.Sprintf("%s %s shall work with module %s",
+				key, f, "rabbitMQ")))
+		}
+	default:
+		errs = append(errs, ConfigError(fmt.Sprintf("%s module %s is not supported", key, f)))
+	}
+	return
+}
+
+// checkStorage checks storage has correct modules enabled
+func checkStorage(backend map[string]string, modules []string) (errs []error) {
+	key := "storage"
+	switch s := backend[key]; s {
+	case "Eggroll":
+		if !Contains("rollsite", modules) {
+			errs = append(errs, ConfigError(fmt.Sprintf("%s %s shall work with module %s",
+				key, s, "rollsite")))
+		}
+		if !Contains("clustermanager", modules) {
+			errs = append(errs, ConfigError(fmt.Sprintf("%s %s shall work with module %s",
+				key, s, "clustermanager")))
+		}
+		if !Contains("nodemanager", modules) {
+			errs = append(errs, ConfigError(fmt.Sprintf("%s %s shall work with module %s",
+				key, s, "nodemanager")))
+		}
+	case "HDFS":
+		if !Contains("hdfs", modules) {
+			errs = append(errs, ConfigError(fmt.Sprintf("%s %s shall work with module %s",
+				key, s, "hdfs")))
+		}
+	case "LocalFS":
+	default:
+		errs = append(errs, ConfigError(fmt.Sprintf("%s module %s is not supported", key, s)))
+	}
+	return
+}
+
+// backendValidator validates yaml from backend' view
+func backendValidator(m *ValidationManager) (errs []error) {
+	yamlMap := m.testTree.rawYamlMap
 
 	modules, err := getModules(yamlMap)
 	if err != nil {
@@ -391,43 +531,15 @@ func backendValidator(m *ValidationManager) (errors []error) {
 
 	backend, err := getBackend(yamlMap)
 	if err != nil {
-		return []error{ConfigError("backend error: " + err.Error())}
+		return []error{err}
 	}
-
-	switch backend["computing"] {
-	case "Spark":
-		if !Contains("nginx", modules) {
-			errors = append(errors, ConfigError("nginx should be included in modules"))
-		}
-	}
-	switch backend["federation"] {
-	case "Spark":
-		if !Contains("pulsar", modules) && !Contains("rabbitMQ", modules) {
-			errors = append(errors, ConfigError("pulsar or rabbitMQ should be included in modules"))
-		}
-	}
-	switch backend["storage"] {
-	case "Spark":
-		if !Contains("HDFS", modules) {
-			errors = append(errors, ConfigError("HDFS should be included in modules"))
-		}
-	}
+	errs = append(errs, checkComputing(backend, modules)...)
+	errs = append(errs, checkFederation(backend, modules)...)
+	errs = append(errs, checkStorage(backend, modules)...)
 	return
 }
 
-// RegisterPreprocessor registers a callback
-func (m *ValidationManager) RegisterPreprocessor(p func(m *ValidationManager) []error) {
-	m.preprocessor = append(m.preprocessor, p)
-}
-
-// preprocess runs callbacks
-func (m *ValidationManager) preprocess() (errors []error) {
-	for _, p := range m.preprocessor {
-		errors = append(errors, p(m)...)
-	}
-	return
-}
-
+// ContainsSkipError returns if error list has SkipError
 func ContainsSkipError(errs []error) bool {
 	var skip SkipError
 	for _, e := range errs {
@@ -438,8 +550,22 @@ func ContainsSkipError(errs []error) bool {
 	return false
 }
 
+// RegisterPreprocessor registers a callback
+func (m *ValidationManager) RegisterPreprocessor(p func(m *ValidationManager) []error) {
+	m.preprocessor = append(m.preprocessor, p)
+}
+
+// preprocess runs callbacks
+func (m *ValidationManager) preprocess() (errs []error) {
+	for _, p := range m.preprocessor {
+		errs = append(errs, p(m)...)
+	}
+	return
+}
+
 // ValidateYaml validates the yaml file.
-func ValidateYaml(templateValue, testValue string, skippedKeys []string, preprocessors ...func(m *ValidationManager) []error) (errs []error) {
+func ValidateYaml(templateValue, testValue string, skippedKeys []string,
+	preprocessors ...func(m *ValidationManager) []error) (errs []error) {
 	if templateValue == "" || testValue == "" {
 		return []error{SkipError("template or test yaml is empty")}
 	}
@@ -457,6 +583,7 @@ func ValidateYaml(templateValue, testValue string, skippedKeys []string, preproc
 	}
 	m.RegisterPreprocessor(moduleValidator)
 	m.RegisterPreprocessor(backendValidator)
-	m.preprocess()
-	return m.compareTwoTrees()
+	errs = append(errs, m.preprocess()...)
+	errs = append(errs, m.compareTwoTrees()...)
+	return
 }
