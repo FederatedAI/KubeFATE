@@ -52,13 +52,12 @@ spec:
           ports:
             - containerPort: 9000
             - containerPort: 9870
-            - containerPort: 50070
           livenessProbe:
             exec:
               command:
               - /bin/bash
               - -c
-              - curl -f localhost:50070
+              - curl -f localhost:9870
             initialDelaySeconds: 30
             periodSeconds: 10
             timeoutSeconds: 5
@@ -69,7 +68,7 @@ spec:
               command:
               - /bin/bash
               - -c
-              - curl -f localhost:50070
+              - curl -f localhost:9870
             initialDelaySeconds: 5
             periodSeconds: 10
             timeoutSeconds: 1
@@ -80,7 +79,7 @@ spec:
               command:
               - /bin/bash
               - -c
-              - curl -f localhost:50070
+              - curl -f localhost:9870
             failureThreshold: 12
             periodSeconds: 10
           volumeMounts:
