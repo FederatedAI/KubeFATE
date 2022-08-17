@@ -23,9 +23,9 @@ spec:
       port: 9000
       targetPort: 9000
       protocol: TCP
-    - name: "tcp-9870"
-      port: 9870
-      targetPort: 9870
+    - name: "tcp-9864"
+      port: 9864
+      targetPort: 9864
       protocol: TCP
   type: {{ .Values.modules.hdfs.datanode.type }}
   selector:

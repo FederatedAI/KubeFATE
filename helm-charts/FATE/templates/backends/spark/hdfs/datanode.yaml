@@ -42,13 +42,13 @@ spec:
                 name: datanode-env
           ports:
             - containerPort: 9000
-            - containerPort: 9870
+            - containerPort: 9864
           livenessProbe:
             exec:
               command:
                 - /bin/bash
                 - -c
-                - curl -f localhost:9870
+                - curl -f localhost:9864
             initialDelaySeconds: 1
             periodSeconds: 10
             timeoutSeconds: 3
@@ -59,7 +59,7 @@ spec:
               command:
                 - /bin/bash
                 - -c
-                - curl -f localhost:9870
+                - curl -f localhost:9864
             initialDelaySeconds: 1
             periodSeconds: 10
             timeoutSeconds: 3
@@ -70,7 +70,7 @@ spec:
               command:
                 - /bin/bash
                 - -c
-                - curl -f localhost:9870
+                - curl -f localhost:9864
             failureThreshold: 12
             periodSeconds: 10
           volumeMounts:
