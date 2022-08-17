@@ -53,10 +53,10 @@ services:
     networks:
       - fate-network
     depends_on:
-      - python
+      - fateflow
 
-  python:
-    image: "federatedai/python-spark:${TAG}"
+  fateflow:
+    image: "federatedai/fateflow:${TAG}"
     restart: always
     ports:
       - 9380:9380
@@ -91,10 +91,11 @@ services:
         set -x
         sleep 5 && python fateflow/python/fate_flow/fate_flow_server.py
     environment:
-      PYTHONPATH: "$PYTHONPATH:/data/projects/fate/fate/python:/data/projects/fate/eggroll/python:/data/projects/fate/fateflow/python:/data/projects/fate/fate/python/fate_client"
+      PYTHONPATH: "$$PYTHONPATH:/data/projects/fate/fate/python:/data/projects/fate/eggroll/python:/data/projects/fate/fateflow/python:/data/projects/fate/fate/python/fate_client"
       FATE_PROJECT_BASE: "/data/projects/fate"
       FATE_FLOW_UPLOAD_MAX_NUM: "1000000"
       FATE_FLOW_UPLOAD_MAX_BYTES: "104868093952"
+      FATE_LOG_LEVEL: "INFO"
 
   mysql:
     image: "mysql:8.0.28"
@@ -123,7 +124,25 @@ services:
     networks:
       - fate-network
     depends_on:
-      - python
+      - fateflow
+
+  rabbitmq:
+    image: federatedai/rabbitmq:3.8.3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: fate
+      RABBITMQ_DEFAULT_PASS: fate
+      RABBITMQ_USER: fate
+      RABBITMQ_PASSWORD: fate
+      RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: "-rabbit max_message_size 536870912"
+    volumes:
+      - ./confs/rabbitmq/enabled_plugins:/etc/rabbitmq/enabled_plugins
+      - ./shared_dir/data/rabbitmq:/var/lib/rabbitmq
+    restart: always
+    networks:
+      - fate-network
 
   pulsar:
     image: "federatedai/pulsar:2.7.0"
@@ -147,7 +166,7 @@ services:
       - "20000:20000"
     restart: always
     environment:
-      FATE_FLOW_IP: "python"
+      FATE_FLOW_IP: "fateflow"
       FATE_FLOW_PORT: "9380"
       FATE_SERVING_HOST: "fate-serving:8059"
     volumes:
@@ -155,6 +174,6 @@ services:
       - shared_dir_examples:/data/projects/fate/examples
       - /etc/localtime:/etc/localtime:ro
     depends_on:
-      - python
+      - fateflow
     networks:
       - fate-network

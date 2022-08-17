@@ -24,8 +24,16 @@ modules:
   - nginx
   - rabbitmq
 
-# backend could be eggroll, spark_rabbitmq and spark_pulsar spark_local_pulsar
-backend: spark_rabbitmq
+# Computing : Eggroll, Spark, Spark_local
+computing: Spark
+# Federation: Eggroll(computing: Eggroll), Pulsar/RabbitMQ(computing: Spark/Spark_local)
+federation: RabbitMQ
+# Storage: Eggroll(computing: Eggroll), HDFS(computing: Spark), LocalFS(computing: Spark_local)
+storage: HDFS
+# Algorithm: Basic, NN
+algorithm: Basic
+# Device: CPU, IPCL
+device: CPU
 
 # Specify domain name for service
 # ingress:
