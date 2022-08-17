@@ -61,7 +61,7 @@ services:
       - 9380:9380
       - 9360:9360
     volumes:
-      - ./confs/spark/spark-defaults.conf:/data/projects/spark-2.4.1-bin-hadoop2.7/conf/spark-defaults.conf
+      - ./confs/spark/spark-defaults.conf:/data/projects/spark-3.1.2-bin-hadoop3.2/conf/spark-defaults.conf
       - ./confs/fate_flow/conf/service_conf.yaml:/data/projects/fate/conf/service_conf.yaml
       - ./confs/fate_flow/conf/pulsar_route_table.yaml:/data/projects/fate/conf/pulsar_route_table.yaml
       - ./confs/fate_flow/conf/rabbitmq_route_table.yaml:/data/projects/fate/conf/rabbitmq_route_table.yaml
@@ -97,7 +97,7 @@ services:
       FATE_LOG_LEVEL: "INFO"
 
   namenode:
-    image: federatedai/hadoop-namenode:2.0.0-hadoop2.7.4-java8
+    image: federatedai/hadoop-namenode:2.0.0-hadoop3.2.1-java8
     restart: always
     ports:
       - 9000:9000
@@ -115,7 +115,7 @@ services:
       - fate-network
 
   datanode-0:
-    image: federatedai/hadoop-datanode:2.0.0-hadoop2.7.4-java8
+    image: federatedai/hadoop-datanode:2.0.0-hadoop3.2.1-java8
     restart: always
     volumes:
       - ./shared_dir/data/datanode-0:/hadoop/dfs/data
@@ -127,7 +127,7 @@ services:
       - fate-network
 
   datanode-1:
-    image: federatedai/hadoop-datanode:2.0.0-hadoop2.7.4-java8
+    image: federatedai/hadoop-datanode:2.0.0-hadoop3.2.1-java8
     restart: always
     volumes:
       - ./shared_dir/data/datanode-1:/hadoop/dfs/data
@@ -139,7 +139,7 @@ services:
       - fate-network
 
   datanode-2:
-    image: federatedai/hadoop-datanode:2.0.0-hadoop2.7.4-java8
+    image: federatedai/hadoop-datanode:2.0.0-hadoop3.2.1-java8
     restart: always
     volumes:
       - ./shared_dir/data/datanode:/hadoop/dfs/data

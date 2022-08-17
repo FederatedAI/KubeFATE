@@ -41,7 +41,7 @@ spec:
     {{ end }}
       containers:
         - name: namenode
-          image: {{ .Values.image.registry }}/hadoop-namenode:2.0.0-hadoop2.7.4-java8
+          image: {{ .Values.image.registry }}/hadoop-namenode:2.0.0-hadoop3.2.1-java8
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
           - name: CLUSTER_NAME

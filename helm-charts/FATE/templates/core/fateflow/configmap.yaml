@@ -124,7 +124,7 @@ data:
     fate_on_spark:
       spark:
         # default use SPARK_HOME environment variable
-        home: /data/projects/spark-2.4.1-bin-hadoop2.7/
+        home: /data/projects/spark-3.1.2-bin-hadoop3.2/
         cores_per_node: {{ .Values.modules.python.spark.cores_per_node }}
         nodes: {{ .Values.modules.python.spark.nodes }}
       linkis_spark:
