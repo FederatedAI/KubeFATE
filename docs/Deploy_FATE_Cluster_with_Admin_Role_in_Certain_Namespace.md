@@ -108,7 +108,7 @@ kubefate cluster ls
 
 ### Add Parties
 
-We use Spark(Pulsar) as compute engine of FATE. So the certificates should be installed beforehand like exchange.
+We use Spark + Pulsar as the backend of FATE. So the certificates for Pulsar should be installed beforehand like exchange.
 
 Refer to [cluster-spark-pulsar.yaml](https://github.com/FederatedAI/KubeFATE/blob/master/k8s-deploy/examples/party-9999/cluster-spark-pulsar.yaml) to get the configuration template of FATE cluster. Don't forget to change the ip and ports of Exchange service.
 
