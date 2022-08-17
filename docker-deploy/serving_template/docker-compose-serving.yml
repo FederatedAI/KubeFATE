@@ -60,6 +60,7 @@ services:
 
   serving-zookeeper:
     image: "bitnami/zookeeper:3.7.0"
+    user: root
     ports:
       - "2181:2181"
       - "2888"
