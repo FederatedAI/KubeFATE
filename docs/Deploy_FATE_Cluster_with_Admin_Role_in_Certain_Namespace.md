@@ -134,7 +134,7 @@ When installing multiple KubeFATE services in one K8s cluster, the domains shoul
 
 There will be some limits when user only has admin privilege in certain namespace:
 
-1. Some commands of KubeFATE won't work:
-   - `kubefate namespace ls`
-   - `kubefate cluster describe`
+1. Some commands of KubeFATE won't work smoothly:
+   - `kubefate namespace ls`(cannot get namespaces)
+   - `kubefate cluster describe`(cannot get node ip)
 2. PodSecurityPolicy can not be enabled.
