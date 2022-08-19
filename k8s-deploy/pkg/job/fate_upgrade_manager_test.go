@@ -26,12 +26,10 @@ func TestValidate(t *testing.T) {
 	specOld := modules.MapStringInterface{
 		"chartName":    "fate",
 		"chartVersion": "v1.7.2",
-		"imageTag":     "1.7.2-release",
 	}
 	specNew := modules.MapStringInterface{
 		"chartName":    "fate",
 		"chartVersion": "v1.8.0",
-		"imageTag":     "1.8.0-release",
 	}
 	fum := FateUpgradeManager{
 		namespace: "blabla",
@@ -48,29 +46,18 @@ func TestValidate(t *testing.T) {
 
 	// spec identical
 	specNew["chartVersion"] = "v1.7.2"
-	specNew["imageTag"] = "1.7.2-release"
 	err = fum.validate(specOld, specNew)
 	assert.NotNil(t, err)
 	specNew["chartVersion"] = "v1.8.0"
-	specNew["imageTag"] = "1.8.0-release"
-
-	// image version do not consistent with the chart version
-	specNew["imageTag"] = "1.9.0-release"
-	err = fum.validate(specOld, specNew)
-	assert.NotNil(t, err)
-	specNew["imageTag"] = "1.8.0-release"
 
 	// do not support downgrade
 	specNew["chartVersion"] = "v1.6.0"
-	specNew["imageTag"] = "1.6.0-release"
 	err = fum.validate(specOld, specNew)
 	assert.NotNil(t, err)
 	specNew["chartVersion"] = "v1.8.0"
-	specNew["imageTag"] = "1.8.0-release"
 
 	// fate version < 1.7.1
 	specOld["chartVersion"] = "v1.7.0"
-	specOld["imageTag"] = "1.7.0-release"
 	err = fum.validate(specOld, specNew)
 	assert.NotNil(t, err)
 }
@@ -79,12 +66,10 @@ func TestGetCluster(t *testing.T) {
 	specOld := modules.MapStringInterface{
 		"chartName":    "fate",
 		"chartVersion": "v1.7.2",
-		"imageTag":     "1.7.2-release",
 	}
 	specNew := modules.MapStringInterface{
 		"chartName":    "fate",
 		"chartVersion": "v1.8.0",
-		"imageTag":     "1.8.0-release",
 		"mysql": map[string]interface{}{
 			"user":     "fate",
 			"password": "fate_dev",

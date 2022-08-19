@@ -4,8 +4,7 @@ chartName: fate-exchange
 chartVersion: v1.8.0
 partyId: 1
 registry: ""
-imageTag: "1.8.0-release"
-pullPolicy: 
+pullPolicy:
 imagePullSecrets: 
 - name: myregistrykey
 persistence: false

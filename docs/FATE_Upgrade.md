@@ -68,7 +68,6 @@ chartName: fate
 chartVersion: v1.7.2
 partyId: 9999
 registry: ""
-imageTag: 1.7.2-release
 pullPolicy:
 imagePullSecrets:
    - name: myregistrykey
@@ -210,10 +209,9 @@ snapshot.sql
 ```
 
 ### Using KubeFATE CLI to do the upgrade
-We just need to change two lines of the cluster.yaml file:
+We just need to change `chartVersion` in  the cluster.yaml file:
 ```
 chartVersion: v1.7.2	  ->   chartVersion: v1.8.0
-imageTag: 1.7.2-release   ->   imageTag: 1.8.0-release
 ```
 Then execute:
 ```

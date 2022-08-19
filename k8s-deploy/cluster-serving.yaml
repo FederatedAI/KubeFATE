@@ -4,8 +4,7 @@ chartName: fate-serving
 chartVersion: v2.1.6
 partyId: 9999
 registry: ""
-imageTag: "2.1.6-release"
-pullPolicy: 
+pullPolicy:
 imagePullSecrets: 
 - name: myregistrykey
 persistence: false
