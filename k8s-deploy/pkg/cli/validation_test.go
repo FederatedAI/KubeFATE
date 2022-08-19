@@ -2,6 +2,7 @@ package cli
 
 import (
 	"errors"
+	"fmt"
 	"reflect"
 	"testing"
 )
@@ -65,6 +66,29 @@ modules:
   - pulsar
   - rabbitmq
 rollsite: 
+`
+	s7 = `
+modules:
+  - mysql
+  - python
+  - fateboard
+  - client
+  - pulsar
+  - hdfs
+
+computing: Spark
+federation: Eggroll
+storage: HDFS
+`
+
+	s8 = `
+modules:
+  - pulsar
+  - rabbitmq
+
+computing: Eggroll
+federation: Pulsar
+storage: HDFS
 `
 )
 
@@ -251,11 +275,11 @@ func TestValidateYaml(t *testing.T) {
 		args     args
 		wantErrs []error
 	}{
-		{"validateEmptyYaml", args{"", "", nil}, []error{errors.New("template or test yaml is empty")}},
-		{"validateSameYaml", args{s1, s1, nil}, []error{}},
-		{"validateValidYaml", args{s1, s2, nil}, []error{}},
-		{"validateNotValidYaml", args{s1, s3, nil}, []error{errors.New("your yaml at '/a/d', line 8 \n  'd: 3' may be redundant")}},
-		{"validateYamlWithskippedKeys", args{s1, s4, []string{"d"}}, []error{}},
+		{"validateEmptyYaml", args{"", "", nil}, []error{SkipError("template or test yaml is empty")}},
+		{"validateSameYaml", args{s1, s1, nil}, []error{ConfigError("computing error, not found"), ConfigError("the modules in your yaml is not valid")}},
+		{"validateValidYaml", args{s1, s2, nil}, []error{ConfigError("computing error, not found"), ConfigError("the modules in your yaml is not valid")}},
+		{"validateNotValidYaml", args{s1, s3, nil}, []error{ConfigError("computing error, not found"), ConfigError("the modules in your yaml is not valid"), ConfigError("your yaml at '/a/d', line 8 \n  'd: 3' may be redundant")}},
+		{"validateYamlWithskippedKeys", args{s1, s4, []string{"d"}}, []error{ConfigError("computing error, not found"), ConfigError("the modules in your yaml is not valid")}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -292,22 +316,229 @@ func Test_getSkippedKeys(t *testing.T) {
 	}
 }
 
-func Test_alertUserIfModulesNotMatchBackend(t *testing.T) {
+func Test_getModules(t *testing.T) {
 	type args struct {
 		yamlMap map[string]interface{}
 	}
-	yamlMap1, _ := bufferToMap([]byte(s5))
-	yamlMap2, _ := bufferToMap([]byte(s6))
+	m4, _ := bufferToMap([]byte(s4))
+	m5, _ := bufferToMap([]byte(s5))
 	tests := []struct {
-		name string
-		args args
+		name    string
+		args    args
+		want    []string
+		wantErr bool
 	}{
-		{"correct", args{yamlMap1}},
-		{"redundant", args{yamlMap2}},
+		{"no modules", args{m4}, nil, true},
+		{"with modules", args{m5}, []string{"rollsite", "clustermanager"}, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			alertUserIfModulesNotMatchBackend(tt.args.yamlMap)
+			got, err := getModules(tt.args.yamlMap)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("getModules() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("getModules() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_getBackend(t *testing.T) {
+	type args struct {
+		yamlMap map[string]interface{}
+	}
+
+	m6, _ := bufferToMap([]byte(s6))
+	m7, _ := bufferToMap([]byte(s7))
+	tests := []struct {
+		name    string
+		args    args
+		want    map[string]string
+		wantErr bool
+	}{
+		{"no backends", args{m6}, nil, true},
+		{"With backends", args{m7}, map[string]string{
+			"computing":  "Spark",
+			"federation": "Eggroll",
+			"storage":    "HDFS",
+		}, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := getBackend(tt.args.yamlMap)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("getBackend() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("getBackend() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_checkCommonModules(t *testing.T) {
+	type args struct {
+		modules []string
+	}
+	common := []string{"mysql", "python", "fateboard", "client"}
+	errs := []error{}
+	for _, c := range common {
+		errs = append(errs, ConfigError(fmt.Sprintf("common module %s not enabled", c)))
+	}
+	tests := []struct {
+		name     string
+		args     args
+		wantErrs []error
+	}{
+		{"no backends", args{nil}, errs},
+		{"full backends", args{common}, nil},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if gotErrs := checkCommonModules(tt.args.modules); !reflect.DeepEqual(gotErrs, tt.wantErrs) {
+				t.Errorf("checkCommonModules() = %v, want %v", gotErrs, tt.wantErrs)
+			}
+		})
+	}
+}
+
+func Test_checkModuleBackend(t *testing.T) {
+	type args struct {
+		modules []string
+		backend map[string]string
+	}
+	m7, _ := bufferToMap([]byte(s7))
+	m8, _ := bufferToMap([]byte(s8))
+	backend7, _ := getBackend(m7)
+	backend8, _ := getBackend(m8)
+	module7, _ := getModules(m7)
+	module8, _ := getModules(m8)
+	tests := []struct {
+		name     string
+		args     args
+		wantErrs []error
+	}{
+		{"7", args{module7, backend7}, []error{ConfigError("module pulsar shall work with federation Pulsar but Eggroll")}},
+		{"8", args{module8, backend8}, []error{ConfigError("module rabbitmq shall work with federation RabbitMQ but Pulsar")}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if gotErrs := checkModuleBackend(tt.args.modules, tt.args.backend); !reflect.DeepEqual(gotErrs, tt.wantErrs) {
+				t.Errorf("checkModuleBackend() = %v, want %v", gotErrs, tt.wantErrs)
+			}
+		})
+	}
+}
+
+func Test_checkComputing(t *testing.T) {
+	type args struct {
+		backend map[string]string
+		modules []string
+	}
+	m7, _ := bufferToMap([]byte(s7))
+	m8, _ := bufferToMap([]byte(s8))
+	backend7, _ := getBackend(m7)
+	backend8, _ := getBackend(m8)
+	module7, _ := getModules(m7)
+	module8, _ := getModules(m8)
+	tests := []struct {
+		name     string
+		args     args
+		wantErrs []error
+	}{
+		{"7", args{backend7, module7}, []error{ConfigError("computing Spark shall work with module spark"), ConfigError("computing Spark shall work with module nginx")}},
+		{"8", args{backend8, module8}, []error{ConfigError("computing Eggroll shall work with module rollsite"), ConfigError("computing Eggroll shall work with module clustermanager"), ConfigError("computing Eggroll shall work with module nodemanager")}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if gotErrs := checkComputing(tt.args.backend, tt.args.modules); !reflect.DeepEqual(gotErrs, tt.wantErrs) {
+				t.Errorf("checkComputing() = %v, want %v", gotErrs, tt.wantErrs)
+			}
+		})
+	}
+}
+
+func Test_checkFederation(t *testing.T) {
+	type args struct {
+		backend map[string]string
+		modules []string
+	}
+	m7, _ := bufferToMap([]byte(s7))
+	m8, _ := bufferToMap([]byte(s8))
+	backend7, _ := getBackend(m7)
+	backend8, _ := getBackend(m8)
+	module7, _ := getModules(m7)
+	module8, _ := getModules(m8)
+	tests := []struct {
+		name     string
+		args     args
+		wantErrs []error
+	}{
+		{"7", args{backend7, module7}, []error{ConfigError("federation Eggroll shall work with module rollsite"), ConfigError("federation Eggroll shall work with module clustermanager"), ConfigError("federation Eggroll shall work with module nodemanager")}},
+		{"8", args{backend8, module8}, nil},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if gotErrs := checkFederation(tt.args.backend, tt.args.modules); !reflect.DeepEqual(gotErrs, tt.wantErrs) {
+				t.Errorf("checkFederation() = %v, want %v", gotErrs, tt.wantErrs)
+			}
+		})
+	}
+}
+
+func Test_checkStorage(t *testing.T) {
+	type args struct {
+		backend map[string]string
+		modules []string
+	}
+	m7, _ := bufferToMap([]byte(s7))
+	m8, _ := bufferToMap([]byte(s8))
+	backend7, _ := getBackend(m7)
+	backend8, _ := getBackend(m8)
+	module7, _ := getModules(m7)
+	module8, _ := getModules(m8)
+	tests := []struct {
+		name     string
+		args     args
+		wantErrs []error
+	}{
+		{"7", args{backend7, module7}, nil},
+		{"8", args{backend8, module8}, []error{ConfigError("storage HDFS shall work with module hdfs")}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if gotErrs := checkStorage(tt.args.backend, tt.args.modules); !reflect.DeepEqual(gotErrs, tt.wantErrs) {
+				t.Errorf("checkStorage() = %v, want %v", gotErrs, tt.wantErrs)
+			}
+		})
+	}
+}
+
+func TestContainsSkipError(t *testing.T) {
+	type args struct {
+		errs []error
+	}
+	e1 := errors.New("")
+	e2 := ConfigError("")
+	e3 := SkipError("")
+	e4 := fmt.Errorf("error :%w ", e3)
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{"without skipErrors", args{[]error{e1, e2}}, false},
+		{"with skipErrors", args{[]error{e3}}, true},
+		{"with wrappedSkipErrors", args{[]error{e4}}, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := ContainsSkipError(tt.args.errs); got != tt.want {
+				t.Errorf("ContainsSkipError() = %v, want %v", got, tt.want)
+			}
 		})
 	}
 }

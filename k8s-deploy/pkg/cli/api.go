@@ -16,6 +16,7 @@ package cli
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 
@@ -171,6 +172,9 @@ func GetResponse(i Item, req *Request, respType int) (msg interface{}, err error
 	log.Debug().Int("rep.Code", rep.Code).Msg("rep.Code")
 
 	if rep.Code != 200 {
+		if rep.Code == 404 {
+			return nil, errors.New("get reponse failed, code 404")
+		}
 		msg, err = i.getResult(ERROR)
 		if err != nil {
 			return
