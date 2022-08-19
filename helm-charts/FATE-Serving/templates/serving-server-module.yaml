@@ -108,7 +108,10 @@ spec:
               subPath: serving-server.properties
             - name: data
               mountPath: /root/.fate
-              subPath: {{ .Values.servingServer.subPath }}
+              subPath: cache
+            - name: data
+              mountPath: /data/projects/fate-serving/serving-server/.fate
+              subPath: model_cache
       {{- with .Values.servingServer.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}
