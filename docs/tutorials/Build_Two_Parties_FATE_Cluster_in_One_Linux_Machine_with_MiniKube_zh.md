@@ -217,7 +217,6 @@ chartName: fate
 chartVersion: v1.8.0
 partyId: 9999
 registry: "hub.c.163.com/federatedai"
-imageTag: "1.8.0-release"
 pullPolicy:
 imagePullSecrets:
 - name: myregistrykey
@@ -272,7 +271,6 @@ chartName: fate
 chartVersion: v1.8.0
 partyId: 10000
 registry: "hub.c.163.com/federatedai"
-imageTag: "1.8.0-release"
 pullPolicy:
 imagePullSecrets:
 - name: myregistrykey
