@@ -107,7 +107,11 @@ data:
        # password: fate
        # engine services
     default_engines:
+      {{- if eq .Values.computing "Spark_local" }}
+      computing: "spark"
+      {{- else }}
       computing: {{ .Values.computing | lower }}
+      {{- end }}
       federation: {{ .Values.federation | lower }}
       storage: {{ .Values.storage | lower }}
     fate_on_standalone:
