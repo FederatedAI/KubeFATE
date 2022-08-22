@@ -10,7 +10,6 @@
 | chartVersion              | scalars   | FATE chart corresponding version.                                                                       |
 | partyId                   | scalars   | FATE-Exchange cluster party id.                                                                         |
 | registry                  | scalars   | Other fate images sources.                                                                              |
-| imageTag                  | scalars   | Image TAG                                                                                               |
 | pullPolicy                | scalars   | Kubernetes images pull policy.                                                                          |
 | persistence               | bool      | Redis and servingServer data persistence.                                                               |
 | podSecurityPolicy.enabled | bool      | if `true`, create & use Pod Security Policy resources                                                   |

@@ -10,7 +10,6 @@ chartName: fate-exchange
 chartVersion: v1.6.0
 partyId: 1
 registry: ""
-imageTag: "1.6.0-release"
 pullPolicy: 
 imagePullSecrets: 
 - name: myregistrykey

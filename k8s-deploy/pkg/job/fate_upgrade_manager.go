@@ -53,14 +53,6 @@ func (fum *FateUpgradeManager) validate(specOld, specNew modules.MapStringInterf
 		return errors.New("the configuration file did not change")
 	}
 
-	// The image version should be consistent with the chartVersion
-	newVersion = strings.ReplaceAll(newVersion, "v", "")
-	oldVersion = strings.ReplaceAll(oldVersion, "v", "")
-	newImgVersion := specNew["imageTag"].(string)
-	if !strings.Contains(newImgVersion, newVersion) {
-		return errors.New("the image tag is inconsistent with the chart version, which is unsupported")
-	}
-
 	// Do not support downgrade
 	newVerFormatted, _ := version.NewVersion(newVersion)
 	oldVerFormatted, _ := version.NewVersion(oldVersion)
