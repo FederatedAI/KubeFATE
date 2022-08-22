@@ -168,11 +168,12 @@ func ClusterInstallCommand() *cli.Command {
 			errs = append(errs, err)
 			skippedKeys := append(getSkippedKeys(m), "route_table")
 			errs = append(errs, ValidateYaml(template, string(clusterConfig), skippedKeys)...)
-			if !ContainsSkipError(errs) {
-				for _, err := range errs {
-					if err != nil {
-						color.Yellow("Config Warning: %s\n", err.Error())
-					}
+			warn := !ContainsSkipError(errs)
+			for _, err := range errs {
+				if err != nil && warn {
+					color.Yellow("Config Warning: %s\n", err.Error())
+				} else if err != nil {
+					log.Debug().Str("validation", err.Error()).Msg("Skipped Error")
 				}
 			}
 
