@@ -355,37 +355,40 @@ skippedKeys:
       # memory: "8Gi"
 
 # pulsar:
-  # nodeSelector:
-  # tolerations:
-  # affinity:
-  # type: ClusterIP
-  # httpNodePort: 30094
-  # httpsNodePort: 30099
-  # loadBalancerIP:
-  # storageClass: "pulsar"
-  # existingClaim:
-  # accessMode: ReadWriteOnce
-  # size: 1Gi
-  # publicLB:
-    # enabled: false
-  # exchange:
-    # ip: 192.168.10.1
-    # port: 30000
-    # domain: fate.org
-  # route_table:
-    # 9999:
-      # host: pulsar
-      # port: 6650
-      # sslPort: 6651
-    # 10000:
-      # host: 192.168.10.1
-      # port: 30105
-      # sslPort: 30109
-      # proxy: ""
-  # resources:
-    # requests:
-      # cpu: "2"
-      # memory: "4Gi"
-    # limits:
-      # cpu: "4"
-      # memory: "8Gi"
+#   nodeSelector:
+#   tolerations:
+#   affinity:
+#   env:
+#   - name: PULSAR_MEM
+#     value: "-Xms4g -Xmx4g -XX:MaxDirectMemorySize=8g"
+#   type: ClusterIP
+#   httpNodePort: 30094
+#   httpsNodePort: 30099
+#   loadBalancerIP:
+#   storageClass: "pulsar"
+#   existingClaim:
+#   accessMode: ReadWriteOnce
+#   size: 1Gi
+#   publicLB:
+#     enabled: false
+#   exchange:
+#     ip: 192.168.10.1
+#     port: 30000
+#     domain: fate.org
+#   route_table:
+#     9999:
+#       host: pulsar
+#       port: 6650
+#       sslPort: 6651
+#     10000:
+#       host: 192.168.10.1
+#       port: 30105
+#       sslPort: 30109
+#       proxy: ""
+#   resources:
+#     requests:
+#       cpu: "2"
+#       memory: "4Gi"
+#     limits:
+#       cpu: "4"
+#       memory: "8Gi"

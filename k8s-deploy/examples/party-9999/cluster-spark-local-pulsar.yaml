@@ -65,6 +65,7 @@ pulsar:
   type: NodePort
   httpNodePort: 30094
   httpsNodePort: 30099
+  env:
   publicLB:
     enabled: false
   route_table:

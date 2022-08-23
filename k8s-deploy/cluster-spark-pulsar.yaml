@@ -233,6 +233,7 @@ device: CPU
   # existingClaim:
   # accessMode: ReadWriteOnce
   # size: 1Gi
+  # env:
   # publicLB:
     # enabled: false
   # exchange:

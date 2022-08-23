@@ -334,6 +334,7 @@ modules:
     include: true
     nodeSelector:
     tolerations:
+    env:
     affinity:
     type: ClusterIP
     httpNodePort: 30094

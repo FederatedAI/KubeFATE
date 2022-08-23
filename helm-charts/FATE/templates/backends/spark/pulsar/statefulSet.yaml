@@ -45,7 +45,10 @@ spec:
             - /bin/bash
             - -c
             - "bin/pulsar standalone -nss"
+        {{- with .Values.modules.pulsar.env }}
           env:
+{{ toYaml . | indent 12 }}
+        {{- end }}
           ports:
             - containerPort: 6650
             - containerPort: 6651

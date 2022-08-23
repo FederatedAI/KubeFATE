@@ -576,6 +576,10 @@ modules:
     resources:
 {{ toYaml . | indent 6 }}
     {{- end }}
+    {{- with .env }}
+    env:
+{{ toYaml . | indent 6 }}
+    {{- end }}
     {{- with .nodeSelector }}
     nodeSelector:
 {{ toYaml . | indent 6 }}
