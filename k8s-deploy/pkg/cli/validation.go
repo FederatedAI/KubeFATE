@@ -212,7 +212,7 @@ func compareTwoTrees(rootTemp, rootTest *TreeNode,
 	case ListValue:
 		item := valueTemp.(ListValue)[0]
 		for _, v := range valueTest {
-			compareTwoTrees(item, v, testLines, skippedKeys)
+			errs = append(errs, compareTwoTrees(item, v, testLines, skippedKeys)...)
 		}
 	default:
 	}
