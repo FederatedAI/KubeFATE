@@ -244,7 +244,7 @@ device: CPU
     # 9999:
       # host: pulsar
       # port: 6650
-      # sslPort:6651
+      # sslPort: 6651
     # 10000:
       # host: 192.168.10.1
       # port: 30105
