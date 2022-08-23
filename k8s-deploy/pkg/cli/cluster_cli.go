@@ -167,12 +167,13 @@ func ClusterInstallCommand() *cli.Command {
 			template, err := GetValueTemplateExample(chartName.(string), chartVersion.(string))
 			errs = append(errs, err)
 			skippedKeys := append(getSkippedKeys(m), "route_table")
-			errs = append(errs, ValidateYaml(template, string(clusterConfig), skippedKeys, nil)...)
-			if !ContainsSkipError(errs) {
-				for _, err := range errs {
-					if err != nil {
-						color.Yellow("Config Warning: %s\n", err.Error())
-					}
+			errs = append(errs, ValidateYaml(template, string(clusterConfig), skippedKeys)...)
+			warn := !ContainsSkipError(errs)
+			for _, err := range errs {
+				if err != nil && warn {
+					color.Yellow("Config Warning: %s\n", err.Error())
+				} else if err != nil {
+					log.Debug().Str("validation", err.Error()).Msg("Skipped Error")
 				}
 			}
 

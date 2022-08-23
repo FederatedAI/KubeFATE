@@ -407,7 +407,10 @@ func checkModuleBackend(modules []string, backend map[string]string) (errs []err
 // moduleValidator validates yaml from modules' view
 func moduleValidator(m *ValidationManager) (errs []error) {
 	yamlMap := m.testTree.rawYamlMap
-
+	if chartName, err := getChartName(yamlMap); err != nil || chartName != "fate" {
+		// if chart is not fate, just skip this validation
+		return []error{}
+	}
 	backend, err := getBackend(yamlMap)
 	if err != nil {
 		return []error{err}
@@ -481,9 +484,9 @@ func checkFederation(backend map[string]string, modules []string) (errs []error)
 				key, f, "pulsar")))
 		}
 	case "RabbitMQ":
-		if !Contains("rabbitMQ", modules) {
+		if !Contains("rabbitmq", modules) {
 			errs = append(errs, ConfigError(fmt.Sprintf("%s %s shall work with module %s",
-				key, f, "rabbitMQ")))
+				key, f, "rabbitmq")))
 		}
 	default:
 		errs = append(errs, ConfigError(fmt.Sprintf("%s module %s is not supported", key, f)))
@@ -509,7 +512,7 @@ func checkStorage(backend map[string]string, modules []string) (errs []error) {
 				key, s, "nodemanager")))
 		}
 	case "HDFS":
-		if !Contains("hdfs", modules) {
+		if !Contains("hdfs", modules) && backend["computing"] != "Spark_local" {
 			errs = append(errs, ConfigError(fmt.Sprintf("%s %s shall work with module %s",
 				key, s, "hdfs")))
 		}
@@ -520,10 +523,26 @@ func checkStorage(backend map[string]string, modules []string) (errs []error) {
 	return
 }
 
+func getChartName(m map[string]interface{}) (string, error) {
+	chartName, ok := m["chartName"]
+	err := errors.New("chart name not found")
+	if !ok {
+		return "", err
+	}
+	name, ok := chartName.(string)
+	if !ok || name != "fate" {
+		return "", err
+	}
+	return name, nil
+}
+
 // backendValidator validates yaml from backend' view
 func backendValidator(m *ValidationManager) (errs []error) {
 	yamlMap := m.testTree.rawYamlMap
-
+	if chartName, err := getChartName(yamlMap); err != nil || chartName != "fate" {
+		// if chart is not fate, just skip this validation
+		return []error{}
+	}
 	modules, err := getModules(yamlMap)
 	if err != nil {
 		return []error{err}
