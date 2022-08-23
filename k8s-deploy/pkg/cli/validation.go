@@ -512,7 +512,7 @@ func checkStorage(backend map[string]string, modules []string) (errs []error) {
 				key, s, "nodemanager")))
 		}
 	case "HDFS":
-		if !Contains("hdfs", modules) && backend["computing"] != "Spark_local" {
+		if !Contains("hdfs", modules) {
 			errs = append(errs, ConfigError(fmt.Sprintf("%s %s shall work with module %s",
 				key, s, "hdfs")))
 		}
