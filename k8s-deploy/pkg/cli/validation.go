@@ -187,7 +187,7 @@ func compareTwoTrees(rootTemp, rootTest *TreeNode,
 	testLines, skippedKeys []string) (errs []error) {
 	valueTemp, valueTest := rootTemp.value, rootTest.value
 	typeTemp, typeTest := reflect.TypeOf(valueTemp), reflect.TypeOf(valueTest)
-	if typeTemp != typeTest {
+	if typeTemp != typeTest && typeTest != nil {
 		route := strings.Join(rootTest.route, "/")
 		errs = append(errs,
 			ConfigError(fmt.Sprintf("your yaml at '%s', line %d \n  '%s' may not match the type",
