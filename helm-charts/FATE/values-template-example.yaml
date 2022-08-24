@@ -361,6 +361,9 @@ skippedKeys:
 #   env:
 #   - name: PULSAR_MEM
 #     value: "-Xms4g -Xmx4g -XX:MaxDirectMemorySize=8g"
+#   confs:
+#     brokerDeleteInactiveTopicsFrequencySeconds: 60
+#     backlogQuotaDefaultLimitGB: 10
 #   type: ClusterIP
 #   httpNodePort: 30094
 #   httpsNodePort: 30099
