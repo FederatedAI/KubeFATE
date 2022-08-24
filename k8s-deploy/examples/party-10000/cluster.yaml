@@ -4,6 +4,7 @@ chartName: fate
 chartVersion: v1.9.0
 partyId: 10000
 registry: ""
+pullPolicy:
 imagePullSecrets: 
 - name: myregistrykey
 persistence: false
