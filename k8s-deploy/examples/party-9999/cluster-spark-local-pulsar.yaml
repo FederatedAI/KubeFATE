@@ -23,7 +23,7 @@ modules:
 
 computing: Spark_local
 federation: Pulsar
-storage: HDFS
+storage: LocalFS
 algorithm: Basic
 device: CPU
 

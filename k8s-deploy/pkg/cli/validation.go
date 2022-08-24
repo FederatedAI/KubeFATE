@@ -187,7 +187,7 @@ func compareTwoTrees(rootTemp, rootTest *TreeNode,
 	testLines, skippedKeys []string) (errs []error) {
 	valueTemp, valueTest := rootTemp.value, rootTest.value
 	typeTemp, typeTest := reflect.TypeOf(valueTemp), reflect.TypeOf(valueTest)
-	if typeTemp != typeTest {
+	if typeTemp != typeTest && typeTest != nil {
 		route := strings.Join(rootTest.route, "/")
 		errs = append(errs,
 			ConfigError(fmt.Sprintf("your yaml at '%s', line %d \n  '%s' may not match the type",
@@ -212,7 +212,7 @@ func compareTwoTrees(rootTemp, rootTest *TreeNode,
 	case ListValue:
 		item := valueTemp.(ListValue)[0]
 		for _, v := range valueTest {
-			compareTwoTrees(item, v, testLines, skippedKeys)
+			errs = append(errs, compareTwoTrees(item, v, testLines, skippedKeys)...)
 		}
 	default:
 	}
@@ -512,7 +512,7 @@ func checkStorage(backend map[string]string, modules []string) (errs []error) {
 				key, s, "nodemanager")))
 		}
 	case "HDFS":
-		if !Contains("hdfs", modules) && backend["computing"] != "Spark_local" {
+		if !Contains("hdfs", modules) {
 			errs = append(errs, ConfigError(fmt.Sprintf("%s %s shall work with module %s",
 				key, s, "hdfs")))
 		}

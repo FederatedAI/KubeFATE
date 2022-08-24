@@ -91,6 +91,23 @@ federation: Pulsar
 storage: HDFS
 `
 
+	s9 = `
+a: 1
+b:
+- 2
+c:
+- d: 1
+- d: 2
+`
+
+	s10 = `
+a:
+b:
+c:
+- e:
+- d:
+`
+
 	sEggroll = `
 modules:
   - rollsite
@@ -149,7 +166,7 @@ modules:
 
 computing: Spark_local
 federation: Pulsar
-storage: HDFS
+storage: LocalFS
 `
 )
 
@@ -341,6 +358,7 @@ func TestValidateYaml(t *testing.T) {
 		{"validateValidYaml", args{s1, s2, nil}, []error{ConfigError("computing error, not found"), ConfigError("the modules in your yaml is not valid")}},
 		{"validateNotValidYaml", args{s1, s3, nil}, []error{ConfigError("computing error, not found"), ConfigError("the modules in your yaml is not valid"), ConfigError("your yaml at '/a/d', line 8 \n  'd: 3' may be redundant")}},
 		{"validateYamlWithskippedKeys", args{s1, s4, []string{"d"}}, []error{ConfigError("computing error, not found"), ConfigError("the modules in your yaml is not valid")}},
+		{"validateTestEmptyValue", args{s9, s10, nil}, []error{ConfigError("your yaml at '/c/@ArrayItem/e', line 5 \n  '- e:' may be redundant")}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
