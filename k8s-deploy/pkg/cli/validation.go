@@ -187,7 +187,7 @@ func compareTwoTrees(rootTemp, rootTest *TreeNode,
 	testLines, skippedKeys []string) (errs []error) {
 	valueTemp, valueTest := rootTemp.value, rootTest.value
 	typeTemp, typeTest := reflect.TypeOf(valueTemp), reflect.TypeOf(valueTest)
-	if typeTemp != typeTest {
+	if typeTemp != typeTest && typeTest != nil {
 		route := strings.Join(rootTest.route, "/")
 		errs = append(errs,
 			ConfigError(fmt.Sprintf("your yaml at '%s', line %d \n  '%s' may not match the type",
@@ -212,7 +212,7 @@ func compareTwoTrees(rootTemp, rootTest *TreeNode,
 	case ListValue:
 		item := valueTemp.(ListValue)[0]
 		for _, v := range valueTest {
-			compareTwoTrees(item, v, testLines, skippedKeys)
+			errs = append(errs, compareTwoTrees(item, v, testLines, skippedKeys)...)
 		}
 	default:
 	}
@@ -407,7 +407,10 @@ func checkModuleBackend(modules []string, backend map[string]string) (errs []err
 // moduleValidator validates yaml from modules' view
 func moduleValidator(m *ValidationManager) (errs []error) {
 	yamlMap := m.testTree.rawYamlMap
-
+	if chartName, err := getChartName(yamlMap); err != nil || chartName != "fate" {
+		// if chart is not fate, just skip this validation
+		return []error{}
+	}
 	backend, err := getBackend(yamlMap)
 	if err != nil {
 		return []error{err}
@@ -481,9 +484,9 @@ func checkFederation(backend map[string]string, modules []string) (errs []error)
 				key, f, "pulsar")))
 		}
 	case "RabbitMQ":
-		if !Contains("rabbitMQ", modules) {
+		if !Contains("rabbitmq", modules) {
 			errs = append(errs, ConfigError(fmt.Sprintf("%s %s shall work with module %s",
-				key, f, "rabbitMQ")))
+				key, f, "rabbitmq")))
 		}
 	default:
 		errs = append(errs, ConfigError(fmt.Sprintf("%s module %s is not supported", key, f)))
@@ -520,10 +523,26 @@ func checkStorage(backend map[string]string, modules []string) (errs []error) {
 	return
 }
 
+func getChartName(m map[string]interface{}) (string, error) {
+	chartName, ok := m["chartName"]
+	err := errors.New("chart name not found")
+	if !ok {
+		return "", err
+	}
+	name, ok := chartName.(string)
+	if !ok || name != "fate" {
+		return "", err
+	}
+	return name, nil
+}
+
 // backendValidator validates yaml from backend' view
 func backendValidator(m *ValidationManager) (errs []error) {
 	yamlMap := m.testTree.rawYamlMap
-
+	if chartName, err := getChartName(yamlMap); err != nil || chartName != "fate" {
+		// if chart is not fate, just skip this validation
+		return []error{}
+	}
 	modules, err := getModules(yamlMap)
 	if err != nil {
 		return []error{err}
