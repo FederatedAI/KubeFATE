@@ -26,7 +26,7 @@ computing: Spark_local
 # Federation: Eggroll(computing: Eggroll), Pulsar/RabbitMQ(computing: Spark/Spark_local)
 federation: Pulsar
 # Storage: Eggroll(computing: Eggroll), HDFS(computing: Spark), LocalFS(computing: Spark_local)
-storage: HDFS
+storage: LocalFS
 # Algorithm: Basic, NN
 algorithm: Basic
 # Device: CPU, IPCL
