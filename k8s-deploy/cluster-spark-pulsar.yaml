@@ -34,6 +34,10 @@ algorithm: Basic
 # Device: CPU, IPCL
 device: CPU
 
+# you can customize some keys which will be ignored in yaml validation
+skippedKeys:
+  - route_table
+  
 # Specify domain name for service
 # ingress:
   # fateboard: 
@@ -234,6 +238,7 @@ device: CPU
   # accessMode: ReadWriteOnce
   # size: 1Gi
   # env:
+  # confs:
   # publicLB:
     # enabled: false
   # exchange:
