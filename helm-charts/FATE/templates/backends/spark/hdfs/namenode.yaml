@@ -41,7 +41,7 @@ spec:
     {{ end }}
       containers:
         - name: namenode
-          image: {{ .Values.image.registry }}/hadoop-namenode:2.0.0-hadoop2.7.4-java8
+          image: {{ .Values.image.registry }}/hadoop-namenode:2.0.0-hadoop3.2.1-java8
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
           - name: CLUSTER_NAME
@@ -52,13 +52,12 @@ spec:
           ports:
             - containerPort: 9000
             - containerPort: 9870
-            - containerPort: 50070
           livenessProbe:
             exec:
               command:
               - /bin/bash
               - -c
-              - curl -f localhost:50070
+              - curl -f localhost:9870
             initialDelaySeconds: 30
             periodSeconds: 10
             timeoutSeconds: 5
@@ -69,7 +68,7 @@ spec:
               command:
               - /bin/bash
               - -c
-              - curl -f localhost:50070
+              - curl -f localhost:9870
             initialDelaySeconds: 5
             periodSeconds: 10
             timeoutSeconds: 1
@@ -80,7 +79,7 @@ spec:
               command:
               - /bin/bash
               - -c
-              - curl -f localhost:50070
+              - curl -f localhost:9870
             failureThreshold: 12
             periodSeconds: 10
           volumeMounts:

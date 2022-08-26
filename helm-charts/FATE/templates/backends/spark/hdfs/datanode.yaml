@@ -32,7 +32,7 @@ spec:
     spec:
       containers:
         - name: datanode
-          image: {{ .Values.image.registry }}/hadoop-datanode:2.0.0-hadoop2.7.4-java8
+          image: {{ .Values.image.registry }}/hadoop-datanode:2.0.0-hadoop3.2.1-java8
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             - name: SERVICE_PRECONDITION
@@ -42,14 +42,13 @@ spec:
                 name: datanode-env
           ports:
             - containerPort: 9000
-            - containerPort: 9870
-            - containerPort: 50075
+            - containerPort: 9864
           livenessProbe:
             exec:
               command:
                 - /bin/bash
                 - -c
-                - curl -f localhost:50075
+                - curl -f localhost:9864
             initialDelaySeconds: 1
             periodSeconds: 10
             timeoutSeconds: 3
@@ -60,7 +59,7 @@ spec:
               command:
                 - /bin/bash
                 - -c
-                - curl -f localhost:50075
+                - curl -f localhost:9864
             initialDelaySeconds: 1
             periodSeconds: 10
             timeoutSeconds: 3
@@ -71,7 +70,7 @@ spec:
               command:
                 - /bin/bash
                 - -c
-                - curl -f localhost:50075
+                - curl -f localhost:9864
             failureThreshold: 12
             periodSeconds: 10
           volumeMounts:
