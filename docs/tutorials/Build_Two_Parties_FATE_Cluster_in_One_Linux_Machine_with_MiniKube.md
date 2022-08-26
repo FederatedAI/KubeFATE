@@ -25,7 +25,7 @@ export fate_version=v1.9.0 && export kubefate_version=v1.4.5 && cd ~ && mkdir de
 ```
 
 Notes:
-* When talking about KubeFATE version, usually there are 3 notions:ƒ
+* When talking about KubeFATE version, usually there are 3 notions:
    * The KubeFATE CLI version, in this tutorial, it is v1.4.5, consider KubeCtl as an example.
    * The KubeFATE service version, in this tutorial, it is v1.4.5, consider Kubernetes as an example.
    * The FATE version, in this tutorial, it is v1.9.0, it also means the version of the helm chart of FATE, currently we use this version to tag the KubeFATE GitHub master branch.
