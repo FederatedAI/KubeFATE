@@ -1,7 +1,7 @@
 name: fate-10000
 namespace: fate-10000
 chartName: fate
-chartVersion: v1.8.0
+chartVersion: v1.9.0
 partyId: 10000
 registry: ""
 pullPolicy:
@@ -40,9 +40,9 @@ rollsite:
   type: NodePort
   nodePort: 30101
   partyList:
-  - partyId: 9999
-    partyIp: 192.168.9.1
-    partyPort: 30091
+    - partyId: 9999
+      partyIp: 192.168.9.1
+      partyPort: 30091
 
 python:
   type: NodePort

@@ -202,10 +202,10 @@ GenerateConfig() {
 				# federation
 				if [ "$federation" == "RabbitMQ" ]; then
 					cp -r training_template/backends/spark/rabbitmq confs-$party_id/confs/
-					sed -i '193,206d' confs-$party_id/docker-compose.yml
+					sed -i '201,215d' confs-$party_id/docker-compose.yml
 				elif [ "$federation" == "Pulsar" ]; then
 					cp -r training_template/backends/spark/pulsar confs-$party_id/confs/
-					sed -i '175,191d' confs-$party_id/docker-compose.yml
+					sed -i '182,199d' confs-$party_id/docker-compose.yml
 				fi
 			fi
 		fi
@@ -220,10 +220,10 @@ GenerateConfig() {
 				# federation
 				if [ "$federation" == "RabbitMQ" ]; then
 					cp -r training_template/backends/spark/rabbitmq confs-$party_id/confs/
-					sed -i '143,156d' confs-$party_id/docker-compose.yml
+					sed -i '147,161d' confs-$party_id/docker-compose.yml
 				elif [ "$federation" == "Pulsar" ]; then
 					cp -r training_template/backends/spark/pulsar confs-$party_id/confs/
-					sed -i '125,141d' confs-$party_id/docker-compose.yml
+					sed -i '129,145d' confs-$party_id/docker-compose.yml
 				fi
 			fi
 		fi

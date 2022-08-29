@@ -164,16 +164,16 @@ UUID        	24bb75ff-f636-4c64-8c04-1b9073f89a2f
 Name        	fate-9999
 NameSpace   	fate-9999
 ChartName   	fate
-ChartVersion	v1.8.0
+ChartVersion	v1.9.0
 Revision    	1
 Age         	44h
 Status      	Running
 Spec        	backend: eggroll
             	chartName: fate
-            	chartVersion: v1.8.0
+            	chartVersion: v1.9.0
             	imagePullSecrets:
             	- name: myregistrykey
-            	imageTag: 1.8.0-release
+            	imageTag: 1.9.0-release
             	ingress:
             	  client:
             	    hosts:

@@ -90,6 +90,84 @@ computing: Eggroll
 federation: Pulsar
 storage: HDFS
 `
+
+	s9 = `
+a: 1
+b:
+- 2
+c:
+- d: 1
+- d: 2
+`
+
+	s10 = `
+a:
+b:
+c:
+- e:
+- d:
+`
+
+	sEggroll = `
+modules:
+  - rollsite
+  - clustermanager
+  - nodemanager
+  - mysql
+  - python
+  - fateboard
+  - client
+
+computing: Eggroll
+federation: Eggroll
+storage: Eggroll
+`
+
+	sSparkMQ = `
+modules:
+  - python
+  - mysql
+  - fateboard
+  - client
+  - spark
+  - hdfs
+  - nginx
+  - rabbitmq
+
+computing: Spark
+federation: RabbitMQ
+storage: HDFS
+`
+
+	sSparkPulsar = `
+modules:
+  - python
+  - mysql
+  - fateboard
+  - client
+  - spark
+  - hdfs
+  - nginx
+  - pulsar
+
+computing: Spark
+federation: Pulsar
+storage: HDFS
+`
+
+	sSparkLocalPulsar = `
+modules:
+  - python
+  - mysql
+  - fateboard
+  - client
+  - nginx
+  - pulsar
+
+computing: Spark_local
+federation: Pulsar
+storage: LocalFS
+`
 )
 
 var (
@@ -280,6 +358,7 @@ func TestValidateYaml(t *testing.T) {
 		{"validateValidYaml", args{s1, s2, nil}, []error{ConfigError("computing error, not found"), ConfigError("the modules in your yaml is not valid")}},
 		{"validateNotValidYaml", args{s1, s3, nil}, []error{ConfigError("computing error, not found"), ConfigError("the modules in your yaml is not valid"), ConfigError("your yaml at '/a/d', line 8 \n  'd: 3' may be redundant")}},
 		{"validateYamlWithskippedKeys", args{s1, s4, []string{"d"}}, []error{ConfigError("computing error, not found"), ConfigError("the modules in your yaml is not valid")}},
+		{"validateTestEmptyValue", args{s9, s10, nil}, []error{ConfigError("your yaml at '/c/@ArrayItem/e', line 5 \n  '- e:' may be redundant")}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -405,17 +484,27 @@ func Test_checkCommonModules(t *testing.T) {
 	}
 }
 
+func sToModuleBackend(s string) (map[string]string, []string) {
+	m, _ := bufferToMap([]byte(s))
+	backend, _ := getBackend(m)
+	module, _ := getModules(m)
+	return backend, module
+}
+
+var (
+	backend7, module7                               = sToModuleBackend(s7)
+	backend8, module8                               = sToModuleBackend(s8)
+	backendEggroll, moduleEggroll                   = sToModuleBackend(sEggroll)
+	backendSparkMQ, moduleSparkMQ                   = sToModuleBackend(sSparkMQ)
+	backendSparkPulsar, moduleSparkPulsar           = sToModuleBackend(sSparkPulsar)
+	backendSparkLocalPulsar, moduleSparkLocalPulsar = sToModuleBackend(sSparkLocalPulsar)
+)
+
 func Test_checkModuleBackend(t *testing.T) {
 	type args struct {
 		modules []string
 		backend map[string]string
 	}
-	m7, _ := bufferToMap([]byte(s7))
-	m8, _ := bufferToMap([]byte(s8))
-	backend7, _ := getBackend(m7)
-	backend8, _ := getBackend(m8)
-	module7, _ := getModules(m7)
-	module8, _ := getModules(m8)
 	tests := []struct {
 		name     string
 		args     args
@@ -423,6 +512,10 @@ func Test_checkModuleBackend(t *testing.T) {
 	}{
 		{"7", args{module7, backend7}, []error{ConfigError("module pulsar shall work with federation Pulsar but Eggroll")}},
 		{"8", args{module8, backend8}, []error{ConfigError("module rabbitmq shall work with federation RabbitMQ but Pulsar")}},
+		{"Eggroll", args{moduleEggroll, backendEggroll}, nil},
+		{"SparkMQ", args{moduleSparkMQ, backendSparkMQ}, nil},
+		{"SparkPulsar", args{moduleSparkPulsar, backendSparkPulsar}, nil},
+		{"SparkLocalPulsar", args{moduleSparkLocalPulsar, backendSparkLocalPulsar}, nil},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -438,12 +531,6 @@ func Test_checkComputing(t *testing.T) {
 		backend map[string]string
 		modules []string
 	}
-	m7, _ := bufferToMap([]byte(s7))
-	m8, _ := bufferToMap([]byte(s8))
-	backend7, _ := getBackend(m7)
-	backend8, _ := getBackend(m8)
-	module7, _ := getModules(m7)
-	module8, _ := getModules(m8)
 	tests := []struct {
 		name     string
 		args     args
@@ -451,6 +538,10 @@ func Test_checkComputing(t *testing.T) {
 	}{
 		{"7", args{backend7, module7}, []error{ConfigError("computing Spark shall work with module spark"), ConfigError("computing Spark shall work with module nginx")}},
 		{"8", args{backend8, module8}, []error{ConfigError("computing Eggroll shall work with module rollsite"), ConfigError("computing Eggroll shall work with module clustermanager"), ConfigError("computing Eggroll shall work with module nodemanager")}},
+		{"Eggroll", args{backendEggroll, moduleEggroll}, nil},
+		{"SparkMQ", args{backendSparkMQ, moduleSparkMQ}, nil},
+		{"SparkPulsar", args{backendSparkPulsar, moduleSparkPulsar}, nil},
+		{"SparkLocalPulsar", args{backendSparkLocalPulsar, moduleSparkLocalPulsar}, nil},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -466,12 +557,6 @@ func Test_checkFederation(t *testing.T) {
 		backend map[string]string
 		modules []string
 	}
-	m7, _ := bufferToMap([]byte(s7))
-	m8, _ := bufferToMap([]byte(s8))
-	backend7, _ := getBackend(m7)
-	backend8, _ := getBackend(m8)
-	module7, _ := getModules(m7)
-	module8, _ := getModules(m8)
 	tests := []struct {
 		name     string
 		args     args
@@ -479,6 +564,10 @@ func Test_checkFederation(t *testing.T) {
 	}{
 		{"7", args{backend7, module7}, []error{ConfigError("federation Eggroll shall work with module rollsite"), ConfigError("federation Eggroll shall work with module clustermanager"), ConfigError("federation Eggroll shall work with module nodemanager")}},
 		{"8", args{backend8, module8}, nil},
+		{"Eggroll", args{backendEggroll, moduleEggroll}, nil},
+		{"SparkMQ", args{backendSparkMQ, moduleSparkMQ}, nil},
+		{"SparkPulsar", args{backendSparkPulsar, moduleSparkPulsar}, nil},
+		{"SparkLocalPulsar", args{backendSparkLocalPulsar, moduleSparkLocalPulsar}, nil},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -494,12 +583,6 @@ func Test_checkStorage(t *testing.T) {
 		backend map[string]string
 		modules []string
 	}
-	m7, _ := bufferToMap([]byte(s7))
-	m8, _ := bufferToMap([]byte(s8))
-	backend7, _ := getBackend(m7)
-	backend8, _ := getBackend(m8)
-	module7, _ := getModules(m7)
-	module8, _ := getModules(m8)
 	tests := []struct {
 		name     string
 		args     args
@@ -507,6 +590,10 @@ func Test_checkStorage(t *testing.T) {
 	}{
 		{"7", args{backend7, module7}, nil},
 		{"8", args{backend8, module8}, []error{ConfigError("storage HDFS shall work with module hdfs")}},
+		{"Eggroll", args{backendEggroll, moduleEggroll}, nil},
+		{"SparkMQ", args{backendSparkMQ, moduleSparkMQ}, nil},
+		{"SparkPulsar", args{backendSparkPulsar, moduleSparkPulsar}, nil},
+		{"SparkLocalPulsar", args{backendSparkLocalPulsar, moduleSparkLocalPulsar}, nil},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
