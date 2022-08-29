@@ -17,7 +17,11 @@
 | podSecurityPolicy.enabled | bool               | if `true`, create & use Pod Security Policy resources                                                  |
 | ingressClassName          | scalars            | The Ingress class name, such as "nginx".                                                               |
 | * modules                 | sequences          | Modules to be deployed in the FATE cluster.                                                            |
-| backend                   | set(eggroll,spark) | Configure cluster computing engine( eggroll or spark)                                                  |
+| computing                   | set(Eggroll, Spark, Spark_local) | Configure cluster computing engine( eggroll, spark or spark_local)                                                  |
+| federation                   | set(Eggroll,Pulsar,RabbitMQ) | Configure cluster federation engine( eggroll,pulsar or rabbitmq)                                                  |
+| storage                   | set(Eggroll,HDFS,LocalFS) | Configure cluster storage engine( eggroll, hdfs or spark)                                                  |
+| algorithm                   | set(Basic, NN) | Configure cluster algorithm ( basic or NeuralNetwork)                                                  |
+| device                   | set(IPCL, CPU) | Configure cluster device( ipcl or cpu)                                                  |
 | ingress                   | mappings           | Custom domain of FATE UI component                                                                     |
 | rollsite                  | mappings           | Configuration of FATE cluster `rollsite` module.                                                       |
 | nodemanager               | mappings           | Configuration of FATE cluster `nodemanager` module.                                                    |
