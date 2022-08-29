@@ -21,14 +21,14 @@ After the tutorial, the deployment architecture looks like the following diagram
 5. Network connectivity to dockerhub or 163 Docker Image Registry, and google gcr.
 6. Setup the global KubeFATE version using in the tutorial and create a folder for the whole tutorial.
 ```
-export fate_version=v1.8.0 && export kubefate_version=v1.4.4 && cd ~ && mkdir demo && cd demo
+export fate_version=v1.9.0 && export kubefate_version=v1.4.5 && cd ~ && mkdir demo && cd demo
 ```
 
 Notes:
 * When talking about KubeFATE version, usually there are 3 notions:
-   * The KubeFATE CLI version, in this tutorial, it is v1.4.4, consider KubeCtl as an example.
-   * The KubeFATE service version, in this tutorial, it is v1.4.4, consider Kubernetes as an example.
-   * The FATE version, in this tutorial, it is v1.8.0, it also means the version of the helm chart of FATE, currently we use this version to tag the KubeFATE GitHub master branch.
+   * The KubeFATE CLI version, in this tutorial, it is v1.4.5, consider KubeCtl as an example.
+   * The KubeFATE service version, in this tutorial, it is v1.4.5, consider Kubernetes as an example.
+   * The FATE version, in this tutorial, it is v1.9.0, it also means the version of the helm chart of FATE, currently we use this version to tag the KubeFATE GitHub master branch.
 * **<font color="red">In this tutorial, the IP of the machine we used is 192.168.100.123. Please change it to your machine's IP in all the following commands and config files.</font></div>**
 
 # Start Tutorial
@@ -85,7 +85,7 @@ Till now, Kubernetes have been ready.
 ## Setup Kubefate
 ### Install KubeFATE CLI
 Go to [KubeFATE Release](https://github.com/FederatedAI/KubeFATE/releases), and find the latest kubefate-k8s release 
-pack, which is `v1.8.0` as set to ENVs before. (replace ${fate_version} with the newest version available)
+pack, which is `v1.9.0` as set to ENVs before. (replace ${fate_version} with the newest version available)
 ```
 curl -LO https://github.com/FederatedAI/KubeFATE/releases/download/${fate_version}/kubefate-k8s-${fate_version}.tar.gz && tar -xzf ./kubefate-k8s-${fate_version}.tar.gz
 ```
@@ -103,7 +103,7 @@ chmod +x ./kubefate && sudo mv ./kubefate /usr/bin
 Try to verify if kubefate works,
 ```
 kubefate@machine:~/kubefate$ kubefate version
-* kubefate commandLine version=v1.4.4
+* kubefate commandLine version=v1.4.5
 * kubefate service connection error, resp¬.StatusCode=404, error: <?xml version="1.0" encoding="iso-8859-1"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
          "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -122,7 +122,7 @@ deployed the KubeFATE service yet.
 
 ### Deploy KubeFATE service
 #### 1. Load the docker image of the KubeFATE service
-Download the KubeFATE Server v1.4.4's docker image,
+Download the KubeFATE Server v1.4.5's docker image,
 ```
 curl -LO https://github.com/FederatedAI/KubeFATE/releases/download/${fate_version}/kubefate-${kubefate_version}.docker
 ```
@@ -132,7 +132,7 @@ the image needs to be loaded into [Docker Registry](https://docs.docker.com/regi
 [Harbor](https://goharbor.io/). For the details of using Harbor as a local image registry, please refer to:
 https://github.com/FederatedAI/KubeFATE/blob/master/registry/README.md.
 ```
-docker load < kubefate-v1.4.4.docker
+docker load < kubefate-v1.4.5.docker
 ```
 #### 2. Create kube-fate namespace and account for KubeFATE service
 We have prepared the yaml for creating kube-fate namespace, as well as creating a service account in rbac-config.yaml in your working folder. Just apply it,
@@ -212,8 +212,8 @@ rtt min/avg/max/mdev = 0.054/0.067/0.080/0.013 ms
 When `example.com` well set, KubeFATE service version can be shown,
 ```
 kubefate@machine:~/kubefate$ kubefate version
-* kubefate service version=v1.4.4
-* kubefate commandLine version=v1.4.4
+* kubefate service version=v1.4.5
+* kubefate commandLine version=v1.4.5
 ```
 Note: The `kubefate` CLI can only work in the same directory of config.yaml
 
@@ -234,7 +234,7 @@ For `/kubefate/examples/party-9999/cluster.yaml`, modify it as following:
 name: fate-9999
 namespace: fate-9999
 chartName: fate
-chartVersion: v1.8.0
+chartVersion: v1.9.0
 partyId: 9999
 registry: "hub.c.163.com/federatedai"
 pullPolicy:
@@ -287,7 +287,7 @@ and for fate-10000:
 name: fate-10000
 namespace: fate-10000
 chartName: fate
-chartVersion: v1.8.0
+chartVersion: v1.9.0
 partyId: 10000
 registry: "hub.c.163.com/federatedai"
 pullPolicy:
@@ -356,8 +356,8 @@ or watch the clusters till their STATUS changing to `Running`:
 ```
 kubefate@machine:~/kubefate$ watch kubefate cluster ls
 UUID                                    NAME            NAMESPACE       REVISION        STATUS  CHART   ChartVERSION    AGE
-51476469-b473-4d41-b2d5-ea7241d5eac7    fate-9999       fate-9999       1               Running fate    v1.8.0          88s
-dacc0549-b9fc-463f-837a-4e7316db2537    fate-10000      fate-10000      1               Running fate    v1.8.0          69s
+51476469-b473-4d41-b2d5-ea7241d5eac7    fate-9999       fate-9999       1               Running fate    v1.9.0          88s
+dacc0549-b9fc-463f-837a-4e7316db2537    fate-10000      fate-10000      1               Running fate    v1.9.0          69s
 ```
 We have about 10G Docker images that need to be pulled, this step will take a while for the first time.
 An alternative way is offline loading the images to the local environment.
@@ -389,16 +389,16 @@ UUID            51476469-b473-4d41-b2d5-ea7241d5eac7
 Name            fate-9999                                  
 NameSpace       fate-9999                                  
 ChartName       fate                                       
-ChartVersion    v1.8.0                                     
+ChartVersion    v1.9.0                                     
 Revision        1                                          
 Age             15h                                        
 Status          Running                                    
 Spec            backend: eggroll                           
                 chartName: fate                            
-                chartVersion: v1.8.0                       
+                chartVersion: v1.9.0                       
                 imagePullSecrets:                          
                 - name: myregistrykey                      
-                imageTag: 1.8.0-release                    
+                imageTag: 1.9.0-release                    
                 ingress:                                   
                   client:                                  
                     annotations:                           

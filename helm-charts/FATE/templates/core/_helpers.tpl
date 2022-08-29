@@ -12,7 +12,7 @@
 
 {{/* Images Suffix */}}
 {{- define "images.fateflow.suffix" -}}
-{{- if eq .Values.computing "Spark" -}}
+{{- if or (eq .Values.computing "Spark") (eq .Values.computing "Spark_local") -}}
 -spark
 {{- end -}}
 {{- if eq .Values.algorithm "NN" -}}

@@ -1,10 +1,9 @@
 name: fate-exchange
 namespace: fate-exchange
 chartName: fate-exchange
-chartVersion: v1.8.0
+chartVersion: v1.9.0
 partyId: 1
 registry: ""
-pullPolicy:
 imagePullSecrets: 
 - name: myregistrykey
 persistence: false
