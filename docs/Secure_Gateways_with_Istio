@@ -18,8 +18,8 @@ Before installing a cluster yaml file with kubefate, please make sure you have e
 istio:
   enabled: true
 ```
-Please NOTE: Istio is not compatible with Spark, so please choose Eggroll as the backend if you would like to enable Istio.
 
+Please NOTE: Istio is not compatible with Spark, so please choose Eggroll as the computing if you would like to enable Istio.
 
 ### Prepare root certificate
 

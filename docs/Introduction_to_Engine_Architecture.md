@@ -1,8 +1,8 @@
-# Introducing KubeFATE to deploy FATE-backed backends
+# Introducing KubeFATE to deploy FATE supported engines
 
 FATE supports two computing engines: eggroll and spark
 
-## Supported Backends
+## Supported engine
 
 FATE supports multiple computing engines, storage engines and federation engines, and KubeFATE supports quick deployment of FATE clusters with different combination of engines.
 
@@ -22,13 +22,17 @@ Rollsite is responsible for data transmission, nodemanager is responsible for st
 Modify the `parties.conf` configuration when using docker-compose:
 
 ```bash
-backend=eggroll
+computing=Eggroll
+federation=Eggroll
+storage=Eggroll
 ```
 
 Modify the `cluster.yaml` configuration when using Kubernetes:
 
 ```yaml
-backend: eggroll
+computing: Eggroll
+federation: Eggroll
+storage: Eggroll
 ```
 
 Architecture diagram:
@@ -37,24 +41,28 @@ Architecture diagram:
   <img src="./images/arch_eggroll.png" />
 </div>
 
-To enabled TLS for the eggroll backend between different FATE parties, check this [doc](/docs/Eggroll_with_TLS.md).
+To enabled TLS for the eggroll federation between different FATE parties, check this [doc](/docs/Eggroll_with_TLS.md).
 
 ### spark_rabbitmq
 
-When backend uses spark_rabbitmq, a FATE cluster of spark + hdfs + rabbitmq engine combination will be deployed.
+spark_rabbitmq, a FATE cluster of spark + hdfs + rabbitmq engine combination will be deployed.
 
 spark is the computing component, hdfs is the storage component, rabbitmq is the federation component.
 
 Modify the `parties.conf` configuration when using docker-compose:
 
 ```bash
-backend=spark_rabbitmq
+computing=Spark
+federation=RabbitMQ
+storage=HDFS
 ```
 
 Modify the `cluster.yaml` configuration when using Kubernetes:
 
 ```yaml
-backend: spark_rabbitmq
+computing: Spark
+federation: RabbitMQ
+storage: HDFS
 ```
 
 Architecture diagram:
@@ -65,20 +73,24 @@ Architecture diagram:
 
 ### spark_pulsar
 
-When backend uses spark_pulsar, it will deploy a FATE cluster of Spark + Hdfs + Pulsar engine combination.
+spark_pulsar, it will deploy a FATE cluster of Spark + Hdfs + Pulsar engine combination.
 
 Spark is the computing component, Hdfs is the storage component, and Pulsar is the federation component.
 
 Modify the `parties.conf` configuration when using docker-compose:
 
 ```bash
-backend=spark_pulsar
+computing=Spark
+federation=Pulsar
+storage=HDFS
 ```
 
 Modify the `cluster.yaml` configuration when using Kubernetes:
 
 ```yaml
-backend: spark_pulsar
+computing: Spark
+federation: Pulsar
+storage: HDFS
 ```
 
 Architecture diagram:
@@ -89,20 +101,24 @@ Architecture diagram:
 
 ### spark_local_pulsar (slim FATE)
 
-When backend uses spark_local_pulsar, a slim FATE cluster is deployed. All computing and storage parts are together, implemented through Spark local and localfs, and data transfer is done through Pulsar.
+spark_local_pulsar, a slim FATE cluster is deployed. All computing and storage parts are together, implemented through Spark local and localfs, and data transfer is done through Pulsar.
 
 Spark local is the computing component, localfs is the storage component, and Pulsar is the federation component.
 
 Modify the `parties.conf` configuration when using docker-compose:
 
 ```bash
-backend=spark_local_pulsar
+computing=Spark_local
+federation=Pulsar
+storage=LocalFS
 ```
 
 Modify the `cluster.yaml` configuration when using Kubernetes:
 
 ```yaml
-backend: spark_local_pulsar
+computing: Spark_local
+federation: Pulsar
+storage: LocalFS
 ```
 
 Architecture diagram:
@@ -111,7 +127,7 @@ Architecture diagram:
   <img src="./images/arch_slim.png">
 </div>
 
-## Comparison of different backends
+## Comparison of different engines
 
 Eggroll can be used as FATE's computing, storage and transmission engine. Eggroll is a simple and high-performance [federation] machine learning computing framework that supports multiple federated network architectures: straight-chain mode, star and ring, etc. Eggroll also supports being used between different organizations with TLS, Eggroll is an open source project on github owned by WeBank.
 repository: <https://github.com/WeBankFinTech/eggroll.git>
@@ -126,7 +142,7 @@ Compared with other modes, spark_local_pulsar can use this mode to minimize the 
 
 When using the rollsite or Pulsar architecture, a federated learning framework can be deployed using FATE-Exchange.
 
-That is to say, when the backend is eggroll, spark_pulsar or spark_local_pulsar, it can support the usage of FATE-Exchange.
+That is to say, when the federation is Eggroll and Pulsar, it can support the use of Exchange.
 
 **Through FATE-Exchange, rollsite parties can only do FML with other rollsite parties, and Pulsar parties can only do FML with other Pulsar parties.**
 

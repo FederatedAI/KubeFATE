@@ -1,24 +1,24 @@
 # FATE Algorithm and Computational Acceleration Selection
 
-FATE作为联邦学习框架，支持很多算法，根据业务选择对应的算法和加速卡也是很多企业的需求，当前KubeFATE支持选择算法和加速卡的选择
+As a federated learning framework, FATE supports many algorithms. It is also the needs of many enterprises to select the corresponding algorithm and accelerator card according to the business. Currently, KubeFATE supports the selection of algorithms and accelerator cards.
 
-不论在docker-compose还是k8s部署中，都可以对以下两个参数做选择：
+Whether in docker-compose or k8s deployment, the following two parameters can be selected:
 
-- `algorithm` 算法选择
-- `device` 计算设备选择
+- `algorithm` Algorithm choice
+- `device` Computing Device Selection
 
-## 算法
+## Algorithm
 
-当前算法的选择包含了两个选项：
+The choice of algorithm consists of two options:
 
 - `Basic`
-    Basic是默认选项，包含了除去nn（包括homo_nn和hetero_nn）算法相关的依赖组件。
+    Basic is the default option, which includes dependencies related to the removal of nn (including homo_nn and hetero_nn) algorithms.
 - `NN`
-    NN就包含了nn包括（homo_nn和hetero_nn）所需的所有依赖。***仅当computing是Eggroll的时候才可以使用NN***
+    NN contains all the dependencies required for nn to include (homo_nn and hetero_nn). ***NN can only be used when computing is Eggroll***
 
-## 计算设备选择
+## Device
 
-当前设备的选择包含了一个选项：
+Device selection consists of an option:
 
 - `CPU`
-    CPU是FATE计算主要的使用设备。
+    The CPU is a computing device that uses the CPU as a FATE computing device.

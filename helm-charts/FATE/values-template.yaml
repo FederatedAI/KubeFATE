@@ -453,7 +453,6 @@ modules:
 {{ toYaml . | indent 8 }}
       {{- end }}
       type: {{ .worker.type | default "ClusterIP" }}
-      nodePort: {{ .master.nodePort }}
     {{- end }}
     {{- end }}
 
