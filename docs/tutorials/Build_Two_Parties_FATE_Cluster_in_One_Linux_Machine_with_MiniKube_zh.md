@@ -531,7 +531,7 @@ Info        	dashboard:
             	- party9999.fateboard.example.com
             	- party9999.pulsar.example.com
             	- party9999.spark.example.com
-            	ip: 10.182.134.142
+            	ip: 192.168.100.124
             	status:
             	  containers:
             	    client: Running
