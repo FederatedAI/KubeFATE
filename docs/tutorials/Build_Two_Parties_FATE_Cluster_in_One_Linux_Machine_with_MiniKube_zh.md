@@ -235,11 +235,7 @@ modules:
   - fateboard
   - client
 
-computing: Eggroll
-federation: Eggroll
-storage: Eggroll
-algorithm: Basic
-device: CPU
+backend: eggroll
 
 ingress:
   fateboard:
@@ -293,11 +289,7 @@ modules:
   - fateboard
   - client
 
-computing: Eggroll
-federation: Eggroll
-storage: Eggroll
-algorithm: Basic
-device: CPU
+backend: eggroll
 
 ingress:
   fateboard:
@@ -373,16 +365,12 @@ ChartVersion    v1.9.0
 Revision        1                                          
 Age             15h                                        
 Status          Running                                    
-Spec            chartName: fate                            
+Spec            backend: eggroll                           
+                chartName: fate                            
                 chartVersion: v1.9.0                       
                 imagePullSecrets:                          
                 - name: myregistrykey                      
-                imageTag: 1.9.0-release
-                computing: Eggroll
-                federation: Eggroll
-                storage: Eggroll
-                algorithm: Basic
-                device: CPU                    
+                imageTag: 1.9.0-release                    
                 ingress:                                   
                   client:                                  
                     annotations:                           
