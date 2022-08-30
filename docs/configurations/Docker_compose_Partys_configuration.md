@@ -13,7 +13,7 @@ The partys.conf file is the main configuration file for docker-compose to deploy
 | federation | Federation engine | Eggroll |
 | storage | Storage engine | Eggroll |
 | algorithm | Algorithm | Basic |
-| device | Device | IPCL |
+| device | Device | CPU |
 | compute_core | Cluster compute_core number, it is recommended to be less than the number of cpu cores | 4 |
 | exchangeip | Deploy exchange cluster host IP | NULL |
 | mysql_ip | External mysql IP | mysql |

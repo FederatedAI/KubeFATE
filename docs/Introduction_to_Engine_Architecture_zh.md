@@ -1,8 +1,8 @@
-# KubeFATE 部署FATE支持后端介绍
+# KubeFATE 部署FATE支持引擎介绍
 
 FATE支持eggroll和spark两种计算引擎
 
-## 支持后端
+## 支持引擎组合
 
 FATE支持选择不同的计算引擎，存储引擎和数据传输引擎，现在KubeFATE支持快捷的部署不同引擎组合的FATE集群。
 
@@ -102,16 +102,16 @@ storage: HDFS
 
 ### spark_local (Slim FATE)
 
-当使用Spark-local + LocalFS + Pulsar/RabbitMQ的时候，会部署一个slim的FATE集群。所有的计算和存储部分都在一起，通过Spark local和localfs来实现，数据传输是通过Pulsar或者RabbitMQ完成。
+当使用Spark_local + LocalFS + Pulsar/RabbitMQ的时候，会部署一个slim的FATE集群。所有的计算和存储部分都在一起，通过Spark_local和LocalFS来实现，数据传输是通过Pulsar或者RabbitMQ完成。
 
 Spark local是计算组件，localfs是存储组件，Pulsar或者RabbitMQ是数据传输组件。
 
 docker-compose使用的时候修改`parties.conf`配置
 
 ```bash
-computing=Spark
+computing=Spark_local
 federation=Pulsar
-storage=HDFS
+storage=LocalFS
 ```
 
 ***这里federation也可以替换为RabbitMQ***
@@ -121,7 +121,7 @@ k8s使用的时候修改`cluster.yaml`配置
 ```yaml
 computing: Spark_local
 federation: Pulsar
-storage: HDFS
+storage: LocalFS
 ```
 
 架构图：
@@ -130,7 +130,7 @@ storage: HDFS
   <img src="./images/arch_slim.png">
 </div>
 
-## 不同backend的比较
+## 不同引擎的比较
 
 Eggroll可以作为FATE的计算，存储和传输引擎，Eggroll是一个简单高性能[联邦]机器学习的计算框架，支持多种联邦网络架构：直链模式、星型和环形等，支持不同组织之间使用证书加密，Eggroll是微众银行主导的github的开源项目。
 项目地址：<https://github.com/WeBankFinTech/eggroll.git>
@@ -145,7 +145,7 @@ Slim FATE相比其他模式，使用这个模式可以最大化减少集群所�
 
 当使用rollsite和Pulsar传输数据的时候，可以使用Exchange的架构来部署联邦学习网络。
 
-也就是说backend是eggroll、spark_pulsar和spark_local_pulsar三种模式的时候可以支持Exchange的使用。
+也就是说federation是Eggroll和Pulsar的时候可以支持Exchange的使用。
 
 **rollsite只能和其他rollsite的FATE通过exchange链接，Pulsar也只能和其他Pulsar的FATE通过exchange链接。**
 
