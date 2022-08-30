@@ -285,7 +285,7 @@ python:
   grpcNodePort: 30092
   logLevel: INFO
 
-servingIp: 10.182.137.144
+servingIp: 192.168.100.123
 servingPort: 30095
 
 nginx:
@@ -295,7 +295,7 @@ nginx:
   route_table:
     10000:
       fateflow:
-        - host: 10.182.137.144
+        - host: 192.168.100.123
           http_port: 30103
           grpc_port: 30108
 
@@ -311,7 +311,7 @@ pulsar:
       port: 6650
       sslPort: 6651
     10000:
-      host: 10.182.137.144
+      host: 192.168.100.123
       port: 30104
       sslPort: 30109
       proxy: ""
@@ -370,7 +370,7 @@ python:
   grpcNodePort: 30102
   logLevel: INFO
 
-servingIp: 10.182.137.144
+servingIp: 192.168.100.123
 servingPort: 30105
 
 nginx:
@@ -380,7 +380,7 @@ nginx:
   route_table:
     9999:
       fateflow:
-        - host: 10.182.137.144
+        - host: 192.168.100.123
           http_port: 30093
           grpc_port: 30098
 
@@ -392,7 +392,7 @@ pulsar:
     enabled: false
   route_table:
     9999:
-      host: 10.182.137.144
+      host: 192.168.100.123
       port: 30094
       sslPort: 30099
       proxy: ""
@@ -492,7 +492,7 @@ Spec        	algorithm: Basic
             	    "10000":
             	      fateflow:
             	      - grpc_port: 30108
-            	        host: 10.182.137.144
+            	        host: 192.168.100.123
             	        http_port: 30103
             	  type: NodePort
             	partyId: 9999
@@ -511,7 +511,7 @@ Spec        	algorithm: Basic
             	      port: 6650
             	      sslPort: 6651
             	    "10000":
-            	      host: 10.182.137.144
+            	      host: 192.168.100.123
             	      port: 30104
             	      proxy: ""
             	      sslPort: 30109
@@ -522,7 +522,7 @@ Spec        	algorithm: Basic
             	  logLevel: INFO
             	  type: NodePort
             	registry: ""
-            	servingIp: 10.182.137.144
+            	servingIp: 192.168.100.123
             	servingPort: 30095
             	storage: HDFS
 
