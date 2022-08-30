@@ -125,7 +125,11 @@ data:
     backlogQuotaCheckIntervalInSeconds=60
     
     # Default per-topic backlog quota limit
+    {{- if .Values.modules.pulsar.confs }}
+    backlogQuotaDefaultLimitGB={{ .Values.modules.pulsar.confs.backlogQuotaDefaultLimitGB | default  10 }}
+    {{- else }}
     backlogQuotaDefaultLimitGB=10
+    {{- end }}
     
     # Default ttl for namespaces if ttl is not already configured at namespace policies. (disable default-ttl with value 0)
     ttlDurationDefaultInSeconds=0
@@ -134,7 +138,11 @@ data:
     brokerDeleteInactiveTopicsEnabled=true
     
     # How often to check for inactive topics
+    {{- if .Values.modules.pulsar.confs }}
+    brokerDeleteInactiveTopicsFrequencySeconds={{ .Values.modules.pulsar.confs.brokerDeleteInactiveTopicsFrequencySeconds | default  60 }}
+    {{- else }}
     brokerDeleteInactiveTopicsFrequencySeconds=60
+    {{- end }}
     
     # Max pending publish requests per connection to avoid keeping large number of pending
     # requests in memory. Default: 1000
