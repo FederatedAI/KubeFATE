@@ -17,7 +17,11 @@
 | podSecurityPolicy.enabled | bool               | if `true`, create & use Pod Security Policy resources                                                  |
 | ingressClassName          | scalars            | The Ingress class name, such as "nginx".                                                               |
 | * modules                 | sequences          | Modules to be deployed in the FATE cluster.                                                            |
-| backend                   | set(eggroll,spark) | Configure cluster computing engine( eggroll or spark)                                                  |
+| computing                   | set(Eggroll, Spark, Spark_local) | Configure cluster computing engine( eggroll, spark or spark_local)                                                  |
+| federation                   | set(Eggroll,Pulsar,RabbitMQ) | Configure cluster federation engine( eggroll,pulsar or rabbitmq)                                                  |
+| storage                   | set(Eggroll,HDFS,LocalFS) | Configure cluster storage engine( eggroll, hdfs or spark)                                                  |
+| algorithm                   | set(Basic, NN) | Configure cluster algorithm ( basic or NeuralNetwork)                                                  |
+| device                   | set(IPCL, CPU) | Configure cluster device( ipcl or cpu)                                                  |
 | ingress                   | mappings           | Custom domain of FATE UI component                                                                     |
 | rollsite                  | mappings           | Configuration of FATE cluster `rollsite` module.                                                       |
 | nodemanager               | mappings           | Configuration of FATE cluster `nodemanager` module.                                                    |
@@ -36,7 +40,8 @@
 | hdfs                      | mappings           | Configuration of FATE cluster `hdfs` module.                                                           |
 | nginx                     | mappings           | Configuration of FATE cluster `nginx` module.                                                          |
 | rabbitmq                  | mappings           | Configuration of FATE cluster `rabbitmq` module.                                                       |
-
+| pulsar                    | mappings           | Configuration of FATE cluster `pulsar` module.                                                         |
+| skippedKeys               | sequences          | you can customize some keys which will be ignored in yaml validation                                       |
 
 
 ### list of modules
@@ -53,6 +58,7 @@
 - hdfs
 - nginx
 - rabbitmq
+- pulsar
 
 
 
@@ -70,6 +76,7 @@
 | `client.tls`            | sequences         | Set this to enable TLS on the ingress record                     |
 | `spark`                 | mappings          | Configuration of spark UI domain                                 |
 | `rabbitmq`              | mappings          | Configuration of Rabbitmq UI domain                              |
+| `pulsar`                | mappings          | Configuration of Pulsar UI domain                              |
 
 
 
@@ -278,4 +285,52 @@ Configuration of kubernetes deployment rabbitmq .
   host: 192.168.0.3
   port: 30084
 ```
+
+
+### pulsar mappings
+
+Configuration of kubernetes deployment pulsar .
+
+| Name             | Type      | Description                                                  |
+| ---------------- | --------- | ------------------------------------------------------------ |
+| nodeSelector     | mappings  | kubernetes nodeSelector.                                     |
+| type             | scalars   | Kubernetes ServiceTypes, default is `ClusterIp`.             |
+| nodePort         | scalars   | Kubernetes Service NodePort.                                 |
+| skippedKeys      | sequences | you can customize some keys which will be ignored in yaml validation |
+| tolerations      |           | Kubernetes tolerations                                       |
+| affinity         |           | Kubernetes affinity                                          |
+| env              | mappings  | env of pulsar.                                               |
+| confs            | mappings  | configuration of pulsar.                                     |
+| httpNodePort     | scalars   | Pulsar HttpNodePort                                          |
+| httpsNodePort    | scalars   | Pulsar HttpsNodePort                                         |
+| loadBalancerIP   | scalars   | Ip of loadBalancer                                           |
+| storageClass     | scalars   | Specify the "storageClass" used to provision the volume. Or the default. StorageClass will be used(the default). Set it to "-" to disable dynamic provisioning. |
+| existingClaim    | scalars   | Kubernetes existingClaim                                     |
+| accessMode       | scalars   | Kubernetes Persistent Volume Access Modes: <br />ReadWriteOnce<br />ReadOnlyMany <br />ReadWriteMany. |
+| size             | scalars   | Match the volume size of PVC.                                |
+| publicLB.enabled | bool      | if `true`, enable publicLB                                   |
+| exchange         | mappings  | FATE cluster `exchange` module's ip and port.                |
+| resources        | mappings  | resources of Pod                                             |
+| route_table      | mappings  | route table of pulsar.                                       |
+
+*example of route_table*:
+
+```bash
+10000:
+  host: 192.168.0.1
+  port: 30104
+9999:
+  host: 192.168.0.2
+  port: 30094
+8888:
+  host: 192.168.0.3
+  port: 30084
+```
+
+
+
+*available customized confs*: 
+
+- backlogQuotaDefaultLimitGB
+- brokerDeleteInactiveTopicsFrequencySeconds
 
