@@ -1,0 +1,27 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: fate-mysql-upgrade-job
+spec:
+  backoffLimit: 0
+  template:
+    spec:
+      serviceAccountName: fum
+      containers:
+        - name: fate-mysql-upgrader
+          image: federatedai/fate-upgrade-manager:latest
+          imagePullPolicy: IfNotPresent
+          command:
+            - "/bin/bash"
+            - "-c"
+            - |
+              python shutdown-flow.py {{ .Release.Namespace }}
+              retVal=$?
+              if [ $retVal -ne 0 ]; then
+                echo "failed to terminate the flow's pod"
+              else
+                {{- with .Values }}
+                python upgrade-mysql.py {{ .username }} {{ .password }} {{ .start }} {{ .target }}
+                {{- end }}
+              fi
+      restartPolicy: Never

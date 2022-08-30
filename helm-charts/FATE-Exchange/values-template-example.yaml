@@ -1,11 +1,9 @@
 name: fate-exchange
 namespace: fate-exchange
 chartName: fate-exchange
-chartVersion: v1.8.0
+chartVersion: v1.9.0
 partyId: 1
 registry: ""
-imageTag: "1.8.0-release"
-pullPolicy: 
 imagePullSecrets: 
 - name: myregistrykey
 persistence: false
@@ -22,6 +20,7 @@ rollsite:
   type: NodePort
   nodePort: 30001
   loadBalancerIP: 192.168.0.1
+  enableTLS: false
   partyList:
   - partyId: 10000
     partyIp: 192.168.10.1

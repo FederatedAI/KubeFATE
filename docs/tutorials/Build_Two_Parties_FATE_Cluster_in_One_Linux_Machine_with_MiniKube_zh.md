@@ -3,7 +3,7 @@
 
 我们的总体架构如下:
 
-![总体架构](https://github.com/FederatedAI/KubeFATE/raw/master/docs/tutorials/images/goal.png)
+![总体架构](../images/fate_on_spark_with_pulsar.png)
 
 本文共出现两台机器：
 1. 用来做Demo的机器，是一台Linux机器，参照前置条件第一点；
@@ -17,10 +17,15 @@
 5. 要保证安装机器可以正常访问Docker Hub或者网易云镜像仓库，以及Google gcr； 
 6. 预先创建一个目录，以便整个过程使用该目录作为工作目录，命令如下：
 ```
-export release_version=v1.8.0 && export kubefate_version=v1.4.4 && cd ~ && mkdir demo && cd demo
+export fate_version=v1.9.0 && export kubefate_version=v1.4.5 && cd ~ && mkdir demo && cd demo
 ```
 
-**注意：下文介绍的MiniKube机器IP地址是192.168.100.123。请修改为你准备的实验机器IP地址！！！**
+Notes:
+* 当我们提到"KubeFATE的版本"，通常来讲会有三个概念：
+    * KubeFATE命令行工具的版本，在本教程中为v1.4.5。
+    * KubeFATE服务版本，在本教程中为v1.4.5。
+    * FATE版本，在本教程中v1.9.0，它也意味着FATE的Helm Chart的版本, 值得注意的是我们用这个版本来给GitHub上的KubeFATE的发布打tag。
+* **<font color="red">下文介绍的MiniKube机器IP地址是192.168.100.123。请修改为你准备的实验机器IP地址</font></div>**
 
 # 开始安装
 ## 安装需要的工具
@@ -44,14 +49,14 @@ curl -LO https://github.com/kubernetes/minikube/releases/download/v1.19.0/miniku
 验证安装结果:
 ```
 kubefate@machine:~/demo$ minikube version
-minikube version: v1.21.0
-commit: 76d74191d82c47883dc7e1319ef7cebd3e00ee11
+minikube version: v1.19.0
+commit: 15cede53bdc5fe242228853e737333b09d4336b5
 ```
 
 ### 使用MiniKube安装Kubernetes
 MiniKube支持使用不同的虚拟机来部署Kubernetes，但是在Linux环境下，我们建议直接使用Docker方式。更多的说明参考：[Install MiniKube - Install a Hypervisor](https://kubernetes.io/docs/tasks/tools/install-minikube/#install-a-hypervisor).
 ```
-sudo minikube start --vm-driver=none --kubernetes-version v1.19.0
+sudo minikube start --vm-driver=none --kubernetes-version v1.19.0  --cni=flannel
 ```
 待到命令执行完成，我们可以验证下，
 ```
@@ -66,13 +71,15 @@ kubeconfig: Configured
 ```
 sudo minikube addons enable ingress
 ```
-到此，我们的Kubernetes也准备好了。
+
+使用命令`kubectl get pods -A`来查看所有的状态，当所有的pod的状态都变成ready的时候，表示K8s集群已经准备就绪。
+
 
 ## 安装Kubefate
 ### 下载KubeFATE命令行工具
-我们从Github上 [KubeFATE Release](https://github.com/FederatedAI/KubeFATE/releases)页面找到Kuberetes部署的下载包，并下载对应版本，如前面环境变量设置`v1.8.0`，
+我们从Github上 [KubeFATE Release](https://github.com/FederatedAI/KubeFATE/releases)页面找到Kuberetes部署的下载包，并下载对应版本，如前面环境变量设置`v1.9.0`，
 ```
-curl -LO https://github.com/FederatedAI/KubeFATE/releases/download/${release_version}/kubefate-k8s-${release_version}.tar.gz && tar -xzf ./kubefate-k8s-${release_version}.tar.gz
+curl -LO https://github.com/FederatedAI/KubeFATE/releases/download/${fate_version}/kubefate-k8s-${fate_version}.tar.gz && tar -xzf ./kubefate-k8s-${fate_version}.tar.gz
 ```
 然后我们可以查看下下载解压的安装包内容，
 ```
@@ -85,10 +92,10 @@ cluster-spark-pulsar.yaml cluster-spark-slim.yaml config.yaml kubefate.yaml
 ```
 chmod +x ./kubefate && sudo mv ./kubefate /usr/bin
 ```
-然后我们测试下kubefate命令是否可用，
+然后我们测试下KubeFATE CLI命令是否可用，
 ```
 kubefate@machine:~/kubefate$ kubefate version
-* kubefate commandLine version=v1.4.4
+* kubefate commandLine version=v1.4.5
 * kubefate service connection error, resp.StatusCode=404, error: <?xml version="1.0" encoding="iso-8859-1"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
          "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -106,13 +113,13 @@ kubefate@machine:~/kubefate$ kubefate version
 
 ### 部署Kubefate服务
 #### 1.载入Kubefate服务镜像
-接着，我们下载KubeFATE服务镜像v1.4.4：
+接着，我们下载KubeFATE服务镜像v1.4.5：
 ```
-curl -LO https://github.com/FederatedAI/KubeFATE/releases/download/${release_version}/kubefate-${kubefate_version}.docker
+curl -LO https://github.com/FederatedAI/KubeFATE/releases/download/${fate_version}/kubefate-${kubefate_version}.docker
 ```
 然后读入本地Docker环境。请注意，因为本文使用的MiniKube，是all-in-one的Kubernetes环境，所以只需要导入本地Docker环境即可给kubelet拉取。如果你运行的是集群形式的Kubernetes，容器镜像需要读入[Docker Registry](https://docs.docker.com/registry/introduction/)或者[Harbor](https://goharbor.io/)。关于如何集成使用Harbor，可以参考：https://github.com/FederatedAI/KubeFATE/blob/master/registry/README.md
 ```
-docker load < kubefate-v1.4.4.docker
+docker load < kubefate-v1.4.5.docker
 ```
 
 #### 2.创建kube-fate的命名空间以及账号
@@ -189,8 +196,8 @@ rtt min/avg/max/mdev = 0.054/0.067/0.080/0.013 ms
 当 `example.com` 顺利设置, KubeFATE服务的版本号应该就可以正常显示,
 ```
 kubefate@machine:~/kubefate$ kubefate version
-* kubefate service version=v1.4.4
-* kubefate commandLine version=v1.4.4
+* kubefate service version=v1.4.5
+* kubefate commandLine version=v1.4.5
 ```
 到此，所有准备工作完毕，下面我们可以开始安装FATE了。需要注意的是，上面的工作只需要做一次，后面如果添加、删除、更新FATE集群，上面的不需要重新执行。
 
@@ -203,16 +210,36 @@ kubectl create namespace fate-9999
 kubectl create namespace fate-10000
 ```
 
-在exmaple目录下，我们已经预先设置了两个例子：`/kubefate/examples/party-9999/` 和 `/kubefate/examples/party-10000`
-对于`/kubefate/examples/party-9999/cluster.yaml`，我们可以将其修改如下：
+如果你是用dockerhub上的镜像仓库，可以先在相应的域名下注册登录信息，因为后面有些镜像需要从dockerhub下载。
+
+```
+DOCKER_REGISTRY_SERVER=docker.io
+DOCKER_USER=<your_user_name>
+DOCKER_PASSWORD=<your_password>
+
+kubectl -n fate-9999 create secret docker-registry myregistrykey \
+  --docker-server=$DOCKER_REGISTRY_SERVER \
+  --docker-username=$DOCKER_USER \
+  --docker-password=$DOCKER_PASSWORD
+  
+kubectl -n fate-10000 create secret docker-registry myregistrykey \
+  --docker-server=$DOCKER_REGISTRY_SERVER \
+  --docker-username=$DOCKER_USER \
+  --docker-password=$DOCKER_PASSWORD
+```
+
+在exmaple目录下我们有一些预设的例子：`/kubefate/examples/party-9999/` 和 `/kubefate/examples/party-10000`
+
+本教程中我们使用Spark+Pulsar的组合来做例子。
+
+对于`/kubefate/examples/party-9999/cluster-spark-pulsar.yaml`，我们可以将其修改如下：
 ```
 name: fate-9999
 namespace: fate-9999
 chartName: fate
-chartVersion: v1.8.0
+chartVersion: v1.9.0
 partyId: 9999
-registry: "hub.c.163.com/federatedai"
-imageTag: "1.8.0-release"
+registry: ""
 pullPolicy:
 imagePullSecrets:
 - name: myregistrykey
@@ -223,31 +250,34 @@ podSecurityPolicy:
   enabled: false
 ingressClassName: nginx
 modules:
-  - rollsite
-  - clustermanager
-  - nodemanager
-  - mysql
   - python
+  - mysql
   - fateboard
   - client
+  - spark
+  - hdfs
+  - nginx
+  - pulsar
 
-backend: eggroll
+computing: Spark
+federation: Pulsar
+storage: HDFS
+algorithm: Basic
+device: CPU
 
 ingress:
   fateboard:
     hosts:
     - name: party9999.fateboard.example.com
-  client:  
+  client:
     hosts:
     - name: party9999.notebook.example.com
-
-rollsite:
-  type: NodePort
-  nodePort: 30091
-  partyList:
-  - partyId: 10000
-    partyIp: 192.168.100.123
-    partyPort: 30101
+  spark:
+    hosts:
+    - name: party9999.spark.example.com
+  pulsar:
+    hosts:
+    - name: party9999.pulsar.example.com
 
 python:
   type: NodePort
@@ -257,52 +287,82 @@ python:
 
 servingIp: 192.168.100.123
 servingPort: 30095
+
+nginx:
+  type: NodePort
+  httpNodePort: 30093
+  grpcNodePort: 30098
+  route_table:
+    10000:
+      fateflow:
+        - host: 192.168.100.123
+          http_port: 30103
+          grpc_port: 30108
+
+pulsar:
+  type: NodePort
+  httpNodePort: 30094
+  httpsNodePort: 30099
+  publicLB:
+    enabled: false
+  route_table:
+    9999:
+      host: pulsar
+      port: 6650
+      sslPort: 6651
+    10000:
+      host: 192.168.100.123
+      port: 30104
+      sslPort: 30109
+      proxy: ""
 ```
 
-对于`/kubefate/examples/party-10000/cluster.yaml`，我们可以将其修改如下：
+对于fate-10000，我们可以将其修改如下：
 ```
 name: fate-10000
 namespace: fate-10000
 chartName: fate
-chartVersion: v1.8.0
+chartVersion: v1.9.0
 partyId: 10000
-registry: "hub.c.163.com/federatedai"
-imageTag: "1.8.0-release"
+registry: ""
 pullPolicy:
 imagePullSecrets:
 - name: myregistrykey
 persistence: false
 istio:
   enabled: false
+ingressClassName: nginx
 podSecurityPolicy:
   enabled: false
-ingressClassName: nginx
 modules:
-  - rollsite
-  - clustermanager
-  - nodemanager
-  - mysql
   - python
+  - mysql
   - fateboard
   - client
+  - spark
+  - hdfs
+  - nginx
+  - pulsar
 
-backend: eggroll
+computing: Spark
+federation: Pulsar
+storage: HDFS
+algorithm: Basic
+device: CPU
 
 ingress:
   fateboard:
     hosts:
     - name: party10000.fateboard.example.com
-  client:  
+  client:
     hosts:
     - name: party10000.notebook.example.com
-
-rollsite:
-  type: NodePort
-  nodePort: 30101
-  partyList:
-  - partyId: 9999
-    partyIp: 192.168.100.123
-    partyPort: 30091
+  spark:
+    hosts:
+    - name: party10000.spark.example.com
+  pulsar:
+    hosts:
+    - name: party10000.pulsar.example.com
 
 python:
   type: NodePort
@@ -312,6 +372,34 @@ python:
 
 servingIp: 192.168.100.123
 servingPort: 30105
+
+nginx:
+  type: NodePort
+  httpNodePort: 30103
+  grpcNodePort: 30108
+  route_table:
+    9999:
+      fateflow:
+        - host: 192.168.100.123
+          http_port: 30093
+          grpc_port: 30098
+
+pulsar:
+  type: NodePort
+  httpNodePort: 30104
+  httpsNodePort: 30109
+  publicLB:
+    enabled: false
+  route_table:
+    9999:
+      host: 192.168.100.123
+      port: 30094
+      sslPort: 30099
+      proxy: ""
+    10000:
+      host: pulsar
+      port: 6650
+      sslPort: 6651
 ```
 
 **注意： 我们强烈建议阅读以下文档**
@@ -320,9 +408,9 @@ servingPort: 30105
 ### 安装FATE集群
 如果一切没有问题，那就可以使用`kubefate cluster install`来部署两个fate集群了，
 ```
-kubefate@machine:~/kubefate$ kubefate cluster install -f examples/party-9999/cluster.yaml
+kubefate@machine:~/kubefate$ kubefate cluster install -f examples/party-9999/cluster-spark-pulsar.yaml
 create job success, job id=2c1d926c-bb57-43d3-9127-8cf3fc6deb4b
-kubefate@machine:~/kubefate$ kubefate cluster install -f examples/party-10000/cluster.yaml
+kubefate@machine:~/kubefate$ kubefate cluster install -f examples/party-10000/cluster-spark-pulsar.yaml
 create job success, job id=7752db70-e368-41fa-8827-d39411728d1b
 ```
 
@@ -330,8 +418,8 @@ create job success, job id=7752db70-e368-41fa-8827-d39411728d1b
 ```
 kubefate@machine:~/kubefate$ watch kubefate cluster ls
 UUID                                    NAME            NAMESPACE       REVISION        STATUS  CHART   ChartVERSION    AGE
-51476469-b473-4d41-b2d5-ea7241d5eac7    fate-9999       fate-9999       1               Running fate    v1.8.0          88s
-dacc0549-b9fc-463f-837a-4e7316db2537    fate-10000      fate-10000      1               Running fate    v1.8.0          69s
+29878fa9-aeee-4ae5-a5b7-fd4e9eb7c1c3    fate-9999       fate-9999       1               Running fate    v1.9.0          88s
+dacc0549-b9fc-463f-837a-4e7316db2537    fate-10000      fate-10000      1               Running fate    v1.9.0          69s
 ```
 因为这个步骤需要到网易云镜像仓库去下载约10G的镜像，所以第一次执行视乎你的网络情况需要一定时间。
 检查下载的进度可以用
@@ -351,97 +439,123 @@ rollsite-7846898d6d-j2gb9        1/1     Running   0          12m
 ```
 
 ### 验证FATE的部署
-通过以上的 `kubefate cluster ls` 命令, 我们得到 `fate-9999` 的集群ID是 `51476469-b473-4d41-b2d5-ea7241d5eac7`, 而 `fate-10000` 的集群ID是 `dacc0549-b9fc-463f-837a-4e7316db2537`. 我们可以通过`kubefate cluster describe`查询集群的具体访问信息，
+通过以上的 `kubefate cluster ls` 命令, 我们得到 `fate-9999` 的集群ID是 `29878fa9-aeee-4ae5-a5b7-fd4e9eb7c1c3`, 而 `fate-10000` 的集群ID是 `dacc0549-b9fc-463f-837a-4e7316db2537`. 我们可以通过`kubefate cluster describe`查询集群的具体访问信息，
 ```
-kubefate@machine:~/demo$ kubefate cluster describe 51476469-b473-4d41-b2d5-ea7241d5eac7
-UUID            51476469-b473-4d41-b2d5-ea7241d5eac7
-Name            fate-9999                                  
-NameSpace       fate-9999                                  
-ChartName       fate                                       
-ChartVersion    v1.8.0                                     
-Revision        1                                          
-Age             15h                                        
-Status          Running                                    
-Spec            backend: eggroll                           
-                chartName: fate                            
-                chartVersion: v1.8.0                       
-                imagePullSecrets:                          
-                - name: myregistrykey                      
-                imageTag: 1.8.0-release                    
-                ingress:                                   
-                  client:                                  
-                    annotations:                           
-                      kubernetes.io/ingress.class: nginx   
-                    hosts:                                 
-                    - name: party9999.notebook.example.com 
-                  fateboard:                               
-                    annotations:                           
-                      kubernetes.io/ingress.class: nginx   
-                    hosts:                                 
-                    - name: party9999.fateboard.example.com
-                istio:                                     
-                  enabled: false                           
-                modules:                                   
-                - rollsite                                 
-                - clustermanager                           
-                - nodemanager                              
-                - mysql                                    
-                - python                                   
-                - fateboard                                
-                - client                                   
-                name: fate-9999                            
-                namespace: fate-9999                       
-                partyId: 9999                              
-                persistence: false                         
-                podSecurityPolicy:                         
-                  enabled: false                           
-                pullPolicy: null                           
-                python:                                    
-                  grpcNodePort: 30092                      
-                  httpNodePort: 30097                      
-                  type: NodePort                           
-                registry: ""                               
-                rollsite:                                  
-                  nodePort: 30091                          
-                  partyList:                               
-                  - partyId: 10000                         
-                    partyIp: 10.192.173.64                 
-                    partyPort: 30101                       
-                  type: NodePort                           
-                servingIp: 10.192.173.64                   
-                servingPort: 30095                         
-                                                           
-Info            dashboard:                                 
-                - party9999.notebook.example.com           
-                - party9999.fateboard.example.com          
-                ip: 10.192.173.64                          
-                port: 30091                                
-                status:                                    
-                  containers:                              
-                    client: Running                        
-                    clustermanager: Running                
-                    fateboard: Running                     
-                    mysql: Running                         
-                    nodemanager-0: Running                 
-                    nodemanager-0-eggrollpair: Running     
-                    nodemanager-1: Running                 
-                    nodemanager-1-eggrollpair: Running     
-                    python: Running                        
-                    rollsite: Running                      
-                  deployments:                             
-                    client: Available                      
-                    clustermanager: Available              
-                    mysql: Available                       
-                    nodemanager-0: Available               
-                    nodemanager-1: Available               
-                    python: Available                      
-                    rollsite: Available          
+kubefate@machine:~/demo$ kubefate cluster describe 29878fa9-aeee-4ae5-a5b7-fd4e9eb7c1c3
+UUID        	29878fa9-aeee-4ae5-a5b7-fd4e9eb7c1c3
+Name        	fate-9999
+NameSpace   	fate-9999
+ChartName   	fate
+ChartVersion	v1.9.0
+Revision    	1
+Age         	54m
+Status      	Running
+Spec        	algorithm: Basic
+            	chartName: fate
+            	chartVersion: v1.9.0
+            	computing: Spark
+            	device: CPU
+            	federation: Pulsar
+            	imagePullSecrets:
+            	- name: myregistrykey
+            	ingress:
+            	  client:
+            	    hosts:
+            	    - name: party9999.notebook.example.com
+            	  fateboard:
+            	    hosts:
+            	    - name: party9999.fateboard.example.com
+            	  pulsar:
+            	    hosts:
+            	    - name: party9999.pulsar.example.com
+            	  spark:
+            	    hosts:
+            	    - name: party9999.spark.example.com
+            	ingressClassName: nginx
+            	istio:
+            	  enabled: false
+            	modules:
+            	- python
+            	- mysql
+            	- fateboard
+            	- client
+            	- spark
+            	- hdfs
+            	- nginx
+            	- pulsar
+            	name: fate-9999
+            	namespace: fate-9999
+            	nginx:
+            	  grpcNodePort: 30098
+            	  httpNodePort: 30093
+            	  route_table:
+            	    "10000":
+            	      fateflow:
+            	      - grpc_port: 30108
+            	        host: 192.168.100.123
+            	        http_port: 30103
+            	  type: NodePort
+            	partyId: 9999
+            	persistence: false
+            	podSecurityPolicy:
+            	  enabled: false
+            	pullPolicy: null
+            	pulsar:
+            	  httpNodePort: 30094
+            	  httpsNodePort: 30099
+            	  publicLB:
+            	    enabled: false
+            	  route_table:
+            	    "9999":
+            	      host: pulsar
+            	      port: 6650
+            	      sslPort: 6651
+            	    "10000":
+            	      host: 192.168.100.123
+            	      port: 30104
+            	      proxy: ""
+            	      sslPort: 30109
+            	  type: NodePort
+            	python:
+            	  grpcNodePort: 30092
+            	  httpNodePort: 30097
+            	  logLevel: INFO
+            	  type: NodePort
+            	registry: ""
+            	servingIp: 192.168.100.123
+            	servingPort: 30095
+            	storage: HDFS
+
+Info        	dashboard:
+            	- party9999.notebook.example.com
+            	- party9999.fateboard.example.com
+            	- party9999.pulsar.example.com
+            	- party9999.spark.example.com
+            	ip: 192.168.100.124
+            	status:
+            	  containers:
+            	    client: Running
+            	    datanode: Running
+            	    fateboard: Running
+            	    fateflow: Running
+            	    mysql: Running
+            	    namenode: Running
+            	    nginx: Running
+            	    pulsar: Running
+            	    spark-master: Running
+            	    spark-worker: Running
+            	  deployments:
+            	    nginx: Available
+            	    spark-master: Available
+            	    spark-worker: Available      
 ```
 从返回的内容中，我们看到`Info->dashboard`里包含了:
 * Jupyter Notebook的访问地址： `party9999.notebook.example.com`。这个是我们准备让数据科学家进行建模分析的平台。已经集成了FATE-Clients； 
 * FATEBoard的访问地址： `party9999.fateboard.example.com`。我们可以通过FATEBoard来查询当前训练的状态。
+* Pulsar的UI地址，`party9999.pulsar.example.com`，可以使用此地址查看Pulsar的UI界面。
+* Spark的UI地址，`party9999.spark.example.com`，可以使用此地址查看Spark的UI界面。
 
-类似的命令我们得到，`fate-10000`的Jupyter Notebook和FATEBoard地址分别是：`party10000.notebook.example.com` 以及`party10000.fateboard.example.com`。
+遇此类推，我们也可以查看fate-10000的各种地址
 
 ### 在浏览器访问FATE集群的机器上配置相关的Host信息
 **注意: 如果DNS已经配置了相关的解析，这步可以跳过**
@@ -501,6 +615,8 @@ notebook截图:
 
 ## 后续
 1. 上面的联邦学习例子是最简单的一个例子，请自行探索其他的例子。
-2. 本文只介绍了基于eggroll的FATE集群架构，在`https://github.com/FederatedAI/KubeFATE/tree/master/k8s-deploy/examples`目录中，我们还准备了其他的YAML文件，用来：
+2. 本文只介绍了基于Spark和Pulsar的FATE集群架构，在`https://github.com/FederatedAI/KubeFATE/tree/master/k8s-deploy/examples`目录中，我们还准备了其他的YAML文件，用来：
 * 部署FATE-Serving。
-* 部署基于Spark的FATE集群，以及基于两种消息队列的FATE集群：rabbitmq和pulsar。
+* 部署基于Eggroll的FATE集群。
+* 部署Rabbitmq做消息队列的FATE集群。
+* 部署FATE-Exchange并尝试星型的联邦。

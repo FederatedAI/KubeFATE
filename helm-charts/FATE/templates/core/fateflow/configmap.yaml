@@ -19,7 +19,7 @@ metadata:
 {{ include "fate.labels" . | indent 4 }}
 data:
   spark-defaults.conf: |
-    spark.master                      {{ if eq .Values.modules.python.backend "spark_local_pulsar" }}local[*]{{ else }}{{ .Values.modules.python.spark.master | default "spark://spark-master:7077"}}{{ end }}
+    spark.master                      {{ if eq .Values.computing "Spark_local" }}local[*]{{ else }}{{ .Values.modules.python.spark.master | default "spark://spark-master:7077"}}{{ end }}
     spark.driver.host                 {{  .Values.modules.python.spark.driverHost | default "fateflow" }}
     {{- if .Values.modules.python.spark.driverStartPort }}
     spark.driver.port                 {{  .Values.modules.python.spark.driverStartPort }}
@@ -48,13 +48,28 @@ data:
     encrypt_password: false
     encrypt_module: fate_arch.common.encrypt_utils#pwdecrypt
     private_key:
+    party_id:
+    hook_module:
+      client_authentication: fate_flow.hook.flow.client_authentication
+      site_authentication: fate_flow.hook.flow.site_authentication
+      permission: fate_flow.hook.flow.permission
+    hook_server_name:
+    authentication:
+      client:
+        switch: false
+        http_app_key:
+        http_secret_key:
+      site:
+        switch: false
+    permission:
+      switch: false
+      component: false
+      dataset: false
     fateflow:
       # you must set real ip address, 127.0.0.1 and 0.0.0.0 is not supported
-      host: {{ if .Values.istio.enabled }}127.0.0.1{{ else }}fateflow{{ end }}
+      host: fateflow
       http_port: 9380
       grpc_port: 9360
-      # http_app_key:
-      # http_secret_key:
       # support rollsite/nginx/fateflow as a coordination proxy
       # rollsite support fate on eggroll, use grpc protocol
       # nginx support fate on eggroll and fate on spark, use http or grpc protocol, default is http
@@ -67,7 +82,7 @@ data:
       #   host: xx
       #   http_port: xx
       #   grpc_port: xx 
-      {{- if eq .Values.modules.python.backend "spark_pulsar" "spark_rabbitmq" "spark_local_pulsar" }}
+      {{- if eq .Values.computing "Spark" "Spark_local" }}
       proxy: nginx
       {{- else }}
       proxy: rollsite
@@ -92,23 +107,13 @@ data:
        # password: fate
        # engine services
     default_engines:
-      {{- if eq .Values.modules.python.backend  "spark_pulsar" }}
-      computing: spark
-      federation: pulsar
-      storage: hdfs
-      {{- else if eq .Values.modules.python.backend  "spark_rabbitmq" }}
-      computing: spark
-      federation: rabbitmq
-      storage: hdfs
-      {{- else if eq .Values.modules.python.backend  "spark_local_pulsar" }}
-      computing: spark
-      federation: pulsar
-      storage: localfs
+      {{- if eq .Values.computing "Spark_local" }}
+      computing: "spark"
       {{- else }}
-      computing: eggroll
-      federation: eggroll
-      storage: eggroll
+      computing: {{ .Values.computing | lower }}
       {{- end }}
+      federation: {{ .Values.federation | lower }}
+      storage: {{ .Values.storage | lower }}
     fate_on_standalone:
       standalone:
         cores_per_node: 20
@@ -123,7 +128,7 @@ data:
     fate_on_spark:
       spark:
         # default use SPARK_HOME environment variable
-        home: /data/projects/spark-2.4.1-bin-hadoop2.7/
+        home: /data/projects/spark-3.1.2-bin-hadoop3.2/
         cores_per_node: {{ .Values.modules.python.spark.cores_per_node }}
         nodes: {{ .Values.modules.python.spark.nodes }}
       linkis_spark:
@@ -154,6 +159,9 @@ data:
         password: {{ .Values.modules.python.rabbitmq.password }}
         # default conf/rabbitmq_route_table.yaml
         route_table: conf/rabbitmq_route_table/rabbitmq_route_table.yaml
+        # mode: replication / client, default: replication
+        mode: replication
+        max_message_size: 1048576
       pulsar:
         host: {{ .Values.modules.python.pulsar.host }}
         port: {{ .Values.modules.python.pulsar.port }}
@@ -161,6 +169,9 @@ data:
         topic_ttl: 3
         # default conf/pulsar_route_table.yaml
         route_table: conf/pulsar_route_table/pulsar_route_table.yaml
+        # mode: replication / client, default: replication
+        mode: replication
+        max_message_size: 1048576
       nginx:
         host: {{ .Values.modules.python.nginx.host }}
         http_port: {{ .Values.modules.python.nginx.http_port }}
@@ -168,10 +179,6 @@ data:
     fateboard:
       host: fateboard
       port: 8080
-    # on API `/model/load` and `/model/load/do`
-    # automatic upload models to the model store if it exists locally but does not exist in the model storage
-    # or download models from the model store if it does not exist locally but exists in the model storage
-    # this config will not affect API `/model/store` or `/model/restore`
     enable_model_store: false
     model_store_address:
       storage: mysql
@@ -243,9 +250,11 @@ data:
     auto_retry_delay: 1  #seconds
     # It can also be specified in the job configuration using the federated_status_collect_type parameter
     federated_status_collect_type: PUSH
+    detect_connect_max_retry_count: 3
+    detect_connect_long_retry_count: 2
     
     # upload
-    upload_max_bytes: 4194304000 # bytes
+    upload_max_bytes: 104857600 # bytes
     
     #component output
     output_data_summary_count_limit: 100

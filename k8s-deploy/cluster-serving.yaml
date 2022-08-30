@@ -1,11 +1,10 @@
 name: fate-serving-9999
 namespace: fate-serving-9999
 chartName: fate-serving
-chartVersion: v2.1.5
+chartVersion: v2.1.6
 partyId: 9999
 registry: ""
-imageTag: "2.1.5-release"
-pullPolicy: 
+pullPolicy:
 imagePullSecrets: 
 - name: myregistrykey
 persistence: false

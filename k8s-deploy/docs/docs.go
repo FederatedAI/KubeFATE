@@ -40,6 +40,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
+                        "default": "Bearer \u003cToken\u003e",
                         "description": "Authentication header",
                         "name": "Authorization",
                         "in": "header",
@@ -105,6 +106,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
+                        "default": "Bearer \u003cToken\u003e",
                         "description": "Authentication header",
                         "name": "Authorization",
                         "in": "header",
@@ -175,6 +177,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
+                        "default": "Bearer \u003cToken\u003e",
                         "description": "Authentication header",
                         "name": "Authorization",
                         "in": "header",
@@ -243,6 +246,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
+                        "default": "Bearer \u003cToken\u003e",
                         "description": "Authentication header",
                         "name": "Authorization",
                         "in": "header",
@@ -309,6 +313,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
+                        "default": "Bearer \u003cToken\u003e",
                         "description": "Authentication header",
                         "name": "Authorization",
                         "in": "header",
@@ -385,6 +390,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
+                        "default": "Bearer \u003cToken\u003e",
                         "description": "Authentication header",
                         "name": "Authorization",
                         "in": "header",
@@ -462,6 +468,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
+                        "default": "Bearer \u003cToken\u003e",
                         "description": "Authentication header",
                         "name": "Authorization",
                         "in": "header",
@@ -541,6 +548,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
+                        "default": "Bearer \u003cToken\u003e",
                         "description": "Authentication header",
                         "name": "Authorization",
                         "in": "header",
@@ -615,6 +623,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
+                        "default": "Bearer \u003cToken\u003e",
                         "description": "Authentication header",
                         "name": "Authorization",
                         "in": "header",
@@ -678,6 +687,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
+                        "default": "Bearer \u003cToken\u003e",
                         "description": "Authentication header",
                         "name": "Authorization",
                         "in": "header",
@@ -745,6 +755,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
+                        "default": "Bearer \u003cToken\u003e",
                         "description": "Authentication header",
                         "name": "Authorization",
                         "in": "header",
@@ -821,6 +832,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
+                        "default": "Bearer \u003cToken\u003e",
                         "description": "Authentication header",
                         "name": "Authorization",
                         "in": "header",
@@ -889,6 +901,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
+                        "default": "Bearer \u003cToken\u003e",
                         "description": "Authentication header",
                         "name": "Authorization",
                         "in": "header",
@@ -999,6 +1012,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
+                        "default": "Bearer \u003cToken\u003e",
                         "description": "Authentication header",
                         "name": "Authorization",
                         "in": "header",
@@ -1118,6 +1132,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
+                        "default": "Bearer \u003cToken\u003e",
                         "description": "Authentication header",
                         "name": "Authorization",
                         "in": "header",
@@ -1169,6 +1184,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
+                        "default": "Bearer \u003cToken\u003e",
                         "description": "Authentication header",
                         "name": "Authorization",
                         "in": "header",
@@ -1232,6 +1248,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
+                        "default": "Bearer \u003cToken\u003e",
                         "description": "Authentication header",
                         "name": "Authorization",
                         "in": "header",
@@ -1305,6 +1322,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
+                        "default": "Bearer \u003cToken\u003e",
                         "description": "Authentication header",
                         "name": "Authorization",
                         "in": "header",
@@ -1375,6 +1393,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
+                        "default": "Bearer \u003cToken\u003e",
                         "description": "Authentication header",
                         "name": "Authorization",
                         "in": "header",
@@ -1477,6 +1496,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
+                        "default": "Bearer \u003cToken\u003e",
                         "description": "Authentication header",
                         "name": "Authorization",
                         "in": "header",
@@ -1523,6 +1543,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
+                        "default": "Bearer \u003cToken\u003e",
                         "description": "Authentication header",
                         "name": "Authorization",
                         "in": "header",
@@ -1591,6 +1612,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
+                        "default": "Bearer \u003cToken\u003e",
                         "description": "Authentication header",
                         "name": "Authorization",
                         "in": "header",
@@ -1608,6 +1630,78 @@ const docTemplate = `{
                         "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/api.JSONERRORResult"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized operation",
+                        "schema": {
+                            "$ref": "#/definitions/api.JSONERRORResult"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/api.JSONERRORResult"
+                        }
+                    }
+                }
+            }
+        },
+        "/valueTemplateExample/{chartName}/{chartVersion}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Chart"
+                ],
+                "summary": "return valueTemplateExample string by chart name and version",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "chart name",
+                        "name": "chartName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "chart version",
+                        "name": "chartVersion",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cToken\u003e",
+                        "description": "Authentication header",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/api.JSONResult"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "401": {
@@ -1827,6 +1921,9 @@ const docTemplate = `{
         "modules.ClusterArgs": {
             "type": "object",
             "properties": {
+                "Keep_upgrade_job": {
+                    "type": "boolean"
+                },
                 "chart_name": {
                     "type": "string"
                 },
@@ -1881,6 +1978,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "values_template": {
+                    "type": "string"
+                },
+                "values_template_example": {
                     "type": "string"
                 },
                 "version": {

@@ -9,24 +9,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-{{ if .Values.modules.python.include }}
+{{- if .Values.modules.python.include }}
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: python
   labels:
     fateMoudle: python
 {{ include "fate.labels" . | indent 4 }}
 spec:
+  serviceName: fateflow
   replicas: 1
-  strategy:
-    type: Recreate
   selector:
     matchLabels:
       fateMoudle: python
 {{ include "fate.matchLabels" . | indent 6 }}
   template:
     metadata:
+      annotations:
+        {{- if .Values.istio.enabled }}
+        sidecar.istio.io/rewriteAppHTTPProbers: "false"
+        {{- end }}
       labels:
         fateMoudle: python
 {{ include "fate.labels" . | indent 8 }}
@@ -75,12 +78,8 @@ spec:
           checkMySQL
       {{- end }}
       containers:
-        - name: python
-          {{- if eq .Values.modules.python.backend "spark_pulsar" "spark_rabbitmq" "spark_local_pulsar" }}
-          image: {{ .Values.image.registry }}/python-spark:{{ .Values.image.tag }}
-          {{- else }}
-          image: {{ .Values.image.registry }}/{{ if .Values.modules.python.enabledNN }}python-nn{{ else }}python{{ end }}:{{ .Values.image.tag }}
-          {{- end }}
+        - name: fateflow
+          image: {{ .Values.image.registry }}/fateflow{{ include "images.fateflow.suffix" . }}:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           {{- if .Values.modules.python.resources}}
           resources:
@@ -102,7 +101,7 @@ spec:
             value: "$PYTHONPATH:/data/projects/fate/fate/python:/data/projects/fate/eggroll/python:/data/projects/fate/fateflow/python:/data/projects/fate/fate/python/fate_client"
           - name: FATE_PROJECT_BASE
             value: "/data/projects/fate"
-          {{- if eq .Values.modules.python.backend "spark_pulsar" "spark_rabbitmq" }}
+          {{- if eq .Values.computing "Spark" }}
           - name: FATE_FLOW_UPLOAD_MAX_NUM
             value: "1000000"
           - name: FATE_FLOW_UPLOAD_MAX_BYTES
@@ -121,18 +120,13 @@ spec:
                 mkdir -p /data/projects/fate/conf/
                 cp /data/projects/fate/conf-tmp/transfer_conf.yaml /data/projects/fate/conf/transfer_conf.yaml
                 cp /data/projects/fate/conf-tmp/service_conf.yaml /data/projects/fate/conf/service_conf.yaml
-                cp /data/projects/fate/conf-tmp/component_registry.json /data/projects/fate/conf/component_registry.json
-                cp /data/projects/fate/conf-tmp/job_default_config.yaml /data/projects/fate/conf/job_default_config.yaml
+                cp /data/projects/fate/conf-tmp/component_registry.json /data/projects/fate/fateflow/conf/component_registry.json
+                cp /data/projects/fate/conf-tmp/job_default_config.yaml /data/projects/fate/fateflow/conf/job_default_config.yaml
                 # fix fateflow conf must use IP
                 sed -i "s/host: fateflow/host: ${POD_IP}/g" /data/projects/fate/conf/service_conf.yaml
                 
-                cp /data/projects/spark-2.4.1-bin-hadoop2.7/conf/spark-defaults-template.conf /data/projects/spark-2.4.1-bin-hadoop2.7/conf/spark-defaults.conf
-                sed -i "s/fateflow/${POD_IP}/g" /data/projects/spark-2.4.1-bin-hadoop2.7/conf/spark-defaults.conf
-                
-                # logs
-                mkdir -p /data/projects/fate/fateflow/logs/fate_flow/
-                touch /data/projects/fate/fateflow/logs/fate_flow/INFO.log
-                ln -sf /dev/stdout /data/projects/fate/fateflow/logs/fate_flow/INFO.log
+                cp /data/projects/spark-3.1.2-bin-hadoop3.2/conf/spark-defaults-template.conf /data/projects/spark-3.1.2-bin-hadoop3.2/conf/spark-defaults.conf
+                sed -i "s/fateflow/${POD_IP}/g" /data/projects/spark-3.1.2-bin-hadoop3.2/conf/spark-defaults.conf
                 
                 sleep 5 && python fateflow/python/fate_flow/fate_flow_server.py
           livenessProbe:
@@ -157,7 +151,7 @@ spec:
             failureThreshold: 12
             periodSeconds: 10
           volumeMounts:
-            {{- if eq .Values.modules.python.backend "eggroll" }}
+            {{- if eq .Values.computing "Eggroll" }}
             - mountPath: /data/projects/fate/eggroll/conf/eggroll.properties
               name: eggroll-confs
               subPath: eggroll.properties
@@ -167,22 +161,21 @@ spec:
               subPath: logs
             - mountPath: /data/projects/fate/conf-tmp/
               name: python-confs
-            - mountPath: /data/projects/spark-2.4.1-bin-hadoop2.7/conf/spark-defaults-template.conf
+            - mountPath: /data/projects/spark-3.1.2-bin-hadoop3.2/conf/spark-defaults-template.conf
               name: python-confs
               subPath: spark-defaults.conf
-            {{- if eq .Values.modules.python.backend "spark_rabbitmq" }}
+            {{- if eq .Values.federation "RabbitMQ" }}
             - mountPath: /data/projects/fate/conf/rabbitmq_route_table
               name: rabbitmq-route-table
             {{- end }}
-            {{- if eq .Values.modules.python.backend "spark_pulsar" "spark_local_pulsar" }}
+            {{- if eq .Values.federation "Pulsar" }}
             - mountPath: /data/projects/fate/conf/pulsar_route_table
               name: pulsar-route-table
             {{- end }}
-            # TODO add mountPath of job and model-cache 
-            - mountPath: /data/projects/fate/jobs
+            - mountPath: /data/projects/fate/fateflow/jobs
               name: python-data
               subPath: jobs
-            - mountPath: /data/projects/fate/model_local_cache
+            - mountPath: /data/projects/fate/fateflow/model_local_cache
               name: python-data
               subPath: model-local-cache
         {{- if .Values.modules.fateboard.include }}
@@ -255,7 +248,7 @@ spec:
     {{- end }}
       restartPolicy: Always
       volumes:
-        {{- if eq .Values.modules.python.backend "eggroll" }}
+        {{- if eq .Values.computing "Eggroll" }}
         - name: eggroll-confs
           configMap:
             name: eggroll-config
@@ -263,12 +256,12 @@ spec:
         - name: python-confs
           configMap:
             name: python-config
-        {{- if eq .Values.modules.python.backend "spark_rabbitmq" }}
+        {{- if eq .Values.federation "RabbitMQ" }}
         - name: rabbitmq-route-table
           configMap:
             name: rabbitmq-route-table
         {{- end }}
-        {{- if eq .Values.modules.python.backend "spark_pulsar" "spark_local_pulsar" }}
+        {{- if eq .Values.federation "Pulsar" }}
         - name: pulsar-route-table
           configMap:
             name: pulsar-route-table
@@ -281,10 +274,22 @@ spec:
         {{- if not .Values.persistence.enabled }}
         - name: python-data
           emptyDir: {}
-        {{- else }}
+        {{- else if and .Values.persistence.enabled (.Values.modules.python.existingClaim) }}
         - name: python-data
           persistentVolumeClaim:
             claimName: {{ .Values.modules.python.existingClaim | default  "python-data" }}
+        {{- else }}
+  volumeClaimTemplates:
+    - metadata:
+        name: python-data
+        labels:
+          fateMoudle: python
+{{ include "fate.labels" . | indent 10 }}
+      spec:
+        accessModes: [{{ .Values.modules.python.accessMode | quote }}]
+        storageClassName: {{ .Values.modules.python.storageClass }}
+        resources:
+          requests:
+            storage: {{ .Values.modules.mysql.size }}
         {{- end }}
-
-{{ end }}
+{{- end }}

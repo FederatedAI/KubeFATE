@@ -1,0 +1,7 @@
+apiVersion: v1
+appVersion: v1.0.0
+description: A Helm chart for a K8s job, which is used for upgrading the framworks
+name: fate-upgrade-manager
+version: v1.0.0
+sources:
+  - https://github.com/FederatedAI/KubeFATE

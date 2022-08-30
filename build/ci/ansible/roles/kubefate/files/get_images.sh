@@ -20,11 +20,11 @@ main() {
   docker pull ${DOCKER_REGISTRY}/federatedai/python-spark:${FATE_VERSION}
   kind load docker-image ${DOCKER_REGISTRY}/federatedai/python-spark:${FATE_VERSION}
 
-  docker pull ${DOCKER_REGISTRY}/federatedai/hadoop-namenode:2.0.0-hadoop2.7.4-java8
-  kind load docker-image ${DOCKER_REGISTRY}/federatedai/hadoop-namenode:2.0.0-hadoop2.7.4-java8
+  docker pull ${DOCKER_REGISTRY}/federatedai/hadoop-namenode:2.0.0-hadoop3.2.1-java8
+  kind load docker-image ${DOCKER_REGISTRY}/federatedai/hadoop-namenode:2.0.0-hadoop3.2.1-java8
 
-  docker pull ${DOCKER_REGISTRY}/federatedai/hadoop-datanode:2.0.0-hadoop2.7.4-java8
-  kind load docker-image ${DOCKER_REGISTRY}/federatedai/hadoop-datanode:2.0.0-hadoop2.7.4-java8
+  docker pull ${DOCKER_REGISTRY}/federatedai/hadoop-datanode:2.0.0-hadoop3.2.1-java8
+  kind load docker-image ${DOCKER_REGISTRY}/federatedai/hadoop-datanode:2.0.0-hadoop3.2.1-java8
 
   docker pull ${DOCKER_REGISTRY}/federatedai/nginx:1.17
   kind load docker-image ${DOCKER_REGISTRY}/federatedai/nginx:1.17

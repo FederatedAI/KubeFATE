@@ -23,7 +23,7 @@ spec:
   - {{ .name }}
   {{- end }}
   gateways:
-  - fate-9999-gateway
+  - {{ .Values.partyName }}-gateway
   http:
   - route:
     - destination:

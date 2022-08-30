@@ -5,7 +5,7 @@ partyName: fate-serving-9999
 image:
   registry: federatedai
   isThridParty:
-  tag: 2.1.5-release
+  tag: 2.1.6-release
   pullPolicy: IfNotPresent
   imagePullSecrets: 
 #  - name: 

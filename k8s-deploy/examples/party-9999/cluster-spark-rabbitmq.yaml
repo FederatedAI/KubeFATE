@@ -1,12 +1,11 @@
 name: fate-9999
 namespace: fate-9999
 chartName: fate
-chartVersion: v1.8.0
+chartVersion: v1.9.0
 partyId: 9999
 registry: ""
-imageTag: 1.8.0-release
-pullPolicy: 
-imagePullSecrets: 
+pullPolicy:
+imagePullSecrets:
 - name: myregistrykey
 persistence: false
 istio:
@@ -24,7 +23,11 @@ modules:
   - nginx
   - rabbitmq
 
-backend: spark_rabbitmq
+computing: Spark
+federation: RabbitMQ
+storage: HDFS
+algorithm: Basic
+device: CPU
 
 ingress:
   fateboard: 

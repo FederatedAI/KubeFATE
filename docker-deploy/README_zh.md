@@ -20,7 +20,8 @@ Compose是用于定义和运行多容器Docker应用程序的工具。通过Comp
 2. 所有主机安装Docker 版本 : 18+；
 3. 所有主机安装Docker-Compose 版本: 1.24+；
 4. 部署机可以联网，所以主机相互之间可以网络互通；
-5. 运行机已经下载FATE 的各组件镜像（离线构建镜像参考文档[构建镜像](https://github.com/FederatedAI/FATE/tree/master/docker-build)）。
+5. 运行机已经下载FATE的各组件镜像，如果无法连接dockerhub，请考虑使用harbor（[Harbor 作为本地镜像源](../registry/README.md)）或者使用离线部署（离线构建镜像参考文档[构建镜像](https://github.com/FederatedAI/FATE/tree/master/build/docker-build)）。
+6. 运行FATE的主机推荐配置8CPUs和16G RAM。
 
 ### 下载部署脚本
 
@@ -46,7 +47,7 @@ RegistryURI=hub.c.163.com
 ```bash
 docker pull federatedai/eggroll:<version>-release
 docker pull federatedai/fateboard:<version>-release
-docker pull federatedai/python:<version>-release
+docker pull federatedai/fateflow:<version>-release
 docker pull federatedai/serving-server:<version>-release
 docker pull federatedai/serving-proxy:<version>-release
 docker pull federatedai/serving-admin:<version>-release
@@ -61,7 +62,7 @@ $ docker images
 REPOSITORY                         TAG 
 federatedai/eggroll                <version>-release
 federatedai/fateboard              <version>-release
-federatedai/python                 <version>-release
+federatedai/fateflow               <version>-release
 federatedai/client                 <version>-release
 federatedai/serving-server         <version>-release
 federatedai/serving-proxy          <version>-release
@@ -93,7 +94,9 @@ RegistryURI=192.168.10.1/federatedai
 
 根据需求修改配置文件`kubeFATE\docker-deploy\parties.conf`。
 
-下面是修改好的文件，`party 10000`的集群将部署在*192.168.7.1*上，而`party 9999`的集群将部署在*192.168.7.2*上。为了减少所需拉取镜像的大小，KubeFATE在默认情况下，会使用不带神经网络的“python”容器，若需要跑神经网络的算法则需把“parties.conf”中的`enabled_nn`设置成`true`。
+`parties.conf`配置文件配置项的含义查看这个文档[parties.conf文件介绍](../docs/configurations/Docker_compose_Partys_configuration.md)
+
+下面是修改好的文件，`party 10000`的集群将部署在*192.168.7.1*上，而`party 9999`的集群将部署在*192.168.7.2*上。
 
 ```bash
 user=fate
@@ -102,35 +105,28 @@ party_list=(10000 9999)
 party_ip_list=(192.168.7.1 192.168.7.2)
 serving_ip_list=(192.168.7.1 192.168.7.2)
 
-# backend could be eggroll, spark_rabbitmq and spark_pulsar spark_local_pulsar
-backend=eggroll
+computing=Eggroll
+federation=Eggroll
+storage=Eggroll
 
-# true if you need python-nn else false, the default value will be false
-enabled_nn=false
+algorithm=Basic
+device=IPCL
 
-# default
-exchangeip=
+compute_core=4
 
-# modify if you are going to use an external db
-mysql_ip=mysql
-mysql_user=fate
-mysql_password=fate_dev
-mysql_db=fate_flow
+......
 
-name_node=hdfs://namenode:9000
-
-# Define fateboard login information
-fateboard_username=admin
-fateboard_password=admin
-
-# Define serving admin login information
-serving_admin_username=admin
-serving_admin_password=admin
 ```
 
-FATE v1.5 开始支持使用Spark作为底层的分布式计算引擎，Spark集群默认会通过容器的方式部署。相关的简介可以参考这个[链接](../docs/FATE_On_Spark.md).
+* 使用Spark+Rabbitmq的部署方式的文档可以参考[这里](../docs/FATE_On_Spark.md).
+* 使用Spark+Pulsar的部署方式的文档可以参考[这里](../docs/FATE_On_Spark_With_Pulsar.md).
+* 使用Spark+local Pulsar的部署方式的文档可以参考[这里](TBD)
 
-**注意**: 默认情况下不会部署exchange组件。如需部署，用户可以把服务器IP填入上述配置文件的`exchangeip`中，该组件的默认监听端口为9371
+使用Docker-compose部署FATE可以支持多种种不同的类型引擎的组合(对computing federation storage的选择)，关于不同类型的FATE的更多细节查看: [不同类型FATE的架构介绍](../docs/Introduction_to_Engine_Architecture_zh.md)。
+
+`algorithm`和`device`的配置可以查看这里[FATE_Algorithm_and_Computational_Acceleration_Selection.md](../docs/FATE_Algorithm_and_Computational_Acceleration_Selection.md)
+
+**注意**: 默认情况下不会部署exchange组件。如需部署，用户可以把服务器IP填入上述配置文件的`exchangeip`中，该组件的默认监听端口为9371。
 
 在运行部署脚本之前，需要确保部署机器可以ssh免密登录到两个运行节点主机上。user代表免密的用户。
 
@@ -189,12 +185,12 @@ CONTAINER ID   IMAGE                                      COMMAND               
 3dca43f3c9d5   federatedai/serving-admin:2.1.5-release    "/bin/sh -c 'java -c…"   5 minutes ago   Up 5 minutes             0.0.0.0:8350->8350/tcp, :::8350->8350/tcp                                                                                                       serving-9999_serving-admin_1
 fe924918509b   federatedai/serving-proxy:2.1.5-release    "/bin/sh -c 'java -D…"   5 minutes ago   Up 5 minutes             0.0.0.0:8059->8059/tcp, :::8059->8059/tcp, 0.0.0.0:8869->8869/tcp, :::8869->8869/tcp, 8879/tcp                                                  serving-9999_serving-proxy_1
 b62ed8ba42b7   bitnami/zookeeper:3.7.0                    "/opt/bitnami/script…"   5 minutes ago   Up 5 minutes             0.0.0.0:2181->2181/tcp, :::2181->2181/tcp, 8080/tcp, 0.0.0.0:49226->2888/tcp, :::49226->2888/tcp, 0.0.0.0:49225->3888/tcp, :::49225->3888/tcp   serving-9999_serving-zookeeper_1
-3c643324066f   federatedai/client:1.8.0-release           "/bin/sh -c 'flow in…"   5 minutes ago   Up 5 minutes             0.0.0.0:20000->20000/tcp, :::20000->20000/tcp                                                                                                   confs-9999_client_1
-3fe0af1ebd71   federatedai/fateboard:1.8.0-release        "/bin/sh -c 'java -D…"   5 minutes ago   Up 5 minutes             0.0.0.0:8080->8080/tcp, :::8080->8080/tcp                                                                                                       confs-9999_fateboard_1
-635b7d99357e   federatedai/python:1.8.0-release           "container-entrypoin…"   5 minutes ago   Up 5 minutes (healthy)   0.0.0.0:9360->9360/tcp, :::9360->9360/tcp, 8080/tcp, 0.0.0.0:9380->9380/tcp, :::9380->9380/tcp                                                  confs-9999_python_1
-8b515f08add3   federatedai/eggroll:1.8.0-release          "/tini -- bash -c 'j…"   5 minutes ago   Up 5 minutes             8080/tcp, 0.0.0.0:9370->9370/tcp, :::9370->9370/tcp                                                                                             confs-9999_rollsite_1
-108cc061c191   federatedai/eggroll:1.8.0-release          "/tini -- bash -c 'j…"   5 minutes ago   Up 5 minutes             4670/tcp, 8080/tcp                                                                                                                              confs-9999_clustermanager_1
-f10575e76899   federatedai/eggroll:1.8.0-release          "/tini -- bash -c 'j…"   5 minutes ago   Up 5 minutes             4671/tcp, 8080/tcp                                                                                                                              confs-9999_nodemanager_1
+3c643324066f   federatedai/client:1.9.0-release           "/bin/sh -c 'flow in…"   5 minutes ago   Up 5 minutes             0.0.0.0:20000->20000/tcp, :::20000->20000/tcp                                                                                                   confs-9999_client_1
+3fe0af1ebd71   federatedai/fateboard:1.9.0-release        "/bin/sh -c 'java -D…"   5 minutes ago   Up 5 minutes             0.0.0.0:8080->8080/tcp, :::8080->8080/tcp                                                                                                       confs-9999_fateboard_1
+635b7d99357e   federatedai/fateflow:1.9.0-release         "container-entrypoin…"   5 minutes ago   Up 5 minutes (healthy)   0.0.0.0:9360->9360/tcp, :::9360->9360/tcp, 8080/tcp, 0.0.0.0:9380->9380/tcp, :::9380->9380/tcp                                                  confs-9999_fateflow_1
+8b515f08add3   federatedai/eggroll:1.9.0-release          "/tini -- bash -c 'j…"   5 minutes ago   Up 5 minutes             8080/tcp, 0.0.0.0:9370->9370/tcp, :::9370->9370/tcp                                                                                             confs-9999_rollsite_1
+108cc061c191   federatedai/eggroll:1.9.0-release          "/tini -- bash -c 'j…"   5 minutes ago   Up 5 minutes             4670/tcp, 8080/tcp                                                                                                                              confs-9999_clustermanager_1
+f10575e76899   federatedai/eggroll:1.9.0-release          "/tini -- bash -c 'j…"   5 minutes ago   Up 5 minutes             4671/tcp, 8080/tcp                                                                                                                              confs-9999_nodemanager_1
 aa0a0002de93   mysql:8.0.28                               "docker-entrypoint.s…"   5 minutes ago   Up 5 minutes             3306/tcp, 33060/tcp                                                                                                                             confs-9999_mysql_1
 ```
 
@@ -206,7 +202,7 @@ docker-compose上的FATE启动成功之后需要验证各个服务是否都正�
 
 ```bash
 #在192.168.7.1上执行下列命令
-$ docker exec -it confs-10000_client_1 bash                        #进入python组件容器内部
+$ docker exec -it confs-10000_client_1 bash                        #进入client组件容器内部
 $ flow test toy --guest-party-id 10000 --host-party-id 9999        #验证
 ```
 
@@ -222,8 +218,6 @@ $ flow test toy --guest-party-id 10000 --host-party-id 9999        #验证
 "2019-08-29 07:21:33,920 - secure_add_guest.py[line:114] - INFO: receive host sum from guest"
 "2019-08-29 07:21:34,118 - secure_add_guest.py[line:121] - INFO: success to calculate secure_sum, it is 2000.0000000000002"
 ```
-
-有关测试结果的更多详细信息，请参阅"python/examples/toy_example/README.md"这个文件 。
 
 ### 验证Serving-Service功能
 
@@ -750,18 +744,6 @@ rm -rf ../confs-<id>/               # 删除docker-compose部署文件
 ```
 
 ### 可能遇到的问题
-
-#### python容器退出
-
-```bash
-docker exec -it confs-10000_python_1 bash
-```
-
-进入docker容器后马上又弹出来了。
-
-解决办法：稍等一会再尝试。
-
-因为python服务依赖其他所有服务的正常运行，然而第一次启动的时候MySQL需要初始化数据库，python服务的容器会出现几次重启，当MySQL等其他服务都运行正常之后，就可以正常执行了。
 
 #### 采用docker hub下载镜像速度可能较慢
 

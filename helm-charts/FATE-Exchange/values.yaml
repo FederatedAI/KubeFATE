@@ -4,7 +4,7 @@ partyName: fate-exchange
 image:
   registry: federatedai
   isThridParty:
-  tag: 1.8.0-release
+  tag: 1.9.0-release
   pullPolicy: IfNotPresent
   imagePullSecrets: 
 #  - name: 
@@ -29,7 +29,8 @@ modules:
     ip: rollsite
     type: ClusterIP
     nodePort: 30001
-    loadBalancerIP: 
+    loadBalancerIP:
+    enableTLS: false
     nodeSelector:
     tolerations:
     affinity:

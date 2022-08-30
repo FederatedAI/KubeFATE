@@ -9,7 +9,9 @@ The nodes (target nodes) to install FATE must meet the following requirements:
 1. A Linux host
 2. Docker: 18+
 3. Docker-Compose: 1.24+
-4. Network connection to Internet to pull container images from Docker Hub. If network connection to Internet is not available, consider to set up [Harbor as a local registry](../registry/README.md) or use [offline images](https://github.com/FederatedAI/FATE/tree/master/docker-build).
+4. The deployment machine have access to the Internet, so the hosts can communicate with each other;
+5. Network connection to Internet to pull container images from Docker Hub. If network connection to Internet is not available, consider to set up [Harbor as a local registry](../registry/README.md) or use [offline images](https://github.com/FederatedAI/FATE/tree/master/build/docker-build).
+6. A host running FATE is recommended to be with 8 CPUs and 16G RAM.
 
 ## Deploying FATE
 
@@ -40,7 +42,7 @@ RegistryURI=192.168.10.1/federatedai
 ...
 ```
 
-**NOTE:** For Chinese user who has difficulty to access docker hub, you can set `RegistryURI` to `hub.c.163.com` to use the mirror of the registry within China.
+**NOTE:** For Chinese user who has difficulty to access docker hub, you can set `RegistryURI` to `hub.c.163.com` to use the mirror of the registry within China, we have already pushed the images to the 163 registry.
 
 ### Configuring multiple parties of FATE
 
@@ -50,7 +52,9 @@ The following steps illustrate how to generate necessary configuration files and
 
 Before deploying the FATE system, multiple parties should be defined in the configuration file: `docker-deploy/parties.conf`.
 
-In the following sample of `docker-deploy/parties.conf` , two parities are specified by id as `10000` and `9999`. Their cluster are going to be deployed on hosts with IP addresses of *192.168.7.1* and *192.168.7.2*. By default, to save time for downloading images, KubeFATE will use images without neural network dependencies, set the `enabled_nn` to `true` in "parties.conf" if neural network workflow is required.
+The meaning of the `parties.conf` configuration file configuration items see this document [parties.conf file introduction](../docs/configurations/Docker_compose_Partys_configuration.md)
+
+In the following sample of `docker-deploy/parties.conf` , two parities are specified by id as `10000` and `9999`. Their clusters are going to be deployed on hosts with IP addresses of *192.168.7.1* and *192.168.7.2*.
 
 ```bash
 user=fate
@@ -59,34 +63,26 @@ party_list=(10000 9999)
 party_ip_list=(192.168.7.1 192.168.7.2)
 serving_ip_list=(192.168.7.1 192.168.7.2)
 
-# backend could be eggroll, spark_rabbitmq and spark_pulsar spark_local_pulsar
-backend=eggroll
+computing=Eggroll
+federation=Eggroll
+storage=Eggroll
 
-# true if you need python-nn else false, the default value will be false
-enabled_nn=false
+algorithm=Basic
+device=IPCL
 
-# default
-exchangeip=
+compute_core=4
 
-# modify if you are going to use an external db
-mysql_ip=mysql
-mysql_user=fate
-mysql_password=fate_dev
-mysql_db=fate_flow
+......
 
-name_node=hdfs://namenode:9000
-
-# Define fateboard login information
-fateboard_username=admin
-fateboard_password=admin
-
-# Define serving admin login information
-serving_admin_username=admin
-serving_admin_password=admin
 ```
 
-Spark was introduced in FATE v1.5 as the underlying computing backend, for more details
-about FATE on Spark please refer to this [document](../docs/FATE_On_Spark.md).
+* For more details about FATE on Spark with Rebbitmq please refer to this [document](../docs/FATE_On_Spark.md).
+* For more details about FATE on Spark with Pulsar, refer to this [document](../docs/FATE_On_Spark_With_Pulsar.md)
+* For more details about FATE on Spark with local pulsar, refer to this [document](placeholder)
+
+Using Docker-compose to deploy FATE can support the combination of many different types of engines (choice of computing federation storage), for more details about different types of FATE see: [Architecture introduction of different types of FATE](../docs/Introduction_to_Engine_Architecture.md).
+
+**Note**: Exchange components are not deployed by default. For deployment, users can fill in the server IP into the `exchangeip` of the above configuration file. The default listening port of this component is 9371.
 
 On the host running FATE, the non-root user needs the owner permission of `/data/projects/fate` folder and Docker permission. No other action is required if the user is root.
 
@@ -112,7 +108,7 @@ drwxr-xr-x. 2 fate docker 6 May 27 00:51 fate
 
 By default, the exchange service is not deployed. The exchange service runs on port 9371. If an exchange (co-locates on the host of the same party or runs standalone) service is needed, update the value of `exchangeip` to the IP address of the desired host.
 
-After editting the above configuration file, use the following commands to generate configuration of target hosts.  
+After editing the above configuration file, use the following commands to generate configuration of target hosts.
 
 ```bash
 cd docker-deploy
@@ -125,7 +121,7 @@ Now, tar files have been generated for each party including the exchange node (p
 
 **Note:** Before running the below commands, all target hosts must
 
-* allow password-less SSH access with SSH key;
+* allow password-less SSH access with SSH key (Otherwise we will need to enter the password for each host for multiple times).
 * meet the requirements specified in [Prerequisites](#Prerequisites).
 
 To deploy FATE to all configured target hosts, use the below command:
@@ -170,18 +166,18 @@ CONTAINER ID   IMAGE                                      COMMAND               
 3dca43f3c9d5   federatedai/serving-admin:2.1.5-release    "/bin/sh -c 'java -c…"   5 minutes ago   Up 5 minutes             0.0.0.0:8350->8350/tcp, :::8350->8350/tcp                                                                                                       serving-9999_serving-admin_1
 fe924918509b   federatedai/serving-proxy:2.1.5-release    "/bin/sh -c 'java -D…"   5 minutes ago   Up 5 minutes             0.0.0.0:8059->8059/tcp, :::8059->8059/tcp, 0.0.0.0:8869->8869/tcp, :::8869->8869/tcp, 8879/tcp                                                  serving-9999_serving-proxy_1
 b62ed8ba42b7   bitnami/zookeeper:3.7.0                    "/opt/bitnami/script…"   5 minutes ago   Up 5 minutes             0.0.0.0:2181->2181/tcp, :::2181->2181/tcp, 8080/tcp, 0.0.0.0:49226->2888/tcp, :::49226->2888/tcp, 0.0.0.0:49225->3888/tcp, :::49225->3888/tcp   serving-9999_serving-zookeeper_1
-3c643324066f   federatedai/client:1.8.0-release           "/bin/sh -c 'flow in…"   5 minutes ago   Up 5 minutes             0.0.0.0:20000->20000/tcp, :::20000->20000/tcp                                                                                                   confs-9999_client_1
-3fe0af1ebd71   federatedai/fateboard:1.8.0-release        "/bin/sh -c 'java -D…"   5 minutes ago   Up 5 minutes             0.0.0.0:8080->8080/tcp, :::8080->8080/tcp                                                                                                       confs-9999_fateboard_1
-635b7d99357e   federatedai/python:1.8.0-release           "container-entrypoin…"   5 minutes ago   Up 5 minutes (healthy)   0.0.0.0:9360->9360/tcp, :::9360->9360/tcp, 8080/tcp, 0.0.0.0:9380->9380/tcp, :::9380->9380/tcp                                                  confs-9999_python_1
-8b515f08add3   federatedai/eggroll:1.8.0-release          "/tini -- bash -c 'j…"   5 minutes ago   Up 5 minutes             8080/tcp, 0.0.0.0:9370->9370/tcp, :::9370->9370/tcp                                                                                             confs-9999_rollsite_1
-108cc061c191   federatedai/eggroll:1.8.0-release          "/tini -- bash -c 'j…"   5 minutes ago   Up 5 minutes             4670/tcp, 8080/tcp                                                                                                                              confs-9999_clustermanager_1
-f10575e76899   federatedai/eggroll:1.8.0-release          "/tini -- bash -c 'j…"   5 minutes ago   Up 5 minutes             4671/tcp, 8080/tcp                                                                                                                              confs-9999_nodemanager_1
+3c643324066f   federatedai/client:1.9.0-release           "/bin/sh -c 'flow in…"   5 minutes ago   Up 5 minutes             0.0.0.0:20000->20000/tcp, :::20000->20000/tcp                                                                                                   confs-9999_client_1
+3fe0af1ebd71   federatedai/fateboard:1.9.0-release        "/bin/sh -c 'java -D…"   5 minutes ago   Up 5 minutes             0.0.0.0:8080->8080/tcp, :::8080->8080/tcp                                                                                                       confs-9999_fateboard_1
+635b7d99357e   federatedai/fateflow:1.9.0-release         "container-entrypoin…"   5 minutes ago   Up 5 minutes (healthy)   0.0.0.0:9360->9360/tcp, :::9360->9360/tcp, 8080/tcp, 0.0.0.0:9380->9380/tcp, :::9380->9380/tcp                                                  confs-9999_fateflow_1
+8b515f08add3   federatedai/eggroll:1.9.0-release          "/tini -- bash -c 'j…"   5 minutes ago   Up 5 minutes             8080/tcp, 0.0.0.0:9370->9370/tcp, :::9370->9370/tcp                                                                                             confs-9999_rollsite_1
+108cc061c191   federatedai/eggroll:1.9.0-release          "/tini -- bash -c 'j…"   5 minutes ago   Up 5 minutes             4670/tcp, 8080/tcp                                                                                                                              confs-9999_clustermanager_1
+f10575e76899   federatedai/eggroll:1.9.0-release          "/tini -- bash -c 'j…"   5 minutes ago   Up 5 minutes             4671/tcp, 8080/tcp                                                                                                                              confs-9999_nodemanager_1
 aa0a0002de93   mysql:8.0.28                               "docker-entrypoint.s…"   5 minutes ago   Up 5 minutes             3306/tcp, 33060/tcp                                                                                                                             confs-9999_mysql_1
 ```
 
 ### Verifying the deployment
 
-On the target node of each party, a container named  `confs-<party_id>_python_1` should have been created and running the `fate-flow` service. For example, on Party 10000's node, run the following commands to verify the deployment:
+On the target node of each party, a container named  `confs-<party_id>_fateflow_1` should have been created and running the `fate-flow` service. For example, on Party 10000's node, run the following commands to verify the deployment:
 
 ```bash
 docker exec -it confs-10000_client_1 bash
@@ -201,13 +197,11 @@ If the test passed, the output may look like the following:
 "2019-08-29 07:21:34,118 - secure_add_guest.py[line:121] - INFO: success to calculate secure_sum, it is 2000.0000000000002"
 ```
 
-For more details about the testing result, please refer to `python/examples/toy_example/README.md` .
-
 ### Verifying the serving service
 
 #### Steps on the host
 
-##### Logging in to the python container
+##### Logging in to the client container
 
 ```bash
 docker exec -it confs-10000_client_1 bash
@@ -236,7 +230,7 @@ flow data upload -c fateflow/examples/upload/upload_host.json
 
 #### Steps on the guest
 
-##### Getting in to the python container
+##### Getting in to the client container
 
 ```bash
 docker exec -it confs-9999_client_1 bash

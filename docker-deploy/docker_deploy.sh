@@ -153,10 +153,10 @@ DeployPartyInternal() {
 		return 0
 	fi
 
-	scp ${WORKINGDIR}/outputs/confs-$target_party_id.tar $user@$target_party_ip:~/
+	scp -P ${SSH_PORT} ${WORKINGDIR}/outputs/confs-$target_party_id.tar $user@$target_party_ip:~/
 	#rm -f ${WORKINGDIR}/outputs/confs-$target_party_id.tar
 	echo "$target_party_ip training cluster copy is ok!"
-	ssh -tt $user@$target_party_ip <<eeooff
+	ssh -p ${SSH_PORT} -tt $user@$target_party_ip <<eeooff
 mkdir -p $dir
 rm -f $dir/confs-$target_party_id.tar
 mv ~/confs-$target_party_id.tar $dir
@@ -205,9 +205,9 @@ DeployPartyServing() {
 		return
 	fi
 
-	scp ${WORKINGDIR}/outputs/serving-$target_party_id.tar $user@$target_party_serving_ip:~/
+	scp -P ${SSH_PORT} ${WORKINGDIR}/outputs/serving-$target_party_id.tar $user@$target_party_serving_ip:~/
 	echo "party $target_party_id serving cluster copy is ok!"
-	ssh -tt $user@$target_party_serving_ip <<eeooff
+	ssh -p ${SSH_PORT} -tt $user@$target_party_serving_ip <<eeooff
 mkdir -p $dir
 rm -f $dir/serving-$target_party_id.tar
 mv ~/serving-$target_party_id.tar $dir
@@ -248,7 +248,7 @@ DeleteCluster() {
 
 	# delete training cluster
 	if [ "$cluster_type" == "--training" ]; then
-		ssh -tt $user@$target_party_ip <<eeooff
+		ssh -p ${SSH_PORT} -tt $user@$target_party_ip <<eeooff
 cd $dir/confs-$target_party_id
 docker-compose down
 exit
@@ -256,7 +256,7 @@ eeooff
 		echo "party $target_party_id training cluster is deleted!"
 	# delete serving cluster
 	elif [ "$cluster_type" == "--serving" ]; then
-		ssh -tt $user@$target_party_serving_ip <<eeooff
+		ssh -p ${SSH_PORT} -tt $user@$target_party_serving_ip <<eeooff
 cd $dir/serving-$target_party_id
 docker-compose down
 exit
@@ -266,18 +266,18 @@ eeooff
 	else
 		# if party is exchange then delete exchange cluster
 		if [ "$target_party_id" == "exchange" ]; then
-			ssh -tt $user@$target_party_ip <<eeooff
+			ssh -p ${SSH_PORT} -tt $user@$target_party_ip <<eeooff
 cd $dir/confs-$target_party_id
 docker-compose down
 exit
 eeooff
 		else
-			ssh -tt $user@$target_party_serving_ip <<eeooff
+			ssh -p ${SSH_PORT} -tt $user@$target_party_serving_ip <<eeooff
 cd $dir/serving-$target_party_id
 docker-compose down
 exit
 eeooff
-			ssh -tt $user@$target_party_ip <<eeooff
+			ssh -p ${SSH_PORT} -tt $user@$target_party_ip <<eeooff
 cd $dir/confs-$target_party_id
 docker-compose down
 exit
@@ -327,7 +327,7 @@ main() {
    Use  ${party_ip_list[$i]}:8080 to access fateboard of party: ${party_list[$i]}
    Use  ${party_ip_list[$i]}:20000 to access notebook of party: ${party_list[$i]}"
       fi
-      if [[ "$backend" == "spark"* ]]; then
+      if [[ "$computing" == "spark"* ]]; then
         echo "   Use  ${party_ip_list[$i]}:8888 to access Spark of party: ${party_list[$i]}"
       fi
       if [ ${serving_ip_list[$i]} ]; then

@@ -1,11 +1,10 @@
 name: fate-10000
 namespace: fate-10000
 chartName: fate
-chartVersion: v1.8.0
+chartVersion: v1.9.0
 partyId: 10000
 registry: ""
-imageTag: 1.8.0-release
-pullPolicy: 
+pullPolicy:
 imagePullSecrets: 
 - name: myregistrykey
 persistence: false
@@ -24,7 +23,11 @@ modules:
   - nginx
   - rabbitmq
 
-backend: spark_rabbitmq
+computing: Spark
+federation: RabbitMQ
+storage: HDFS
+algorithm: Basic
+device: CPU
 
 ingress:
   fateboard: 
@@ -68,7 +71,5 @@ rabbitmq:
       host: 192.168.9.1
       port: 30094
     10000:
-      host: pulsar
-      port: 6650
-      sslPort: 6651
-      
+      host: rabbitmq
+      port: 5672

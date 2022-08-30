@@ -113,6 +113,8 @@ definitions:
     type: object
   modules.ClusterArgs:
     properties:
+      Keep_upgrade_job:
+        type: boolean
       chart_name:
         type: string
       chart_version:
@@ -149,6 +151,8 @@ definitions:
       values:
         type: string
       values_template:
+        type: string
+      values_template_example:
         type: string
       version:
         type: string
@@ -262,7 +266,8 @@ paths:
   /chart:
     get:
       parameters:
-      - description: Authentication header
+      - default: Bearer <Token>
+        description: Authentication header
         in: header
         name: Authorization
         required: true
@@ -301,7 +306,8 @@ paths:
         name: file
         required: true
         type: file
-      - description: Authentication header
+      - default: Bearer <Token>
+        description: Authentication header
         in: header
         name: Authorization
         required: true
@@ -343,7 +349,8 @@ paths:
         name: chartId
         required: true
         type: string
-      - description: Authentication header
+      - default: Bearer <Token>
+        description: Authentication header
         in: header
         name: Authorization
         required: true
@@ -379,7 +386,8 @@ paths:
         name: chartId
         required: true
         type: string
-      - description: Authentication header
+      - default: Bearer <Token>
+        description: Authentication header
         in: header
         name: Authorization
         required: true
@@ -422,7 +430,8 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/modules.ClusterArgs'
-      - description: Authentication header
+      - default: Bearer <Token>
+        description: Authentication header
         in: header
         name: Authorization
         required: true
@@ -467,7 +476,8 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/modules.ClusterArgs'
-      - description: Authentication header
+      - default: Bearer <Token>
+        description: Authentication header
         in: header
         name: Authorization
         required: true
@@ -513,7 +523,8 @@ paths:
         name: all
         required: true
         type: boolean
-      - description: Authentication header
+      - default: Bearer <Token>
+        description: Authentication header
         in: header
         name: Authorization
         required: true
@@ -560,7 +571,8 @@ paths:
         name: clusterId
         required: true
         type: string
-      - description: Authentication header
+      - default: Bearer <Token>
+        description: Authentication header
         in: header
         name: Authorization
         required: true
@@ -604,7 +616,8 @@ paths:
         name: clusterId
         required: true
         type: string
-      - description: Authentication header
+      - default: Bearer <Token>
+        description: Authentication header
         in: header
         name: Authorization
         required: true
@@ -644,7 +657,8 @@ paths:
   /job/:
     get:
       parameters:
-      - description: Authentication header
+      - default: Bearer <Token>
+        description: Authentication header
         in: header
         name: Authorization
         required: true
@@ -684,7 +698,8 @@ paths:
         name: jobId
         required: true
         type: string
-      - description: Authentication header
+      - default: Bearer <Token>
+        description: Authentication header
         in: header
         name: Authorization
         required: true
@@ -720,7 +735,8 @@ paths:
         name: jobId
         required: true
         type: string
-      - description: Authentication header
+      - default: Bearer <Token>
+        description: Authentication header
         in: header
         name: Authorization
         required: true
@@ -767,7 +783,8 @@ paths:
         name: jobStatus
         required: true
         type: string
-      - description: Authentication header
+      - default: Bearer <Token>
+        description: Authentication header
         in: header
         name: Authorization
         required: true
@@ -848,7 +865,8 @@ paths:
         name: limit-bytes
         required: true
         type: string
-      - description: Authentication header
+      - default: Bearer <Token>
+        description: Authentication header
         in: header
         name: Authorization
         required: true
@@ -925,7 +943,8 @@ paths:
         name: limit-bytes
         required: true
         type: string
-      - description: Authentication header
+      - default: Bearer <Token>
+        description: Authentication header
         in: header
         name: Authorization
         required: true
@@ -957,7 +976,8 @@ paths:
   /namespace/:
     get:
       parameters:
-      - description: Authentication header
+      - default: Bearer <Token>
+        description: Authentication header
         in: header
         name: Authorization
         required: true
@@ -994,7 +1014,8 @@ paths:
   /user:
     get:
       parameters:
-      - description: Authentication header
+      - default: Bearer <Token>
+        description: Authentication header
         in: header
         name: Authorization
         required: true
@@ -1038,7 +1059,8 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/modules.User'
-      - description: Authentication header
+      - default: Bearer <Token>
+        description: Authentication header
         in: header
         name: Authorization
         required: true
@@ -1080,7 +1102,8 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/modules.User'
-      - description: Authentication header
+      - default: Bearer <Token>
+        description: Authentication header
         in: header
         name: Authorization
         required: true
@@ -1122,7 +1145,8 @@ paths:
         name: userId
         required: true
         type: string
-      - description: Authentication header
+      - default: Bearer <Token>
+        description: Authentication header
         in: header
         name: Authorization
         required: true
@@ -1158,7 +1182,8 @@ paths:
         name: userId
         required: true
         type: string
-      - description: Authentication header
+      - default: Bearer <Token>
+        description: Authentication header
         in: header
         name: Authorization
         required: true
@@ -1220,7 +1245,8 @@ paths:
   /user/logout:
     post:
       parameters:
-      - description: Authentication header
+      - default: Bearer <Token>
+        description: Authentication header
         in: header
         name: Authorization
         required: true
@@ -1241,6 +1267,50 @@ paths:
       summary: logout
       tags:
       - User
+  /valueTemplateExample/{chartName}/{chartVersion}:
+    get:
+      parameters:
+      - description: chart name
+        in: path
+        name: chartName
+        required: true
+        type: string
+      - description: chart version
+        in: path
+        name: chartVersion
+        required: true
+        type: string
+      - default: Bearer <Token>
+        description: Authentication header
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            allOf:
+            - $ref: '#/definitions/api.JSONResult'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "401":
+          description: Unauthorized operation
+          schema:
+            $ref: '#/definitions/api.JSONERRORResult'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/api.JSONERRORResult'
+      security:
+      - ApiKeyAuth: []
+      summary: return valueTemplateExample string by chart name and version
+      tags:
+      - Chart
   /version:
     get:
       parameters:

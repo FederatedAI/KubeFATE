@@ -16,9 +16,10 @@ package cli
 
 import (
 	"fmt"
-	"github.com/urfave/cli/v2" // imports as package "cli"
 	"sort"
 	"time"
+
+	"github.com/urfave/cli/v2" // imports as package "cli"
 )
 
 const (
@@ -42,6 +43,7 @@ func initCommandLine() *cli.App {
 			ChartCommand(),
 			VersionCommand(),
 			NamespaceCommand(),
+			SupportBundleCommand(),
 		},
 	}
 

@@ -17,6 +17,21 @@ networks:
   fate-serving-network:
     external:
       name: <fate-network>
+
+volumes:
+  data_dir_server:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: <path-to-host-dir>/data/server
+  data_dir_zookeeper:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: <path-to-host-dir>/data/zookeeper
+
 services:
   serving-server:
     image: "federatedai/serving-server:${SERVING_TAG}"
@@ -24,7 +39,8 @@ services:
       - "8000:8000"
     volumes:
       - ./confs/serving-server/conf/serving-server.properties:/data/projects/fate-serving/serving-server/conf/serving-server.properties
-      - ./confs/serving-server/cache:/root/.fate
+      - ./data/server:/data/projects/fate-serving/serving-server/.fate
+      - /etc/localtime:/etc/localtime:ro
     networks:
       - fate-serving-network
 
@@ -38,15 +54,20 @@ services:
     volumes:
       - ./confs/serving-proxy/conf/application.properties:/data/projects/fate-serving/serving-proxy/conf/application.properties
       - ./confs/serving-proxy/conf/route_table.json:/data/projects/fate-serving/serving-proxy/conf/route_table.json
+      - /etc/localtime:/etc/localtime:ro
     networks:
       - fate-serving-network
 
   serving-zookeeper:
     image: "bitnami/zookeeper:3.7.0"
+    user: root
     ports:
       - "2181:2181"
       - "2888"
       - "3888"
+    volumes:
+      - ./data/zookeeper:/bitnami/zookeeper
+      - /etc/localtime:/etc/localtime:ro
     environment:
       ALLOW_ANONYMOUS_LOGIN: "yes"
     networks:
@@ -58,5 +79,6 @@ services:
       - "8350:8350"
     volumes:
       - ./confs/serving-admin/conf/application.properties:/data/projects/fate-serving/serving-admin/conf/application.properties
+      - /etc/localtime:/etc/localtime:ro
     networks:
       - fate-serving-network
