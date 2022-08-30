@@ -92,7 +92,7 @@ cluster-spark-pulsar.yaml cluster-spark-slim.yaml config.yaml kubefate.yaml
 ```
 chmod +x ./kubefate && sudo mv ./kubefate /usr/bin
 ```
-然后我们测试下KubeCLI命令是否可用，
+然后我们测试下KubeFATE CLI命令是否可用，
 ```
 kubefate@machine:~/kubefate$ kubefate version
 * kubefate commandLine version=v1.4.5
