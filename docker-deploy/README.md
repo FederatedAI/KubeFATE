@@ -80,7 +80,7 @@ compute_core=4
 * For more details about FATE on Spark with Pulsar, refer to this [document](../docs/FATE_On_Spark_With_Pulsar.md)
 * For more details about FATE on Spark with local pulsar, refer to this [document](placeholder)
 
-Using Docker-compose to deploy FATE can support the combination of many different types of engines (choice of computing federation storage), for more details about different types of FATE see: [Architecture introduction of different types of FATE](../docs/Introduction_to_Backend_Architecture_en.md).
+Using Docker-compose to deploy FATE can support the combination of many different types of engines (choice of computing federation storage), for more details about different types of FATE see: [Architecture introduction of different types of FATE](../docs/Introduction_to_Engine_Architecture.md).
 
 **Note**: Exchange components are not deployed by default. For deployment, users can fill in the server IP into the `exchangeip` of the above configuration file. The default listening port of this component is 9371.
 

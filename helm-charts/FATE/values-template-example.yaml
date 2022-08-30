@@ -36,7 +36,7 @@ storage: Eggroll
 # Algorithm: [Basic, NN]
 algorithm: Basic
 # Device: [IPCL, CPU]
-device: IPCL
+device: CPU
 
 skippedKeys:
   - route_table

@@ -17,11 +17,11 @@
 | podSecurityPolicy.enabled | bool               | if `true`, create & use Pod Security Policy resources                                                  |
 | ingressClassName          | scalars            | The Ingress class name, such as "nginx".                                                               |
 | * modules                 | sequences          | Modules to be deployed in the FATE cluster.                                                            |
-| computing                   | set(Eggroll, Spark, Spark_local) | Configure cluster computing engine( eggroll, spark or spark_local)                                                  |
-| federation                   | set(Eggroll,Pulsar,RabbitMQ) | Configure cluster federation engine( eggroll,pulsar or rabbitmq)                                                  |
+| computing                 | set(Eggroll, Spark, Spark_local) | Configure cluster computing engine( eggroll, spark or spark_local)                                                  |
+| federation                | set(Eggroll,Pulsar,RabbitMQ) | Configure cluster federation engine( eggroll,pulsar or rabbitmq)                                                  |
 | storage                   | set(Eggroll,HDFS,LocalFS) | Configure cluster storage engine( eggroll, hdfs or spark)                                                  |
-| algorithm                   | set(Basic, NN) | Configure cluster algorithm ( basic or NeuralNetwork)                                                  |
-| device                   | set(IPCL, CPU) | Configure cluster device( ipcl or cpu)                                                  |
+| algorithm                 | set(Basic, NN)     | Configure cluster algorithm ( basic or NeuralNetwork)                                                  |
+| device                    | set(IPCL, CPU)     | Configure cluster device( ipcl or cpu)                                                  |
 | ingress                   | mappings           | Custom domain of FATE UI component                                                                     |
 | rollsite                  | mappings           | Configuration of FATE cluster `rollsite` module.                                                       |
 | nodemanager               | mappings           | Configuration of FATE cluster `nodemanager` module.                                                    |
@@ -43,6 +43,7 @@
 | pulsar                    | mappings           | Configuration of FATE cluster `pulsar` module.                                                         |
 | skippedKeys               | sequences          | you can customize some keys which will be ignored in yaml validation                                       |
 
+***Computing federation storage algorithm device configuration introduction reference [Introduction to Engine Architecture](../Introduction_to_Engine_Architecture.md) 和 [FATE Algorithm and Computational Acceleration Selection](../FATE_Algorithm_and_Computational_Acceleration_Selection.md)***
 
 ### list of modules
 

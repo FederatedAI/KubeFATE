@@ -122,7 +122,7 @@ compute_core=4
 * 使用Spark+Pulsar的部署方式的文档可以参考[这里](../docs/FATE_On_Spark_With_Pulsar.md).
 * 使用Spark+local Pulsar的部署方式的文档可以参考[这里](TBD)
 
-使用Docker-compose部署FATE可以支持多种种不同的类型引擎的组合(对computing federation storage的选择)，关于不同类型的FATE的更多细节查看: [不同类型FATE的架构介绍](../docs/Introduction_to_Backend_Architecture_zh.md)。
+使用Docker-compose部署FATE可以支持多种种不同的类型引擎的组合(对computing federation storage的选择)，关于不同类型的FATE的更多细节查看: [不同类型FATE的架构介绍](../docs/Introduction_to_Engine_Architecture_zh.md)。
 
 `algorithm`和`device`的配置可以查看这里[FATE_Algorithm_and_Computational_Acceleration_Selection.md](../docs/FATE_Algorithm_and_Computational_Acceleration_Selection.md)
 
