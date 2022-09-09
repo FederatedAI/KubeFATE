@@ -97,7 +97,7 @@ services:
       FATE_LOG_LEVEL: "INFO"
 
   namenode:
-    image: federatedai/hadoop-namenode:2.0.0-hadoop3.2.1-java8
+    image: "federatedai/hadoop-namenode:2.0.0-hadoop3.2.1-java8"
     restart: always
     ports:
       - 9000:9000
@@ -114,7 +114,7 @@ services:
       - fate-network
 
   datanode-0:
-    image: federatedai/hadoop-datanode:2.0.0-hadoop3.2.1-java8
+    image: "federatedai/hadoop-datanode:2.0.0-hadoop3.2.1-java8"
     restart: always
     volumes:
       - ./shared_dir/data/datanode-0:/hadoop/dfs/data
@@ -126,7 +126,7 @@ services:
       - fate-network
 
   datanode-1:
-    image: federatedai/hadoop-datanode:2.0.0-hadoop3.2.1-java8
+    image: "federatedai/hadoop-datanode:2.0.0-hadoop3.2.1-java8"
     restart: always
     volumes:
       - ./shared_dir/data/datanode-1:/hadoop/dfs/data
@@ -138,7 +138,7 @@ services:
       - fate-network
 
   datanode-2:
-    image: federatedai/hadoop-datanode:2.0.0-hadoop3.2.1-java8
+    image: "federatedai/hadoop-datanode:2.0.0-hadoop3.2.1-java8"
     restart: always
     volumes:
       - ./shared_dir/data/datanode:/hadoop/dfs/data
@@ -152,7 +152,7 @@ services:
       - fate-network
 
   spark-master:
-    image: federatedai/spark-master:${TAG}
+    image: "federatedai/spark-master:${TAG}"
     restart: always
     ports:
       - "8888:8080"
@@ -165,7 +165,7 @@ services:
       - fate-network
 
   spark-worker:
-    image: federatedai/spark-worker:${TAG}
+    image: "federatedai/spark-worker:${TAG}"
     restart: always
     depends_on:
       - spark-master
@@ -180,7 +180,7 @@ services:
       - fate-network
 
   rabbitmq:
-    image: federatedai/rabbitmq:3.8.3-management
+    image: "federatedai/rabbitmq:3.8.3-management"
     ports:
       - "5672:5672"
       - "15672:15672"
