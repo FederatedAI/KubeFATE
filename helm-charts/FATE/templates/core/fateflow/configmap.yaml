@@ -190,8 +190,8 @@ data:
       {{- else }}
       - ''
       {{- end }}
-      {{- if and .useRegistry .zookeeper }}
     zookeeper:
+      {{- if .zookeeper }}
 {{ toYaml .zookeeper | indent 6 }}
       {{- else}}
       hosts:
