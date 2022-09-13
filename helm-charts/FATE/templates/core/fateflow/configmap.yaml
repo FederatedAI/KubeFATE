@@ -200,6 +200,12 @@ data:
       {{- if and .useRegistry .zookeeper }}
     zookeeper:
 {{ toYaml .zookeeper | indent 6 }}
+      {{- else}}
+      hosts:
+      - serving-zookeeper.fate-serving-9999:2181
+        use_acl: false
+        user: fate
+        password: fate
       {{- end }}
     {{- end }}
   transfer_conf.yaml: |
