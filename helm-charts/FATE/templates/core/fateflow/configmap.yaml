@@ -203,9 +203,9 @@ data:
       {{- else}}
       hosts:
       - serving-zookeeper.fate-serving-9999:2181
-        use_acl: false
-        user: fate
-        password: fate
+      use_acl: false
+      user: fate
+      password: fate
       {{- end }}
     {{- end }}
   transfer_conf.yaml: |
