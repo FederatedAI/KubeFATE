@@ -43,7 +43,7 @@
 | pulsar                    | mappings           | Configuration of FATE cluster `pulsar` module.                                                         |
 | skippedKeys               | sequences          | you can customize some keys which will be ignored in yaml validation                                       |
 
-***Computing federation storage algorithm device configuration introduction reference [Introduction to Engine Architecture](../Introduction_to_Engine_Architecture.md) 和 [FATE Algorithm and Computational Acceleration Selection](../FATE_Algorithm_and_Computational_Acceleration_Selection.md)***
+***Computing federation storage algorithm device configuration introduction reference [Introduction to Engine Architecture](../Introduction_to_Engine_Architecture.md) and [FATE Algorithm and Computational Acceleration Selection](../FATE_Algorithm_and_Computational_Acceleration_Selection.md)***
 
 ### list of modules
 
