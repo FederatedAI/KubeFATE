@@ -231,6 +231,7 @@ modules:
     storageClass:
     accessMode: ReadWriteOnce
     size: 1Gi
+
   serving:
     ip: 192.168.9.1
     port: 30095
@@ -238,7 +239,10 @@ modules:
     zookeeper:
       hosts:
         - serving-zookeeper.fate-serving-9999:2181
-      use_acl: false
+    use_acl: false
+    user: fate
+    password: fate
+
   fateboard:
     include: true
     type: ClusterIP

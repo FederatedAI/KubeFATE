@@ -99,13 +99,6 @@ data:
       port: {{ .Values.externalMysqlPort | default .Values.modules.mysql.port | default "3306" }}
       max_connections: 100
       stale_timeout: 30
-    zookeeper:
-      hosts:
-      - "serving-zookeeper:2181"
-       # use_acl: false
-       # user: fate
-       # password: fate
-       # engine services
     default_engines:
       {{- if eq .Values.computing "Spark_local" }}
       computing: "spark"
@@ -197,9 +190,15 @@ data:
       {{- else }}
       - ''
       {{- end }}
-      {{- if and .useRegistry .zookeeper }}
     zookeeper:
+      {{- if .zookeeper }}
 {{ toYaml .zookeeper | indent 6 }}
+      {{- else}}
+      hosts:
+      - serving-zookeeper.fate-serving-9999:2181
+      use_acl: false
+      user: fate
+      password: fate
       {{- end }}
     {{- end }}
   transfer_conf.yaml: |
