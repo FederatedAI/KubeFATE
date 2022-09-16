@@ -1,0 +1,157 @@
+# Copyright 2019-2022 VMware, Inc.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+{{- if .Values.modules.nodemanager.include }}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: nodemanager
+  labels:
+    fateMoudle: nodemanager
+    app: nodemanager
+{{ include "fate.labels" . | indent 4 }}
+spec:
+  replicas: {{ .Values.modules.nodemanager.replicas }}
+  serviceName: nodemanager
+  selector:
+    matchLabels:
+      fateMoudle: nodemanager
+{{ include "fate.matchLabels" . | indent 6 }}
+  template:
+    metadata:
+      labels:
+        fateMoudle: nodemanager
+        app: nodemanager
+{{ include "fate.labels" . | indent 8 }}
+    spec:
+      containers:
+        - name: nodemanager-eggrollpair
+        {{- if .Values.image.isThridParty }}
+          image: {{ .Values.image.registry }}/fluentd:v1.12
+        {{- else }}
+          image: fluent/fluentd:v1.12
+        {{- end }}
+          volumeMounts:
+          - name: eggroll-log
+            mountPath: /data/projects/fate/eggroll/logs/
+          - name: fluentd-conf
+            subPath: fluent.conf
+            mountPath: /fluentd/etc/fluent.conf
+        - image: {{ .Values.image.registry }}/eggroll{{ include "images.eggroll.suffix" . }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if .Values.modules.nodemanager.resources}}
+          resources:
+          {{- range $key, $val := .Values.modules.nodemanager.resources }}
+            {{ $key }}:
+{{ toYaml $val | indent 14 }}
+          {{- end }}
+          {{- end }}
+          name: nodemanager
+          command:
+          - bash
+          - -c
+          - |
+            set -x
+            mkdir -p /data/projects/fate/eggroll/logs/eggroll/
+            touch /data/projects/fate/eggroll/logs/eggroll/eggroll-audit.log
+            ln -sf /dev/stdout /data/projects/fate/eggroll/logs/eggroll/eggroll-audit.log
+            touch /data/projects/fate/eggroll/logs/eggroll/eggroll.jvm.log
+            ln -sf /dev/stdout /data/projects/fate/eggroll/logs/eggroll/eggroll.jvm.log
+            touch /data/projects/fate/eggroll/logs/eggroll/eggroll.jvm.err.log 
+            ln -sf /dev/stderr /data/projects/fate/eggroll/logs/eggroll/eggroll.jvm.err.log
+            /tini -- java -Dlog4j.configurationFile=$${EGGROLL_HOME}/conf/log4j2.properties -cp $${EGGROLL_HOME}/lib/*: com.webank.eggroll.core.Bootstrap --bootstraps com.webank.eggroll.core.resourcemanager.NodeManagerBootstrap -c $${EGGROLL_HOME}/conf/eggroll.properties -p 4671 -s 'EGGROLL_DEAMON'
+          ports:
+            - containerPort: 4671
+          livenessProbe:
+            tcpSocket:
+              port: 4671
+            initialDelaySeconds: 1
+            periodSeconds: 10
+            timeoutSeconds: 3
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            tcpSocket:
+              port: 4671
+            initialDelaySeconds: 1
+            periodSeconds: 10
+            timeoutSeconds: 3
+            successThreshold: 1
+            failureThreshold: 3
+          startupProbe:
+            tcpSocket:
+              port: 4671
+            failureThreshold: 12
+            periodSeconds: 10
+          volumeMounts:
+            - name: eggroll-log
+              mountPath: /data/projects/fate/eggroll/logs/
+            - mountPath: /data/projects/fate/eggroll/conf/eggroll.properties
+              name: eggroll-confs
+              subPath: eggroll.properties
+            - mountPath: /data/projects/fate/conf/
+              name: python-confs
+            - name: data-dir
+              mountPath: /data/projects/fate/eggroll/data
+              subPath: {{ .Values.modules.nodemanager.subPath }}
+      {{- with .Values.modules.nodemanager.nodeSelector }}
+      nodeSelector: 
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.modules.nodemanager.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.modules.nodemanager.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.image.imagePullSecrets }}
+      imagePullSecrets:
+{{ toYaml . | indent 6 }}
+      {{- end }}
+      serviceAccountName: {{ template "serviceAccountName" . }}
+      restartPolicy: Always
+      volumes:
+        - name: eggroll-log
+          emptyDir: {}
+        - name: fluentd-conf
+          configMap:
+            name: fluentd-config
+        - name: eggroll-confs
+          configMap:
+            name: eggroll-config
+        - name: python-confs
+          configMap:
+            name: python-config
+        {{- if not .Values.persistence.enabled }}
+        - name: data-dir
+          emptyDir: {}
+        {{- else if and .Values.persistence.enabled (.Values.modules.nodemanager.existingClaim) }}
+        - name: data-dir
+          persistentVolumeClaim:
+            claimName: {{ .Values.modules.nodemanager.existingClaim }}
+        {{- else }}
+  volumeClaimTemplates:
+    - metadata:
+        name: data-dir
+        labels:
+          fateMoudle: nodemanager
+{{ include "fate.labels" . | indent 10 }}
+      spec:
+        accessModes: [ {{ .Values.modules.nodemanager.accessMode | quote }} ]
+        storageClassName: {{ .Values.modules.nodemanager.storageClass }}
+        resources:
+          requests:
+            storage: {{ .Values.modules.nodemanager.size }}
+        {{- end }}
+{{- end }}

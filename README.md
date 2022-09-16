@@ -48,7 +48,9 @@ $ make docker-build
 ```
 
 ## Specifying an image repository
-By default, the installation script pulls the images from [Docker Hub](https://hub.docker.com/u/federatedai) during the deployment. A user could also modify the file `.env` to specify a local registry (such as Harbor) to pull images from. A local registry can improve the efficiency of the deployment.
+By default, the installation script pulls the images from [Docker Hub](https://hub.docker.com/u/federatedai) during the deployment.
+* For docker compose mode, modify the .env file to specify the image registry.
+* For K8s mode, check this [offical doc](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/).
 
 ## License
 [Apache License 2.0](https://github.com/FederatedAI/FATE/blob/master/LICENSE)

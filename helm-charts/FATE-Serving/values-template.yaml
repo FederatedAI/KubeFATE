@@ -6,7 +6,6 @@ partyName: {{ .name }}
 image:
   registry: {{ .registry | default "federatedai" }}
   isThridParty: {{ empty .registry | ternary  "false" "true" }}
-  tag: {{ .imageTag | default "2.0.4-release" }}
   pullPolicy: {{ .pullPolicy | default "IfNotPresent" }}
   {{- with .imagePullSecrets }}
   imagePullSecrets:
@@ -26,6 +25,7 @@ podSecurityPolicy:
   enabled: {{ .enabled | default false }}
 {{- end }}
 
+ingressClassName: {{ .ingressClassName | default "nginx"}}
 
 {{- with .ingress }}
 ingress:
@@ -70,7 +70,6 @@ servingProxy:
   type: {{ .type }}
   nodePort: {{ .nodePort }}
   loadBalancerIP: {{ .loadBalancerIP }}
-  ingerssHost: {{ .ingressHost | default (printf "%s.serving-admin.example.com" $partyId) }}
 
   {{- with .partyList }}
   partyList:
@@ -104,7 +103,7 @@ servingProxy:
 
 servingRedis:
   include: {{ has "servingRedis" .modules }}
-  
+
   {{- with .servingRedis }}
 
   password: {{ .password | default "fate_dev" }}
@@ -144,12 +143,17 @@ servingServer:
     port: {{ .port }}
   {{- end }}
   
+  cacheSwitch: {{ .cacheType | default "false" }}
+  cacheType: {{ .cacheType | default "local" }}
+  singleAdaptor: {{ .singleAdaptor | default "com.webank.ai.fate.serving.adaptor.dataaccess.MockAdapter" }}
+  batchAdaptor: {{ .batchAdaptor | default "com.webank.ai.fate.serving.adaptor.dataaccess.MockBatchAdapter" }}
+  AdapterURL: {{ .AdapterURL | default "http://127.0.0.1:9380/v1/http/adapter/getFeature" }}
+
   subPath: {{ .subPath }}
   existingClaim: {{ .existingClaim }}
   storageClass: {{ .storageClass | default "serving-redis" }}
   accessMode: {{ .accessMode | default "ReadWriteOnce" }}
   size: {{ .size | default "1Gi" }}
-  cacheType: {{ .cacheType | default "local" }}
   {{- with .nodeSelector }}
   nodeSelector:
 {{ toYaml . | indent 4 }}

@@ -31,21 +31,21 @@ env:
   - name: FATECLOUD_LOG_LEVEL
     value: "debug"
 ```
-| Name                     | Description                                                  |
-| ------------------------ | ------------------------------------------------------------ |
-| FATECLOUD_DB_TYPE        | Database types that support kubefate. At present, there is only "mysql". |
-| FATECLOUD_DB_HOST        | DB host, for example "localhost".                            |
-| FATECLOUD_DB_PORT        | DB port, for example "3306".                                 |
-| FATECLOUD_DB_NAME        | Database name.                                               |
-| FATECLOUD_DB_USERNAME    | Database user.                                               |
-| FATECLOUD_DB_PASSWORD    | Database password.                                           |
+| Name                     | Description                                                                         |
+|--------------------------|-------------------------------------------------------------------------------------|
+| FATECLOUD_DB_TYPE        | Database types that support kubefate. At present, there is only "mysql".            |
+| FATECLOUD_DB_HOST        | DB host, for example "localhost".                                                   |
+| FATECLOUD_DB_PORT        | DB port, for example "3306".                                                        |
+| FATECLOUD_DB_NAME        | Database name.                                                                      |
+| FATECLOUD_DB_USERNAME    | Database user.                                                                      |
+| FATECLOUD_DB_PASSWORD    | Database password.                                                                  |
 | FATECLOUD_REPO_NAME      | Remote helm [chart repository](https://helm.sh/docs/topics/chart_repository/) name. |
-| FATECLOUD_REPO_URL       | Remote helm chart repository url.                            |
-| FATECLOUD_USER_USERNAME  | Username of KubeFATE service default user.                   |
-| FATECLOUD_USER_PASSWORD  | Password of KubeFATE service default user.                   |
-| FATECLOUD_SERVER_ADDRESS | KubeFATE service address.                                    |
-| FATECLOUD_SERVER_PORT    | KubeFATE service port.                                       |
-| FATECLOUD_LOG_LEVEL      | KubeFATE service log level.                                  |
+| FATECLOUD_REPO_URL       | Remote helm chart repository url.                                                   |
+| FATECLOUD_USER_USERNAME  | Username of KubeFATE service default user.                                          |
+| FATECLOUD_USER_PASSWORD  | Password of KubeFATE service default user.                                          |
+| FATECLOUD_SERVER_ADDRESS | KubeFATE service address.                                                           |
+| FATECLOUD_SERVER_PORT    | KubeFATE service port.                                                              |
+| FATECLOUD_LOG_LEVEL      | KubeFATE service log level.                                                         |
 
 ### Service
 ```
@@ -69,10 +69,12 @@ rules:
             serviceName: kubefate
             servicePort: 8080
 ```
-|Name    |Description                          |
-|--------|-------------------------------------|
-|host    |Defining the domain name of ingress. |
-|backend |Backend depends on KubeFATE service. |
+| Name    | Description                          |
+|---------|--------------------------------------|
+| host    | Defining the domain name of ingress. |
+| backend | Backend depends on KubeFATE service. |
+
+You can config the nginx-ingress to enable the service with TLS. More info please refer to [kubefate_service_tls_enable](./kubefate_service_tls_enable.md)
 
 ## MySQL
 ### Deployment

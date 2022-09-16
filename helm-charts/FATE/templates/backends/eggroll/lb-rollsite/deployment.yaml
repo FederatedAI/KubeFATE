@@ -52,8 +52,15 @@ spec:
           env:
           - name: PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION
             value: python
-          image: {{ .Values.image.registry }}/eggroll:{{ .Values.image.tag }}
+          image: {{ .Values.image.registry }}/eggroll{{ include "images.eggroll.suffix" . }}:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if .Values.modules.lbrollsite.resources}}
+          resources:
+          {{- range $key, $val := .Values.modules.lbrollsite.resources }}
+            {{ $key }}:
+{{ toYaml $val | indent 14 }}
+          {{- end }}
+          {{- end }}
           command:
           - bash
           - -c

@@ -50,7 +50,7 @@ func (j *Job) Router(r *gin.RouterGroup) {
 // @Failure 400 {object} JSONERRORResult "Bad Request"
 // @Failure 401 {object} JSONERRORResult "Unauthorized operation"
 // @Router /job/ [get]
-// @Param Authorization header string true "Authentication header"
+// @Param Authorization header string true "Authentication header" default(Bearer <Token>)
 // @Security ApiKeyAuth
 func (*Job) getJobList(c *gin.Context) {
 
@@ -74,7 +74,7 @@ func (*Job) getJobList(c *gin.Context) {
 // @Failure 401 {object} JSONERRORResult "Unauthorized operation"
 // @Failure 500 {object} JSONERRORResult "Internal server error"
 // @Router /job/{jobId} [get]
-// @Param Authorization header string true "Authentication header"
+// @Param Authorization header string true "Authentication header" default(Bearer <Token>)
 // @Security ApiKeyAuth
 func (*Job) getJob(c *gin.Context) {
 
@@ -106,7 +106,7 @@ func (*Job) getJob(c *gin.Context) {
 // @Failure 401 {object} JSONERRORResult "Unauthorized operation"
 // @Failure 500 {object} JSONERRORResult "Internal server error"
 // @Router /job/{jobId} [put]
-// @Param Authorization header string true "Authentication header"
+// @Param Authorization header string true "Authentication header" default(Bearer <Token>)
 // @Security ApiKeyAuth
 func (*Job) putJob(c *gin.Context) {
 
@@ -143,7 +143,7 @@ func (*Job) putJob(c *gin.Context) {
 // @Failure 401 {object} JSONERRORResult "Unauthorized operation"
 // @Failure 500 {object} JSONERRORResult "Internal server error"
 // @Router /job/{jobId} [delete]
-// @Param Authorization header string true "Authentication header"
+// @Param Authorization header string true "Authentication header" default(Bearer <Token>)
 // @Security ApiKeyAuth
 func (*Job) deleteJob(c *gin.Context) {
 

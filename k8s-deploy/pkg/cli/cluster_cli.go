@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2021 VMware, Inc.
+ * Copyright 2019-2022 VMware, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ import (
 	"errors"
 
 	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/modules"
+	"github.com/fatih/color"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/rs/zerolog/log"
 	"github.com/urfave/cli/v2"
@@ -153,13 +154,27 @@ func ClusterInstallCommand() *cli.Command {
 			}
 
 			chartVersion, ok := m["chartVersion"]
-			if !ok {
-				return errors.New("chartVersion not found, check your Cluster file")
+			if !ok || chartVersion == "" {
+				return errors.New("chartVersion not found, check your cluster.yaml file")
 			}
 
 			chartName, ok := m["chartName"]
-			if !ok {
-				chartName = ""
+			if !ok || chartName == "" {
+				return errors.New("chartName not found, check your cluster.yaml file")
+			}
+
+			var errs []error
+			template, err := GetValueTemplateExample(chartName.(string), chartVersion.(string))
+			errs = append(errs, err)
+			skippedKeys := append(getSkippedKeys(m), "route_table")
+			errs = append(errs, ValidateYaml(template, string(clusterConfig), skippedKeys)...)
+			warn := !ContainsSkipError(errs)
+			for _, err := range errs {
+				if err != nil && warn {
+					color.Yellow("Config Warning: %s\n", err.Error())
+				} else if err != nil {
+					log.Debug().Str("validation", err.Error()).Msg("Skipped Error")
+				}
 			}
 
 			var json = jsoniter.ConfigCompatibleWithStandardLibrary
@@ -199,16 +214,23 @@ func ClusterUpdateCommand() *cli.Command {
 				Usage:    "Enter your own configured Cluster.yaml file",
 				Required: true,
 			},
+			&cli.BoolFlag{
+				Name:  "keepUpgradeJob",
+				Value: false,
+				Usage: "Only useful when upgrading the FML framework's version. If true, will keep the" +
+					"upgrade manager's job on the k8s cluster. Otherwise, will clean up the job",
+			},
 		},
 		Usage: "Update a Cluster",
 		Action: func(c *cli.Context) error {
-			valTemValPath := c.String("file")
+			keepUpgradeJob := c.Bool("keepUpgradeJob")
+			log.Debug().Bool("keepUpgradeJob", keepUpgradeJob).Msg("install flag")
 
+			valTemValPath := c.String("file")
 			clusterConfig, err := ioutil.ReadFile(valTemValPath)
 			if err != nil {
 				return err
 			}
-
 			log.Debug().Str("yaml", string(clusterConfig)).Msg("ReadFile Success")
 
 			var m map[string]interface{}
@@ -246,12 +268,13 @@ func ClusterUpdateCommand() *cli.Command {
 
 			cluster := new(Cluster)
 			args := &modules.ClusterArgs{
-				Name:         name.(string),
-				Namespace:    namespace.(string),
-				ChartVersion: chartVersion.(string),
-				ChartName:    chartName.(string),
-				Cover:        false,
-				Data:         valBJ,
+				Name:           name.(string),
+				Namespace:      namespace.(string),
+				ChartVersion:   chartVersion.(string),
+				ChartName:      chartName.(string),
+				Cover:          false,
+				Data:           valBJ,
+				KeepUpgradeJob: keepUpgradeJob,
 			}
 
 			body, err := json.Marshal(args)

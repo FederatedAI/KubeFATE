@@ -1,26 +1,27 @@
-## 使用Docker Compose 部署 FATE
+# 使用Docker Compose 部署 FATE
 
-### 前言
+## 前言
 
-[FATE](https://www.fedai.org/ )是一个联邦学习框架，能有效帮助多个机构在满足用户隐私保护、数据安全和政府法规的要求下，进行数据使用和建模。项目地址：（https://github.com/FederatedAI/FATE/） 本文档介绍使用Docker Compose部署FATE集群的方法。
+[FATE](https://www.fedai.org/ )是一个联邦学习框架，能有效帮助多个机构在满足用户隐私保护、数据安全和政府法规的要求下，进行数据使用和建模。项目地址：（<https://github.com/FederatedAI/FATE/>） 本文档介绍使用Docker Compose部署FATE集群的方法。
 
-### Docker Compose 简介
+## Docker Compose 简介
 
 Compose是用于定义和运行多容器Docker应用程序的工具。通过Compose，您可以使用YAML文件来配置应用程序的服务。然后，使用一个命令，就可以从配置中创建并启动所有服务。要了解有关Compose的所有功能的更多信息，请参阅[相关文档](https://docs.docker.com/compose/#features)。
 
 使用Docker compose 可以方便的部署FATE，下面是使用步骤。
 
-### 目标
+## 目标
 
 两个可以互通的FATE实例，每个实例均包括FATE所有组件。
 
-### 准备工作
+## 准备工作
 
 1. 两个主机（物理机或者虚拟机，都是Centos7系统）；
 2. 所有主机安装Docker 版本 : 18+；
 3. 所有主机安装Docker-Compose 版本: 1.24+；
 4. 部署机可以联网，所以主机相互之间可以网络互通；
-5. 运行机已经下载FATE 的各组件镜像（离线构建镜像参考文档[构建镜像](https://github.com/FederatedAI/FATE/tree/master/docker-build)）。
+5. 运行机已经下载FATE的各组件镜像，如果无法连接dockerhub，请考虑使用harbor（[Harbor 作为本地镜像源](../registry/README.md)）或者使用离线部署（离线构建镜像参考文档[构建镜像](https://github.com/FederatedAI/FATE/tree/master/build/docker-build)）。
+6. 运行FATE的主机推荐配置8CPUs和16G RAM。
 
 ### 下载部署脚本
 
@@ -44,13 +45,14 @@ RegistryURI=hub.c.163.com
 如果运行机没有FATE组件的镜像，可以通过以下命令从Docker Hub获取镜像。FATE镜像的版本`<version>`可在[release页面](https://github.com/FederatedAI/FATE/releases)上查看，其中serving镜像的版本信息在[这个页面](https://github.com/FederatedAI/FATE-Serving/releases)：
 
 ```bash
-$ docker pull federatedai/eggroll:<version>-release
-$ docker pull federatedai/fateboard:<version>-release
-$ docker pull federatedai/python:<version>-release
-$ docker pull federatedai/serving-server:<version>-release
-$ docker pull federatedai/serving-proxy:<version>-release
-$ docker pull redis:5
-$ docker pull mysql:8
+docker pull federatedai/eggroll:<version>-release
+docker pull federatedai/fateboard:<version>-release
+docker pull federatedai/fateflow:<version>-release
+docker pull federatedai/serving-server:<version>-release
+docker pull federatedai/serving-proxy:<version>-release
+docker pull federatedai/serving-admin:<version>-release
+docker pull bitnami/zookeeper:3.7.0 
+docker pull mysql:8.0.28
 ```
 
 检查所有镜像是否下载成功。
@@ -60,12 +62,13 @@ $ docker images
 REPOSITORY                         TAG 
 federatedai/eggroll                <version>-release
 federatedai/fateboard              <version>-release
-federatedai/python                 <version>-release
+federatedai/fateflow               <version>-release
 federatedai/client                 <version>-release
 federatedai/serving-server         <version>-release
 federatedai/serving-proxy          <version>-release
-redis                              5
-mysql                              8
+federatedai/serving-admin          <version>-release
+bitnami/zookeeper                  3.7.0 
+mysql                              8.0.28
 ```
 
 ### 离线部署（可选）
@@ -81,37 +84,49 @@ RegistryURI=192.168.10.1/federatedai
 ...
 ```
 
-### 用Docker Compose部署FATE
+## 用Docker Compose部署FATE
 
   ***如果在之前你已经部署过其他版本的FATE，请删除清理之后再部署新的版本，[删除部署](#删除部署).***
 
-#### 配置需要部署的实例数目
+### 配置需要部署的实例数目
 
 部署脚本提供了部署多个FATE实例的功能，下面的例子我们部署在两个机器上，每个机器运行一个FATE实例，这里两台机器的IP分别为*192.168.7.1*和*192.168.7.2*
 
 根据需求修改配置文件`kubeFATE\docker-deploy\parties.conf`。
 
-下面是修改好的文件，`party 10000`的集群将部署在*192.168.7.1*上，而`party 9999`的集群将部署在*192.168.7.2*上。为了减少所需拉取镜像的大小，KubeFATE在默认情况下，会使用不带神经网络的“python”容器，若需要跑神经网络的算法则需把“parties.conf”中的`enabled_nn`设置成`true`。
+`parties.conf`配置文件配置项的含义查看这个文档[parties.conf文件介绍](../docs/configurations/Docker_compose_Partys_configuration.md)
+
+下面是修改好的文件，`party 10000`的集群将部署在*192.168.7.1*上，而`party 9999`的集群将部署在*192.168.7.2*上。
+
+```bash
+user=fate
+dir=/data/projects/fate
+party_list=(10000 9999)
+party_ip_list=(192.168.7.1 192.168.7.2)
+serving_ip_list=(192.168.7.1 192.168.7.2)
+
+computing=Eggroll
+federation=Eggroll
+storage=Eggroll
+
+algorithm=Basic
+device=IPCL
+
+compute_core=4
+
+......
 
 ```
-user=fate                                   # 运行FATE容器的用户
-dir=/data/projects/fate                     # docker-compose部署目录
-partylist=(10000 9999)                      # 组织id
-partyiplist=(192.168.7.1 192.168.7.2)       # id对应训练集群ip
-servingiplist=(192.168.7.1 192.168.7.2)     # id对应在线预测集群ip
-# computing_backend could be eggroll or spark.
-computing_backend=eggroll
 
-# true if you need python-nn else false, the default value will be false
-enabled_nn=false
+* 使用Spark+Rabbitmq的部署方式的文档可以参考[这里](../docs/FATE_On_Spark.md).
+* 使用Spark+Pulsar的部署方式的文档可以参考[这里](../docs/FATE_On_Spark_With_Pulsar.md).
+* 使用Spark+local Pulsar的部署方式的文档可以参考[这里](TBD)
 
-fateboard_username=admin                    # 访问fateboard的用户名
-fateboard_password=admin                    # 访问fateboard的密码
-```
+使用Docker-compose部署FATE可以支持多种种不同的类型引擎的组合(对computing federation storage的选择)，关于不同类型的FATE的更多细节查看: [不同类型FATE的架构介绍](../docs/Introduction_to_Engine_Architecture_zh.md)。
 
-FATE 1.5 支持使用Spark作为底层的分布式计算引擎，Spark集群默认会通过容器的方式部署。相关的简介可以参考这个[链接](../docs/FATE_On_Spark.md).
+`algorithm`和`device`的配置可以查看这里[FATE_Algorithm_and_Computational_Acceleration_Selection.md](../docs/FATE_Algorithm_and_Computational_Acceleration_Selection.md)
 
-**注意**: 默认情况下不会部署exchange组件。如需部署，用户可以把服务器IP填入上述配置文件的`exchangeip`中，该组件的默认监听端口为9371
+**注意**: 默认情况下不会部署exchange组件。如需部署，用户可以把服务器IP填入上述配置文件的`exchangeip`中，该组件的默认监听端口为9371。
 
 在运行部署脚本之前，需要确保部署机器可以ssh免密登录到两个运行节点主机上。user代表免密的用户。
 
@@ -137,55 +152,49 @@ total 0
 drwxr-xr-x. 2 fate docker 6 May 27 00:51 fate
 ```
 
-#### 执行部署脚本
+### 执行部署脚本
+
 以下修改可在任意机器执行。
 
 进入目录`kubeFATE\docker-deploy`，然后运行：
 
 ```bash
-$ ./generate_config.sh          # 生成部署文件
-$ ./docker_deploy.sh all        # 在各个party上部署FATE
+bash ./generate_config.sh          # 生成部署文件
+bash ./docker_deploy.sh all        # 在各个party上部署FATE
 ```
+
 脚本将会生成10000、9999两个组织(Party)的部署文件，然后打包成tar文件。接着把tar文件`confs-<party-id>.tar`、`serving-<party-id>.tar`分别复制到party对应的主机上并解包，解包后的文件默认在`/data/projects/fate`目录下。然后脚本将远程登录到这些主机并使用docker compose命令启动FATE实例。
 
 命令成功执行返回后，登录其中任意一个主机：
 
 ```bash
-$ ssh root@192.168.7.1
+ssh root@192.168.7.1
 ```
 
 使用以下命令验证实例状态，
 
 ```bash
-$ docker ps
+docker ps
 ````
+
 输出显示如下，若各个组件都是运行（up）状态，说明部署成功。
 
-```
-CONTAINER ID        IMAGE                                     COMMAND                  CREATED             STATUS              PORTS                                 NAMES
-69b8b36af395        federatedai/eggroll:<tag>          "bash -c 'java -Dlog…"   2 hours ago         Up 2 hours    
-      0.0.0.0:9371->9370/tcp                                                   confs-exchange_exchange_1
-71cd792ba088        federatedai/serving-proxy:<tag>    "/bin/sh -c 'java -D…"   2 hours ago         Up 2 hours    
-      0.0.0.0:8059->8059/tcp, 0.0.0.0:8869->8869/tcp, 8879/tcp                 serving-10000_serving-proxy_1
-2c79047918c6        federatedai/serving-server:<tag>   "/bin/sh -c 'java -c…"   2 hours ago         Up 2 hours    
-      0.0.0.0:8000->8000/tcp                                                   serving-10000_serving-server_1
-b1a5384a55dc        redis:5                            "docker-entrypoint.s…"   2 hours ago         Up 2 hours    
-      6379/tcp                                                                 serving-10000_redis_1
-321c4e29313b        federatedai/client:<tag>           "/bin/sh -c 'sleep 5…"   2 hours ago         Up 2 hours    
-      0.0.0.0:20000->20000/tcp                                                 confs-10000_client_1
-c1b3190126ab        federatedai/fateboard:<tag>        "/bin/sh -c 'java -D…"   2 hours ago         Up 2 hours    
-      0.0.0.0:8080->8080/tcp                                                   confs-10000_fateboard_1
-cc679996e79f        federatedai/python:<tag>           "/bin/sh -c 'sleep 5…"   2 hours ago         Up 2 hours    
-      0.0.0.0:8484->8484/tcp, 0.0.0.0:9360->9360/tcp, 0.0.0.0:9380->9380/tcp   confs-10000_python_1
-c79800300000        federatedai/eggroll:<tag>          "bash -c 'java -Dlog…"   2 hours ago         Up 2 hours    
-      4671/tcp                                                                 confs-10000_nodemanager_1
-ee2f1c3aad99        federatedai/eggroll:<tag>          "bash -c 'java -Dlog…"   2 hours ago         Up 2 hours    
-      4670/tcp                                                                 confs-10000_clustermanager_1
-a1f784882d20        federatedai/eggroll:<tag>          "bash -c 'java -Dlog…"   2 hours ago         Up 2 hours                  0.0.0.0:9370->9370/tcp                                                   confs-10000_rollsite_1
-2b4526e6d534        mysql:8                            "docker-entrypoint.s…"   2 hours ago         Up 2 hours                  3306/tcp, 33060/tcp                                                      confs-10000_mysql_1
+```bash
+CONTAINER ID   IMAGE                                      COMMAND                  CREATED         STATUS                   PORTS                                                                                                                                           NAMES
+5d2e84ba4c77   federatedai/serving-server:2.1.5-release   "/bin/sh -c 'java -c…"   5 minutes ago   Up 5 minutes             0.0.0.0:8000->8000/tcp, :::8000->8000/tcp                                                                                                       serving-9999_serving-server_1
+3dca43f3c9d5   federatedai/serving-admin:2.1.5-release    "/bin/sh -c 'java -c…"   5 minutes ago   Up 5 minutes             0.0.0.0:8350->8350/tcp, :::8350->8350/tcp                                                                                                       serving-9999_serving-admin_1
+fe924918509b   federatedai/serving-proxy:2.1.5-release    "/bin/sh -c 'java -D…"   5 minutes ago   Up 5 minutes             0.0.0.0:8059->8059/tcp, :::8059->8059/tcp, 0.0.0.0:8869->8869/tcp, :::8869->8869/tcp, 8879/tcp                                                  serving-9999_serving-proxy_1
+b62ed8ba42b7   bitnami/zookeeper:3.7.0                    "/opt/bitnami/script…"   5 minutes ago   Up 5 minutes             0.0.0.0:2181->2181/tcp, :::2181->2181/tcp, 8080/tcp, 0.0.0.0:49226->2888/tcp, :::49226->2888/tcp, 0.0.0.0:49225->3888/tcp, :::49225->3888/tcp   serving-9999_serving-zookeeper_1
+3c643324066f   federatedai/client:1.9.0-release           "/bin/sh -c 'flow in…"   5 minutes ago   Up 5 minutes             0.0.0.0:20000->20000/tcp, :::20000->20000/tcp                                                                                                   confs-9999_client_1
+3fe0af1ebd71   federatedai/fateboard:1.9.0-release        "/bin/sh -c 'java -D…"   5 minutes ago   Up 5 minutes             0.0.0.0:8080->8080/tcp, :::8080->8080/tcp                                                                                                       confs-9999_fateboard_1
+635b7d99357e   federatedai/fateflow:1.9.0-release         "container-entrypoin…"   5 minutes ago   Up 5 minutes (healthy)   0.0.0.0:9360->9360/tcp, :::9360->9360/tcp, 8080/tcp, 0.0.0.0:9380->9380/tcp, :::9380->9380/tcp                                                  confs-9999_fateflow_1
+8b515f08add3   federatedai/eggroll:1.9.0-release          "/tini -- bash -c 'j…"   5 minutes ago   Up 5 minutes             8080/tcp, 0.0.0.0:9370->9370/tcp, :::9370->9370/tcp                                                                                             confs-9999_rollsite_1
+108cc061c191   federatedai/eggroll:1.9.0-release          "/tini -- bash -c 'j…"   5 minutes ago   Up 5 minutes             4670/tcp, 8080/tcp                                                                                                                              confs-9999_clustermanager_1
+f10575e76899   federatedai/eggroll:1.9.0-release          "/tini -- bash -c 'j…"   5 minutes ago   Up 5 minutes             4671/tcp, 8080/tcp                                                                                                                              confs-9999_nodemanager_1
+aa0a0002de93   mysql:8.0.28                               "docker-entrypoint.s…"   5 minutes ago   Up 5 minutes             3306/tcp, 33060/tcp                                                                                                                             confs-9999_mysql_1
 ```
 
-####  验证部署
+### 验证部署
 
 docker-compose上的FATE启动成功之后需要验证各个服务是否都正常运行，我们可以通过验证toy_example示例来检测。
 
@@ -193,13 +202,13 @@ docker-compose上的FATE启动成功之后需要验证各个服务是否都正�
 
 ```bash
 #在192.168.7.1上执行下列命令
-$ docker exec -it confs-10000_client_1 bash                        #进入python组件容器内部
+$ docker exec -it confs-10000_client_1 bash                        #进入client组件容器内部
 $ flow test toy --guest-party-id 10000 --host-party-id 9999        #验证
 ```
 
 如果测试通过，屏幕将显示类似如下消息：
 
-```
+```bash
 "2019-08-29 07:21:25,353 - secure_add_guest.py[line:96] - INFO: begin to init parameters of secure add example guest"
 "2019-08-29 07:21:25,354 - secure_add_guest.py[line:99] - INFO: begin to make guest data"
 "2019-08-29 07:21:26,225 - secure_add_guest.py[line:102] - INFO: split data into two random parts"
@@ -210,16 +219,18 @@ $ flow test toy --guest-party-id 10000 --host-party-id 9999        #验证
 "2019-08-29 07:21:34,118 - secure_add_guest.py[line:121] - INFO: success to calculate secure_sum, it is 2000.0000000000002"
 ```
 
-有关测试结果的更多详细信息，请参阅"python/examples/toy_example/README.md"这个文件 。
+### 验证Serving-Service功能
 
-#### 验证Serving-Service功能
-##### Host方操作
-###### 进入python容器
+#### Host方操作
+
+##### 进入party10000 client容器
+
 ```bash
 docker exec -it confs-10000_client_1 bash
 ```
 
-###### 修改examples/upload_host.json 
+##### 修改examples/upload_host.json
+
 ```bash
 cat > fateflow/examples/upload/upload_host.json <<EOF
 {
@@ -233,18 +244,22 @@ cat > fateflow/examples/upload/upload_host.json <<EOF
 EOF
 ```
 
-###### 上传数据
+##### 上传host数据
+
 ```bash
 flow data upload -c fateflow/examples/upload/upload_host.json
 ```
 
-##### Guest方操作
-###### 进入python容器
+#### Guest方操作
+
+##### 进入party9999 client容器
+
 ```bash
 docker exec -it confs-9999_client_1 bash
 ```
 
-###### 修改examples/upload_guest.json 
+##### 修改examples/upload_guest.json
+
 ```bash
 cat > fateflow/examples/upload/upload_guest.json <<EOF
 {
@@ -258,12 +273,13 @@ cat > fateflow/examples/upload/upload_guest.json <<EOF
 EOF
 ```
 
-###### 上传数据
+##### 上传guest数据
+
 ```bash
 flow data upload -c fateflow/examples/upload/upload_guest.json
 ```
 
-###### 修改examples/test_hetero_lr_job_conf.json
+##### 修改examples/test_hetero_lr_job_conf.json
 
 ```bash
 cat > fateflow/examples/lr/test_hetero_lr_job_conf.json <<EOF
@@ -476,12 +492,14 @@ cat > fateflow/examples/lr/test_hetero_lr_job_dsl.json <<EOF
 EOF
 ```
 
-###### 提交任务
+##### 提交任务
+
 ```bash
 flow job submit -d fateflow/examples/lr/test_hetero_lr_job_dsl.json -c fateflow/examples/lr/test_hetero_lr_job_conf.json
 ```
 
 output：
+
 ```json
 {
     "data": {
@@ -506,12 +524,14 @@ output：
 }
 ```
 
-###### 查看训练任务状态
+##### 查看训练任务状态
+
 ```bash
 flow task query -r guest -j 202111230933232084530 | grep -w f_status
 ```
 
 output:
+
 ```bash
             "f_status": "success",
             "f_status": "waiting",
@@ -524,7 +544,7 @@ output:
 
 等到所有的`waiting`状态变为`success`.
 
-###### 部署模型
+##### 部署模型
 
 ```bash
 flow model deploy --model-id arbiter-10000#guest-9999#host-10000#model --model-version 202111230933232084530
@@ -572,7 +592,8 @@ flow model deploy --model-id arbiter-10000#guest-9999#host-10000#model --model-v
 
 *后面需要用到的`model_version`都是这一步得到的`"model_version": "202111230954255210490"`*
 
-###### 修改加载模型的配置
+##### 修改加载模型的配置
+
 ```bash
 cat > fateflow/examples/model/publish_load_model.json <<EOF
 {
@@ -599,12 +620,14 @@ cat > fateflow/examples/model/publish_load_model.json <<EOF
 EOF
 ```
 
-###### 加载模型
-```bash 
+##### 加载模型
+
+```bash
 flow model load -c fateflow/examples/model/publish_load_model.json
 ```
 
 output:
+
 ```json
 {
     "data": {
@@ -635,7 +658,8 @@ output:
 }
 ```
 
-###### 修改绑定模型的配置
+##### 修改绑定模型的配置
+
 ```bash
 cat > fateflow/examples/model/bind_model_service.json <<EOF
 {
@@ -658,13 +682,14 @@ cat > fateflow/examples/model/bind_model_service.json <<EOF
 EOF
 ```
 
+##### 绑定模型
 
-###### 绑定模型
 ```bash
 flow model bind -c fateflow/examples/model/bind_model_service.json
 ```
 
 output:
+
 ```json
 {
     "retcode": 0,
@@ -672,7 +697,8 @@ output:
 }
 ```
 
-###### 在线测试
+##### 在线测试
+
 发送以下信息到"GUEST"方的推理服务"{SERVING_SERVICE_IP}:8059/federation/v1/inference"
 
 ```bash
@@ -696,38 +722,30 @@ $ curl -X POST -H 'Content-Type: application/json' -i 'http://192.168.7.2:8059/f
 ```
 
 output:
+
 ```json
 {"retcode":0,"retmsg":"","data":{"score":0.018025086161221948,"modelId":"guest#9999#arbiter-10000#guest-9999#host-10000#model","modelVersion":"202111240318516571130","timestamp":1637743473990},"flag":0}
 ```
+
 ### 删除部署
+
 在部署机器上运行以下命令可以停止所有FATE集群：
+
 ```bash
-./docker_deploy.sh --delete all
+bash ./docker_deploy.sh --delete all
 ```
 
 如果想要彻底删除在运行机器上部署的FATE，可以分别登录节点，然后运行命令：
 
 ```bash
-$ cd /data/projects/fate/confs-<id>/  # <id> 组织的id，本例中代表10000或者9999
-$ docker-compose down
-$ rm -rf ../confs-<id>/               # 删除docker-compose部署文件
+cd /data/projects/fate/confs-<id>/  # <id> 组织的id，本例中代表10000或者9999
+docker-compose down
+rm -rf ../confs-<id>/               # 删除docker-compose部署文件
 ```
 
 ### 可能遇到的问题
 
-#### python容器退出
-
-```bash
-$ docker exec -it confs-10000_python_1 bash
-```
-
-进入docker容器后马上又弹出来了。
-
-解决办法：稍等一会再尝试。
-
-因为python服务依赖其他所有服务的正常运行，然而第一次启动的时候MySQL需要初始化数据库，python服务的容器会出现几次重启，当MySQL等其他服务都运行正常之后，就可以正常执行了。
-
-#### 采用docker hub下载镜像速度可能较慢。
+#### 采用docker hub下载镜像速度可能较慢
 
 解决办法：可以自己构建镜像，自己构建镜像参考[这里](https://github.com/FederatedAI/FATE/tree/master/docker-build)。
 

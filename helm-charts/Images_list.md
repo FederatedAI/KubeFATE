@@ -11,8 +11,8 @@
 - federatedai/python-spark:${version-tag}
 - federatedai/spark-master:${version-tag}
 - federatedai/spark-worker:${version-tag}
-- federatedai/hadoop-datanode:2.0.0-hadoop2.7.4-java8
-- federatedai/hadoop-namenode:2.0.0-hadoop2.7.4-java8
+- federatedai/hadoop-datanode:2.0.0-hadoop3.2.1-java8
+- federatedai/hadoop-namenode:2.0.0-hadoop3.2.1-java8
 - nginx:1.17
 - federatedai/nginx:${version-tag}
 - federatedai/rabbitmq:3.8.3-management

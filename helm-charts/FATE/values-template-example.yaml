@@ -1,10 +1,9 @@
 name: fate-9999
 namespace: fate-9999
 chartName: fate
-chartVersion: v1.8.0
+chartVersion: v1.9.0
 partyId: 9999
 registry: ""
-imageTag: "1.8.0-release"
 pullPolicy: 
 imagePullSecrets: 
 - name: myregistrykey
@@ -28,8 +27,19 @@ modules:
   # - nginx
   # - rabbitmq
 
-# backend could be eggroll, spark_rabbitmq and spark_pulsar spark_local_pulsar
-backend: eggroll
+# Computing : [Eggroll, Spark, Spark_local]
+computing: Eggroll
+# Federation: [Eggroll(computing: Eggroll), Pulsar/RabbitMQ(computing: Spark/Spark_local)]
+federation: Eggroll
+# Storage: [Eggroll(computing: Eggroll), HDFS(computing: Spark), LocalFS(computing: Spark_local)]
+storage: Eggroll
+# Algorithm: [Basic, NN]
+algorithm: Basic
+# Device: [IPCL, CPU]
+device: CPU
+
+skippedKeys:
+  - route_table
 
 # ingress:
   # fateboard:
@@ -65,6 +75,7 @@ backend: eggroll
   # - partyId: 10000
     # partyIp: 192.168.0.1
     # partyPort: 30101
+  # enableTLS: true
   # nodeSelector:
   # - disktype: ssd
   # tolerations:
@@ -82,6 +93,13 @@ backend: eggroll
     # clientList:
     # - partID: 9999
     # concurrency: 49
+  # resources:
+    # requests:
+      # cpu: "1"
+      # memory: "1Gi"
+    # limits:
+      # cpu: "4"
+      # memory: "1Gi"
 
 
 # lbrollsite:
@@ -96,46 +114,45 @@ backend: eggroll
   # nodeSelector:
   # tolerations:
   # affinity:
+  # resources:
+    # requests:
+      # cpu: "1"
+      # memory: "1Gi"
+    # limits:
+      # cpu: "1"
+      # memory: "1Gi"
 
 # nodemanager:
-  # count: 3
-  # sessionProcessorsPerNode: 4
-  # storageClass: "nodemanagers"
-  # accessMode: ReadWriteOnce
-  # size: 2Gi
-  # list:
-  # - name: nodemanager
-    # nodeSelector:
-      # kubernetes.io/hostname: localhost.localdomain
-    # tolerations:
-      # - key: "swapenable"
-      #  operator: "Equal"
-      #  value: "true"
-      #  effect: "PreferNoSchedule"
-    # affinity:
-      # nodeAffinity:
-      #   requiredDuringSchedulingIgnoredDuringExecution:
-      #     nodeSelectorTerms:
-      #       - matchExpressions:
-      #           - key: kubernetes.io/hostname
-      #             operator: In
-      #             values:
-      #               - localhost.localdomain
-      # podAntiAffinity:
-      #   requiredDuringSchedulingIgnoredDuringExecution:
-      #     - labelSelector:
-      #         matchExpressions:
-      #           - key: app
-      #             operator: In
-      #             values:
-      #               - nodemanager
-      #       topologyKey: kubernetes.io/hostname
-    # sessionProcessorsPerNode: 4
-    # subPath: "nodemanager"
-    # existingClaim: ""
-    # storageClass: "nodemanager"
-    # accessMode: ReadWriteOnce
-    # size: 1Gi
+#   replicas: 2
+#   sessionProcessorsPerNode: 4
+#   nodeSelector:
+#   tolerations:
+#   affinity:
+#   subPath: "nodemanager"
+#   storageClass: "local-scsi"
+#   accessMode: ReadWriteOnce
+#   size: 1Gi
+#   existingClaim: "nodemanager"
+#   resources:
+#     requests:
+#       cpu: "2"
+#       memory: "4Gi"
+#     limits:
+#       cpu: "4"
+#       memory: "8Gi"
+
+# clustermanager:
+#   nodeSelector:
+#   tolerations:
+#   affinity:
+  # resources:
+    # requests:
+      # cpu: "1"
+      # memory: "1Gi"
+    # limits:
+      # cpu: "1"
+      # memory: "1Gi"
+
 
 # python:
   # type: NodePort
@@ -152,6 +169,13 @@ backend: eggroll
   # storageClass: "python"
   # accessMode: ReadWriteMany
   # size: 1Gi
+  # resources:
+    # requests:
+      # cpu: "2"
+      # memory: "4Gi"
+    # limits:
+      # cpu: "4"
+      # memory: "8Gi"
   # clustermanager:
     # cores_per_node: 16
     # nodes: 2
@@ -271,11 +295,20 @@ backend: eggroll
     # affinity:
     # type: ClusterIP
     # nodePort: 30900
+    # existingClaim: ""
+    # storageClass: "namenode"
+    # accessMode: ReadWriteOnce
+    # size: 1Gi
   # datanode:
+    # replicas:
     # nodeSelector:
     # tolerations:
     # affinity:
     # type: ClusterIP
+    # existingClaim: ""
+    # storageClass: "datanode"
+    # accessMode:
+    # size:
 # nginx:
   # nodeSelector:
   # tolerations:
@@ -316,28 +349,52 @@ backend: eggroll
     # 10000:
       # host: 192.168.0.1
       # port: 30104
+  # resources:
+    # requests:
+      # cpu: "2"
+      # memory: "4Gi"
+    # limits:
+      # cpu: "4"
+      # memory: "8Gi"
 
 # pulsar:
-  # nodeSelector:
-  # tolerations:
-  # affinity:
-  # type: ClusterIP
-  # httpNodePort: 30094
-  # httpsNodePort: 30099
-  # loadBalancerIP:
-  # publicLB:
-    # enabled: false
-  # exchange:
-    # ip: 192.168.10.1
-    # port: 30000
-    # domain: fate.org
-  # route_table:
-    # 9999:
-      # host: pulsar
-      # port: 6650
-      # sslPort:6651
-    # 10000:
-      # host: 192.168.10.1
-      # port: 30105
-      # sslPort: 30109
-      # proxy: ""
+#   nodeSelector:
+#   tolerations:
+#   affinity:
+#   env:
+#   - name: PULSAR_MEM
+#     value: "-Xms4g -Xmx4g -XX:MaxDirectMemorySize=8g"
+#   confs:
+#     brokerDeleteInactiveTopicsFrequencySeconds: 60
+#     backlogQuotaDefaultLimitGB: 10
+#   type: ClusterIP
+#   httpNodePort: 30094
+#   httpsNodePort: 30099
+#   loadBalancerIP:
+#   storageClass: "pulsar"
+#   existingClaim:
+#   accessMode: ReadWriteOnce
+#   size: 1Gi
+#   publicLB:
+#     enabled: false
+#   exchange:
+#     ip: 192.168.10.1
+#     port: 30000
+#     domain: fate.org
+#   route_table:
+#     9999:
+#       host: pulsar
+#       port: 6650
+#       sslPort: 6651
+#     10000:
+#       host: 192.168.10.1
+#       port: 30105
+#       sslPort: 30109
+#       proxy: ""
+#   resources:
+#     requests:
+#       cpu: "2"
+#       memory: "4Gi"
+#     limits:
+#       cpu: "4"
+#       memory: "8Gi"

@@ -40,8 +40,15 @@ spec:
           env:
           - name: PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION
             value: python
-          image: {{ .Values.image.registry }}/eggroll:{{ .Values.image.tag }}
+          image: {{ .Values.image.registry }}/eggroll{{ include "images.eggroll.suffix" . }}:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if .Values.modules.rollsite.resources}}
+          resources:
+          {{- range $key, $val := .Values.modules.rollsite.resources }}
+            {{ $key }}:
+{{ toYaml $val | indent 14 }}
+          {{- end }}
+          {{- end }}
           command:
           - bash
           - -c
@@ -52,8 +59,12 @@ spec:
             ln -sf /dev/stdout /data/projects/fate/eggroll/logs/eggroll/eggroll-audit.log
             touch /data/projects/fate/eggroll/logs/eggroll/eggroll.jvm.log
             ln -sf /dev/stdout /data/projects/fate/eggroll/logs/eggroll/eggroll.jvm.log
-            touch /data/projects/fate/eggroll/logs/eggroll/eggroll.jvm.err.log 
+            touch /data/projects/fate/eggroll/logs/eggroll/eggroll.jvm.err.log
             ln -sf /dev/stderr /data/projects/fate/eggroll/logs/eggroll/eggroll.jvm.err.log
+            cp /data/projects/fate/eggroll/conf/temp_eggroll.properties /data/projects/fate/eggroll/conf/eggroll.properties
+            {{- if .Values.modules.rollsite.enableTLS }}
+            cat /data/projects/fate/eggroll/conf/cert_configs >> /data/projects/fate/eggroll/conf/eggroll.properties
+            {{- end}}
             java -Dlog4j.configurationFile=$${EGGROLL_HOME}/conf/log4j2.properties -cp $${EGGROLL_HOME}/lib/*:$${EGGROLL_HOME}/conf/ com.webank.eggroll.rollsite.EggSiteBootstrap -c $${EGGROLL_HOME}/conf/eggroll.properties
           ports:
             - containerPort: 9370
@@ -81,9 +92,16 @@ spec:
           volumeMounts:
             - mountPath: /data/projects/fate/eggroll/conf/route_table/
               name: rollsite-confs
-            - mountPath: /data/projects/fate/eggroll/conf/eggroll.properties
+            - mountPath: /data/projects/fate/eggroll/conf/temp_eggroll.properties
               name: eggroll-confs
               subPath: eggroll.properties
+            {{- if .Values.modules.rollsite.enableTLS }}
+            - mountPath: /data/projects/fate/eggroll/conf/cert_configs
+              name: eggroll-confs
+              subPath: cert_configs
+            - mountPath: /data/projects/fate/eggroll/conf/cert/
+              name: eggroll-certs
+            {{- end }}
       {{- with .Values.modules.rollsite.nodeSelector }}
       nodeSelector: 
 {{ toYaml . | indent 8 }}
@@ -109,4 +127,9 @@ spec:
         - name: eggroll-confs
           configMap:
             name: eggroll-config
+        {{- if .Values.modules.rollsite.enableTLS }}
+        - name: eggroll-certs
+          secret:
+            secretName: eggroll-certs
+        {{- end}}
 {{ end }}

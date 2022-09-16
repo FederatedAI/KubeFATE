@@ -2,13 +2,24 @@
 image:
   registry: federatedai
   isThridParty:
-  tag: 1.8.0-release
+  tag: 1.9.0-release
   pullPolicy: IfNotPresent
   imagePullSecrets: 
 #  - name: 
   
 partyId: 9999
 partyName: fate-9999
+
+# Computing : Eggroll, Spark, Spark_local
+computing: Eggroll
+# Federation: Eggroll(computing: Eggroll), Pulsar/RabbitMQ(computing: Spark/Spark_local)
+federation: Eggroll
+# Storage: Eggroll(computing: Eggroll), HDFS(computing: Spark), LocalFS(computing: Spark_local)
+storage: Eggroll
+# Algorithm: Basic, NN
+algorithm: Basic
+# Device: CPU, IPCL
+device: IPCL
 
 istio:
   enabled: false
@@ -79,7 +90,8 @@ modules:
     ip: rollsite
     type: ClusterIP
     nodePort: 30091
-    loadBalancerIP: 
+    loadBalancerIP:
+    enableTLS: false
     nodeSelector:
     tolerations:
     affinity:
@@ -116,13 +128,11 @@ modules:
     nodeSelector:
     tolerations:
     affinity:
-    backend: eggroll
-    enabledNN: false
     logLevel: INFO
     # subPath: ""
-    existingClaim: ""
+    existingClaim:
     claimName: python-data
-    storageClass: "python"
+    storageClass:
     accessMode: ReadWriteOnce
     size: 1Gi
     clustermanager:
@@ -166,8 +176,8 @@ modules:
     tolerations:
     affinity:
     subPath: "client"
-    existingClaim: ""
-    storageClass: "nodemanager-0"
+    existingClaim:
+    storageClass:
     accessMode: ReadWriteOnce
     size: 1Gi
   clustermanager: 
@@ -179,27 +189,20 @@ modules:
     affinity:
   nodemanager:  
     include: true
-    list:
-    - name: nodemanager-0
-      nodeSelector:
-      tolerations:
-      affinity:
-      sessionProcessorsPerNode: 2
-      subPath: "nodemanager-0"
-      existingClaim: ""
-      storageClass: "nodemanager-0"
-      accessMode: ReadWriteOnce
-      size: 1Gi
-    - name: nodemanager-1
-      nodeSelector:
-      tolerations:
-      affinity:
-      sessionProcessorsPerNode: 2
-      subPath: "nodemanager-1"
-      existingClaim: ""
-      storageClass: "nodemanager-1"
-      accessMode: ReadWriteOnce
-      size: 1Gi
+    replicas: 2
+    nodeSelector:
+    tolerations:
+    affinity:
+    sessionProcessorsPerNode: 2
+    subPath: "nodemanager"
+    storageClass:
+    accessMode: ReadWriteOnce
+    size: 1Gi
+    existingClaim:
+    resources:
+      requests:
+        cpu: "2"
+        memory: "4Gi"
 
   client: 
     include: true
@@ -209,8 +212,8 @@ modules:
     tolerations:
     affinity:
     subPath: "client"
-    existingClaim: ""
-    storageClass: "client"
+    existingClaim:
+    storageClass:
     accessMode: ReadWriteOnce
     size: 1Gi
 
@@ -226,9 +229,9 @@ modules:
     user: fate
     password: fate_dev
     subPath: "mysql"
-    existingClaim: ""
+    existingClaim:
     claimName: mysql-data
-    storageClass: "mysql"
+    storageClass:
     accessMode: ReadWriteOnce
     size: 1Gi
   serving:
@@ -260,17 +263,14 @@ modules:
       Image: ""
       ImageTag: ""
       replicas: 2
-      resources:
-        requests:
-          cpu: "2"
-          memory: "4Gi"
-        limits:
-          cpu: "4"
-          memory: "8Gi"
       nodeSelector:
       tolerations:
       affinity:
       type: ClusterIP
+      resources:
+        requests:
+          cpu: "2"
+          memory: "4Gi"
   hdfs:
     include: true
     namenode:
@@ -279,11 +279,20 @@ modules:
       affinity:
       type: ClusterIP
       nodePort: 30900
+      existingClaim:
+      storageClass:
+      accessMode: ReadWriteOnce
+      size: 1Gi
     datanode:
+      replicas: 3
       nodeSelector:
       tolerations:
       affinity:
       type: ClusterIP
+      existingClaim:
+      storageClass:
+      accessMode: ReadWriteOnce
+      size: 1Gi
   nginx:
     include: true
     nodeSelector:
@@ -328,11 +337,17 @@ modules:
     include: true
     nodeSelector:
     tolerations:
+    env:
+    confs:
     affinity:
     type: ClusterIP
     httpNodePort: 30094
     httpsNodePort: 30099
-    loadBalancerIP: 
+    loadBalancerIP:
+    existingClaim:
+    accessMode: ReadWriteOnce
+    storageClass:
+    size: 1Gi
     publicLB:
       enabled: false
     # exchange:

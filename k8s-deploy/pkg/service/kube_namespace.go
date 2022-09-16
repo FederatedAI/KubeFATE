@@ -16,6 +16,7 @@
 package service
 
 import (
+	"github.com/pkg/errors"
 	v1 "k8s.io/api/core/v1"
 )
 
@@ -23,7 +24,7 @@ import (
 func GetNamespaces() ([]v1.Namespace, error) {
 	namespaceList, err := KubeClient.GetNamespaces()
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "Get namespaces failed. Please check if user has the privilege to list resource \"namespaces\" at the cluster scope")
 	}
 	return namespaceList.Items, nil
 }

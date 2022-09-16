@@ -35,6 +35,13 @@ spec:
         - name: rabbitmq
           image: {{ .Values.image.registry }}/rabbitmq:3.8.3-management
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if .Values.modules.rabbitmq.resources }}
+          resources:
+          {{- range $key, $val := .Values.modules.rabbitmq.resources }}
+            {{ $key }}:
+{{ toYaml $val | indent 14 }}
+          {{- end }}
+          {{- end }}
           env:
           - name: RABBITMQ_DEFAULT_USER
             value: fate

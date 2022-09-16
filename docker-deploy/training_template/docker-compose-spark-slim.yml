@@ -1,4 +1,4 @@
-# Copyright 2019-2020 VMware, Inc.
+# Copyright 2019-2022 VMware, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-version: "3"
+version: "3.7"
 
 networks:
   fate-network:
@@ -48,26 +48,33 @@ services:
     volumes:
       - ./confs/fateboard/conf:/data/projects/fate/fateboard/conf
       - fate_flow_logs:/data/projects/fate/fateflow/logs
+      - /etc/localtime:/etc/localtime:ro
     restart: always
     networks:
       - fate-network
     depends_on:
-      - python
+      - fateflow
 
-  python:
-    image: "federatedai/python-spark:${TAG}"
+  fateflow:
+    image: "federatedai/fateflow:${TAG}"
     restart: always
     ports:
       - 9380:9380
       - 9360:9360
     volumes:
-      - ./confs/spark/spark-defaults.conf:/data/projects/spark-2.4.1-bin-hadoop2.7/conf/spark-defaults.conf
-      - ./confs/fate_flow/conf:/data/projects/fate/conf
+      - ./confs/spark/spark-defaults.conf:/data/projects/spark-3.1.3-bin-hadoop3.2/conf/spark-defaults.conf
+      - ./confs/fate_flow/conf/service_conf.yaml:/data/projects/fate/conf/service_conf.yaml
+      - ./confs/fate_flow/conf/pulsar_route_table.yaml:/data/projects/fate/conf/pulsar_route_table.yaml
+      - ./confs/fate_flow/conf/rabbitmq_route_table.yaml:/data/projects/fate/conf/rabbitmq_route_table.yaml
+      - ./confs/fate_flow/conf/component_registry.json:/data/projects/fate/fateflow/conf/component_registry.json
+      - ./confs/fate_flow/conf/job_default_config.yaml:/data/projects/fate/fateflow/conf/job_default_config.yaml
+      - ./confs/fate_flow/conf/template_info.yaml:/data/projects/fate/fateflow/conf/template_info.yaml
       - shared_dir_federatedml:/data/projects/fate/fate/python/federatedml
       - shared_dir_examples:/data/projects/fate/examples
       - download_dir:/data/projects/fate/python/download_dir
       - fate_flow_logs:/data/projects/fate/fateflow/logs
       - ./shared_dir/data/model_local_cache:/data/projects/fate/fateflow/model_local_cache
+      - /etc/localtime:/etc/localtime:ro
     networks:
       fate-network:
         ipv4_address: 192.167.0.100
@@ -84,10 +91,11 @@ services:
         set -x
         sleep 5 && python fateflow/python/fate_flow/fate_flow_server.py
     environment:
-      PYTHONPATH: "$PYTHONPATH:/data/projects/fate/fate/python:/data/projects/fate/eggroll/python:/data/projects/fate/fateflow/python:/data/projects/fate/fate/python/fate_client"
+      PYTHONPATH: "$$PYTHONPATH:/data/projects/fate/fate/python:/data/projects/fate/eggroll/python:/data/projects/fate/fateflow/python:/data/projects/fate/fate/python/fate_client"
       FATE_PROJECT_BASE: "/data/projects/fate"
       FATE_FLOW_UPLOAD_MAX_NUM: "1000000"
       FATE_FLOW_UPLOAD_MAX_BYTES: "104868093952"
+      FATE_LOG_LEVEL: "INFO"
 
   mysql:
     image: "mysql:8.0.28"
@@ -96,6 +104,7 @@ services:
     volumes:
       - ./confs/mysql/init:/docker-entrypoint-initdb.d/
       - ./shared_dir/data/mysql:/var/lib/mysql
+      - /etc/localtime:/etc/localtime:ro
     restart: always
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
@@ -110,11 +119,30 @@ services:
     volumes:
       - ./confs/nginx/route_table.yaml:/data/projects/fate/proxy/nginx/conf/route_table.yaml
       - ./confs/nginx/nginx.conf:/data/projects/fate/proxy/nginx/conf/nginx.conf
+      - /etc/localtime:/etc/localtime:ro
     restart: always
     networks:
       - fate-network
     depends_on:
-      - python
+      - fateflow
+
+  rabbitmq:
+    image: federatedai/rabbitmq:3.8.3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: fate
+      RABBITMQ_DEFAULT_PASS: fate
+      RABBITMQ_USER: fate
+      RABBITMQ_PASSWORD: fate
+      RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: "-rabbit max_message_size 536870912"
+    volumes:
+      - ./confs/rabbitmq/enabled_plugins:/etc/rabbitmq/enabled_plugins
+      - ./shared_dir/data/rabbitmq:/var/lib/rabbitmq
+    restart: always
+    networks:
+      - fate-network
 
   pulsar:
     image: "federatedai/pulsar:2.7.0"
@@ -122,12 +150,10 @@ services:
       - "6650:6650"
       - "6651:6651"
       - "8001:8080"
-    deploy:
-      restart_policy:
-        condition: any
     volumes:
       - ./confs/pulsar/standalone.conf:/pulsar/conf/standalone.conf
       - ./shared_dir/data/pulsar:/pulsar/data
+      - /etc/localtime:/etc/localtime:ro
     command:
       ["/bin/bash", "-c", "bin/pulsar standalone -nss"]
     restart: always
@@ -140,13 +166,14 @@ services:
       - "20000:20000"
     restart: always
     environment:
-      FATE_FLOW_IP: "python"
+      FATE_FLOW_IP: "fateflow"
       FATE_FLOW_PORT: "9380"
       FATE_SERVING_HOST: "fate-serving:8059"
     volumes:
       - download_dir:/data/projects/fate/download_dir
       - shared_dir_examples:/data/projects/fate/examples
+      - /etc/localtime:/etc/localtime:ro
     depends_on:
-      - python
+      - fateflow
     networks:
       - fate-network

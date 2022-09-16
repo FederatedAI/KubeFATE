@@ -1,11 +1,10 @@
 name: fate-10000
 namespace: fate-10000
 chartName: fate
-chartVersion: v1.8.0
+chartVersion: v1.9.0
 partyId: 10000
 registry: ""
-imageTag: 1.8.0-release
-pullPolicy: 
+pullPolicy:
 imagePullSecrets: 
 - name: myregistrykey
 persistence: false
@@ -23,7 +22,11 @@ modules:
   - fateboard
   - client
 
-backend: eggroll
+computing: Eggroll
+federation: Eggroll
+storage: Eggroll
+algorithm: Basic
+device: CPU
 
 ingress:
   fateboard: 
@@ -37,9 +40,9 @@ rollsite:
   type: NodePort
   nodePort: 30101
   partyList:
-  - partyId: 9999
-    partyIp: 192.168.9.1
-    partyPort: 30091
+    - partyId: 9999
+      partyIp: 192.168.9.1
+      partyPort: 30091
 
 python:
   type: NodePort

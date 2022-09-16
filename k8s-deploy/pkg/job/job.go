@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2021 VMware, Inc.
+ * Copyright 2019-2022 VMware, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,15 @@ package job
 
 import (
 	"fmt"
-	"reflect"
 	"time"
 
 	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/modules"
 	"github.com/FederatedAI/KubeFATE/k8s-deploy/pkg/service"
 	"github.com/rs/zerolog/log"
+)
+
+const (
+	fateChartName = "fate"
 )
 
 func stopJob(job *modules.Job, cluster *modules.Cluster) bool {
@@ -145,10 +148,16 @@ func ClusterUpdate(clusterArgs *modules.ClusterArgs, creator string) (*modules.J
 	var valuesOld = cluster.Values
 	var valuesNew = clusterNew.Values
 
-	if reflect.DeepEqual(specOld, specNew) &&
-		cluster.ChartName == clusterArgs.ChartName &&
-		cluster.ChartVersion == clusterArgs.ChartVersion {
-		return nil, fmt.Errorf("the configuration file did not change")
+	var um UpgradeManager
+	switch cluster.ChartName {
+	case fateChartName:
+		um = &FateUpgradeManager{
+			namespace: clusterArgs.Namespace,
+		}
+	}
+	err = um.validate(specOld, specNew)
+	if err != nil {
+		return nil, err
 	}
 
 	job := modules.NewJob(clusterArgs, "ClusterUpdate", creator, cluster.Uuid)
@@ -174,6 +183,39 @@ func ClusterUpdate(clusterArgs *modules.ClusterArgs, creator string) (*modules.J
 			log.Error().Err(dbErr).Msg("Cluster.SetStatus error")
 		}
 
+		if specOld["chartVersion"].(string) != specNew["chartVersion"].(string) {
+			umCluster := um.getCluster(specOld, specNew)
+			// We will implicitly install a new cluster for the upgrade manager, and delete it after it finishes its job
+			err := umCluster.HelmInstall()
+			if err != nil {
+				log.Error().Err(err).Msgf("failed to install the upgrade manager's helm chart for cluster %s", cluster.ChartName)
+				dbErr := job.SetStatus(modules.JobStatusFailed)
+				if dbErr != nil {
+					log.Error().Err(dbErr).Msg("job.SetStatus error")
+				}
+				job.Status = modules.JobStatusFailed
+				log.Error().Msg("abort upgrade because failed to install upgrade manager")
+				return
+			}
+			finished := um.waitFinish(30, 20)
+			if !finished {
+				dbErr := job.SetStatus(modules.JobStatusFailed)
+				if dbErr != nil {
+					log.Error().Err(dbErr).Msg("job.SetStatus error")
+				}
+			}
+			if !clusterArgs.KeepUpgradeJob {
+				err = umCluster.HelmDelete()
+				if err != nil {
+					log.Error().Err(err).Msg("failed to delete the upgrade manager cluster, need a person to investigate why")
+				}
+			}
+			if job.Status == modules.JobStatusFailed {
+				log.Error().Msg("abort upgrade because upgrade manager cannot finish its job")
+				return
+			}
+		}
+
 		dbErr = cluster.SetValues(valuesNew)
 		if dbErr != nil {
 			log.Error().Err(dbErr).Msg("Cluster.SetSpec error")
@@ -193,7 +235,7 @@ func ClusterUpdate(clusterArgs *modules.ClusterArgs, creator string) (*modules.J
 		cluster.HelmRevision += 1
 
 		_, dbErr = cluster.UpdateByUuid(job.ClusterId)
-		if err != nil {
+		if dbErr != nil {
 			log.Error().Err(dbErr).Interface("cluster", cluster).Msg("Update Cluster error")
 		}
 
@@ -221,7 +263,6 @@ func ClusterUpdate(clusterArgs *modules.ClusterArgs, creator string) (*modules.J
 			}
 		}
 
-		//
 		for job.Status == modules.JobStatusRunning {
 			if stopJob(job, &cluster) {
 				continue
@@ -282,7 +323,6 @@ func ClusterUpdate(clusterArgs *modules.ClusterArgs, creator string) (*modules.J
 
 		// rollBACK
 		if job.Status != modules.JobStatusSuccess && job.Status != modules.JobStatusCanceled {
-			//todo helm rollBack
 			dbErr = cluster.SetValues(valuesOld)
 			if dbErr != nil {
 				log.Error().Err(dbErr).Msg("Cluster.SetSpec error")
