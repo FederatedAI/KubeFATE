@@ -149,8 +149,11 @@ modules:
       password: fate
     pulsar:
       host: pulsar
-      mng_port: 8080
       port: 6650
+      mng_port: 8080      
+      topic_ttl: 3
+      cluster: standalone
+      tenant: fl-tenant      
     nginx:
       host: nginx
       http_port: 9300
