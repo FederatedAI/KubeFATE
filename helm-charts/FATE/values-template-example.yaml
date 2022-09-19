@@ -4,8 +4,8 @@ chartName: fate
 chartVersion: v1.9.0
 partyId: 9999
 registry: ""
-pullPolicy: 
-imagePullSecrets: 
+pullPolicy:
+imagePullSecrets:
 - name: myregistrykey
 persistence: false
 istio:
@@ -47,27 +47,27 @@ skippedKeys:
     # hosts:
     # - name: party9999.fateboard.example.com
       # path: /
-    # tls: 
+    # tls:
     # - secretName: my-tls-secret
       # hosts:
         # - party9999.fateboard.example.com
-  # client: 
+  # client:
     # hosts:
     # - name: party9999.notebook.example.com
-  # spark: 
+  # spark:
     # hosts:
     # - name: party9999.spark.example.com
-  # rabbitmq: 
+  # rabbitmq:
     # hosts:
     # - name: party9999.rabbitmq.example.com
-  # pulsar: 
+  # pulsar:
     # hosts:
     # - name: party9999.pulsar.example.com
-  
-# rollsite: 
+
+# rollsite:
   # type: NodePort
   # nodePort: 30091
-  # loadBalancerIP: 
+  # loadBalancerIP:
   # exchange:
     # ip: 192.168.0.1
     # port: 30000
@@ -179,16 +179,16 @@ skippedKeys:
   # clustermanager:
     # cores_per_node: 16
     # nodes: 2
-  # spark: 
+  # spark:
     # cores_per_node: 20
     # nodes: 2
     # master: spark://spark-master:7077
-    # driverHost: 
-    # driverHostType: 
-    # portMaxRetries: 
-    # driverStartPort: 
-    # blockManagerStartPort: 
-    # pysparkPython: 
+    # driverHost:
+    # driverHostType:
+    # portMaxRetries:
+    # driverStartPort:
+    # blockManagerStartPort:
+    # pysparkPython:
   # hdfs:
     # name_node: hdfs://namenode:9000
     # path_prefix:
@@ -210,20 +210,20 @@ skippedKeys:
     # http_port: 9300
     # grpc_port: 9310
 
-# fateboard: 
+# fateboard:
   # type: ClusterIP
   # username: admin
   # password: admin
-  
+
 # client:
-  # nodeSelector: 
+  # nodeSelector:
   # subPath: ""
   # existingClaim: ""
   # storageClass: "client"
   # accessMode: ReadWriteOnce
   # size: 1Gi
 
-# mysql: 
+# mysql:
   # nodeSelector:
   # tolerations:
   # affinity:
@@ -249,11 +249,13 @@ skippedKeys:
 # servingIp: 192.168.0.1
 # servingPort: 30095
 # serving:
-  # useRegistry: false
-  # zookeeper:
-    # hosts:
-    # - serving-zookeeper.fate-serving-9999:2181
-    # use_acl: false
+#   useRegistry: false
+#   zookeeper:
+#     hosts:
+#     - serving-zookeeper.fate-serving-9999:2181
+#     use_acl: false
+#     user: fate
+#     password: fate
 
 
 # spark:
@@ -321,13 +323,13 @@ skippedKeys:
     # ip: 192.168.10.1
     # httpPort: 30003
     # grpcPort: 30008
-  # route_table: 
-    # 10000: 
-      # proxy: 
-        # - host: 192.168.0.1 
+  # route_table:
+    # 10000:
+      # proxy:
+        # - host: 192.168.0.1
           # http_port: 30103
-          # grpc_port: 30108 
-      # fateflow: 
+          # grpc_port: 30108
+      # fateflow:
         # - host: 192.168.0.1
           # http_port: 30107
           # grpc_port: 30102
