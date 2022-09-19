@@ -264,6 +264,9 @@ modules:
       host: {{ .host }}
       mng_port: {{ .mng_port }}
       port: {{ .port }}
+      topic_ttl: {{ .topic_ttl }}
+      cluster: {{ .cluster }}
+      tenant: {{ .tenant }}      
     {{- end }}
     {{- with .rabbitmq }}
     rabbitmq:
