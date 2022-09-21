@@ -41,57 +41,32 @@ func stopJob(job *modules.Job, cluster *modules.Cluster) bool {
 	return false
 }
 
-func generateSubJobs_b(job *modules.Job, ClusterStatus map[string]string) modules.SubJobs {
-
-	subJobs := make(modules.SubJobs)
-	if job.SubJobs != nil {
-		subJobs = job.SubJobs
+func getClusterComponentsStatus(clusterName, clusterNamespace string) (map[string]string, error) {
+	deploymentStatus, err := service.GetClusterDeployStatus(clusterName, clusterNamespace)
+	if err != nil {
+		log.Error().Err(err).Msg("GetClusterDeployStatus error")
+		return deploymentStatus, err
 	}
-
-	for k, v := range ClusterStatus {
-		var subJobStatus string
-		if v == "Running" {
-			subJobStatus = "Success"
-		} else if v == "Failed" || v == "Unknown" || v == "Pending" {
-			subJobStatus = v
-		} else {
-			subJobStatus = "Running"
-		}
-
-		var subJob modules.SubJob
-		if _, ok := subJobs[k]; !ok {
-			subJob = modules.SubJob{
-				ModuleName:    k,
-				Status:        subJobStatus,
-				ModulesStatus: v,
-				StartTime:     job.StartTime,
-			}
-		} else {
-			subJob = subJobs[k]
-			subJob.Status = subJobStatus
-			subJob.ModulesStatus = v
-		}
-
-		if subJobStatus == "Success" && subJob.EndTime.IsZero() {
-			subJob.EndTime = time.Now()
-		}
-
-		subJobs[k] = subJob
-		log.Debug().Interface("subJob", subJob).Msg("generate SubJobs")
+	stsStatus, err := service.GetClusterStsStatus(clusterName, clusterNamespace)
+	if err != nil {
+		log.Error().Err(err).Msg("GetClusterStsStatus error")
+		return deploymentStatus, err
 	}
-
-	job.SubJobs = subJobs
-	return subJobs
+	for k, v := range stsStatus {
+		deploymentStatus[k] = v
+	}
+	return deploymentStatus, nil
 }
 
-func generateSubJobs(job *modules.Job, ClusterDeployStatus map[string]string) modules.SubJobs {
+func generateSubJobs(job *modules.Job, clusterComponentStatus map[string]string) modules.SubJobs {
 
 	subJobs := make(modules.SubJobs)
 	if job.SubJobs != nil {
 		subJobs = job.SubJobs
 	}
 
-	for k, v := range ClusterDeployStatus {
+	// The cluster component status includes deployments and statefulSets
+	for k, v := range clusterComponentStatus {
 		var subJobStatus string = "Running"
 		if service.CheckStatus(v) {
 			subJobStatus = "Success"
@@ -281,19 +256,19 @@ func ClusterUpdate(clusterArgs *modules.ClusterArgs, creator string) (*modules.J
 			}
 
 			// update subJobs
-			ClusterStatus, err := service.GetClusterDeployStatus(clusterArgs.Name, clusterArgs.Namespace)
+			clusterComponentStatus, err := getClusterComponentsStatus(clusterArgs.Name, clusterArgs.Namespace)
 			if err != nil {
 				log.Error().Err(err).Msg("GetClusterDeployStatus error")
 			}
 
-			subJobs := generateSubJobs(job, ClusterStatus)
+			subJobs := generateSubJobs(job, clusterComponentStatus)
 
 			dbErr = job.SetSubJobs(subJobs)
 			if dbErr != nil {
 				log.Error().Err(dbErr).Msg("job.SetSubJobs error")
 			}
 
-			if service.CheckClusterStatus(ClusterStatus) {
+			if service.CheckClusterStatus(clusterComponentStatus) {
 				dbErr := job.SetStatus(modules.JobStatusSuccess)
 				if dbErr != nil {
 					log.Error().Err(dbErr).Msg("job.SetStatus error")
@@ -380,21 +355,21 @@ func ClusterUpdate(clusterArgs *modules.ClusterArgs, creator string) (*modules.J
 				}
 
 				// update subJobs
-				ClusterStatus, err := service.GetClusterDeployStatus(clusterArgs.Name, clusterArgs.Namespace)
+				clusterComponentStatus, err := getClusterComponentsStatus(clusterArgs.Name, clusterArgs.Namespace)
 				if err != nil {
-					log.Error().Err(err).Msg("GetClusterDeployStatus error")
+					log.Error().Err(err).Msg("clusterComponentStatus error")
 				}
 
-				log.Debug().Interface("ClusterStatus", ClusterStatus).Msg("GetClusterDeployStatus()")
+				log.Debug().Interface("clusterComponentStatus", clusterComponentStatus).Msg("clusterComponentStatus()")
 
-				subJobs := generateSubJobs(job, ClusterStatus)
+				subJobs := generateSubJobs(job, clusterComponentStatus)
 
 				dbErr = job.SetSubJobs(subJobs)
 				if dbErr != nil {
 					log.Error().Err(dbErr).Msg("job.SetSubJobs error")
 				}
 
-				if service.CheckClusterStatus(ClusterStatus) {
+				if service.CheckClusterStatus(clusterComponentStatus) {
 					dbErr := job.SetStatus(modules.JobStatusSuccess)
 					if dbErr != nil {
 						log.Error().Err(dbErr).Msg("job.SetStatus error")

@@ -321,17 +321,19 @@ func updateLastJobEvent(job *modules.Job, Event string) {
 		log.Error().Err(dbErr).Msg("job.SetStatus error")
 	}
 }
+
+// checkStatus returns a bool to indicate if the job is finished successfully
 func checkStatus(job *modules.Job, cluster *modules.Cluster) bool {
 
 	// update subJobs
-	ClusterStatus, err := service.GetClusterDeployStatus(cluster.Name, cluster.NameSpace)
+	clusterComponentStatus, err := getClusterComponentsStatus(cluster.Name, cluster.NameSpace)
 	if err != nil {
-		log.Error().Err(err).Msg("GetClusterDeployStatus error")
+		log.Error().Err(err).Msg("getClusterComponentsStatus error")
 		return false
 	}
 
-	log.Debug().Interface("ClusterStatus", ClusterStatus).Msg("GetClusterDeployStatus()")
-	subJobs := generateSubJobs(job, ClusterStatus)
+	log.Debug().Interface("ClusterStatus", clusterComponentStatus).Msg("the cluster component status")
+	subJobs := generateSubJobs(job, clusterComponentStatus)
 
 	dbErr := job.SetSubJobs(subJobs)
 	if dbErr != nil {
@@ -339,7 +341,7 @@ func checkStatus(job *modules.Job, cluster *modules.Cluster) bool {
 		return false
 	}
 
-	if service.CheckClusterStatus(ClusterStatus) {
+	if service.CheckClusterStatus(clusterComponentStatus) {
 		dbErr := job.SetStatus(modules.JobStatusSuccess)
 		if dbErr != nil {
 			log.Error().Err(dbErr).Msg("job setStatus error")

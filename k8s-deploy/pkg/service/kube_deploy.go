@@ -34,43 +34,6 @@ func GetDeployList(clusterName, namespace string) (*v1.DeploymentList, error) {
 	return list, nil
 }
 
-// GetDeploy GetDeploy
-func GetDeploy(deploymentName, namespace string) (*v1.Deployment, error) {
-
-	deploy, err := KubeClient.GetDeployment(namespace, deploymentName)
-	if err != nil {
-		return nil, err
-	}
-
-	return deploy, nil
-}
-
-// CheckDeploy CheckDeploy
-func CheckDeploy(deploy *v1.Deployment) bool {
-	if deploy == nil {
-		return false
-	}
-	for _, v := range deploy.Status.Conditions {
-		if v.Type == v1.DeploymentAvailable && v.Status == corev1.ConditionTrue {
-			return true
-		}
-	}
-	return false
-}
-
-// CheckDeploys CheckDeploys
-func CheckDeploys(deploys *v1.DeploymentList) bool {
-	if deploys == nil || len(deploys.Items) == 0 {
-		return false
-	}
-	for _, v := range deploys.Items {
-		if !CheckDeploy(&v) {
-			return false
-		}
-	}
-	return true
-}
-
 // GetDeployStatus GetDeployStatus
 func GetDeployStatus(deploy *v1.Deployment) (string, string) {
 
@@ -90,16 +53,6 @@ func GetDeployStatus(deploy *v1.Deployment) (string, string) {
 		}
 	}
 	return "Undefined", fmt.Sprintf("please use kubectl cli check deploy status of %s", deploy.Name)
-}
-
-//GetDeploymentStatus GetDeploymentStatus
-func GetDeploymentStatusInfo(deploys *v1.DeploymentList) (map[string]string, error) {
-	status := make(map[string]string)
-	for _, v := range deploys.Items {
-		Type, message := GetDeployStatus(&v)
-		status[v.Name] = fmt.Sprintf("%s, %s", Type, message)
-	}
-	return status, nil
 }
 
 func GetDeploymentStatus(deploys *v1.DeploymentList) (map[string]string, error) {
