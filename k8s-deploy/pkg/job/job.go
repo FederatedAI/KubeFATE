@@ -130,9 +130,11 @@ func ClusterUpdate(clusterArgs *modules.ClusterArgs, creator string) (*modules.J
 			namespace: clusterArgs.Namespace,
 		}
 	}
-	err = um.validate(specOld, specNew)
-	if err != nil {
-		return nil, err
+	if um != nil {
+		err = um.validate(specOld, specNew)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	job := modules.NewJob(clusterArgs, "ClusterUpdate", creator, cluster.Uuid)
