@@ -129,14 +129,13 @@ func ClusterUpdate(clusterArgs *modules.ClusterArgs, creator string) (*modules.J
 		um = &FateUpgradeManager{
 			namespace: clusterArgs.Namespace,
 		}
+	default:
+		um = &FallbackUpgradeManager{}
+		log.Info().Msgf("no upgrade manager is available for %s", cluster.Name)
 	}
-	if um != nil {
-		err = um.validate(specOld, specNew)
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		log.Info().Msgf("there is no upgrade manager implemented for %s", cluster.ChartName)
+	err = um.validate(specOld, specNew)
+	if err != nil {
+		return nil, err
 	}
 
 	job := modules.NewJob(clusterArgs, "ClusterUpdate", creator, cluster.Uuid)
@@ -161,9 +160,8 @@ func ClusterUpdate(clusterArgs *modules.ClusterArgs, creator string) (*modules.J
 		if dbErr != nil {
 			log.Error().Err(dbErr).Msg("Cluster.SetStatus error")
 		}
-
-		if specOld["chartVersion"].(string) != specNew["chartVersion"].(string) {
-			umCluster := um.getCluster(specOld, specNew)
+		umCluster := um.getCluster(specOld, specNew)
+		if umCluster.Name != "fallbackUM" && specOld["chartVersion"].(string) != specNew["chartVersion"].(string) {
 			// We will implicitly install a new cluster for the upgrade manager, and delete it after it finishes its job
 			err := umCluster.HelmInstall()
 			if err != nil {
