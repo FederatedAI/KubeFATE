@@ -135,6 +135,8 @@ func ClusterUpdate(clusterArgs *modules.ClusterArgs, creator string) (*modules.J
 		if err != nil {
 			return nil, err
 		}
+	} else {
+		log.Info().Msgf("there is no upgrade manager implemented for %s", cluster.ChartName)
 	}
 
 	job := modules.NewJob(clusterArgs, "ClusterUpdate", creator, cluster.Uuid)
