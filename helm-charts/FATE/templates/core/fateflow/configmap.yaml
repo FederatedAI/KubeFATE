@@ -184,7 +184,7 @@ data:
     fateboard:
       host: fateboard
       port: 8080
-    enable_model_store: false
+    enable_model_store: true
     model_store_address:
       storage: mysql
       name: {{ .Values.externalMysqlDatabase | default .Values.modules.mysql.database | default "eggroll_meta" }}

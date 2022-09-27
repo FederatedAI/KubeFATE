@@ -217,7 +217,7 @@ modules:
   python: 
     include: {{ has "python" .modules }}
     {{- with .python }}
-    replicas: {{ .replicas }}
+    replicas: {{ .replicas | default 1 }}
     {{- with .resources }}
     resources:
 {{ toYaml . | indent 6 }}
