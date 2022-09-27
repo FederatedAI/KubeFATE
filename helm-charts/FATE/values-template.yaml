@@ -217,6 +217,7 @@ modules:
   python: 
     include: {{ has "python" .modules }}
     {{- with .python }}
+    replicas: {{ .replicas }}
     {{- with .resources }}
     resources:
 {{ toYaml . | indent 6 }}
@@ -239,6 +240,8 @@ modules:
     affinity:
 {{ toYaml . | indent 6 }}
     {{- end }}
+    failedTaskAutoRetryTimes: {{ .failedTaskAutoRetryTimes | default 5 }}
+    failedTaskAutoRetryDelay: {{ .failedTaskAutoRetryDelay | default 60 }}
     existingClaim: {{ .existingClaim  }}
     claimName: {{ .claimName | default "python-data" }}
     storageClass: {{ .storageClass | default "python" }}
@@ -405,6 +408,18 @@ modules:
     type: {{ .type }}
     username: {{ .username }}
     password: {{ .password }}
+    {{- with .nodeSelector }}
+    nodeSelector:
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    {{- with .tolerations }}
+    tolerations:
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    {{- with .affinity }}
+    affinity:
+{{ toYaml . | indent 6 }}
+    {{- end }}
     {{- end}}
 
   spark:

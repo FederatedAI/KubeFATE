@@ -67,9 +67,19 @@ data:
       dataset: false
     fateflow:
       # you must set real ip address, 127.0.0.1 and 0.0.0.0 is not supported
-      host: fateflow
+      host: fateflow_ip
       http_port: 9380
       grpc_port: 9360
+      # when you have multiple fateflow server on one party,
+      # we suggest using nginx for load balancing.
+      nginx:
+        # under K8s mode, 'fateflow' is the service name, which will be a L4 load balancer.
+        host: fateflow
+        http_port: 9380
+        grpc_port: 9360
+      # use random instance_id instead of {host}:{http_port}
+      random_instance_id: false
+
       # support rollsite/nginx/fateflow as a coordination proxy
       # rollsite support fate on eggroll, use grpc protocol
       # nginx support fate on eggroll and fate on spark, use http or grpc protocol, default is http
@@ -247,8 +257,8 @@ data:
     federated_command_trys: 3
     end_status_job_scheduling_time_limit: 300000 # ms
     end_status_job_scheduling_updates: 1
-    auto_retries: 0
-    auto_retry_delay: 1  #seconds
+    auto_retries: {{ .Values.modules.python.failedTaskAutoRetryTimes }}
+    auto_retry_delay: {{ .Values.modules.python.failedTaskAutoRetryDelay }}  #seconds
     # It can also be specified in the job configuration using the federated_status_collect_type parameter
     federated_status_collect_type: PUSH
     detect_connect_max_retry_count: 3
