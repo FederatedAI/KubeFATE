@@ -155,65 +155,70 @@ skippedKeys:
 
 
 # python:
-  # type: NodePort
-  # httpNodePort: 30097
-  # grpcNodePort: 30092
-  # loadBalancerIP:
-  # serviceAccountName: ""
-  # nodeSelector:
-  # tolerations:
-  # affinity:
-  # enabledNN: false
-  # logLevel: INFO
-  # existingClaim: ""
-  # storageClass: "python"
-  # accessMode: ReadWriteMany
-  # size: 1Gi
-  # resources:
-    # requests:
-      # cpu: "2"
-      # memory: "4Gi"
-    # limits:
-      # cpu: "4"
-      # memory: "8Gi"
-  # clustermanager:
-    # cores_per_node: 16
-    # nodes: 2
-  # spark:
-    # cores_per_node: 20
-    # nodes: 2
-    # master: spark://spark-master:7077
-    # driverHost:
-    # driverHostType:
-    # portMaxRetries:
-    # driverStartPort:
-    # blockManagerStartPort:
-    # pysparkPython:
-  # hdfs:
-    # name_node: hdfs://namenode:9000
-    # path_prefix:
-  # rabbitmq:
-    # host: rabbitmq
-    # mng_port: 15672
-    # port: 5672
-    # user: fate
-    # password: fate
-  # pulsar:
-    # host: pulsar
-    # mng_port: 8080
-    # port: 6650
-    # topic_ttl: 3
-    # cluster: standalone
-    # tenant: fl-tenant     
-  # nginx:
-    # host: nginx
-    # http_port: 9300
-    # grpc_port: 9310
+#   type: NodePort
+#   replicas: 1
+#   httpNodePort: 30097
+#   grpcNodePort: 30092
+#   loadBalancerIP:
+#   serviceAccountName: ""
+#   nodeSelector:
+#   tolerations:
+#   affinity:
+#   failedTaskAutoRetryTimes:
+#   failedTaskAutoRetryDelay:
+#   logLevel: INFO
+#   existingClaim: ""
+#   storageClass: "python"
+#   accessMode: ReadWriteMany
+#   size: 1Gi
+#   resources:
+#     requests:
+#       cpu: "2"
+#       memory: "4Gi"
+#     limits:
+#       cpu: "4"
+#       memory: "8Gi"
+#   clustermanager:
+#     cores_per_node: 16
+#     nodes: 2
+#   spark:
+#     cores_per_node: 20
+#     nodes: 2
+#     master: spark://spark-master:7077
+#     driverHost:
+#     driverHostType:
+#     portMaxRetries:
+#     driverStartPort:
+#     blockManagerStartPort:
+#     pysparkPython:
+#   hdfs:
+#     name_node: hdfs://namenode:9000
+#     path_prefix:
+#   rabbitmq:
+#     host: rabbitmq
+#     mng_port: 15672
+#     port: 5672
+#     user: fate
+#     password: fate
+#   pulsar:
+#     host: pulsar
+#     mng_port: 8080
+#     port: 6650
+#     topic_ttl: 3
+#     cluster: standalone
+#     tenant: fl-tenant
+#   nginx:
+#     host: nginx
+#     http_port: 9300
+#     grpc_port: 9310
 
 # fateboard:
-  # type: ClusterIP
-  # username: admin
-  # password: admin
+#   type: ClusterIP
+#   username: admin
+#   password: admin
+#   nodeSelector:
+#   tolerations:
+#   affinity:
 
 # client:
   # nodeSelector:
