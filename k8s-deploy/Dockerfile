@@ -1,3 +1,5 @@
+ARG ARCH=amd64
+
 FROM golang:1.17 as builder
 
 WORKDIR /workspace
@@ -13,9 +15,9 @@ COPY docs/docs.go docs/docs.go
 COPY config.yaml config.yaml
 
 ARG LDFLAGS
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GO111MODULE=on go build -a -ldflags '-s' -installsuffix cgo -o kubefate kubefate.go
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=${ARCH} GO111MODULE=on go build -a -ldflags '-s' -installsuffix cgo -o kubefate kubefate.go
 
-FROM gcr.io/distroless/static:nonroot
+FROM gcr.io/distroless/static:nonroot-${ARCH}
 WORKDIR /
 COPY --from=builder /workspace/kubefate .
 COPY --from=builder /workspace/config.yaml  .
