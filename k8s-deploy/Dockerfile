@@ -15,6 +15,7 @@ COPY docs/docs.go docs/docs.go
 COPY config.yaml config.yaml
 
 ARG LDFLAGS
+ARG ARCH
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=${ARCH} GO111MODULE=on go build -a -ldflags '-s' -installsuffix cgo -o kubefate kubefate.go
 
 FROM gcr.io/distroless/static:nonroot-${ARCH}
