@@ -70,12 +70,12 @@ swag: swag-bin
 package: kubefate-without-swag
 	mkdir -p tmp/kubefate;
 	cp -r bin/kubefate *.yaml examples tmp/kubefate;
-	tar -czvf kubefate-k8s-${VERSION}-${ARCH}.tar.gz -C tmp/ kubefate;
+	tar -czvf kubefate-k8s-${RELEASE_VERSION}-${ARCH}.tar.gz -C tmp/ kubefate;
 	rm -r tmp;
 
 release: package docker-save
-	mkdir -p release/${ARCH};
-	mv kubefate-k8s-${VERSION}-${ARCH}.tar.gz kubefate-${VERSION}-${ARCH}.docker release/${ARCH};
+	mkdir -p release;
+	mv kubefate-k8s-${RELEASE_VERSION}-${ARCH}.tar.gz kubefate-${VERSION}-${ARCH}.docker release/;
 
 clean:
 	rm -r release
