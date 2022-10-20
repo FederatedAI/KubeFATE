@@ -319,7 +319,8 @@ modules:
     sessionProcessorsPerNode: {{ .sessionProcessorsPerNode }}
     replicas: {{ .replicas | default 2 }}
     subPath: {{ .subPath }}
-    storageClass: {{ .storageClass  | default "client" }}
+    storageClass: {{ .storageClass  | default "nodemanager" }}
+    existingClaim: {{ .existingClaim }}
     accessMode: {{ .accessMode  | default "ReadWriteOnce" }}
     size: {{ .size  | default "1Gi" }}
     {{- with .nodeSelector }}
