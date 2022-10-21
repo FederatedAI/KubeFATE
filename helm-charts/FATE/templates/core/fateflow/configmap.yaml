@@ -187,11 +187,11 @@ data:
     enable_model_store: true
     model_store_address:
       storage: mysql
-      name: {{ .Values.externalMysqlDatabase | default .Values.modules.mysql.database | default "eggroll_meta" }}
+      database: {{ .Values.externalMysqlDatabase | default .Values.modules.mysql.database | default "eggroll_meta" }}
       host: '{{ .Values.externalMysqlIp | default .Values.modules.mysql.ip | default "mysql" }}'
       port: {{ .Values.externalMysqlPort | default .Values.modules.mysql.port | default "3306" }}
       user: '{{ .Values.externalMysqlUser | default .Values.modules.mysql.user | default "fate" }}'
-      passwd: '{{ .Values.externalMysqlPassword | default .Values.modules.mysql.password | default "fate_dev" }}'
+      password: '{{ .Values.externalMysqlPassword | default .Values.modules.mysql.password | default "fate_dev" }}'
       max_connections: 10
       stale_timeout: 10
     {{- with .Values.modules.serving }}
