@@ -2,46 +2,46 @@
 `cluster.yaml` declares information about the FATE cluster to be deployed, which KubeFATE CLI uses to deploy the FATE cluster.
 
 ## cluster.yaml
-| Name                      | Type               | Description                                                                                            |
-|---------------------------|--------------------|--------------------------------------------------------------------------------------------------------|
-| * name                    | scalars            | FATE cluster name.                                                                                     |
-| * namespace               | scalars            | Kubernetes namespace for FATE cluster.                                                                 |
-| * chartName               | scalars            | FATE chart name. (fate/fate-serving)                                                                   |
-| * chartVersion            | scalars            | FATE chart corresponding version.                                                                      |
-| * partyId                 | scalars            | FATE cluster party id.                                                                                 |
-| registry                  | scalars            | Other fate images sources.                                                                             |
-| pullPolicy                | scalars            | kubernetes images pull policy                                                                          |
-| imagePullSecrets          | sequences          | The imagePullSecrets names for all deployments                                                         |
-| * persistence             | bool               | mysql and nodemanager data persistence.                                                                |
-| istio.enable              | bool               | enable istio                                                                                           |
-| podSecurityPolicy.enabled | bool               | if `true`, create & use Pod Security Policy resources                                                  |
-| ingressClassName          | scalars            | The Ingress class name, such as "nginx".                                                               |
-| * modules                 | sequences          | Modules to be deployed in the FATE cluster.                                                            |
-| computing                 | set(Eggroll, Spark, Spark_local) | Configure cluster computing engine( eggroll, spark or spark_local)                                                  |
-| federation                | set(Eggroll,Pulsar,RabbitMQ) | Configure cluster federation engine( eggroll,pulsar or rabbitmq)                                                  |
-| storage                   | set(Eggroll,HDFS,LocalFS) | Configure cluster storage engine( eggroll, hdfs or spark)                                                  |
-| algorithm                 | set(Basic, NN)     | Configure cluster algorithm ( basic or NeuralNetwork)                                                  |
-| device                    | set(IPCL, CPU)     | Configure cluster device( ipcl or cpu)                                                  |
-| ingress                   | mappings           | Custom domain of FATE UI component                                                                     |
-| rollsite                  | mappings           | Configuration of FATE cluster `rollsite` module.                                                       |
-| nodemanager               | mappings           | Configuration of FATE cluster `nodemanager` module.                                                    |
-| python                    | mappings           | Configuration of FATE cluster `python` module.                                                         |
-| fateboard                 | mappings           | Configuration of FATE cluster `fateboard` module.                                                      |
-| client                    | mappings           | Configuration of FATE cluster `client` module.                                                         |
-| mysql                     | mappings           | Configuration of FATE cluster `mysql` module.<br />If you use your own redis, please delete this item. |
-| externalMysqlIp           | scalars            | Access your own MySQL.                                                                                 |
-| externalMysqlPort         | scalars            | Access your own MySQL.                                                                                 |
-| externalMysqlDatabase     | scalars            | Access your own MySQL.                                                                                 |
-| externalMysqlUser         | scalars            | Access your own MySQL.                                                                                 |
-| externalMysqlPassword     | scalars            | Access your own MySQL.                                                                                 |
-| servingIp                 | scalars            | Serving cluster connected to fate.                                                                     |
-| servingPort               | scalars            | Serving cluster connected to fate.                                                                     |
-| spark                     | mappings           | Configuration of FATE cluster `spark` module.                                                          |
-| hdfs                      | mappings           | Configuration of FATE cluster `hdfs` module.                                                           |
-| nginx                     | mappings           | Configuration of FATE cluster `nginx` module.                                                          |
-| rabbitmq                  | mappings           | Configuration of FATE cluster `rabbitmq` module.                                                       |
-| pulsar                    | mappings           | Configuration of FATE cluster `pulsar` module.                                                         |
-| skippedKeys               | sequences          | you can customize some keys which will be ignored in yaml validation                                       |
+| Name                      | Type                             | Description                                                                                            |
+| ------------------------- | -------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| * name                    | scalars                          | FATE cluster name.                                                                                     |
+| * namespace               | scalars                          | Kubernetes namespace for FATE cluster.                                                                 |
+| * chartName               | scalars                          | FATE chart name. (fate/fate-serving)                                                                   |
+| * chartVersion            | scalars                          | FATE chart corresponding version.                                                                      |
+| * partyId                 | scalars                          | FATE cluster party id.                                                                                 |
+| registry                  | scalars                          | Other fate images sources.                                                                             |
+| pullPolicy                | scalars                          | kubernetes images pull policy                                                                          |
+| imagePullSecrets          | sequences                        | The imagePullSecrets names for all deployments                                                         |
+| * persistence             | bool                             | mysql and nodemanager data persistence.                                                                |
+| istio.enable              | bool                             | enable istio                                                                                           |
+| podSecurityPolicy.enabled | bool                             | if `true`, create & use Pod Security Policy resources                                                  |
+| ingressClassName          | scalars                          | The Ingress class name, such as "nginx".                                                               |
+| * modules                 | sequences                        | Modules to be deployed in the FATE cluster.                                                            |
+| computing                 | set(Eggroll, Spark, Spark_local) | Configure cluster computing engine( eggroll, spark or spark_local)                                     |
+| federation                | set(Eggroll,Pulsar,RabbitMQ)     | Configure cluster federation engine( eggroll,pulsar or rabbitmq)                                       |
+| storage                   | set(Eggroll,HDFS,LocalFS,Hive)   | Configure cluster storage engine( eggroll, hdfs, spark or hive)                                        |
+| algorithm                 | set(Basic, NN)                   | Configure cluster algorithm ( basic or NeuralNetwork)                                                  |
+| device                    | set(IPCL, CPU)                   | Configure cluster device( ipcl or cpu)                                                                 |
+| ingress                   | mappings                         | Custom domain of FATE UI component                                                                     |
+| rollsite                  | mappings                         | Configuration of FATE cluster `rollsite` module.                                                       |
+| nodemanager               | mappings                         | Configuration of FATE cluster `nodemanager` module.                                                    |
+| python                    | mappings                         | Configuration of FATE cluster `python` module.                                                         |
+| fateboard                 | mappings                         | Configuration of FATE cluster `fateboard` module.                                                      |
+| client                    | mappings                         | Configuration of FATE cluster `client` module.                                                         |
+| mysql                     | mappings                         | Configuration of FATE cluster `mysql` module.<br />If you use your own redis, please delete this item. |
+| externalMysqlIp           | scalars                          | Access your own MySQL.                                                                                 |
+| externalMysqlPort         | scalars                          | Access your own MySQL.                                                                                 |
+| externalMysqlDatabase     | scalars                          | Access your own MySQL.                                                                                 |
+| externalMysqlUser         | scalars                          | Access your own MySQL.                                                                                 |
+| externalMysqlPassword     | scalars                          | Access your own MySQL.                                                                                 |
+| servingIp                 | scalars                          | Serving cluster connected to fate.                                                                     |
+| servingPort               | scalars                          | Serving cluster connected to fate.                                                                     |
+| spark                     | mappings                         | Configuration of FATE cluster `spark` module.                                                          |
+| hdfs                      | mappings                         | Configuration of FATE cluster `hdfs` module.                                                           |
+| nginx                     | mappings                         | Configuration of FATE cluster `nginx` module.                                                          |
+| rabbitmq                  | mappings                         | Configuration of FATE cluster `rabbitmq` module.                                                       |
+| pulsar                    | mappings                         | Configuration of FATE cluster `pulsar` module.                                                         |
+| skippedKeys               | sequences                        | you can customize some keys which will be ignored in yaml validation                                   |
 
 ***Computing federation storage algorithm device configuration introduction reference [Introduction to Engine Architecture](../Introduction_to_Engine_Architecture.md) and [FATE Algorithm and Computational Acceleration Selection](../FATE_Algorithm_and_Computational_Acceleration_Selection.md)***
 
@@ -66,7 +66,7 @@
 ### ingress mappings
 
 | Name                    | Type              | Description                                                      |
-|-------------------------|-------------------|------------------------------------------------------------------|
+| ----------------------- | ----------------- | ---------------------------------------------------------------- |
 | `fateboard`             | mappings          | Configuration of Fateboard UI domain                             |
 | `fateboard.annotations` | mappings          | The annotations used commonly for ingresses                      |
 | `fateboard.hosts`       | sequences         | Set hosts list of ingress record                                 |
@@ -77,7 +77,7 @@
 | `client.tls`            | sequences         | Set this to enable TLS on the ingress record                     |
 | `spark`                 | mappings          | Configuration of spark UI domain                                 |
 | `rabbitmq`              | mappings          | Configuration of Rabbitmq UI domain                              |
-| `pulsar`                | mappings          | Configuration of Pulsar UI domain                              |
+| `pulsar`                | mappings          | Configuration of Pulsar UI domain                                |
 
 
 
@@ -85,7 +85,7 @@
 It is used to declare the `rollsite ` module in the FATE cluster to be deployed.
 
 | Name         | subitem     | Type      | Description                                                                                                                                                                             |
-|--------------|-------------|-----------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ------------ | ----------- | --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | type         |             | scalars   | Kubernetes ServiceTypes, default is NodePort.                                                                                                                                           |
 | nodePort     |             | scalars   | The port used by `proxy` module's kubernetes service, default range: 30000-32767.                                                                                                       |
 | partyList    |             | sequences | If this FATE cluster is exchange cluster, partyList is all party's sequences of all parties proxy address. If this FATE cluster is one of participants, delete this configuration item. |
@@ -117,7 +117,7 @@ The parties are directly connected.
 ### nodemanager mappings
 
 | Name                       | SubItem                    | Type      | Description                                                                                                                                                     |
-|----------------------------|----------------------------|-----------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| -------------------------- | -------------------------- | --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | count                      |                            | scalars   | Number of nodes deployed nodemanager.                                                                                                                           |
 | session-Processors-PerNode |                            | scalars   | Configuration of FATE cluster `nodemanager` module.                                                                                                             |
 | list                       |                            | sequences | List of nodemanager nodes.                                                                                                                                      |
@@ -133,7 +133,7 @@ The parties are directly connected.
 ### python mappings
 
 | Name                        | Type     | Description                                                                                  |
-|-----------------------------|----------|----------------------------------------------------------------------------------------------|
+| --------------------------- | -------- | -------------------------------------------------------------------------------------------- |
 | type                        | scalars  | Kubernetes ServiceTypes, default is NodePort.<br />Other modules can connect to the fateflow |
 | nodePort                    | scalars  | The port used by `proxy` module's kubernetes service, default range: 30000-32767.            |
 | nodeSelector                | mappings | kubernetes nodeSelector.                                                                     |
@@ -152,13 +152,14 @@ The parties are directly connected.
 | rabbitmq                    | mappings | If you use the existing rabbitmq, you can set this configuration                             |
 | nginx                       | mappings | If you use the existing nginx, you can set this configuration                                |
 | logLevel                    | scalars  | The log level of the Python process, default level is Info                                   |
+| hive                        | mappings | If you use the existing hive, you can set this configuration                                 |
 
 ### fateboard mappings
 
 Configuration of kubernetes deployment fateboard.
 
 | Name     | Type     | Description                 |
-|----------|----------|-----------------------------|
+| -------- | -------- | --------------------------- |
 | type     | mappings | Kubernetes nodeSelector.    |
 | username | scalars  | Login username of fateboard |
 | password | scalars  | Login password of fateboard |
@@ -168,7 +169,7 @@ Configuration of kubernetes deployment fateboard.
 Configuration of kubernetes deployment client.
 
 | Name          | Type     | Description                                                                                                                                                     |
-|---------------|----------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | nodeSelector  | mappings | kubernetes nodeSelector.                                                                                                                                        |
 | subPath       | scalars  | Path of data persistence, specify the "subPath" if the PVC is shared with other components.                                                                     |
 | existingClaim | scalars  | Use the existing PVC which must be created manually before bound.                                                                                               |
@@ -181,7 +182,7 @@ Configuration of kubernetes deployment client.
 Configuration of kubernetes deployment mysql.
 
 | Name          | Type     | Description                                                                                                                                                     |
-|---------------|----------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | nodeSelector  | mappings | kubernetes nodeSelector.                                                                                                                                        |
 | ip            | scalars  | Allow other modules to connect to MySQL.                                                                                                                        |
 | port          | scalars  | Mysql port.                                                                                                                                                     |
@@ -201,7 +202,7 @@ Configuration of kubernetes deployment mysql.
 Configuration of kubernetes deployment spark.
 
 | Name              | SubItem      | Type     | Description                  |
-|-------------------|--------------|----------|------------------------------|
+| ----------------- | ------------ | -------- | ---------------------------- |
 | master/<br>worker | Image        | scalars  | Image of spark components    |
 |                   | ImageTag     | scalars  | ImageTag of spark components |
 |                   | replicas     | scalars  | Number of copies of pod      |
@@ -213,18 +214,18 @@ Configuration of kubernetes deployment spark.
 
 Configuration of kubernetes deployment hdfs.
 
-| Name                   | SubItem      | Type     | Description                                      |
-|------------------------|--------------|----------|--------------------------------------------------|
-| namenode/<br>datanode  | nodeSelector | mappings | kubernetes nodeSelector.                         |
-|                        | type         | scalars  | Kubernetes ServiceTypes, default is `ClusterIp`. |
-| datanode               | replicas     | scalars  | The replicas of the HDFS datanode pods           |
+| Name                  | SubItem      | Type     | Description                                      |
+| --------------------- | ------------ | -------- | ------------------------------------------------ |
+| namenode/<br>datanode | nodeSelector | mappings | kubernetes nodeSelector.                         |
+|                       | type         | scalars  | Kubernetes ServiceTypes, default is `ClusterIp`. |
+| datanode              | replicas     | scalars  | The replicas of the HDFS datanode pods           |
 
 ### nginx mappings
 
 Configuration of kubernetes deployment hdfs.
 
 | Name         | Type     | Description                  |
-|--------------|----------|------------------------------|
+| ------------ | -------- | ---------------------------- |
 | nodeSelector | mappings | kubernetes nodeSelector.     |
 | type         | scalars  | Kubernetes ServiceTypes.     |
 | nodePort     | scalars  | Kubernetes Service NodePort. |
@@ -263,7 +264,7 @@ Configuration of kubernetes deployment hdfs.
 Configuration of kubernetes deployment rabbitmq .
 
 | Name         | Type     | Description                                      |
-|--------------|----------|--------------------------------------------------|
+| ------------ | -------- | ------------------------------------------------ |
 | nodeSelector | mappings | kubernetes nodeSelector.                         |
 | type         | scalars  | Kubernetes ServiceTypes, default is `ClusterIp`. |
 | nodePort     | scalars  | Kubernetes Service NodePort.                     |
@@ -292,27 +293,27 @@ Configuration of kubernetes deployment rabbitmq .
 
 Configuration of kubernetes deployment pulsar .
 
-| Name             | Type      | Description                                                  |
-| ---------------- | --------- | ------------------------------------------------------------ |
-| nodeSelector     | mappings  | kubernetes nodeSelector.                                     |
-| type             | scalars   | Kubernetes ServiceTypes, default is `ClusterIp`.             |
-| nodePort         | scalars   | Kubernetes Service NodePort.                                 |
-| skippedKeys      | sequences | you can customize some keys which will be ignored in yaml validation |
-| tolerations      |           | Kubernetes tolerations                                       |
-| affinity         |           | Kubernetes affinity                                          |
-| env              | mappings  | env of pulsar.                                               |
-| confs            | mappings  | configuration of pulsar.                                     |
-| httpNodePort     | scalars   | Pulsar HttpNodePort                                          |
-| httpsNodePort    | scalars   | Pulsar HttpsNodePort                                         |
-| loadBalancerIP   | scalars   | Ip of loadBalancer                                           |
+| Name             | Type      | Description                                                                                                                                                     |
+| ---------------- | --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| nodeSelector     | mappings  | kubernetes nodeSelector.                                                                                                                                        |
+| type             | scalars   | Kubernetes ServiceTypes, default is `ClusterIp`.                                                                                                                |
+| nodePort         | scalars   | Kubernetes Service NodePort.                                                                                                                                    |
+| skippedKeys      | sequences | you can customize some keys which will be ignored in yaml validation                                                                                            |
+| tolerations      |           | Kubernetes tolerations                                                                                                                                          |
+| affinity         |           | Kubernetes affinity                                                                                                                                             |
+| env              | mappings  | env of pulsar.                                                                                                                                                  |
+| confs            | mappings  | configuration of pulsar.                                                                                                                                        |
+| httpNodePort     | scalars   | Pulsar HttpNodePort                                                                                                                                             |
+| httpsNodePort    | scalars   | Pulsar HttpsNodePort                                                                                                                                            |
+| loadBalancerIP   | scalars   | Ip of loadBalancer                                                                                                                                              |
 | storageClass     | scalars   | Specify the "storageClass" used to provision the volume. Or the default. StorageClass will be used(the default). Set it to "-" to disable dynamic provisioning. |
-| existingClaim    | scalars   | Kubernetes existingClaim                                     |
-| accessMode       | scalars   | Kubernetes Persistent Volume Access Modes: <br />ReadWriteOnce<br />ReadOnlyMany <br />ReadWriteMany. |
-| size             | scalars   | Match the volume size of PVC.                                |
-| publicLB.enabled | bool      | if `true`, enable publicLB                                   |
-| exchange         | mappings  | FATE cluster `exchange` module's ip and port.                |
-| resources        | mappings  | resources of Pod                                             |
-| route_table      | mappings  | route table of pulsar.                                       |
+| existingClaim    | scalars   | Kubernetes existingClaim                                                                                                                                        |
+| accessMode       | scalars   | Kubernetes Persistent Volume Access Modes: <br />ReadWriteOnce<br />ReadOnlyMany <br />ReadWriteMany.                                                           |
+| size             | scalars   | Match the volume size of PVC.                                                                                                                                   |
+| publicLB.enabled | bool      | if `true`, enable publicLB                                                                                                                                      |
+| exchange         | mappings  | FATE cluster `exchange` module's ip and port.                                                                                                                   |
+| resources        | mappings  | resources of Pod                                                                                                                                                |
+| route_table      | mappings  | route table of pulsar.                                                                                                                                          |
 
 *example of route_table*:
 
@@ -335,3 +336,16 @@ Configuration of kubernetes deployment pulsar .
 - backlogQuotaDefaultLimitGB
 - brokerDeleteInactiveTopicsFrequencySeconds
 
+
+### hive mappings
+
+Configuration of existing hive. 
+Please note: you have to run hive cluster by your self, then set below configurations used for storage engine.
+
+| Name           | Type    | Description            |
+| -------------- | ------- | ---------------------- |
+| host           | scalars | configuration of hive. |
+| port           | scalars | configuration of hive. |
+| auth_mechanism | scalars | configuration of hive. |
+| user           | scalars | configuration of hive. |
+| password       | scalars | configuration of hive. |

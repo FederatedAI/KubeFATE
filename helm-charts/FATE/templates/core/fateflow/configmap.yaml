@@ -142,11 +142,11 @@ data:
         token_code: MLSS
         python_path: /data/projects/fate/python
       hive:
-        host: 127.0.0.1
-        port: 10000
-        auth_mechanism:
-        username:
-        password:
+        host: {{ .Values.modules.python.hive.host }}
+        port: {{ .Values.modules.python.hive.port }}
+        auth_mechanism: {{ .Values.modules.python.hive.auth_mechanism }}
+        username: {{ .Values.modules.python.hive.username }}
+        password: {{ .Values.modules.python.hive.password }}
       linkis_hive:
         host: 127.0.0.1
         port: 9001
