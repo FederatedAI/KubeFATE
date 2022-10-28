@@ -171,6 +171,12 @@ modules:
       host: nginx
       http_port: 9300
       grpc_port: 9310
+    hive:
+      host:
+      port:
+      auth_mechanism:
+      username:
+      password:
   client:
     include: true
     ip: client

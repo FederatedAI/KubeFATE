@@ -211,6 +211,12 @@ skippedKeys:
 #     host: nginx
 #     http_port: 9300
 #     grpc_port: 9310
+#   hive:
+#     host: 127.0.0.1
+#     port: 10000
+#     auth_mechanism:
+#     username:
+#     password:
 
 # fateboard:
 #   type: ClusterIP

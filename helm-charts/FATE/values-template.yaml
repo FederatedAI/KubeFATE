@@ -285,6 +285,14 @@ modules:
       http_port: {{ .http_port }}
       grpc_port: {{ .grpc_port }}
     {{- end }}
+    {{- with .hive }}
+    hive:
+      host: {{ .host }}
+      port: {{ .port }}
+      auth_mechanism: {{ .auth_mechanism }}
+      username: {{ .username }}
+      password: {{ .password }}
+    {{- end }}
     {{- end }}
 
 
