@@ -189,6 +189,7 @@ modules:
     storageClass:
     accessMode: ReadWriteOnce
     size: 1Gi
+    notebook_hashed_password: 
   clustermanager: 
     include: true
     ip: clustermanager

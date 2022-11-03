@@ -370,6 +370,7 @@ modules:
     affinity:
 {{ toYaml . | indent 6 }}
     {{- end }}
+    notebook_hashed_password: {{ .notebook_hashed_password | default "" }}
     {{- end }}
 
 
