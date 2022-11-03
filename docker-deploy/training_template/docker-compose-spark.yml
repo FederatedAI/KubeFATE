@@ -254,6 +254,7 @@ services:
       FATE_FLOW_IP: "fateflow"
       FATE_FLOW_PORT: "9380"
       FATE_SERVING_HOST: "fate-serving:8059"
+      NOTEBOOK_HASHED_PASSWORD: "${NOTEBOOK_HASHED_PASSWORD}"
     volumes:
       - download_dir:/data/projects/fate/download_dir
       - shared_dir_examples:/data/projects/fate/examples
@@ -262,3 +263,4 @@ services:
       - fateflow
     networks:
       - fate-network
+    command: ["bash", "-c", "flow init --ip ${FATE_FLOW_IP} --port ${FATE_FLOW_PORT} && pipeline init --ip ${FATE_FLOW_IP} --port ${FATE_FLOW_PORT} && jupyter notebook --ip=0.0.0.0 --port=20000 --allow-root --debug --NotebookApp.notebook_dir='/data/projects/fate/' --no-browser --NotebookApp.token='' --NotebookApp.password='${NOTEBOOK_HASHED_PASSWORD}'"]
