@@ -233,6 +233,7 @@ skippedKeys:
   # storageClass: "client"
   # accessMode: ReadWriteOnce
   # size: 1Gi
+  # notebook_hashed_password: ""
 
 # mysql:
   # nodeSelector:
