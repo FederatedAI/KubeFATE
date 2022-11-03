@@ -168,14 +168,15 @@ Configuration of kubernetes deployment fateboard.
 
 Configuration of kubernetes deployment client.
 
-| Name          | Type     | Description                                                                                                                                                     |
-| ------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| nodeSelector  | mappings | kubernetes nodeSelector.                                                                                                                                        |
-| subPath       | scalars  | Path of data persistence, specify the "subPath" if the PVC is shared with other components.                                                                     |
-| existingClaim | scalars  | Use the existing PVC which must be created manually before bound.                                                                                               |
-| storageClass  | scalars  | Specify the "storageClass" used to provision the volume. Or the default. StorageClass will be used(the default). Set it to "-" to disable dynamic provisioning. |
-| accessMode    | scalars  | Kubernetes Persistent Volume Access Modes: <br />ReadWriteOnce<br />ReadOnlyMany <br />ReadWriteMany.                                                           |
-| size          | scalars  | Match the volume size of PVC.                                                                                                                                   |
+| Name                     | Type     | Description                                                                                                                                                     |
+| ------------------------ | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| nodeSelector             | mappings | kubernetes nodeSelector.                                                                                                                                        |
+| subPath                  | scalars  | Path of data persistence, specify the "subPath" if the PVC is shared with other components.                                                                     |
+| existingClaim            | scalars  | Use the existing PVC which must be created manually before bound.                                                                                               |
+| storageClass             | scalars  | Specify the "storageClass" used to provision the volume. Or the default. StorageClass will be used(the default). Set it to "-" to disable dynamic provisioning. |
+| accessMode               | scalars  | Kubernetes Persistent Volume Access Modes: <br />ReadWriteOnce<br />ReadOnlyMany <br />ReadWriteMany.                                                           |
+| size                     | scalars  | Match the volume size of PVC.                                                                                                                                   |
+| notebook_hashed_password | scalars  | hashed password for jupyter notebook.                                                                                                                           |
 
 ### Mysql mappings
 

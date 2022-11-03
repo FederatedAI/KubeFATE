@@ -495,7 +495,7 @@ EOF
 			rm -rf confs-exchange/
 			mkdir -p confs-exchange/conf/
 			cp ${WORKINGDIR}/.env confs-exchange/
-			echo "NOTEBOOK_HASHED_PASSWORD=${notebook_hashed_password}" >> confs-exchange/.env
+
 			cp training_template/docker-compose-exchange.yml confs-exchange/docker-compose.yml
 			cp -r training_template/backends/eggroll/conf/* confs-exchange/conf/
 
@@ -567,7 +567,6 @@ EOF
 		fi
 		# generate conf dir
 		cp ${WORKINGDIR}/.env ./serving-$party_id
-		echo "NOTEBOOK_HASHED_PASSWORD=${notebook_hashed_password}" >> ./serving-$party_id/.env
 
 		# serving admin
 		sed -i "s/admin.username=<serving_admin.username>/admin.username=${serving_admin_username}/g" ./serving-$party_id/confs/serving-admin/conf/application.properties
