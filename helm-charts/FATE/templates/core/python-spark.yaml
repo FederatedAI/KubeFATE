@@ -34,6 +34,7 @@ spec:
         fateMoudle: python
 {{ include "fate.labels" . | indent 8 }}
     spec:
+      serviceAccountName: flow
       {{- if .Values.istio.enabled }}
       {{- else }}
       initContainers:
