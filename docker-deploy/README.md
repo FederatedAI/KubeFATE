@@ -718,5 +718,6 @@ To delete the cluster completely, log in to each host and run the commands as fo
 ```bash
 cd /data/projects/fate/confs-<id>/  # id of party
 docker-compose down
+docker network prune
 rm -rf ../confs-<id>/               # delete the legacy files
 ```
