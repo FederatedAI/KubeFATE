@@ -227,6 +227,7 @@ modules:
     httpNodePort: {{ .httpNodePort }}
     grpcNodePort: {{ .grpcNodePort }}
     loadBalancerIP: {{ .loadBalancerIP }}
+    dependent_distribution: {{ .dependent_distribution }}
     serviceAccountName: {{ .serviceAccountName }}
     {{- with .nodeSelector }}
     nodeSelector: 
