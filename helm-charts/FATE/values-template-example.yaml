@@ -170,6 +170,7 @@ skippedKeys:
 #   existingClaim: ""
 #   storageClass: "python"
 #   accessMode: ReadWriteMany
+#   dependent_distribution: false
 #   size: 1Gi
 #   resources:
 #     requests:

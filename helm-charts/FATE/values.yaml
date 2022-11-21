@@ -134,6 +134,7 @@ modules:
     logLevel: INFO
     # subPath: ""
     existingClaim:
+    dependent_distribution: false
     claimName: python-data
     storageClass:
     accessMode: ReadWriteOnce
