@@ -102,19 +102,24 @@ func (fum *FateUpgradeManager) waitFinish(interval, round int) bool {
 }
 
 func getMysqlCredFromSpec(clusterSpec modules.MapStringInterface) (username, password string) {
+	defaultUsername := "fate"
+	defaultPassword := "fate_dev"
+	if clusterSpec["mysql"] == nil {
+	   return defaultUsername, defaultPassword
+	}
 	mysqlSpec := clusterSpec["mysql"].(map[string]interface{})
 	if mysqlSpec["user"] == nil {
-		username = "fate"
+	   username = defaultUsername
 	} else {
-		username = mysqlSpec["user"].(string)
+	   username = mysqlSpec["user"].(string)
 	}
 	if mysqlSpec["password"] == nil {
-		password = "fate_dev"
+	   password = defaultPassword
 	} else {
-		password = mysqlSpec["password"].(string)
+	   password = mysqlSpec["password"].(string)
 	}
 	return
-}
+ }
 
 func constructFumSpec(oldSpec, newSpec modules.MapStringInterface) (fumSpec modules.MapStringInterface) {
 	oldVersion := strings.ReplaceAll(oldSpec["chartVersion"].(string), "v", "")
