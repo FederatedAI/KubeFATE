@@ -90,6 +90,8 @@ rules:
   resources:
   - deployments
   - statefulsets
+  - deployments/status
+  - statefulsets/status
   verbs:
   - get
   - list
@@ -141,3 +143,14 @@ rules:
   - delete
   - update
   - patch
+- apiGroups:
+    - batch
+  resources:
+    - jobs
+  verbs:
+    - get
+    - list
+    - create
+    - delete
+    - update
+    - patch
