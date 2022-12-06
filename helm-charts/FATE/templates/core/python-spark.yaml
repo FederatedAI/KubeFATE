@@ -194,11 +194,7 @@ spec:
       imagePullSecrets:
 {{ toYaml . | indent 6 }}
       {{- end }}
-    {{- if .Values.modules.python.serviceAccountName }}
-      serviceAccountName: {{ .Values.modules.python.serviceAccountName }}
-    {{- else }}
-      serviceAccountName: {{ template "serviceAccountName" . }}
-    {{- end }}
+      serviceAccountName: {{ .Values.modules.python.serviceAccountName | default "flow"}}
       restartPolicy: Always
       volumes:
         {{- if eq .Values.computing "Eggroll" }}

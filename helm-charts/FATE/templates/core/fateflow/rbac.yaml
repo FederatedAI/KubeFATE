@@ -1,0 +1,39 @@
+{{- if not .Values.modules.python.serviceAccountName -}}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: flow
+  namespace: {{ .Release.Namespace }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: flow
+  namespace: {{ .Release.Namespace }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: flow-role
+subjects:
+  - kind: ServiceAccount
+    name: flow
+    namespace: {{ .Release.Namespace }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: flow-role
+  namespace: {{ .Release.Namespace }}
+rules:
+  - apiGroups:
+      - batch
+    resources:
+      - jobs
+    verbs:
+      - get
+      - list
+      - create
+      - delete
+      - update
+      - patch
+{{- end -}}
