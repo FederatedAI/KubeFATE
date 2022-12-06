@@ -1,3 +1,4 @@
+{{- if not .Values.modules.python.serviceAccountName -}}
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -25,29 +26,14 @@ metadata:
   namespace: {{ .Release.Namespace }}
 rules:
   - apiGroups:
-      - apps
+      - batch
     resources:
-      - statefulsets
-      - statefulsets/status
+      - jobs
     verbs:
+      - get
+      - list
       - create
+      - delete
       - update
       - patch
-      - list
-      - get
-      - delete
-  - apiGroups:
-      - ""
-    resources:
-      - pods
-      - pods/log
-    verbs:
-      - get
-      - list
-  - apiGroups:
-      - ""
-    resources:
-      - pods/exec
-    verbs:
-      - create
-      - get
+{{- end -}}
