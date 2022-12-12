@@ -1,0 +1,61 @@
+name: edge-server-1
+namespace: fedml-edge-server-1
+chartName: fedml-server
+chartVersion: 0.7.355
+# registry: ""
+# pullPolicy: IfNotPresent
+# imagePullSecrets:
+  # - name: myregistrykey
+# ingressClassName: nginx
+modules:
+  - server
+
+# ingress:
+  # server:
+    # annotations: {}
+    # hosts:
+      # - host: chart-example.local
+      #   paths:
+          # - path: /
+          #   pathType: ImplementationSpecific
+    # tls:
+    #  - secretName: chart-example-tls
+    #    hosts:
+    #      - chart-example.local
+
+server:
+  fedmlAccountId: "1190"
+  # fedmlVersion: "release"
+  # fedmlServerOsName: "Linux"
+  # replicaCount: 1
+  # volume:
+    # serverHomeDirHostPath: "/home/fedml-server"
+    # serverHomeDirMountPath: "/home/fedml/fedml-server"
+  # nameOverride: ""
+  # fullnameOverride: ""
+  # serviceAccount:
+    # create: true
+    # annotations: {}
+    # name: ""
+  # type: ClusterIP
+  # port: 9999
+  # podAnnotations:
+  # nodeSelector:
+  # tolerations:
+  # affinity:
+  # resources:
+  # autoscaling:
+    # enabled: false
+    # minReplicas: 1
+    # maxReplicas: 10
+    # targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+  # podSecurityContext: {}
+    # fsGroup: 2000
+  # securityContext: { }
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
