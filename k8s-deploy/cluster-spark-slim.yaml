@@ -1,10 +1,10 @@
 name: fate-9999
 namespace: fate-9999
 chartName: fate
-chartVersion: v1.8.0
+chartVersion: v1.8.1
 partyId: 9999
 registry: ""
-imageTag: "1.8.0-release"
+imageTag: "1.8.1-release"
 pullPolicy: 
 imagePullSecrets: 
 - name: myregistrykey
@@ -114,7 +114,7 @@ backend: spark_local_pulsar
 # spark:
   # master:
     # Image: "federatedai/spark-master"
-    # ImageTag: "1.6.0-release"
+    # ImageTag: "1.8.1-release"
     # replicas: 1
     # resources:
       # requests:
@@ -127,7 +127,7 @@ backend: spark_local_pulsar
     # type: ClusterIP
   # worker:
     # Image: "federatedai/spark-worker"
-    # ImageTag: "1.6.0-release"
+    # ImageTag: "1.8.1-release"
     # replicas: 2
     # resources:
       # requests:
