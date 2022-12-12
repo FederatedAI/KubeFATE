@@ -1,0 +1,6 @@
+apiVersion: v2
+appVersion: release
+description: A Helm chart for FedML Edge Server
+name: fedml-server
+type: application
+version: 0.7.355
