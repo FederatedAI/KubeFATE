@@ -30,6 +30,7 @@ rules:
   - deployments
   - deployments/status
   - statefulsets
+  - statefulsets/status
   verbs:
   - update
   - patch

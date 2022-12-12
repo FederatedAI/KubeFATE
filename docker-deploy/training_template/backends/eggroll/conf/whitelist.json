@@ -1,0 +1,127 @@
+{
+    "builtins": [
+        "int",
+        "list",
+        "set"
+    ],
+    "collections": [
+        "OrderedDict",
+        "defaultdict"
+    ],
+    "eggroll.core.transfer_model": [
+        "ErRollSiteHeader"
+    ],
+    "eggroll.roll_pair.task.storage": [
+        "BSS"
+    ],
+    "federatedml.cipher_compressor.compressor": [
+        "PackingCipherTensor",
+        "NormalCipherPackage",
+        "PackingCipherTensorPackage"
+    ],
+    "federatedml.ensemble.basic_algorithms.decision_tree.tree_core.feature_histogram": [
+        "FeatureHistogramWeights",
+        "HistogramBag"
+    ],
+    "federatedml.ensemble.basic_algorithms.decision_tree.tree_core.feature_importance": [
+        "FeatureImportance"
+    ],
+    "federatedml.ensemble.basic_algorithms.decision_tree.tree_core.g_h_optim": [
+        "SplitInfoPackage"
+    ],
+    "federatedml.ensemble.basic_algorithms.decision_tree.tree_core.node": [
+        "Node"
+    ],
+    "federatedml.ensemble.basic_algorithms.decision_tree.tree_core.splitter": [
+        "SplitInfo"
+    ],
+    "federatedml.evaluation.performance_recorder": [
+        "PerformanceRecorder"
+    ],
+    "federatedml.feature.binning.bin_result": [
+        "BinColResults"
+    ],
+    "federatedml.feature.binning.optimal_binning.bucket_info": [
+        "Bucket"
+    ],
+    "federatedml.feature.binning.quantile_summaries": [
+        "QuantileSummaries",
+        "Stats",
+        "SparseQuantileSummaries"
+    ],
+    "federatedml.feature.fate_element_type": [
+        "NoneType"
+    ],
+    "federatedml.feature.homo_feature_binning.homo_binning_base": [
+        "SplitPointNode"
+    ],
+    "federatedml.feature.instance": [
+        "Instance"
+    ],
+    "federatedml.feature.one_hot_encoder": [
+        "TransferPair"
+    ],
+    "federatedml.feature.sparse_vector": [
+        "SparseVector"
+    ],
+    "federatedml.framework.weights": [
+        "TransferableWeights",
+        "DictWeights",
+        "NumpyWeights",
+        "ListWeights",
+        "OrderDictWeights",
+        "NumericWeights"
+    ],
+    "federatedml.linear_model.linear_model_weight": [
+        "LinearModelWeights"
+    ],
+    "federatedml.secureprotol.fate_paillier": [
+        "PaillierPublicKey",
+        "PaillierEncryptedNumber"
+    ],
+    "federatedml.secureprotol.fixedpoint": [
+        "FixedPointNumber"
+    ],
+    "federatedml.secureprotol.number_theory.field.integers_modulo_prime_field": [
+        "IntegersModuloPrimeElement"
+    ],
+    "federatedml.secureprotol.number_theory.group.twisted_edwards_curve_group": [
+        "TwistedEdwardsCurveElement"
+    ],
+    "federatedml.secureprotol.symmetric_encryption.cryptor_executor": [
+        "CryptoExecutor"
+    ],
+    "federatedml.secureprotol.symmetric_encryption.pohlig_hellman_encryption": [
+        "PohligHellmanCipherKey",
+        "PohligHellmanCiphertext"
+    ],
+    "federatedml.statistic.intersect.intersect_preprocess": [
+        "BitArray"
+    ],
+    "federatedml.statistic.statics": [
+        "SummaryStatistics"
+    ],
+    "gmpy2": [
+        "from_binary"
+    ],
+    "numpy": [
+        "dtype",
+        "ndarray"
+    ],
+    "numpy.core.multiarray": [
+        "_reconstruct",
+        "scalar"
+    ],
+    "numpy.core.numeric": [
+        "_frombuffer"
+    ],
+    "tensorflow.python.framework.ops": [
+        "convert_to_tensor"
+    ],
+    "torch._utils": [
+        "_rebuild_tensor_v2"
+    ],
+    "torch.storage": [
+        "_load_from_bytes"
+    ]
+}
