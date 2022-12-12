@@ -36,4 +36,12 @@ rules:
       - delete
       - update
       - patch
+  - apiGroups:
+      - ''
+    resources:
+      - pods
+      - pods/status
+    verbs:
+      - get
+      - list
 {{- end -}}
