@@ -30,18 +30,18 @@ The chart can be downloaded in each KubeFATE release, with name `fate-{release_v
 
 Download it and copy it to the folder to upload.
 ```
-$ kubefate chart upload -f ./fate-v1.8.0.tgz
+$ kubefate chart upload -f ./fate-v1.8.1.tgz
 Upload file success
 
 $ kubefate chart ls
 UUID                                    NAME    VERSION         APPVERSION
-ca3f7843-749a-4f69-9f6b-4c544a7623ac    fate    v1.8.0        v1.8.0
+ca3f7843-749a-4f69-9f6b-4c544a7623ac    fate    v1.8.1        v1.8.1
 ```
 
-Then, we can deploy the fate cluster of v1.8.0 version. The detail of cluster.yaml please refer to: [FATE Cluster Configuration](./configurations/FATE_cluster_configuration.md)
+Then, we can deploy the fate cluster of v1.8.1 version. The detail of cluster.yaml please refer to: [FATE Cluster Configuration](./configurations/FATE_cluster_configuration.md)
 ```
 chartName: fate
-chartVersion: v1.8.0
+chartVersion: v1.8.1
 ```
 
 We can delete the chart with:

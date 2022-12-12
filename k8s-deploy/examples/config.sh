@@ -85,8 +85,8 @@ $SED -i "s/192.168.0.1/${party_exchange_IP}/g" ./party-10000/cluster-spark-local
 
 # exchange config
 
-$SED -i "s/chartVersion: .*/chartVersion: ${chartVersion}/g" ./party-exchange/rollsite.yaml
-$SED -i "s/chartVersion: .*/chartVersion: ${chartVersion}/g" ./party-exchange/trafficServer.yaml
+$SED -i "s/chartVersion: .*/chartVersion: ${fate_chartVersion}/g" ./party-exchange/rollsite.yaml
+$SED -i "s/chartVersion: .*/chartVersion: ${fate_chartVersion}/g" ./party-exchange/trafficServer.yaml
 
 $SED -i "s/imageTag: .*/imageTag: ${fate_imageTAG}/g" ./party-exchange/rollsite.yaml
 $SED -i "s/imageTag: .*/imageTag: ${fate_imageTAG}/g" ./party-exchange/trafficServer.yaml
