@@ -17,7 +17,7 @@
 5. 要保证安装机器可以正常访问Docker Hub或者网易云镜像仓库，以及Google gcr； 
 6. 预先创建一个目录，以便整个过程使用该目录作为工作目录，命令如下：
 ```
-export release_version=v1.8.0 && export kubefate_version=v1.4.4 && cd ~ && mkdir demo && cd demo
+export release_version=v1.8.1 && export kubefate_version=v1.4.4 && cd ~ && mkdir demo && cd demo
 ```
 
 **注意：下文介绍的MiniKube机器IP地址是192.168.100.123。请修改为你准备的实验机器IP地址！！！**
@@ -70,7 +70,7 @@ sudo minikube addons enable ingress
 
 ## 安装Kubefate
 ### 下载KubeFATE命令行工具
-我们从Github上 [KubeFATE Release](https://github.com/FederatedAI/KubeFATE/releases)页面找到Kuberetes部署的下载包，并下载对应版本，如前面环境变量设置`v1.8.0`，
+我们从Github上 [KubeFATE Release](https://github.com/FederatedAI/KubeFATE/releases)页面找到Kuberetes部署的下载包，并下载对应版本，如前面环境变量设置`v1.8.1`，
 ```
 curl -LO https://github.com/FederatedAI/KubeFATE/releases/download/${release_version}/kubefate-k8s-${release_version}.tar.gz && tar -xzf ./kubefate-k8s-${release_version}.tar.gz
 ```
@@ -209,10 +209,10 @@ kubectl create namespace fate-10000
 name: fate-9999
 namespace: fate-9999
 chartName: fate
-chartVersion: v1.8.0
+chartVersion: v1.8.1
 partyId: 9999
 registry: "hub.c.163.com/federatedai"
-imageTag: "1.8.0-release"
+imageTag: "1.8.1-release"
 pullPolicy:
 imagePullSecrets:
 - name: myregistrykey
@@ -264,10 +264,10 @@ servingPort: 30095
 name: fate-10000
 namespace: fate-10000
 chartName: fate
-chartVersion: v1.8.0
+chartVersion: v1.8.1
 partyId: 10000
 registry: "hub.c.163.com/federatedai"
-imageTag: "1.8.0-release"
+imageTag: "1.8.1-release"
 pullPolicy:
 imagePullSecrets:
 - name: myregistrykey
@@ -330,8 +330,8 @@ create job success, job id=7752db70-e368-41fa-8827-d39411728d1b
 ```
 kubefate@machine:~/kubefate$ watch kubefate cluster ls
 UUID                                    NAME            NAMESPACE       REVISION        STATUS  CHART   ChartVERSION    AGE
-51476469-b473-4d41-b2d5-ea7241d5eac7    fate-9999       fate-9999       1               Running fate    v1.8.0          88s
-dacc0549-b9fc-463f-837a-4e7316db2537    fate-10000      fate-10000      1               Running fate    v1.8.0          69s
+51476469-b473-4d41-b2d5-ea7241d5eac7    fate-9999       fate-9999       1               Running fate    v1.8.1          88s
+dacc0549-b9fc-463f-837a-4e7316db2537    fate-10000      fate-10000      1               Running fate    v1.8.1          69s
 ```
 因为这个步骤需要到网易云镜像仓库去下载约10G的镜像，所以第一次执行视乎你的网络情况需要一定时间。
 检查下载的进度可以用
@@ -358,16 +358,16 @@ UUID            51476469-b473-4d41-b2d5-ea7241d5eac7
 Name            fate-9999                                  
 NameSpace       fate-9999                                  
 ChartName       fate                                       
-ChartVersion    v1.8.0                                     
+ChartVersion    v1.8.1                                     
 Revision        1                                          
 Age             15h                                        
 Status          Running                                    
 Spec            backend: eggroll                           
                 chartName: fate                            
-                chartVersion: v1.8.0                       
+                chartVersion: v1.8.1                       
                 imagePullSecrets:                          
                 - name: myregistrykey                      
-                imageTag: 1.8.0-release                    
+                imageTag: 1.8.1-release                    
                 ingress:                                   
                   client:                                  
                     annotations:                           
