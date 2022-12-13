@@ -185,13 +185,13 @@ UUID         24bb75ff-f636-4c64-8c04-1b9073f89a2f
 Name         fate-9999                           
 NameSpace    fate-9999                           
 ChartName    fate                                
-ChartVersion v1.9.0                              
+ChartVersion v1.9.2                              
 Revision     1                                   
 Age          15m                                 
 Status       Running                             
 Spec         algorithm: Basic                    
              chartName: fate                     
-             chartVersion: v1.9.0                
+             chartVersion: v1.9.2                
              computing: Eggroll                  
              device: CPU                         
              federation: Eggroll                 

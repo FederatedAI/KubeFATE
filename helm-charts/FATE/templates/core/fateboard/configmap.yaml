@@ -31,8 +31,8 @@ data:
     {{- end }}
     fateflow.http_app_key=
     fateflow.http_secret_key=
-    spring.http.encoding.charset=UTF-8
-    spring.http.encoding.enabled=true
+    server.servlet.encoding.charset=UTF-8
+    server.servlet.encoding.enabled=true
     server.tomcat.uri-encoding=UTF-8
     fateboard.front_end.cors=false
     fateboard.front_end.url=http://localhost:8028
