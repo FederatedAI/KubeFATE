@@ -76,7 +76,7 @@ compute_core=4
 
 ```
 
-* For more details about FATE on Spark with Rebbitmq please refer to this [document](../docs/FATE_On_Spark.md).
+* For more details about FATE on Spark with RabbitMQ please refer to this [document](../docs/FATE_On_Spark.md).
 * For more details about FATE on Spark with Pulsar, refer to this [document](../docs/FATE_On_Spark_With_Pulsar.md)
 * For more details about FATE on Spark with local pulsar, refer to this [document](placeholder)
 
