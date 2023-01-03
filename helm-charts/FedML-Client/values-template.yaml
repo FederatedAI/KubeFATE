@@ -1,0 +1,115 @@
+image:
+  repository: {{ .registry | default "public.ecr.aws/x6k8q1x9" }}/fedml-client-agent
+  pullPolicy: {{ .pullPolicy | default "IfNotPresent" }}
+  tag: ""
+
+{{- with .imagePullSecrets }}
+imagePullSecrets:
+  {{- toYaml . | nindent 2 }}
+{{- end }}
+
+{{- with .ingress }}
+{{- if hasKey . "client" }}
+ingress:
+  enabled: true
+  className: {{ $.ingressClassName }}
+  {{- with .client }}
+  {{- with .annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .hosts }}
+  hosts:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .tls }}
+  tls:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- end }}
+{{- end }}
+{{- end }}
+
+{{- with .client }}
+replicaCount: {{ .replicaCount | default 1 }}
+{{- if .nameOverride }}
+nameOverride: {{ .nameOverride }}
+{{- end }}
+{{- if .fullnameOverride }}
+fullnameOverride: {{ .fullnameOverride }}
+{{- end }}
+
+{{- with .serviceAccount }}
+serviceAccount:
+  create: {{ .create | default true }}
+  {{- with .annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  name: {{ .name }}
+{{- end }}
+
+{{- with .podAnnotations }}
+podAnnotations:
+  {{- toYaml . | nindent 2 }}
+{{- end }}
+
+{{- with .podSecurityContext }}
+podSecurityContext:
+  {{- toYaml . | nindent 2 }}
+{{- end }}
+
+{{- with .securityContext }}
+securityContext:
+  {{- toYaml . | nindent 2 }}
+{{- end }}
+
+service:
+  type: {{ .type | default "ClusterIP" }}
+  port: {{ .port | default 9988 }}
+
+{{- with .resources }}
+resources:
+  {{- toYaml . | nindent 2 }}
+{{- end }}
+
+{{- with .autoscaling }}
+autoscaling:
+  enabled: false
+  minReplicas: {{ .minReplicas | default 1 }}
+  maxReplicas: {{ .minReplicas | default 10 }}
+  {{- if .targetCPUUtilizationPercentage }}
+  targetCPUUtilizationPercentage: {{ .targetCPUUtilizationPercentage }}
+  {{- end }}
+  {{- if .targetMemoryUtilizationPercentage }}
+  targetMemoryUtilizationPercentage: {{ .targetMemoryUtilizationPercentage }}
+  {{- end }}
+{{- end }}
+
+{{- with .nodeSelector }}
+nodeSelector:
+  {{- toYaml . | nindent 2 }}
+{{- end }}
+
+{{- with .tolerations }}
+tolerations:
+  {{- toYaml . | nindent 2 }}
+{{- end }}
+
+{{- with .affinity }}
+affinity:
+  {{- toYaml . | nindent 2 }}
+{{- end }}
+
+env:
+  fedmlAccountId: {{ .fedmlAccountId }}
+  fedmlVersion: {{ .fedmlVersion | default "release" }}
+  fedmlClientOsName: {{ .fedmlClientOsName | default "Linux" }}
+
+{{- with .volume }}
+volume:
+  clientHomeDirHostPath: {{ .clientHomeDirHostPath | default "/home/fedml-client" }}
+  clientHomeDirMountPath: {{ .clientHomeDirMountPath | default "/home/fedml/fedml-client" }}
+{{- end }}
+
+{{- end -}}

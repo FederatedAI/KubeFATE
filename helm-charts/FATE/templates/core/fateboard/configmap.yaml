@@ -24,6 +24,11 @@ data:
     #priority is higher than {fateflow.url}, split by ;
     #below config can support configuring more than one fate flow for this fate board
     fateflow.url-list=
+    {{- $replicaCount := .Values.modules.python.replicas | int -}}
+    {{- range $index0 := until $replicaCount }}
+      {{- $index1 := $index0 | add1 -}}
+      http://python-{{ $index0 }}.fateflow:9380{{ if ne $index1 $replicaCount }};{{ end }}
+    {{- end }}
     fateflow.http_app_key=
     fateflow.http_secret_key=
     server.servlet.encoding.charset=UTF-8

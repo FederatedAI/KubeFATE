@@ -129,7 +129,6 @@ skippedKeys:
   # nodeSelector:
   # tolerations:
   # affinity:
-  # enabledNN: false
   # logLevel: INFO
   # existingClaim: ""
   # storageClass: "python"

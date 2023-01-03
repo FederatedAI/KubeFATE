@@ -1,6 +1,8 @@
 NAME ?= federatedai/kubefate
 VERSION ?= v1.4.5
 IMG ?= ${NAME}:${VERSION}
+ARCH ?= amd64
+GOOS ?= linux
 
 ifeq (,$(shell go env GOBIN))
 GOBIN=$(shell go env GOPATH)/bin
@@ -26,10 +28,10 @@ test: fmt vet
 
 # Build manager binary
 kubefate: fmt vet swag
-	CGO_ENABLED=0 go build -a --ldflags '-extldflags "-static"' -o ${OUTPUT_FILE} ${BUILD_MODE} kubefate.go
+	GOOS=${GOOS} GOARCH=${ARCH} CGO_ENABLED=0 go build -a --ldflags '-extldflags "-static"' -o ${OUTPUT_FILE} ${BUILD_MODE} kubefate.go
 
 kubefate-without-swag: fmt vet
-	CGO_ENABLED=0 go build -a --ldflags '-extldflags "-static"' -o ${OUTPUT_FILE} ${BUILD_MODE} kubefate.go
+	GOOS=${GOOS} GOARCH=${ARCH} CGO_ENABLED=0 go build -a --ldflags '-extldflags "-static"' -o ${OUTPUT_FILE} ${BUILD_MODE} kubefate.go
 
 run: fmt vet 
 	go run ./kubefate.go service
@@ -43,16 +45,16 @@ uninstall:
 	kubectl delete -f rbac-config.yaml
 
 docker-build: test
-	docker build . -t ${IMG}
+	docker build --build-arg ARCH=${ARCH} . -t ${IMG}
 
 docker-build-without-test:
-	docker build . -t ${IMG}
+	docker build --build-arg ARCH=${ARCH} . -t ${IMG}
 
 docker-push:
 	docker push ${IMG}
 
 docker-save: docker-build-without-test
-	docker save -o kubefate-${VERSION}.docker ${IMG} 
+	docker save -o kubefate-${VERSION}-${ARCH}.docker ${IMG}
 
 # Run go fmt against code
 fmt:
@@ -68,12 +70,12 @@ swag: swag-bin
 package: kubefate-without-swag
 	mkdir -p tmp/kubefate;
 	cp -r bin/kubefate *.yaml examples tmp/kubefate;
-	tar -czvf kubefate-k8s-${RELEASE_VERSION}.tar.gz -C tmp/ kubefate;
+	tar -czvf kubefate-k8s-${RELEASE_VERSION}-${ARCH}.tar.gz -C tmp/ kubefate;
 	rm -r tmp;
 
 release: package docker-save
 	mkdir -p release;
-	mv kubefate-k8s-${RELEASE_VERSION}.tar.gz kubefate-${VERSION}.docker release/;
+	mv kubefate-k8s-${RELEASE_VERSION}-${ARCH}.tar.gz kubefate-${VERSION}-${ARCH}.docker release/;
 
 clean:
 	rm -r release

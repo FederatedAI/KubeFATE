@@ -217,6 +217,7 @@ modules:
   python: 
     include: {{ has "python" .modules }}
     {{- with .python }}
+    replicas: {{ .replicas | default 1 }}
     {{- with .resources }}
     resources:
 {{ toYaml . | indent 6 }}
@@ -226,6 +227,7 @@ modules:
     httpNodePort: {{ .httpNodePort }}
     grpcNodePort: {{ .grpcNodePort }}
     loadBalancerIP: {{ .loadBalancerIP }}
+    dependent_distribution: {{ .dependent_distribution }}
     serviceAccountName: {{ .serviceAccountName }}
     {{- with .nodeSelector }}
     nodeSelector: 
@@ -239,6 +241,8 @@ modules:
     affinity:
 {{ toYaml . | indent 6 }}
     {{- end }}
+    failedTaskAutoRetryTimes: {{ .failedTaskAutoRetryTimes | default 5 }}
+    failedTaskAutoRetryDelay: {{ .failedTaskAutoRetryDelay | default 60 }}
     existingClaim: {{ .existingClaim  }}
     claimName: {{ .claimName | default "python-data" }}
     storageClass: {{ .storageClass | default "python" }}
@@ -264,6 +268,9 @@ modules:
       host: {{ .host }}
       mng_port: {{ .mng_port }}
       port: {{ .port }}
+      topic_ttl: {{ .topic_ttl }}
+      cluster: {{ .cluster }}
+      tenant: {{ .tenant }}      
     {{- end }}
     {{- with .rabbitmq }}
     rabbitmq:
@@ -278,6 +285,14 @@ modules:
       host: {{ .host }}
       http_port: {{ .http_port }}
       grpc_port: {{ .grpc_port }}
+    {{- end }}
+    {{- with .hive }}
+    hive:
+      host: {{ .host }}
+      port: {{ .port }}
+      auth_mechanism: {{ .auth_mechanism }}
+      username: {{ .username }}
+      password: {{ .password }}
     {{- end }}
     {{- end }}
 
@@ -313,7 +328,8 @@ modules:
     sessionProcessorsPerNode: {{ .sessionProcessorsPerNode }}
     replicas: {{ .replicas | default 2 }}
     subPath: {{ .subPath }}
-    storageClass: {{ .storageClass  | default "client" }}
+    storageClass: {{ .storageClass  | default "nodemanager" }}
+    existingClaim: {{ .existingClaim }}
     accessMode: {{ .accessMode  | default "ReadWriteOnce" }}
     size: {{ .size  | default "1Gi" }}
     {{- with .nodeSelector }}
@@ -355,6 +371,7 @@ modules:
     affinity:
 {{ toYaml . | indent 6 }}
     {{- end }}
+    notebook_hashed_password: {{ .notebook_hashed_password | default "" }}
     {{- end }}
 
 
@@ -402,6 +419,18 @@ modules:
     type: {{ .type }}
     username: {{ .username }}
     password: {{ .password }}
+    {{- with .nodeSelector }}
+    nodeSelector:
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    {{- with .tolerations }}
+    tolerations:
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    {{- with .affinity }}
+    affinity:
+{{ toYaml . | indent 6 }}
+    {{- end }}
     {{- end}}
 
   spark:

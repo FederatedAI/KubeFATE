@@ -44,7 +44,7 @@ data:
   service_conf.yaml: |
     use_registry: {{ .Values.modules.serving.useRegistry | default false }}
     use_deserialize_safe_module: false
-    dependent_distribution: false
+    dependent_distribution: {{ .Values.modules.python.dependent_distribution | default false }}
     encrypt_password: false
     encrypt_module: fate_arch.common.encrypt_utils#pwdecrypt
     private_key:
@@ -67,9 +67,19 @@ data:
       dataset: false
     fateflow:
       # you must set real ip address, 127.0.0.1 and 0.0.0.0 is not supported
-      host: fateflow
+      host: fateflow_ip
       http_port: 9380
       grpc_port: 9360
+      # when you have multiple fateflow server on one party,
+      # we suggest using nginx for load balancing.
+      nginx:
+        # under K8s mode, 'fateflow' is the service name, which will be a L4 load balancer.
+        host: fateflow
+        http_port: 9380
+        grpc_port: 9360
+      # use random instance_id instead of {host}:{http_port}
+      random_instance_id: false
+
       # support rollsite/nginx/fateflow as a coordination proxy
       # rollsite support fate on eggroll, use grpc protocol
       # nginx support fate on eggroll and fate on spark, use http or grpc protocol, default is http
@@ -99,13 +109,6 @@ data:
       port: {{ .Values.externalMysqlPort | default .Values.modules.mysql.port | default "3306" }}
       max_connections: 100
       stale_timeout: 30
-    zookeeper:
-      hosts:
-      - "serving-zookeeper:2181"
-       # use_acl: false
-       # user: fate
-       # password: fate
-       # engine services
     default_engines:
       {{- if eq .Values.computing "Spark_local" }}
       computing: "spark"
@@ -139,11 +142,11 @@ data:
         token_code: MLSS
         python_path: /data/projects/fate/python
       hive:
-        host: 127.0.0.1
-        port: 10000
-        auth_mechanism:
-        username:
-        password:
+        host: {{ .Values.modules.python.hive.host }}
+        port: {{ .Values.modules.python.hive.port }}
+        auth_mechanism: {{ .Values.modules.python.hive.auth_mechanism }}
+        username: {{ .Values.modules.python.hive.username }}
+        password: {{ .Values.modules.python.hive.password }}
       linkis_hive:
         host: 127.0.0.1
         port: 9001
@@ -166,7 +169,9 @@ data:
         host: {{ .Values.modules.python.pulsar.host }}
         port: {{ .Values.modules.python.pulsar.port }}
         mng_port: {{ .Values.modules.python.pulsar.mng_port }}
-        topic_ttl: 3
+        topic_ttl: {{ .Values.modules.python.pulsar.topic_ttl }}
+        cluster: {{ .Values.modules.python.pulsar.cluster }}
+        tenant: {{ .Values.modules.python.pulsar.tenant }}        
         # default conf/pulsar_route_table.yaml
         route_table: conf/pulsar_route_table/pulsar_route_table.yaml
         # mode: replication / client, default: replication
@@ -179,14 +184,14 @@ data:
     fateboard:
       host: fateboard
       port: 8080
-    enable_model_store: false
+    enable_model_store: true
     model_store_address:
       storage: mysql
-      name: {{ .Values.externalMysqlDatabase | default .Values.modules.mysql.database | default "eggroll_meta" }}
+      database: {{ .Values.externalMysqlDatabase | default .Values.modules.mysql.database | default "eggroll_meta" }}
       host: '{{ .Values.externalMysqlIp | default .Values.modules.mysql.ip | default "mysql" }}'
       port: {{ .Values.externalMysqlPort | default .Values.modules.mysql.port | default "3306" }}
       user: '{{ .Values.externalMysqlUser | default .Values.modules.mysql.user | default "fate" }}'
-      passwd: '{{ .Values.externalMysqlPassword | default .Values.modules.mysql.password | default "fate_dev" }}'
+      password: '{{ .Values.externalMysqlPassword | default .Values.modules.mysql.password | default "fate_dev" }}'
       max_connections: 10
       stale_timeout: 10
     {{- with .Values.modules.serving }}
@@ -197,9 +202,15 @@ data:
       {{- else }}
       - ''
       {{- end }}
-      {{- if and .useRegistry .zookeeper }}
     zookeeper:
+      {{- if .zookeeper }}
 {{ toYaml .zookeeper | indent 6 }}
+      {{- else}}
+      hosts:
+      - serving-zookeeper.fate-serving-9999:2181
+      use_acl: false
+      user: fate
+      password: fate
       {{- end }}
     {{- end }}
   transfer_conf.yaml: |
@@ -246,8 +257,8 @@ data:
     federated_command_trys: 3
     end_status_job_scheduling_time_limit: 300000 # ms
     end_status_job_scheduling_updates: 1
-    auto_retries: 0
-    auto_retry_delay: 1  #seconds
+    auto_retries: {{ .Values.modules.python.failedTaskAutoRetryTimes }}
+    auto_retry_delay: {{ .Values.modules.python.failedTaskAutoRetryDelay }}  #seconds
     # It can also be specified in the job configuration using the federated_status_collect_type parameter
     federated_status_collect_type: PUSH
     detect_connect_max_retry_count: 3

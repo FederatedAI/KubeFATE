@@ -19,7 +19,7 @@ metadata:
 {{ include "fate.labels" . | indent 4 }}
 spec:
   serviceName: fateflow
-  replicas: 1
+  replicas: {{ .Values.modules.python.replicas }}
   selector:
     matchLabels:
       fateMoudle: python
@@ -123,7 +123,7 @@ spec:
                 cp /data/projects/fate/conf-tmp/component_registry.json /data/projects/fate/fateflow/conf/component_registry.json
                 cp /data/projects/fate/conf-tmp/job_default_config.yaml /data/projects/fate/fateflow/conf/job_default_config.yaml
                 # fix fateflow conf must use IP
-                sed -i "s/host: fateflow/host: ${POD_IP}/g" /data/projects/fate/conf/service_conf.yaml
+                sed -i "s/host: fateflow_ip/host: ${POD_IP}/g" /data/projects/fate/conf/service_conf.yaml
                 
                 cp /data/projects/spark-3.1.3-bin-hadoop3.2/conf/spark-defaults-template.conf /data/projects/spark-3.1.3-bin-hadoop3.2/conf/spark-defaults.conf
                 sed -i "s/fateflow/${POD_IP}/g" /data/projects/spark-3.1.3-bin-hadoop3.2/conf/spark-defaults.conf
@@ -178,53 +178,6 @@ spec:
             - mountPath: /data/projects/fate/fateflow/model_local_cache
               name: python-data
               subPath: model-local-cache
-        {{- if .Values.modules.fateboard.include }}
-        - image: {{ .Values.image.registry }}/fateboard:{{ .Values.image.tag }}
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
-          name: fateboard
-          ports:
-            - containerPort: 8080
-          livenessProbe:
-            httpGet:
-              path: /
-              port: 8080
-              httpHeaders:
-                - name: X-Custom-Header
-                  value: livenessProbe
-            initialDelaySeconds: 1
-            periodSeconds: 10
-            timeoutSeconds: 3
-            successThreshold: 1
-            failureThreshold: 3
-          readinessProbe:
-            httpGet:
-              path: /
-              port: 8080
-              httpHeaders:
-                - name: X-Custom-Header
-                  value: readinessProbe
-            initialDelaySeconds: 1
-            periodSeconds: 10
-            timeoutSeconds: 3
-            successThreshold: 1
-            failureThreshold: 3
-          startupProbe:
-            httpGet:
-              path: /
-              port: 8080
-              httpHeaders:
-                - name: X-Custom-Header
-                  value: startupProbe
-            failureThreshold: 12
-            periodSeconds: 10
-          volumeMounts:
-            - mountPath: /data/projects/fate/fateboard/conf/application.properties
-              name: fateboard-confs
-              subPath: application.properties
-            - name: python-data
-              mountPath: /data/projects/fate/fateflow/logs
-              subPath: logs
-        {{- end }}
       {{- with .Values.modules.python.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}
@@ -265,11 +218,6 @@ spec:
         - name: pulsar-route-table
           configMap:
             name: pulsar-route-table
-        {{- end }}
-        {{- if .Values.modules.fateboard.include }}
-        - name: fateboard-confs
-          configMap:
-            name: fateboard-config
         {{- end }}
         {{- if not .Values.persistence.enabled }}
         - name: python-data
