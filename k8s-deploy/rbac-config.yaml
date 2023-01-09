@@ -36,24 +36,6 @@ stringData:
   mariadbUsername: kubefate
   mariadbPassword: kubefate
 ---
-apiVersion: policy/v1beta1
-kind: PodSecurityPolicy
-metadata:
-  name: kubefate-psp
-  namespace: kube-fate
-spec:
-  privileged: false
-  seLinux:
-    rule: RunAsAny
-  supplementalGroups:
-    rule: RunAsAny
-  runAsUser:
-    rule: RunAsAny
-  fsGroup:
-    rule: RunAsAny
-  volumes:
-  - '*'
----
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -117,17 +99,6 @@ rules:
   - virtualservices
   verbs:
   - get
-  - create
-  - delete
-  - update
-  - patch
-- apiGroups:
-  - policy
-  resources:
-  - podsecuritypolicies
-  verbs:
-  - get
-  - use
   - create
   - delete
   - update
