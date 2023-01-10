@@ -229,6 +229,7 @@ GenerateConfig() {
 		fi
 
 		cp ${WORKINGDIR}/.env ./confs-$party_id
+		echo "NOTEBOOK_HASHED_PASSWORD=${notebook_hashed_password}" >> ./confs-$party_id/.env
 
 		# Modify the configuration file
 
@@ -236,7 +237,7 @@ GenerateConfig() {
 		Suffix=""
 		# computing
 		if [ "$computing" == "Spark" ] || [ "$computing" == "Spark_local" ]; then
-			Suffix=$Suffix"-spark"
+			Suffix=$Suffix""
 		fi
 		# algorithm 
 		if [ "$algorithm" == "NN" ]; then
@@ -248,12 +249,13 @@ GenerateConfig() {
 		fi
 		
 		# federatedai/fateflow-${computing}-${algorithm}-${device}:${version}
-		sed -i "s#image: \"federatedai/fateflow:\${TAG}\"#image: \"federatedai/fateflow${Suffix}:\${TAG}\"#g" ./confs-$party_id/docker-compose.yml
 		
 		# eggroll or spark-worker
 		if [ "$computing" == "Eggroll" ]; then
+			sed -i "s#image: \"federatedai/fateflow:\${TAG}\"#image: \"federatedai/fateflow${Suffix}:\${TAG}\"#g" ./confs-$party_id/docker-compose.yml
 			sed -i "s#image: \"federatedai/eggroll:\${TAG}\"#image: \"federatedai/eggroll${Suffix}:\${TAG}\"#g" ./confs-$party_id/docker-compose.yml
-		elif [ "$computing" == "Spark" ]; then
+		elif [ "$computing" == "Spark" ] || [ "$computing" == "Spark_local" ]; then
+			sed -i "s#image: \"federatedai/fateflow:\${TAG}\"#image: \"federatedai/fateflow-spark${Suffix}:\${TAG}\"#g" ./confs-$party_id/docker-compose.yml
 			sed -i "s#image: \"federatedai/spark-worker:\${TAG}\"#image: \"federatedai/spark-worker${Suffix}:\${TAG}\"#g" ./confs-$party_id/docker-compose.yml
 		fi
 
@@ -494,6 +496,7 @@ EOF
 			rm -rf confs-exchange/
 			mkdir -p confs-exchange/conf/
 			cp ${WORKINGDIR}/.env confs-exchange/
+
 			cp training_template/docker-compose-exchange.yml confs-exchange/docker-compose.yml
 			cp -r training_template/backends/eggroll/conf/* confs-exchange/conf/
 

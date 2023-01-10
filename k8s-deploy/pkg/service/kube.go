@@ -35,6 +35,7 @@ type kubeClient interface {
 	kube.Log
 	kube.Deployment
 	kube.Job
+	kube.Sts
 }
 
 var KubeClient kubeClient = &kube.KUBE

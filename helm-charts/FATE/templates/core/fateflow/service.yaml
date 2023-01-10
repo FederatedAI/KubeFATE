@@ -57,11 +57,9 @@ spec:
       {{- end }}
       protocol: TCP
   type: {{ .Values.modules.python.type }}
-  
   {{- if .Values.modules.python.loadBalancerIP }}
   loadBalancerIP: "{{ .Values.modules.python.loadBalancerIP }}"
   {{- end }}
-  
   selector:
     fateMoudle: python
 {{ include "fate.matchLabels" . | indent 4 }}

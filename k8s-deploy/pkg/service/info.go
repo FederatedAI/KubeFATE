@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2021 VMware, Inc.
+ * Copyright 2019-2022 VMware, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,22 +30,29 @@ func GetClusterInfo(name, namespace string) (map[string]interface{}, error) {
 		return nil, err
 	}
 
-	containerList, err := GetPodContainersStatus(name, getDefaultNamespace(namespace))
+	containerStatus, err := GetPodContainersStatus(name, getDefaultNamespace(namespace))
 	if err != nil {
 		log.Error().Str("func", "GetPodContainersStatus()").Err(err).Msg("GetPodContainersStatus error")
 		return nil, err
 	}
 
-	deploymentList, err := GetClusterDeployStatus(name, getDefaultNamespace(namespace))
+	deploymentStatus, err := GetClusterDeployStatus(name, getDefaultNamespace(namespace))
 	if err != nil {
 		log.Error().Str("func", "GetClusterDeployStatus()").Err(err).Msg("GetClusterDeployStatus error")
 		return nil, err
 	}
 
+	stsStatus, err := GetClusterStsStatus(name, getDefaultNamespace(namespace))
+	if err != nil {
+		log.Error().Str("func", "GetClusterStsStatus()").Err(err).Msg("GetClusterStsStatus error")
+		return nil, err
+	}
+
 	status := make(map[string]interface{})
 
-	status["containers"] = containerList
-	status["deployments"] = deploymentList
+	status["containers"] = containerStatus
+	status["deployments"] = deploymentStatus
+	status["statefulSets"] = stsStatus
 
 	ingressURLList, err := GetIngressURLList(name, getDefaultNamespace(namespace))
 	if err != nil {
@@ -69,11 +76,6 @@ func GetClusterInfo(name, namespace string) (map[string]interface{}, error) {
 	log.Debug().Interface("cluster-info", info).Msg("show the cluster info real-time status")
 
 	return info, nil
-}
-
-//GetClusterStatus GetClusterStatus
-func GetClusterStatus(name, namespace string) (map[string]string, error) {
-	return GetClusterDeployStatus(name, namespace)
 }
 
 // CheckClusterStatus CheckClusterStatus

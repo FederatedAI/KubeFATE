@@ -2,7 +2,7 @@
 image:
   registry: federatedai
   isThridParty:
-  tag: 1.9.2-release
+  tag: 1.10.0-release
   pullPolicy: IfNotPresent
   imagePullSecrets: 
 #  - name: 
@@ -120,6 +120,7 @@ modules:
     affinity:
   python: 
     include: true
+    replicas: 1
     type: ClusterIP
     httpNodePort: 30097
     grpcNodePort: 30092
@@ -128,9 +129,12 @@ modules:
     nodeSelector:
     tolerations:
     affinity:
+    failedTaskAutoRetryTimes:
+    failedTaskAutoRetryDelay:
     logLevel: INFO
     # subPath: ""
     existingClaim:
+    dependent_distribution: false
     claimName: python-data
     storageClass:
     accessMode: ReadWriteOnce
@@ -159,12 +163,21 @@ modules:
       password: fate
     pulsar:
       host: pulsar
-      mng_port: 8080
       port: 6650
+      mng_port: 8080      
+      topic_ttl: 3
+      cluster: standalone
+      tenant: fl-tenant      
     nginx:
       host: nginx
       http_port: 9300
       grpc_port: 9310
+    hive:
+      host:
+      port:
+      auth_mechanism:
+      username:
+      password:
   client:
     include: true
     ip: client
@@ -177,6 +190,7 @@ modules:
     storageClass:
     accessMode: ReadWriteOnce
     size: 1Gi
+    notebook_hashed_password: 
   clustermanager: 
     include: true
     ip: clustermanager
@@ -201,19 +215,6 @@ modules:
         cpu: "2"
         memory: "4Gi"
 
-  client: 
-    include: true
-    ip: client
-    type: ClusterIP
-    nodeSelector:
-    tolerations:
-    affinity:
-    subPath: "client"
-    existingClaim:
-    storageClass:
-    accessMode: ReadWriteOnce
-    size: 1Gi
-
   mysql: 
     include: true
     type: ClusterIP
@@ -231,6 +232,7 @@ modules:
     storageClass:
     accessMode: ReadWriteOnce
     size: 1Gi
+
   serving:
     ip: 192.168.9.1
     port: 30095
@@ -238,12 +240,18 @@ modules:
     zookeeper:
       hosts:
         - serving-zookeeper.fate-serving-9999:2181
-      use_acl: false
+    use_acl: false
+    user: fate
+    password: fate
+
   fateboard:
     include: true
     type: ClusterIP
     username: admin
     password: admin
+    nodeSelector:
+    tolerations:
+    affinity:
 
   spark:
     include: true

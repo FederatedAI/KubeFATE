@@ -185,12 +185,12 @@ CONTAINER ID   IMAGE                                      COMMAND               
 3dca43f3c9d5   federatedai/serving-admin:2.1.5-release    "/bin/sh -c 'java -c…"   5 minutes ago   Up 5 minutes             0.0.0.0:8350->8350/tcp, :::8350->8350/tcp                                                                                                       serving-9999_serving-admin_1
 fe924918509b   federatedai/serving-proxy:2.1.5-release    "/bin/sh -c 'java -D…"   5 minutes ago   Up 5 minutes             0.0.0.0:8059->8059/tcp, :::8059->8059/tcp, 0.0.0.0:8869->8869/tcp, :::8869->8869/tcp, 8879/tcp                                                  serving-9999_serving-proxy_1
 b62ed8ba42b7   bitnami/zookeeper:3.7.0                    "/opt/bitnami/script…"   5 minutes ago   Up 5 minutes             0.0.0.0:2181->2181/tcp, :::2181->2181/tcp, 8080/tcp, 0.0.0.0:49226->2888/tcp, :::49226->2888/tcp, 0.0.0.0:49225->3888/tcp, :::49225->3888/tcp   serving-9999_serving-zookeeper_1
-3c643324066f   federatedai/client:1.9.2-release           "/bin/sh -c 'flow in…"   5 minutes ago   Up 5 minutes             0.0.0.0:20000->20000/tcp, :::20000->20000/tcp                                                                                                   confs-9999_client_1
-3fe0af1ebd71   federatedai/fateboard:1.9.2-release        "/bin/sh -c 'java -D…"   5 minutes ago   Up 5 minutes             0.0.0.0:8080->8080/tcp, :::8080->8080/tcp                                                                                                       confs-9999_fateboard_1
-635b7d99357e   federatedai/fateflow:1.9.2-release         "container-entrypoin…"   5 minutes ago   Up 5 minutes (healthy)   0.0.0.0:9360->9360/tcp, :::9360->9360/tcp, 8080/tcp, 0.0.0.0:9380->9380/tcp, :::9380->9380/tcp                                                  confs-9999_fateflow_1
-8b515f08add3   federatedai/eggroll:1.9.2-release          "/tini -- bash -c 'j…"   5 minutes ago   Up 5 minutes             8080/tcp, 0.0.0.0:9370->9370/tcp, :::9370->9370/tcp                                                                                             confs-9999_rollsite_1
-108cc061c191   federatedai/eggroll:1.9.2-release          "/tini -- bash -c 'j…"   5 minutes ago   Up 5 minutes             4670/tcp, 8080/tcp                                                                                                                              confs-9999_clustermanager_1
-f10575e76899   federatedai/eggroll:1.9.2-release          "/tini -- bash -c 'j…"   5 minutes ago   Up 5 minutes             4671/tcp, 8080/tcp                                                                                                                              confs-9999_nodemanager_1
+3c643324066f   federatedai/client:1.10.0-release           "/bin/sh -c 'flow in…"   5 minutes ago   Up 5 minutes             0.0.0.0:20000->20000/tcp, :::20000->20000/tcp                                                                                                   confs-9999_client_1
+3fe0af1ebd71   federatedai/fateboard:1.10.0-release        "/bin/sh -c 'java -D…"   5 minutes ago   Up 5 minutes             0.0.0.0:8080->8080/tcp, :::8080->8080/tcp                                                                                                       confs-9999_fateboard_1
+635b7d99357e   federatedai/fateflow:1.10.0-release         "container-entrypoin…"   5 minutes ago   Up 5 minutes (healthy)   0.0.0.0:9360->9360/tcp, :::9360->9360/tcp, 8080/tcp, 0.0.0.0:9380->9380/tcp, :::9380->9380/tcp                                                  confs-9999_fateflow_1
+8b515f08add3   federatedai/eggroll:1.10.0-release          "/tini -- bash -c 'j…"   5 minutes ago   Up 5 minutes             8080/tcp, 0.0.0.0:9370->9370/tcp, :::9370->9370/tcp                                                                                             confs-9999_rollsite_1
+108cc061c191   federatedai/eggroll:1.10.0-release          "/tini -- bash -c 'j…"   5 minutes ago   Up 5 minutes             4670/tcp, 8080/tcp                                                                                                                              confs-9999_clustermanager_1
+f10575e76899   federatedai/eggroll:1.10.0-release          "/tini -- bash -c 'j…"   5 minutes ago   Up 5 minutes             4671/tcp, 8080/tcp                                                                                                                              confs-9999_nodemanager_1
 aa0a0002de93   mysql:8.0.28                               "docker-entrypoint.s…"   5 minutes ago   Up 5 minutes             3306/tcp, 33060/tcp                                                                                                                             confs-9999_mysql_1
 ```
 
@@ -229,21 +229,6 @@ $ flow test toy --guest-party-id 10000 --host-party-id 9999        #验证
 docker exec -it confs-10000_client_1 bash
 ```
 
-##### 修改examples/upload_host.json
-
-```bash
-cat > fateflow/examples/upload/upload_host.json <<EOF
-{
-  "file": "examples/data/breast_hetero_host.csv",
-  "id_delimiter": ",",
-  "head": 1,
-  "partition": 10,
-  "namespace": "experiment",
-  "table_name": "breast_hetero_host"
-}
-EOF
-```
-
 ##### 上传host数据
 
 ```bash
@@ -258,238 +243,10 @@ flow data upload -c fateflow/examples/upload/upload_host.json
 docker exec -it confs-9999_client_1 bash
 ```
 
-##### 修改examples/upload_guest.json
-
-```bash
-cat > fateflow/examples/upload/upload_guest.json <<EOF
-{
-  "file": "examples/data/breast_hetero_guest.csv",
-  "id_delimiter": ",",
-  "head": 1,
-  "partition": 4,
-  "namespace": "experiment",
-  "table_name": "breast_hetero_guest"
-}
-EOF
-```
-
 ##### 上传guest数据
 
 ```bash
 flow data upload -c fateflow/examples/upload/upload_guest.json
-```
-
-##### 修改examples/test_hetero_lr_job_conf.json
-
-```bash
-cat > fateflow/examples/lr/test_hetero_lr_job_conf.json <<EOF
-{
-  "dsl_version": "2",
-  "initiator": {
-    "role": "guest",
-    "party_id": 9999
-  },
-  "role": {
-    "guest": [
-      9999
-    ],
-    "host": [
-      10000
-    ],
-    "arbiter": [
-      10000
-    ]
-  },
-  "job_parameters": {
-    "common": {
-      "task_parallelism": 2,
-      "computing_partitions": 8,
-      "task_cores": 4,
-      "auto_retries": 1
-    }
-  },
-  "component_parameters": {
-    "common": {
-      "intersection_0": {
-        "intersect_method": "raw",
-        "sync_intersect_ids": true,
-        "only_output_key": false
-      },
-      "hetero_lr_0": {
-        "penalty": "L2",
-        "optimizer": "rmsprop",
-        "alpha": 0.01,
-        "max_iter": 3,
-        "batch_size": 320,
-        "learning_rate": 0.15,
-        "init_param": {
-          "init_method": "random_uniform"
-        }
-      }
-    },
-    "role": {
-      "guest": {
-        "0": {
-          "reader_0": {
-            "table": {
-              "name": "breast_hetero_guest",
-              "namespace": "experiment"
-            }
-          },
-          "dataio_0": {
-            "with_label": true,
-            "label_name": "y",
-            "label_type": "int",
-            "output_format": "dense"
-          }
-        }
-      },
-      "host": {
-        "0": {
-          "reader_0": {
-            "table": {
-              "name": "breast_hetero_host",
-              "namespace": "experiment"
-            }
-          },
-          "dataio_0": {
-            "with_label": false,
-            "output_format": "dense"
-          },
-          "evaluation_0": {
-            "need_run": false
-          }
-        }
-      }
-    }
-  }
-}
-EOF
-```
-
-##### 修改examples/test_hetero_lr_job_dsl.json
-
-```bash
-cat > fateflow/examples/lr/test_hetero_lr_job_dsl.json <<EOF
-{
-  "components": {
-    "reader_0": {
-      "module": "Reader",
-      "output": {
-        "data": [
-          "table"
-        ]
-      }
-    },
-    "dataio_0": {
-      "module": "DataTransform",
-      "input": {
-        "data": {
-          "data": [
-            "reader_0.table"
-          ]
-        }
-      },
-      "output": {
-        "data": [
-          "train"
-        ],
-        "model": [
-          "dataio"
-        ]
-      },
-      "need_deploy": true
-    },
-    "intersection_0": {
-      "module": "Intersection",
-      "input": {
-        "data": {
-          "data": [
-            "dataio_0.train"
-          ]
-        }
-      },
-      "output": {
-        "data": [
-          "train"
-        ]
-      }
-    },
-    "hetero_feature_binning_0": {
-      "module": "HeteroFeatureBinning",
-      "input": {
-        "data": {
-          "data": [
-            "intersection_0.train"
-          ]
-        }
-      },
-      "output": {
-        "data": [
-          "train"
-        ],
-        "model": [
-          "hetero_feature_binning"
-        ]
-      }
-    },
-    "hetero_feature_selection_0": {
-      "module": "HeteroFeatureSelection",
-      "input": {
-        "data": {
-          "data": [
-            "hetero_feature_binning_0.train"
-          ]
-        },
-        "isometric_model": [
-          "hetero_feature_binning_0.hetero_feature_binning"
-        ]
-      },
-      "output": {
-        "data": [
-          "train"
-        ],
-        "model": [
-          "selected"
-        ]
-      }
-    },
-    "hetero_lr_0": {
-      "module": "HeteroLR",
-      "input": {
-        "data": {
-          "train_data": [
-            "hetero_feature_selection_0.train"
-          ]
-        }
-      },
-      "output": {
-        "data": [
-          "train"
-        ],
-        "model": [
-          "hetero_lr"
-        ]
-      }
-    },
-    "evaluation_0": {
-      "module": "Evaluation",
-      "input": {
-        "data": {
-          "data": [
-            "hetero_lr_0.train"
-          ]
-        }
-      },
-      "output": {
-        "data": [
-          "evaluate"
-        ]
-      }
-    }
-  }
-}
-EOF
 ```
 
 ##### 提交任务

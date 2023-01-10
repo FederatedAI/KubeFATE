@@ -22,3 +22,21 @@ type UpgradeManager interface {
 	getCluster(specOld, specNew modules.MapStringInterface) modules.Cluster
 	waitFinish(interval, round int) bool
 }
+
+type FallbackUpgradeManager struct {
+	UpgradeManager
+}
+
+func (um *FallbackUpgradeManager) validate(specold, specNew modules.MapStringInterface) error {
+	return nil
+}
+
+func (um *FallbackUpgradeManager) getCluster(specold, specNew modules.MapStringInterface) modules.Cluster {
+	return modules.Cluster{
+		Name: "fallbackUM",
+	}
+}
+
+func (um *FallbackUpgradeManager) waitFinish(interval, round int) bool {
+	return true
+}

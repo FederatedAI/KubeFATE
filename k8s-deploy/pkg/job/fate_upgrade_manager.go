@@ -105,21 +105,21 @@ func getMysqlCredFromSpec(clusterSpec modules.MapStringInterface) (username, pas
 	defaultUsername := "fate"
 	defaultPassword := "fate_dev"
 	if clusterSpec["mysql"] == nil {
-	   return defaultUsername, defaultPassword
+		return defaultUsername, defaultPassword
 	}
 	mysqlSpec := clusterSpec["mysql"].(map[string]interface{})
 	if mysqlSpec["user"] == nil {
-	   username = defaultUsername
+		username = defaultUsername
 	} else {
-	   username = mysqlSpec["user"].(string)
+		username = mysqlSpec["user"].(string)
 	}
 	if mysqlSpec["password"] == nil {
-	   password = defaultPassword
+		password = defaultPassword
 	} else {
-	   password = mysqlSpec["password"].(string)
+		password = mysqlSpec["password"].(string)
 	}
 	return
- }
+}
 
 func constructFumSpec(oldSpec, newSpec modules.MapStringInterface) (fumSpec modules.MapStringInterface) {
 	oldVersion := strings.ReplaceAll(oldSpec["chartVersion"].(string), "v", "")

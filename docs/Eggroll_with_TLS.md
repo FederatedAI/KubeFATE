@@ -146,7 +146,7 @@ Then in the cluster.yaml file of FATE-Exchange, turn on the ```enableTLS``` swit
 
 ## Docker-Compose mode
 
-In KubeFATE release v1.9.2, we will not provide a switch for enabling TLS for rollsite. This can be done in below manual steps:
+In KubeFATE release v1.10.0, we will not provide a switch for enabling TLS for rollsite. This can be done in below manual steps:
 
 1. Generate the certs, as above documents shows, for every FATE cluster and for the FATE Exchange if needed.
 2. Run `docker ps` to get the container id of the rollsite.

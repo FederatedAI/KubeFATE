@@ -43,8 +43,11 @@ spec:
               value: "9380"
             - name: FATE_SERVING_HOST
               value: "{{.Values.modules.serving.ip}}:{{.Values.modules.serving.port}}"
+            - name: NOTEBOOK_HASHED_PASSWORD
+              value: {{ .Values.modules.client.notebook_hashed_password }}
           ports:
             - containerPort: 20000
+          command: ["bash", "-c", "pipeline init --ip ${FATE_FLOW_IP} --port ${FATE_FLOW_PORT} && flow init --ip ${FATE_FLOW_IP} --port ${FATE_FLOW_PORT} && jupyter notebook --ip=0.0.0.0 --port=20000 --allow-root --debug --NotebookApp.notebook_dir='/data/projects/fate/' --no-browser --NotebookApp.token='' --NotebookApp.password=${NOTEBOOK_HASHED_PASSWORD}"]
           livenessProbe:
             httpGet:
               path: /

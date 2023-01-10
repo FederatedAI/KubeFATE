@@ -97,7 +97,7 @@ services:
       FATE_LOG_LEVEL: "INFO"
 
   namenode:
-    image: federatedai/hadoop-namenode:2.0.0-hadoop3.2.1-java8
+    image: "federatedai/hadoop-namenode:2.0.0-hadoop3.2.1-java8"
     restart: always
     ports:
       - 9000:9000
@@ -114,9 +114,10 @@ services:
       - fate-network
 
   datanode-0:
-    image: federatedai/hadoop-datanode:2.0.0-hadoop3.2.1-java8
+    image: "federatedai/hadoop-datanode:2.0.0-hadoop3.2.1-java8"
     restart: always
     volumes:
+      - /etc/localtime:/etc/localtime:ro
       - ./shared_dir/data/datanode-0:/hadoop/dfs/data
     environment:
       SERVICE_PRECONDITION: "namenode:9000"
@@ -126,9 +127,10 @@ services:
       - fate-network
 
   datanode-1:
-    image: federatedai/hadoop-datanode:2.0.0-hadoop3.2.1-java8
+    image: "federatedai/hadoop-datanode:2.0.0-hadoop3.2.1-java8"
     restart: always
     volumes:
+      - /etc/localtime:/etc/localtime:ro
       - ./shared_dir/data/datanode-1:/hadoop/dfs/data
     environment:
       SERVICE_PRECONDITION: "namenode:9000"
@@ -138,10 +140,9 @@ services:
       - fate-network
 
   datanode-2:
-    image: federatedai/hadoop-datanode:2.0.0-hadoop3.2.1-java8
+    image: "federatedai/hadoop-datanode:2.0.0-hadoop3.2.1-java8"
     restart: always
     volumes:
-      - ./shared_dir/data/datanode:/hadoop/dfs/data
       - /etc/localtime:/etc/localtime:ro
       - ./shared_dir/data/datanode-2:/hadoop/dfs/data
     environment:
@@ -151,8 +152,9 @@ services:
     networks:
       - fate-network
 
+
   spark-master:
-    image: federatedai/spark-master:${TAG}
+    image: "federatedai/spark-master:${TAG}"
     restart: always
     ports:
       - "8888:8080"
@@ -165,7 +167,7 @@ services:
       - fate-network
 
   spark-worker:
-    image: federatedai/spark-worker:${TAG}
+    image: "federatedai/spark-worker:${TAG}"
     restart: always
     depends_on:
       - spark-master
@@ -180,7 +182,7 @@ services:
       - fate-network
 
   rabbitmq:
-    image: federatedai/rabbitmq:3.8.3-management
+    image: "federatedai/rabbitmq:3.8.3-management"
     ports:
       - "5672:5672"
       - "15672:15672"
@@ -252,6 +254,7 @@ services:
       FATE_FLOW_IP: "fateflow"
       FATE_FLOW_PORT: "9380"
       FATE_SERVING_HOST: "fate-serving:8059"
+      NOTEBOOK_HASHED_PASSWORD: "${NOTEBOOK_HASHED_PASSWORD}"
     volumes:
       - download_dir:/data/projects/fate/download_dir
       - shared_dir_examples:/data/projects/fate/examples
@@ -260,3 +263,4 @@ services:
       - fateflow
     networks:
       - fate-network
+    command: ["bash", "-c", "pipeline init --ip $${FATE_FLOW_IP} --port $${FATE_FLOW_PORT} && flow init --ip $${FATE_FLOW_IP} --port $${FATE_FLOW_PORT} && jupyter notebook --ip=0.0.0.0 --port=20000 --allow-root --debug --NotebookApp.notebook_dir='/data/projects/fate/' --no-browser --NotebookApp.token='' --NotebookApp.password=$${NOTEBOOK_HASHED_PASSWORD} "]
