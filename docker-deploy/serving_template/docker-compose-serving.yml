@@ -11,12 +11,11 @@
 # limitations under the License.
 #
 
-version: '3'
+version: '3.7'
 
 networks:
-  fate-serving-network:
-    external:
-      name: <fate-network>
+  <fate-network>:
+    external: true
 
 volumes:
   data_dir_server:
@@ -42,7 +41,7 @@ services:
       - ./data/server:/data/projects/fate-serving/serving-server/.fate
       - /etc/localtime:/etc/localtime:ro
     networks:
-      - fate-serving-network
+      - <fate-network>
 
   serving-proxy:
     image: "federatedai/serving-proxy:${SERVING_TAG}"
@@ -56,7 +55,7 @@ services:
       - ./confs/serving-proxy/conf/route_table.json:/data/projects/fate-serving/serving-proxy/conf/route_table.json
       - /etc/localtime:/etc/localtime:ro
     networks:
-      - fate-serving-network
+      - <fate-network>
 
   serving-zookeeper:
     image: "bitnami/zookeeper:3.7.0"
@@ -71,7 +70,7 @@ services:
     environment:
       ALLOW_ANONYMOUS_LOGIN: "yes"
     networks:
-      - fate-serving-network
+      - <fate-network>
 
   serving-admin:
     image: "federatedai/serving-admin:${SERVING_TAG}"
@@ -81,4 +80,4 @@ services:
       - ./confs/serving-admin/conf/application.properties:/data/projects/fate-serving/serving-admin/conf/application.properties
       - /etc/localtime:/etc/localtime:ro
     networks:
-      - fate-serving-network
+      - <fate-network>
