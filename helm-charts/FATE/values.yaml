@@ -2,7 +2,7 @@
 image:
   registry: federatedai
   isThridParty:
-  tag: 1.9.0-release
+  tag: 1.10.0-release
   pullPolicy: IfNotPresent
   imagePullSecrets: 
 #  - name: 
@@ -134,6 +134,7 @@ modules:
     logLevel: INFO
     # subPath: ""
     existingClaim:
+    dependent_distribution: false
     claimName: python-data
     storageClass:
     accessMode: ReadWriteOnce

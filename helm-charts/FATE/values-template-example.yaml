@@ -1,7 +1,7 @@
 name: fate-9999
 namespace: fate-9999
 chartName: fate
-chartVersion: v1.9.0
+chartVersion: v1.10.0
 partyId: 9999
 registry: ""
 pullPolicy:
@@ -170,6 +170,7 @@ skippedKeys:
 #   existingClaim: ""
 #   storageClass: "python"
 #   accessMode: ReadWriteMany
+#   dependent_distribution: false
 #   size: 1Gi
 #   resources:
 #     requests:
@@ -273,7 +274,7 @@ skippedKeys:
 # spark:
   # master:
     # Image: "federatedai/spark-master"
-    # ImageTag: "1.6.1-release"
+    # ImageTag: "1.10.0-release"
     # replicas: 1
     # resources:
       # requests:
@@ -289,7 +290,7 @@ skippedKeys:
     # nodePort: 30977
   # worker:
     # Image: "federatedai/spark-worker"
-    # ImageTag: "1.6.1-release"
+    # ImageTag: "1.10.0-release"
     # replicas: 2
     # resources:
       # requests:

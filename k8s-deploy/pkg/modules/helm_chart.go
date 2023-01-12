@@ -27,7 +27,7 @@ import (
 // HelmChart Helm Chart model
 type HelmChart struct {
 	Uuid                  string    `json:"uuid" gorm:"type:varchar(36);index;unique"`
-	Name                  string    `json:"name" gorm:"type:varchar(16);not null"`
+	Name                  string    `json:"name" gorm:"type:varchar(36);not null"`
 	Chart                 string    `json:"chart" gorm:"type:text;not null"`
 	Values                string    `json:"values" gorm:"type:text;not null"`
 	ValuesTemplate        string    `json:"values_template" gorm:"type:text;not null"`

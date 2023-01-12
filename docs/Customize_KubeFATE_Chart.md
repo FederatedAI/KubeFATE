@@ -28,7 +28,7 @@ Unzip one KubeFATE's Chart, you can find a `templates` folder and 4 files:
 ## `templates` folder
 In `templates` folder, the template yaml file combined with values will generate valid Kubernetes manifest files for each `FATE` or `FATE-Serving` component.
 
-e.g. For `FATE` v1.9.0, there are following templates locating in `template` folder:
+e.g. For `FATE` v1.10.0, there are following templates locating in `template` folder:
 1. eggroll: eggroll module, including 3 eggroll related components: clustermanager, nodemanager and rollsite/lb-rollsite.
 2. spark: spark module, including spark, hdfs, nginx, pulsar/rabbitmq. People just need to pick one module from spark and eggroll.
 3. client: the module for the jupyter notebook client.

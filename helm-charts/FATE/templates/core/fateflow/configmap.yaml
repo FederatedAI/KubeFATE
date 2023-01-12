@@ -44,7 +44,7 @@ data:
   service_conf.yaml: |
     use_registry: {{ .Values.modules.serving.useRegistry | default false }}
     use_deserialize_safe_module: false
-    dependent_distribution: false
+    dependent_distribution: {{ .Values.modules.python.dependent_distribution | default false }}
     encrypt_password: false
     encrypt_module: fate_arch.common.encrypt_utils#pwdecrypt
     private_key:

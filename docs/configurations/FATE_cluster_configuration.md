@@ -153,6 +153,7 @@ The parties are directly connected.
 | nginx                       | mappings | If you use the existing nginx, you can set this configuration                                |
 | logLevel                    | scalars  | The log level of the Python process, default level is Info                                   |
 | hive                        | mappings | If you use the existing hive, you can set this configuration                                 |
+| dependent_distribution      | mappings | Distribute dependencies with spark                                                           |
 
 ### fateboard mappings
 
