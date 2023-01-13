@@ -577,7 +577,7 @@ EOF
 		sed -i "s#model.transfer.url=http://127.0.0.1:9380/v1/model/transfer#model.transfer.url=http://${party_ip}:9380/v1/model/transfer#g" ./serving-$party_id/confs/serving-server/conf/serving-server.properties
 
 		# network
-		sed -i "s/name: <fate-network>/name: confs-${party_id}_fate-network/g" serving-$party_id/docker-compose.yml
+		sed -i "s/<fate-network>/confs-${party_id}_fate-network/g" serving-$party_id/docker-compose.yml
 		
 		# serving proxy
 		sed -i "s/coordinator=<partyID>/coordinator=${party_id}/g" ./serving-$party_id/confs/serving-proxy/conf/application.properties
