@@ -17,14 +17,14 @@
 5. 要保证安装机器可以正常访问Docker Hub或者网易云镜像仓库，以及Google gcr； 
 6. 预先创建一个目录，以便整个过程使用该目录作为工作目录，命令如下：
 ```
-export fate_version=v1.9.0 && export kubefate_version=v1.4.5 && cd ~ && mkdir demo && cd demo
+export fate_version=v1.10.0 && export kubefate_version=v1.4.5 && cd ~ && mkdir demo && cd demo
 ```
 
 Notes:
 * 当我们提到"KubeFATE的版本"，通常来讲会有三个概念：
     * KubeFATE命令行工具的版本，在本教程中为v1.4.5。
     * KubeFATE服务版本，在本教程中为v1.4.5。
-    * FATE版本，在本教程中v1.9.0，它也意味着FATE的Helm Chart的版本, 值得注意的是我们用这个版本来给GitHub上的KubeFATE的发布打tag。
+    * FATE版本，在本教程中v1.10.0，它也意味着FATE的Helm Chart的版本, 值得注意的是我们用这个版本来给GitHub上的KubeFATE的发布打tag。
 * **<font color="red">下文介绍的MiniKube机器IP地址是192.168.100.123。请修改为你准备的实验机器IP地址</font></div>**
 
 # 开始安装
@@ -77,7 +77,7 @@ sudo minikube addons enable ingress
 
 ## 安装Kubefate
 ### 下载KubeFATE命令行工具
-我们从Github上 [KubeFATE Release](https://github.com/FederatedAI/KubeFATE/releases)页面找到Kuberetes部署的下载包，并下载对应版本，如前面环境变量设置`v1.9.0`，
+我们从Github上 [KubeFATE Release](https://github.com/FederatedAI/KubeFATE/releases)页面找到Kuberetes部署的下载包，并下载对应版本，如前面环境变量设置`v1.10.0`，
 ```
 curl -LO https://github.com/FederatedAI/KubeFATE/releases/download/${fate_version}/kubefate-k8s-${fate_version}.tar.gz && tar -xzf ./kubefate-k8s-${fate_version}.tar.gz
 ```
@@ -237,7 +237,7 @@ kubectl -n fate-10000 create secret docker-registry myregistrykey \
 name: fate-9999
 namespace: fate-9999
 chartName: fate
-chartVersion: v1.9.0
+chartVersion: v1.10.0
 partyId: 9999
 registry: ""
 pullPolicy:
@@ -322,7 +322,7 @@ pulsar:
 name: fate-10000
 namespace: fate-10000
 chartName: fate
-chartVersion: v1.9.0
+chartVersion: v1.10.0
 partyId: 10000
 registry: ""
 pullPolicy:
@@ -418,8 +418,8 @@ create job success, job id=7752db70-e368-41fa-8827-d39411728d1b
 ```
 kubefate@machine:~/kubefate$ watch kubefate cluster ls
 UUID                                    NAME            NAMESPACE       REVISION        STATUS  CHART   ChartVERSION    AGE
-29878fa9-aeee-4ae5-a5b7-fd4e9eb7c1c3    fate-9999       fate-9999       1               Running fate    v1.9.0          88s
-dacc0549-b9fc-463f-837a-4e7316db2537    fate-10000      fate-10000      1               Running fate    v1.9.0          69s
+29878fa9-aeee-4ae5-a5b7-fd4e9eb7c1c3    fate-9999       fate-9999       1               Running fate    v1.10.0          88s
+dacc0549-b9fc-463f-837a-4e7316db2537    fate-10000      fate-10000      1               Running fate    v1.10.0          69s
 ```
 因为这个步骤需要到网易云镜像仓库去下载约10G的镜像，所以第一次执行视乎你的网络情况需要一定时间。
 检查下载的进度可以用
@@ -446,13 +446,13 @@ UUID        	29878fa9-aeee-4ae5-a5b7-fd4e9eb7c1c3
 Name        	fate-9999
 NameSpace   	fate-9999
 ChartName   	fate
-ChartVersion	v1.9.0
+ChartVersion	v1.10.0
 Revision    	1
 Age         	54m
 Status      	Running
 Spec        	algorithm: Basic
             	chartName: fate
-            	chartVersion: v1.9.0
+            	chartVersion: v1.10.0
             	computing: Spark
             	device: CPU
             	federation: Pulsar

@@ -84,8 +84,8 @@ done
 
 # exchange config
 
-$SED -i "s/chartVersion: .*/chartVersion: ${chartVersion}/g" ./party-exchange/rollsite.yaml
-$SED -i "s/chartVersion: .*/chartVersion: ${chartVersion}/g" ./party-exchange/trafficServer.yaml
+$SED -i "s/chartVersion: .*/chartVersion: ${fate_chartVersion}/g" ./party-exchange/rollsite.yaml
+$SED -i "s/chartVersion: .*/chartVersion: ${fate_chartVersion}/g" ./party-exchange/trafficServer.yaml
 
 $SED -i "s/192.168.9.1/${party_9999_IP}/g" ./party-exchange/rollsite.yaml
 $SED -i "s/192.168.9.1/${party_9999_IP}/g" ./party-exchange/trafficServer.yaml
