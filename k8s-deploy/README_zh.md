@@ -54,6 +54,8 @@ KubeFATE在设计上分离了服务与FATE集群的配置(基于Helm Chart)，�
 
 ## KubeFATE 使用指南
 
+KubeFATE可以支持部署在任意k8s上，作为初次使用或者对k8s不太熟悉者建议使用Minikube上手, 可以参考这个教程：[《使用Minikube部署包含两方的联邦学习网络》](../docs/tutorials/Build_Two_Parties_FATE_Cluster_in_One_Linux_Machine_with_MiniKube_zh.md)
+
 ### 需要满足的依赖
 
 依赖软件的建议版本：
