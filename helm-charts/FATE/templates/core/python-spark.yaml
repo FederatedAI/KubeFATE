@@ -238,6 +238,6 @@ spec:
         storageClassName: {{ .Values.modules.python.storageClass }}
         resources:
           requests:
-            storage: {{ .Values.modules.mysql.size }}
+            storage: {{ .Values.modules.python.size }}
         {{- end }}
 {{- end }}
