@@ -169,9 +169,9 @@ data:
         host: {{ .Values.modules.python.pulsar.host }}
         port: {{ .Values.modules.python.pulsar.port }}
         mng_port: {{ .Values.modules.python.pulsar.mng_port }}
-        topic_ttl: {{ .Values.modules.python.pulsar.topic_ttl }}
-        cluster: {{ .Values.modules.python.pulsar.cluster }}
-        tenant: {{ .Values.modules.python.pulsar.tenant }}        
+        topic_ttl: {{ .Values.modules.python.pulsar.topic_ttl | default "3" }}
+        cluster: {{ .Values.modules.python.pulsar.cluster | default "standalone" }}
+        tenant: {{ .Values.modules.python.pulsar.tenant | default "fl-tenant" }}        
         # default conf/pulsar_route_table.yaml
         route_table: conf/pulsar_route_table/pulsar_route_table.yaml
         # mode: replication / client, default: replication

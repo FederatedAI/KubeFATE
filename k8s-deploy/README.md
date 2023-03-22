@@ -54,6 +54,8 @@ Suppose in an organization, there are two roles:
 
 ## Usage
 
+KubeFATE can support deployment on any k8s. As a first-time user or someone who is not familiar with k8s, it is recommended to use Minikube to get started. You can refer to this tutorial [Build Two Parties FATE Cluster in One Linux Machine with MiniKube](../docs/tutorials/Build_Two_Parties_FATE_Cluster_in_One_Linux_Machine_with_MiniKube.md)
+
 ### Prerequisite
 
 Recommended version of dependent software:
