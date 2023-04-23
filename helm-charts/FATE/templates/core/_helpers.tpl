@@ -21,4 +21,7 @@
 {{- if eq .Values.device "IPCL" -}}
 -ipcl
 {{- end -}}
+{{- if eq .Values.device "GPU" -}}
+-gpu
+{{- end -}}
 {{- end -}}

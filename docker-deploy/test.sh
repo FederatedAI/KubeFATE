@@ -83,7 +83,7 @@ toy_example() {
 cd $dir
 cd confs-$target_party_id
 
-docker-compose exec -T client bash -c '
+docker compose exec -T client bash -c '
 flow test toy --guest-party-id $guest --host-party-id $host
 '
 
@@ -108,7 +108,7 @@ upload_data() {
 cd $dir
 cd confs-$target_party_id
 
-docker-compose exec -T python bash -c '
+docker compose exec -T python bash -c '
 cd examples/scripts; 
 python upload_default_data.py -f 1
 '
@@ -142,7 +142,7 @@ min_test_task(){
 cd $dir
 cd confs-$target_party_id
 
-docker-compose exec -T python bash -c '
+docker compose exec -T python bash -c '
 cd examples/min_test_task; 
 python run_task.py -gid ${guest_id} -hid ${host_id} -aid ${arbiter_id}
 '

@@ -1,8 +1,8 @@
-name: fate-10000
-namespace: fate-10000
+name: fate-9999
+namespace: fate-9999
 chartName: fate
 chartVersion: v1.11.1
-partyId: 10000
+partyId: 9999
 registry: ""
 pullPolicy:
 imagePullSecrets: 
@@ -25,30 +25,35 @@ modules:
 computing: Eggroll
 federation: Eggroll
 storage: Eggroll
-algorithm: Basic
-device: CPU
+algorithm: NN
+device: GPU
 
 ingress:
-  fateboard: 
+  fateboard:
     hosts:
-    - name: party10000.fateboard.example.com
+    - name: party9999.fateboard.example.com
   client:  
     hosts:
-    - name: party10000.notebook.example.com
+    - name: party9999.notebook.example.com
 
-rollsite: 
+rollsite:
   type: NodePort
-  nodePort: 30101
+  nodePort: 30091
   partyList:
-    - partyId: 9999
-      partyIp: 192.168.9.1
-      partyPort: 30091
+    - partyId: 10000
+      partyIp: 192.168.10.1
+      partyPort: 30101
 
 python:
   type: NodePort
-  httpNodePort: 30107
-  grpcNodePort: 30102
+  httpNodePort: 30097
+  grpcNodePort: 30092
   logLevel: INFO
+  resources:
+    requests:
+      nvidia.com/gpu: 1
+    limits:
+      nvidia.com/gpu: 1
 
-servingIp: 192.168.10.1
-servingPort: 30105
+servingIp: 192.168.9.1
+servingPort: 30095

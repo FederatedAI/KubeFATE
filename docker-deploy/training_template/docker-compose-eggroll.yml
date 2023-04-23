@@ -113,14 +113,11 @@ services:
       - shared_dir_federatedml:/data/projects/fate/fate/python/federatedml
       - shared_dir_examples:/data/projects/fate/examples
       - download_dir:/data/projects/fate/python/download_dir
+      - fate_flow_logs:/data/projects/fate/fateflow/logs
       - ./confs/fate_flow/conf/service_conf.yaml:/data/projects/fate/conf/service_conf.yaml
       - ./confs/fate_flow/conf/pulsar_route_table.yaml:/data/projects/fate/conf/pulsar_route_table.yaml
       - ./confs/fate_flow/conf/rabbitmq_route_table.yaml:/data/projects/fate/conf/rabbitmq_route_table.yaml
-      - ./confs/fate_flow/conf/component_registry.json:/data/projects/fate/fateflow/conf/component_registry.json
-      - ./confs/fate_flow/conf/job_default_config.yaml:/data/projects/fate/fateflow/conf/job_default_config.yaml
-      - ./confs/fate_flow/conf/template_info.yaml:/data/projects/fate/fateflow/conf/template_info.yaml
       - ./confs/eggroll/conf:/data/projects/fate/eggroll/conf
-      - fate_flow_logs:/data/projects/fate/fateflow/logs
       - ./shared_dir/data/model_local_cache:/data/projects/fate/fateflow/model_local_cache
       - /etc/localtime:/etc/localtime:ro
     depends_on:
@@ -175,6 +172,5 @@ services:
     restart: always
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
-
     networks:
       - fate-network

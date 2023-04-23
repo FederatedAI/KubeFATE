@@ -163,10 +163,10 @@ mv ~/confs-$target_party_id.tar $dir
 cd $dir
 tar -xzf confs-$target_party_id.tar
 cd confs-$target_party_id
-docker-compose down
+docker compose down
 docker volume rm -f confs-${target_party_id}_shared_dir_examples
 docker volume rm -f confs-${target_party_id}_shared_dir_federatedml
-docker-compose up -d
+docker compose up -d
 cd ../
 rm -f confs-${target_party_id}.tar
 exit
@@ -214,8 +214,8 @@ mv ~/serving-$target_party_id.tar $dir
 cd $dir
 tar -xzf serving-$target_party_id.tar
 cd serving-$target_party_id
-docker-compose down
-docker-compose up -d
+docker compose down
+docker compose up -d
 cd ../
 rm -f serving-$target_party_id.tar
 exit
@@ -250,7 +250,7 @@ DeleteCluster() {
 	if [ "$cluster_type" == "--training" ]; then
 		ssh -p ${SSH_PORT} -tt $user@$target_party_ip <<eeooff
 cd $dir/confs-$target_party_id
-docker-compose down
+docker compose down
 exit
 eeooff
 		echo "party $target_party_id training cluster is deleted!"
@@ -258,7 +258,7 @@ eeooff
 	elif [ "$cluster_type" == "--serving" ]; then
 		ssh -p ${SSH_PORT} -tt $user@$target_party_serving_ip <<eeooff
 cd $dir/serving-$target_party_id
-docker-compose down
+docker compose down
 exit
 eeooff
 		echo "party $target_party_id serving cluster is deleted!"
@@ -268,18 +268,18 @@ eeooff
 		if [ "$target_party_id" == "exchange" ]; then
 			ssh -p ${SSH_PORT} -tt $user@$target_party_ip <<eeooff
 cd $dir/confs-$target_party_id
-docker-compose down
+docker compose down
 exit
 eeooff
 		else
 			ssh -p ${SSH_PORT} -tt $user@$target_party_serving_ip <<eeooff
 cd $dir/serving-$target_party_id
-docker-compose down
+docker compose down
 exit
 eeooff
 			ssh -p ${SSH_PORT} -tt $user@$target_party_ip <<eeooff
 cd $dir/confs-$target_party_id
-docker-compose down
+docker compose down
 exit
 eeooff
 			echo "party $target_party_id training cluster is deleted!"
@@ -300,8 +300,8 @@ handleLocally() {
 			mkdir -p $dir
 			tar -xf ${WORKINGDIR}/outputs/${type}-${target_party_id}.tar -C $dir
 			cd ${dir}/${type}-${target_party_id}
-			docker-compose down
-			docker-compose up -d
+			docker compose down
+			docker compose up -d
 			local_flag="true"
 			return 0
 		fi

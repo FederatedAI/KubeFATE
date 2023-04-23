@@ -18,69 +18,33 @@ if [[ "$unamestr" == "Darwin" ]] ; then
         exit 1;
     }
 fi
+
+
 # 9999 config
-$SED -i "s/chartVersion: .*/chartVersion: ${fate_chartVersion}/g" party-9999/cluster.yaml
-$SED -i "s/chartVersion: .*/chartVersion: ${fate_serving_chartVersion}/g" ./party-9999/cluster-serving.yaml
-$SED -i "s/chartVersion: .*/chartVersion: ${fate_chartVersion}/g" ./party-9999/cluster-spark-rabbitmq.yaml
-$SED -i "s/chartVersion: .*/chartVersion: ${fate_chartVersion}/g" ./party-9999/cluster-spark-pulsar.yaml
-$SED -i "s/chartVersion: .*/chartVersion: ${fate_chartVersion}/g" ./party-9999/cluster-spark-local-pulsar.yaml
-
-$SED -i "s/192.168.9.1/${party_9999_IP}/g" ./party-9999/cluster.yaml
-$SED -i "s/192.168.9.1/${party_9999_IP}/g" ./party-9999/cluster-serving.yaml
-$SED -i "s/192.168.9.1/${party_9999_IP}/g" ./party-9999/cluster-spark-rabbitmq.yaml
-$SED -i "s/192.168.9.1/${party_9999_IP}/g" ./party-9999/cluster-spark-pulsar.yaml
-$SED -i "s/192.168.9.1/${party_9999_IP}/g" ./party-9999/cluster-spark-local-pulsar.yaml
-
-$SED -i "s/192.168.10.1/${party_10000_IP}/g" ./party-9999/cluster.yaml
-$SED -i "s/192.168.10.1/${party_10000_IP}/g" ./party-9999/cluster-serving.yaml
-$SED -i "s/192.168.10.1/${party_10000_IP}/g" ./party-9999/cluster-spark-rabbitmq.yaml
-$SED -i "s/192.168.10.1/${party_10000_IP}/g" ./party-9999/cluster-spark-pulsar.yaml
-$SED -i "s/192.168.10.1/${party_10000_IP}/g" ./party-9999/cluster-spark-local-pulsar.yaml
-
-$SED -i "s/192.168.0.1/${party_exchange_IP}/g" ./party-9999/cluster.yaml
-$SED -i "s/192.168.0.1/${party_exchange_IP}/g" ./party-9999/cluster-serving.yaml
-$SED -i "s/192.168.0.1/${party_exchange_IP}/g" ./party-9999/cluster-spark-rabbitmq.yaml
-$SED -i "s/192.168.0.1/${party_exchange_IP}/g" ./party-9999/cluster-spark-pulsar.yaml
-$SED -i "s/192.168.0.1/${party_exchange_IP}/g" ./party-9999/cluster-spark-local-pulsar.yaml
-
 
 for item in `ls party-9999`
 do
-    $SED -i "s/algorithm: .*/algorithm: ${algorithm}/g" ./party-9999/$item
-    $SED -i "s/device: .*/device: ${device}/g" ./party-9999/$item
+    $SED -i "s/chartVersion: .*/chartVersion: ${fate_chartVersion}/g" party-9999/cluster.yaml
+    $SED -i "s/192.168.9.1/${party_9999_IP}/g" ./party-9999/$item
+    $SED -i "s/192.168.10.1/${party_10000_IP}/g" ./party-9999/$item
+    $SED -i "s/192.168.0.1/${party_exchange_IP}/g" ./party-9999/$item
 done
+
+$SED -i "s/chartVersion: .*/chartVersion: ${fate_serving_chartVersion}/g" ./party-9999/cluster-serving.yaml
+
 
 # 10000 config
 
-$SED -i "s/chartVersion: .*/chartVersion: ${fate_chartVersion}/g" ./party-10000/cluster.yaml
-$SED -i "s/chartVersion: .*/chartVersion: ${fate_serving_chartVersion}/g" ./party-10000/cluster-serving.yaml
-$SED -i "s/chartVersion: .*/chartVersion: ${fate_chartVersion}/g" ./party-10000/cluster-spark-rabbitmq.yaml
-$SED -i "s/chartVersion: .*/chartVersion: ${fate_chartVersion}/g" ./party-10000/cluster-spark-pulsar.yaml
-$SED -i "s/chartVersion: .*/chartVersion: ${fate_chartVersion}/g" ./party-10000/cluster-spark-local-pulsar.yaml
-
-$SED -i "s/192.168.9.1/${party_9999_IP}/g" ./party-10000/cluster.yaml
-$SED -i "s/192.168.9.1/${party_9999_IP}/g" ./party-10000/cluster-serving.yaml
-$SED -i "s/192.168.9.1/${party_9999_IP}/g" ./party-10000/cluster-spark-rabbitmq.yaml
-$SED -i "s/192.168.9.1/${party_9999_IP}/g" ./party-10000/cluster-spark-pulsar.yaml
-$SED -i "s/192.168.9.1/${party_9999_IP}/g" ./party-10000/cluster-spark-local-pulsar.yaml
-
-$SED -i "s/192.168.10.1/${party_10000_IP}/g" ./party-10000/cluster.yaml
-$SED -i "s/192.168.10.1/${party_10000_IP}/g" ./party-10000/cluster-serving.yaml
-$SED -i "s/192.168.10.1/${party_10000_IP}/g" ./party-10000/cluster-spark-rabbitmq.yaml
-$SED -i "s/192.168.10.1/${party_10000_IP}/g" ./party-10000/cluster-spark-pulsar.yaml
-$SED -i "s/192.168.10.1/${party_10000_IP}/g" ./party-10000/cluster-spark-local-pulsar.yaml
-
-$SED -i "s/192.168.0.1/${party_exchange_IP}/g" ./party-10000/cluster.yaml
-$SED -i "s/192.168.0.1/${party_exchange_IP}/g" ./party-10000/cluster-serving.yaml
-$SED -i "s/192.168.0.1/${party_exchange_IP}/g" ./party-10000/cluster-spark-rabbitmq.yaml
-$SED -i "s/192.168.0.1/${party_exchange_IP}/g" ./party-10000/cluster-spark-pulsar.yaml
-$SED -i "s/192.168.0.1/${party_exchange_IP}/g" ./party-10000/cluster-spark-local-pulsar.yaml
-
 for item in `ls party-10000`
 do
-    $SED -i "s/algorithm: .*/algorithm: ${algorithm}/g" ./party-10000/$item
-    $SED -i "s/device: .*/device: ${device}/g" ./party-10000/$item
+    $SED -i "s/chartVersion: .*/chartVersion: ${fate_chartVersion}/g" ./party-10000/$item
+    $SED -i "s/192.168.9.1/${party_9999_IP}/g" ./party-10000/$item
+    $SED -i "s/192.168.10.1/${party_10000_IP}/g" ./party-10000/$item
+    $SED -i "s/192.168.0.1/${party_exchange_IP}/g" ./party-10000/$item
 done
+
+$SED -i "s/chartVersion: .*/chartVersion: ${fate_serving_chartVersion}/g" ./party-10000/cluster-serving.yaml
+
 
 # exchange config
 

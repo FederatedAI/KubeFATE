@@ -2,7 +2,7 @@
 image:
   registry: federatedai
   isThridParty:
-  tag: 1.10.0-release
+  tag: 1.11.1-release
   pullPolicy: IfNotPresent
   imagePullSecrets: 
 #  - name: 
@@ -18,7 +18,7 @@ federation: Eggroll
 storage: Eggroll
 # Algorithm: Basic, NN
 algorithm: Basic
-# Device: CPU, IPCL
+# Device: CPU, IPCL, GPU
 device: IPCL
 
 istio:
