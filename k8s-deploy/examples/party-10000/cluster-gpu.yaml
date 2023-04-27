@@ -25,8 +25,8 @@ modules:
 computing: Eggroll
 federation: Eggroll
 storage: Eggroll
-algorithm: Basic
-device: CPU
+algorithm: NN
+device: GPU
 
 ingress:
   fateboard: 
@@ -49,6 +49,11 @@ python:
   httpNodePort: 30107
   grpcNodePort: 30102
   logLevel: INFO
+  resources:
+    requests:
+      nvidia.com/gpu: 1
+    limits:
+      nvidia.com/gpu: 1
 
 servingIp: 192.168.10.1
 servingPort: 30105

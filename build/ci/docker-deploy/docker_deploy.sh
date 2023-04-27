@@ -21,11 +21,11 @@ cd ${target_dir}
 tar -xzf confs-${target_party_id}.tar
 
 cd confs-${target_party_id}
-docker-compose down
+docker compose down
 docker volume rm -f confs-${target_party_id}_shared_dir_examples
 docker volume rm -f confs-${target_party_id}_shared_dir_federatedml
 # exclude client service to save time !
-docker-compose up -d
+docker compose up -d
 
 cd ../
 rm -f confs-${target_party_id}.tar
@@ -34,8 +34,8 @@ echo "# party ${target_party_id} training cluster deploy is ok!"
 echo "# serving cluster deploy begin"
 tar -xzf serving-${target_party_id}.tar
 cd serving-${target_party_id}
-docker-compose down
-docker-compose up -d
+docker compose down
+docker compose up -d
 
 cd ../
 rm -f serving-${target_party_id}.tar

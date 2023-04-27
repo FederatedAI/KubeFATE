@@ -22,3 +22,5 @@ Device selection consists of an option:
 
 - `CPU`
     The CPU is a computing device that uses the CPU as a FATE computing device.
+- `GPU`
+    The GPU is a computing device that uses the GPU as a FATE computing device.

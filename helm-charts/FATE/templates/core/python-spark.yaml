@@ -118,10 +118,7 @@ spec:
             - |
                 set -x
                 mkdir -p /data/projects/fate/conf/
-                cp /data/projects/fate/conf-tmp/transfer_conf.yaml /data/projects/fate/conf/transfer_conf.yaml
                 cp /data/projects/fate/conf-tmp/service_conf.yaml /data/projects/fate/conf/service_conf.yaml
-                cp /data/projects/fate/conf-tmp/component_registry.json /data/projects/fate/fateflow/conf/component_registry.json
-                cp /data/projects/fate/conf-tmp/job_default_config.yaml /data/projects/fate/fateflow/conf/job_default_config.yaml
                 # fix fateflow conf must use IP
                 sed -i "s/host: fateflow_ip/host: ${POD_IP}/g" /data/projects/fate/conf/service_conf.yaml
                 
