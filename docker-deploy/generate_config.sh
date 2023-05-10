@@ -60,7 +60,7 @@ function CheckConfig(){
 	computing_list="Eggroll Spark Spark_local"
 	spark_federation_list="RabbitMQ Pulsar"
 	algorithm_list="Basic NN"
-	device_list="CPU IPCL"
+	device_list="CPU IPCL GPU"
 
 	if ! `list_include_item "$computing_list" "$computing"`; then
 		echo "[ERROR]: Please check whether computing is one of $computing_list"
@@ -154,6 +154,9 @@ GenerateConfig() {
 
 		eval exchange_ip=${exchangeip}
 
+		# gpu_count defaulet 1
+		eval gpu_count=${gpu_count:-1}
+
 		echo package $party_id start!
 
 		rm -rf confs-$party_id/
@@ -220,10 +223,10 @@ GenerateConfig() {
 				# federation
 				if [ "$federation" == "RabbitMQ" ]; then
 					cp -r training_template/backends/spark/rabbitmq confs-$party_id/confs/
-					sed -i '147,161d' confs-$party_id/docker-compose.yml
+					sed -i '147,159d' confs-$party_id/docker-compose.yml
 				elif [ "$federation" == "Pulsar" ]; then
 					cp -r training_template/backends/spark/pulsar confs-$party_id/confs/
-					sed -i '129,145d' confs-$party_id/docker-compose.yml
+					sed -i '127,143d' confs-$party_id/docker-compose.yml
 				fi
 			fi
 		fi
@@ -247,6 +250,9 @@ GenerateConfig() {
 		if [ "$device" == "IPCL" ]; then
 			Suffix=$Suffix"-ipcl"
 		fi
+		if [ "$device" == "GPU" ]; then
+			Suffix=$Suffix"-gpu"
+		fi
 		
 		# federatedai/fateflow-${computing}-${algorithm}-${device}:${version}
 		
@@ -259,6 +265,27 @@ GenerateConfig() {
 			sed -i "s#image: \"federatedai/spark-worker:\${TAG}\"#image: \"federatedai/spark-worker${Suffix}:\${TAG}\"#g" ./confs-$party_id/docker-compose.yml
 		fi
 
+		# GPU
+		if [ "$device" == "GPU" ]; then
+      line=0 # line refers to the line number of the fateflow `command` line in docker-compose.yaml
+      if [ "$computing" == "Eggroll" ]; then
+          line=137
+      fi
+      if [ "$computing" == "Spark" ]; then
+          line=84
+      fi
+      if [ "$computing" == "Spark_local" ]; then
+        line=85
+      fi
+      sed -i "${line}i\\
+    deploy:\\
+      resources:\\
+        reservations:\\
+          devices:\\
+          - driver: nvidia\\
+            count: $gpu_count\\
+            capabilities: [gpu]" ./confs-$party_id/docker-compose.yml
+		fi
 		# RegistryURI
 		if [ "$RegistryURI" != "" ]; then
 			sed -i 's#federatedai#${RegistryURI}/federatedai#g' ./confs-$party_id/docker-compose.yml

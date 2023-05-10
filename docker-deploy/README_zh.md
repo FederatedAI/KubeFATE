@@ -17,8 +17,8 @@ Compose是用于定义和运行多容器Docker应用程序的工具。通过Comp
 ## 准备工作
 
 1. 两个主机（物理机或者虚拟机，都是Centos7系统）；
-2. 所有主机安装Docker 版本 : 18+；
-3. 所有主机安装Docker-Compose 版本: 1.24+；
+2. 所有主机安装Docker 版本 :  19.03.0+；
+3. 所有主机安装Docker Compose 版本: 1.27.0+；
 4. 部署机可以联网，所以主机相互之间可以网络互通；
 5. 运行机已经下载FATE的各组件镜像，如果无法连接dockerhub，请考虑使用harbor（[Harbor 作为本地镜像源](../registry/README.md)）或者使用离线部署（离线构建镜像参考文档[构建镜像](https://github.com/FederatedAI/FATE/tree/master/build/docker-build)）。
 6. 运行FATE的主机推荐配置8CPUs和16G RAM。
@@ -138,9 +138,9 @@ compute_core=4
 # 设置用户密码
 [user@localhost]$ sudo passwd fate
 # 创建docker-compose部署目录
-[user@localhost]$ sudo mkdir -p /data/projects/fate
+[user@localhost]$ sudo mkdir -p /data/projects/fate /home/fate
 # 修改docker-compose部署目录对应用户和组
-[user@localhost]$ sudo chown -R fate:docker /data/projects/fate
+[user@localhost]$ sudo chown -R fate:docker /data/projects/fate /home/fate
 # 选择用户
 [user@localhost]$ sudo su fate
 # 查看是否拥有docker权限
@@ -151,6 +151,23 @@ CONTAINER ID  IMAGE   COMMAND   CREATED   STATUS    PORTS   NAMES
 total 0
 drwxr-xr-x. 2 fate docker 6 May 27 00:51 fate
 ```
+
+### GPU支持
+
+从v1.11.1开始docker compose部署支持使用GPU的FATE部署，如果要使用GPU，你需要先搞定GPU的docker环境。可以参考docker的官方文档（<https://docs.docker.com/config/containers/resource_constraints/#gpu>）。
+
+要使用GPU需要修改配置,这两个都需要修改
+
+```sh
+algorithm=NN
+device=GPU
+
+gpu_count=1
+```
+
+FATE GPU的使用只有fateflow组件，所以每个Party最少需要有一个GPU。
+
+*gpu_count会映射为count，参考 [Docker compose GPU support](https://docs.docker.com/compose/gpu-support/)*
 
 ### 执行部署脚本
 
@@ -185,12 +202,12 @@ CONTAINER ID   IMAGE                                      COMMAND               
 3dca43f3c9d5   federatedai/serving-admin:2.1.5-release    "/bin/sh -c 'java -c…"   5 minutes ago   Up 5 minutes             0.0.0.0:8350->8350/tcp, :::8350->8350/tcp                                                                                                       serving-9999_serving-admin_1
 fe924918509b   federatedai/serving-proxy:2.1.5-release    "/bin/sh -c 'java -D…"   5 minutes ago   Up 5 minutes             0.0.0.0:8059->8059/tcp, :::8059->8059/tcp, 0.0.0.0:8869->8869/tcp, :::8869->8869/tcp, 8879/tcp                                                  serving-9999_serving-proxy_1
 b62ed8ba42b7   bitnami/zookeeper:3.7.0                    "/opt/bitnami/script…"   5 minutes ago   Up 5 minutes             0.0.0.0:2181->2181/tcp, :::2181->2181/tcp, 8080/tcp, 0.0.0.0:49226->2888/tcp, :::49226->2888/tcp, 0.0.0.0:49225->3888/tcp, :::49225->3888/tcp   serving-9999_serving-zookeeper_1
-3c643324066f   federatedai/client:1.10.0-release           "/bin/sh -c 'flow in…"   5 minutes ago   Up 5 minutes             0.0.0.0:20000->20000/tcp, :::20000->20000/tcp                                                                                                   confs-9999_client_1
-3fe0af1ebd71   federatedai/fateboard:1.10.0-release        "/bin/sh -c 'java -D…"   5 minutes ago   Up 5 minutes             0.0.0.0:8080->8080/tcp, :::8080->8080/tcp                                                                                                       confs-9999_fateboard_1
-635b7d99357e   federatedai/fateflow:1.10.0-release         "container-entrypoin…"   5 minutes ago   Up 5 minutes (healthy)   0.0.0.0:9360->9360/tcp, :::9360->9360/tcp, 8080/tcp, 0.0.0.0:9380->9380/tcp, :::9380->9380/tcp                                                  confs-9999_fateflow_1
-8b515f08add3   federatedai/eggroll:1.10.0-release          "/tini -- bash -c 'j…"   5 minutes ago   Up 5 minutes             8080/tcp, 0.0.0.0:9370->9370/tcp, :::9370->9370/tcp                                                                                             confs-9999_rollsite_1
-108cc061c191   federatedai/eggroll:1.10.0-release          "/tini -- bash -c 'j…"   5 minutes ago   Up 5 minutes             4670/tcp, 8080/tcp                                                                                                                              confs-9999_clustermanager_1
-f10575e76899   federatedai/eggroll:1.10.0-release          "/tini -- bash -c 'j…"   5 minutes ago   Up 5 minutes             4671/tcp, 8080/tcp                                                                                                                              confs-9999_nodemanager_1
+3c643324066f   federatedai/client:1.11.1-release           "/bin/sh -c 'flow in…"   5 minutes ago   Up 5 minutes             0.0.0.0:20000->20000/tcp, :::20000->20000/tcp                                                                                                   confs-9999_client_1
+3fe0af1ebd71   federatedai/fateboard:1.11.1-release        "/bin/sh -c 'java -D…"   5 minutes ago   Up 5 minutes             0.0.0.0:8080->8080/tcp, :::8080->8080/tcp                                                                                                       confs-9999_fateboard_1
+635b7d99357e   federatedai/fateflow:1.11.1-release         "container-entrypoin…"   5 minutes ago   Up 5 minutes (healthy)   0.0.0.0:9360->9360/tcp, :::9360->9360/tcp, 8080/tcp, 0.0.0.0:9380->9380/tcp, :::9380->9380/tcp                                                  confs-9999_fateflow_1
+8b515f08add3   federatedai/eggroll:1.11.1-release          "/tini -- bash -c 'j…"   5 minutes ago   Up 5 minutes             8080/tcp, 0.0.0.0:9370->9370/tcp, :::9370->9370/tcp                                                                                             confs-9999_rollsite_1
+108cc061c191   federatedai/eggroll:1.11.1-release          "/tini -- bash -c 'j…"   5 minutes ago   Up 5 minutes             4670/tcp, 8080/tcp                                                                                                                              confs-9999_clustermanager_1
+f10575e76899   federatedai/eggroll:1.11.1-release          "/tini -- bash -c 'j…"   5 minutes ago   Up 5 minutes             4671/tcp, 8080/tcp                                                                                                                              confs-9999_nodemanager_1
 aa0a0002de93   mysql:8.0.28                               "docker-entrypoint.s…"   5 minutes ago   Up 5 minutes             3306/tcp, 33060/tcp                                                                                                                             confs-9999_mysql_1
 ```
 

@@ -213,62 +213,7 @@ data:
       password: fate
       {{- end }}
     {{- end }}
-  transfer_conf.yaml: |
-    paths: # dir or path
-      - "python/federatedml/transfer_variable/auth_conf"
-  component_registry.json: |
-    {
-      "components": {
-      },
-      "providers": {
-      },
-      "default_settings": {
-        "fate_flow":{
-          "default_version_key": "FATEFlow"
-        },
-        "fate": {
-          "default_version_key": "FATE"
-        },
-        "class_path": {
-          "interface": "components.components.Components",
-          "feature_instance": "feature.instance.Instance",
-          "feature_vector": "feature.sparse_vector.SparseVector",
-          "model": "protobuf.generated",
-          "model_migrate": "protobuf.model_migrate.model_migrate",
-          "homo_model_convert": "protobuf.homo_model_convert.homo_model_convert"
-        }
-      }
-    }
-  job_default_config.yaml: |
-    # component provider, relative path to get_fate_python_directory
-    default_component_provider_path: federatedml
-    
-    # resource
-    total_cores_overweight_percent: 1  # 1 means no overweight
-    total_memory_overweight_percent: 1  # 1 means no overweight
-    task_parallelism: 1
-    task_cores: 4
-    task_memory: 0  # mb
-    max_cores_percent_per_job: 1  # 1 means total
-    
-    # scheduling
-    job_timeout: 259200 # s
-    remote_request_timeout: 30000  # ms
-    federated_command_trys: 3
-    end_status_job_scheduling_time_limit: 300000 # ms
-    end_status_job_scheduling_updates: 1
-    auto_retries: {{ .Values.modules.python.failedTaskAutoRetryTimes }}
-    auto_retry_delay: {{ .Values.modules.python.failedTaskAutoRetryDelay }}  #seconds
-    # It can also be specified in the job configuration using the federated_status_collect_type parameter
-    federated_status_collect_type: PUSH
-    detect_connect_max_retry_count: 3
-    detect_connect_long_retry_count: 2
-    
-    # upload
-    upload_max_bytes: 104857600 # bytes
-    
-    #component output
-    output_data_summary_count_limit: 100
+
 ---
 kind: ConfigMap
 apiVersion: v1

@@ -142,6 +142,10 @@ create job success, job id=d92d7a56-7002-46a4-9363-da9c7346e05a
 3. Rabbitmq。
 4. Pulsar。
 
+### GPU 支持
+
+从v1.11.1开始，KubeFATE可以部署支持GPU的FATE集群，部署支持GPU的FATE需要有一些特别准备工作和配置，可以查看这个文档[KubeFATE 部署支持GPU的FATE](../)
+
 ### 检查安装集群任务的状态
 
 上面的命令会创建一个安装FATE集群的任务，用于异步部署。使用```kubefate job describe```命令可以检查任务的状态，直到看到结果为`install success`
@@ -187,13 +191,13 @@ UUID         24bb75ff-f636-4c64-8c04-1b9073f89a2f
 Name         fate-9999                           
 NameSpace    fate-9999                           
 ChartName    fate                                
-ChartVersion v1.10.0                              
+ChartVersion v1.11.1                              
 Revision     1                                   
 Age          15m                                 
 Status       Running                             
 Spec         algorithm: Basic                    
              chartName: fate                     
-             chartVersion: v1.10.0                
+             chartVersion: v1.11.1                
              computing: Eggroll                  
              device: CPU                         
              federation: Eggroll                 
