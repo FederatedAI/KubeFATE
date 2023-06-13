@@ -197,7 +197,7 @@ aa0a0002de93   mysql:8.0.28                               "docker-entrypoint.sâ€
 On the target node of each party, a container named  `confs-<party_id>_fateflow_1` should have been created and running the `fate-flow` service. For example, on Party 10000's node, run the following commands to verify the deployment:
 
 ```bash
-docker exec -it confs-10000_client_1 bash
+docker exec -it confs-10000-client-1 bash
 flow test toy --guest-party-id 10000 --host-party-id 9999
 ```
 
