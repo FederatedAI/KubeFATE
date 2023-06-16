@@ -173,7 +173,7 @@ GenerateConfig() {
 			# eggroll config
 			#db connect inf
 			# use the fixed db name here
-			sed -i "s#<jdbc.url>#jdbc:mysql://${db_ip}:3306/${db_name}?useSSL=false\&serverTimezone=UTC\&characterEncoding=utf8\&allowPublicKeyRetrieval=true#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
+			sed -i "s#<jdbc.url>#jdbc:mysql://${db_ip}:3306/${db_name}?useSSL=false\&serverTimezone=Asia/Shanghai\&characterEncoding=utf8\&allowPublicKeyRetrieval=true#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
 			sed -i "s#<jdbc.username>#${db_user}#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
 			sed -i "s#<jdbc.password>#${db_password}#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
 
@@ -341,6 +341,7 @@ GenerateConfig() {
 		echo mysql module of $party_id done!
 
 		# fate_flow
+		sed -i "s/party_id:/party_id: ${party_id}/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
 		sed -i "s/name: <db_name>/name: '${db_name}'/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
 		sed -i "s/user: <db_user>/user: '${db_user}'/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
 		sed -i "s/passwd: <db_passwd>/passwd: '${db_password}'/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml

@@ -166,6 +166,9 @@ cd confs-$target_party_id
 docker compose down
 docker volume rm -f confs-${target_party_id}_shared_dir_examples
 docker volume rm -f confs-${target_party_id}_shared_dir_federatedml
+docker volume rm -f confs-${target_party_id}_sdownload_dir
+docker volume rm -f confs-${target_party_id}_fate_flow_logs
+
 docker compose up -d
 cd ../
 rm -f confs-${target_party_id}.tar

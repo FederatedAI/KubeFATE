@@ -4,6 +4,7 @@ dependent_distribution: false
 encrypt_password: false
 encrypt_module: fate_arch.common.encrypt_utils#pwdecrypt
 private_key:
+private_key_file:
 party_id:
 hook_module:
   client_authentication: fate_flow.hook.flow.client_authentication
@@ -26,6 +27,15 @@ fateflow:
   host: 192.167.0.100
   http_port: 9380
   grpc_port: 9360
+  # when you have multiple fateflow server on one party,
+  # we suggest using nginx for load balancing.
+  nginx:
+    host:
+    http_port:
+    grpc_port:
+  # use random instance_id instead of {host}:{http_port}
+  random_instance_id: false
+
   # support rollsite/nginx/fateflow as a coordination proxy
   # rollsite support fate on eggroll, use grpc protocol
   # nginx support fate on eggroll and fate on spark, use http or grpc protocol, default is http
