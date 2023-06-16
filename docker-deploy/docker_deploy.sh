@@ -242,12 +242,17 @@ DeleteCluster() {
 			fi
 		done
 	fi
+	
+	echo "target_party_ip: $target_party_ip"
 
 	for ((i = 0; i < ${#party_list[*]}; i++)); do
 		if [ "${party_list[$i]}" = "$target_party_id" ]; then
 			target_party_serving_ip=${serving_ip_list[$i]}
 		fi
 	done
+
+		echo "target_party_ip: $target_party_ip"
+		echo "cluster_type: $cluster_type"
 
 	# delete training cluster
 	if [ "$cluster_type" == "--training" ]; then
@@ -275,16 +280,20 @@ docker compose down
 exit
 eeooff
 		else
+			if [ "$target_party_serving_ip" != "" ]; then
 			ssh -p ${SSH_PORT} -tt $user@$target_party_serving_ip <<eeooff
 cd $dir/serving-$target_party_id
 docker compose down
 exit
 eeooff
+			fi
+			if [ "$target_party_ip" != "" ]; then
 			ssh -p ${SSH_PORT} -tt $user@$target_party_ip <<eeooff
 cd $dir/confs-$target_party_id
 docker compose down
 exit
 eeooff
+			fi
 			echo "party $target_party_id training cluster is deleted!"
 			echo "party $target_party_id serving cluster is deleted!"
 		fi
