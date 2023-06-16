@@ -151,6 +151,7 @@ GenerateConfig() {
 		eval db_user=${mysql_user}
 		eval db_password=${mysql_password}
 		eval db_name=${mysql_db}
+		eval db_serverTimezone=${serverTimezone}
 
 		eval exchange_ip=${exchangeip}
 
@@ -173,7 +174,7 @@ GenerateConfig() {
 			# eggroll config
 			#db connect inf
 			# use the fixed db name here
-			sed -i "s#<jdbc.url>#jdbc:mysql://${db_ip}:3306/${db_name}?useSSL=false\&serverTimezone=Asia/Shanghai\&characterEncoding=utf8\&allowPublicKeyRetrieval=true#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
+			sed -i "s#<jdbc.url>#jdbc:mysql://${db_ip}:3306/${db_name}?useSSL=false\&serverTimezone=${db_serverTimezone}\&characterEncoding=utf8\&allowPublicKeyRetrieval=true#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
 			sed -i "s#<jdbc.username>#${db_user}#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
 			sed -i "s#<jdbc.password>#${db_password}#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
 
@@ -322,18 +323,13 @@ GenerateConfig() {
 		
 		echo >./confs-$party_id/confs/mysql/init/insert-node.sql
 		echo "CREATE DATABASE IF NOT EXISTS ${db_name};" >>./confs-$party_id/confs/mysql/init/insert-node.sql
+		echo "CREATE DATABASE IF NOT EXISTS fate_flow;" >>./confs-$party_id/confs/mysql/init/insert-node.sql
 		echo "CREATE USER '${db_user}'@'%' IDENTIFIED BY '${db_password}';" >>./confs-$party_id/confs/mysql/init/insert-node.sql
 		echo "GRANT ALL ON *.* TO '${db_user}'@'%';" >>./confs-$party_id/confs/mysql/init/insert-node.sql
-		
+
 		if [[ "$computing" == "Eggroll" ]]; then
 			echo 'USE `'${db_name}'`;' >>./confs-$party_id/confs/mysql/init/insert-node.sql
-			echo "INSERT INTO server_node (host, port, node_type, status) values ('${clustermanager_ip}', '${clustermanager_port_db}', 'CLUSTER_MANAGER', 'HEALTHY');" >>./confs-$party_id/confs/mysql/init/insert-node.sql
-			for ((j = 0; j < ${#nodemanager_ip[*]}; j++)); do
-				echo "INSERT INTO server_node (host, port, node_type, status) values ('${nodemanager_ip[j]}', '${nodemanager_port_db}', 'NODE_MANAGER', 'HEALTHY');" >>./confs-$party_id/confs/mysql/init/insert-node.sql
-			done
-			echo "show tables;" >>./confs-$party_id/confs/mysql/init/insert-node.sql
-			echo "select * from server_node;" >>./confs-$party_id/confs/mysql/init/insert-node.sql
-		
+			echo "show tables;" >>./confs-$party_id/confs/mysql/init/insert-node.sql		
 			sed -i "s/eggroll_meta/${db_name}/g" ./confs-$party_id/confs/mysql/init/create-eggroll-meta-tables.sql
 		else
 			rm -f ./confs-$party_id/confs/mysql/init/create-eggroll-meta-tables.sql
