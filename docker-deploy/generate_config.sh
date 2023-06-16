@@ -206,10 +206,10 @@ GenerateConfig() {
 				# federation
 				if [ "$federation" == "RabbitMQ" ]; then
 					cp -r training_template/backends/spark/rabbitmq confs-$party_id/confs/
-					sed -i '201,215d' confs-$party_id/docker-compose.yml
+					sed -i '200,214d' confs-$party_id/docker-compose.yml
 				elif [ "$federation" == "Pulsar" ]; then
 					cp -r training_template/backends/spark/pulsar confs-$party_id/confs/
-					sed -i '182,199d' confs-$party_id/docker-compose.yml
+					sed -i '181,198d' confs-$party_id/docker-compose.yml
 				fi
 			fi
 		fi
@@ -224,10 +224,10 @@ GenerateConfig() {
 				# federation
 				if [ "$federation" == "RabbitMQ" ]; then
 					cp -r training_template/backends/spark/rabbitmq confs-$party_id/confs/
-					sed -i '147,159d' confs-$party_id/docker-compose.yml
+					sed -i '146,160d' confs-$party_id/docker-compose.yml
 				elif [ "$federation" == "Pulsar" ]; then
 					cp -r training_template/backends/spark/pulsar confs-$party_id/confs/
-					sed -i '127,143d' confs-$party_id/docker-compose.yml
+					sed -i '128,144d' confs-$party_id/docker-compose.yml
 				fi
 			fi
 		fi
@@ -246,6 +246,10 @@ GenerateConfig() {
 		# algorithm 
 		if [ "$algorithm" == "NN" ]; then
 			Suffix=$Suffix"-nn"
+		elif [ "$algorithm" == "LLM" ]; then
+			Suffix=$Suffix"-llm"
+		elif [ "$algorithm" == "ALL" ]; then
+			Suffix=$Suffix"-all"
 		fi
 		# device
 		if [ "$device" == "IPCL" ]; then
@@ -270,7 +274,7 @@ GenerateConfig() {
 		if [ "$device" == "GPU" ]; then
       line=0 # line refers to the line number of the fateflow `command` line in docker-compose.yaml
       if [ "$computing" == "Eggroll" ]; then
-          line=137
+          line=140
       fi
       if [ "$computing" == "Spark" ]; then
           line=84

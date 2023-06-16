@@ -99,8 +99,8 @@ services:
       - clustermanager
     networks:
       - fate-network
-    security_opt:
-      - seccomp:unconfined
+    cap_add:
+      - SYS_PTRACE
     command: ["bash", "-c", "java -Dlog4j.configurationFile=$${EGGROLL_HOME}/conf/log4j2.properties -cp $${EGGROLL_HOME}/lib/*: com.webank.eggroll.core.Bootstrap --bootstraps com.webank.eggroll.core.resourcemanager.NodeManagerBootstrap -c $${EGGROLL_HOME}/conf/eggroll.properties -p 4671 -s 'EGGROLL_DEAMON'"]
   
   fateflow:
@@ -173,8 +173,8 @@ services:
       - ./shared_dir/data/mysql:/var/lib/mysql
       - /etc/localtime:/etc/localtime:ro
     restart: always
-    security_opt:
-      - seccomp:unconfined
+    cap_add:
+      - SYS_NICE
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
     networks:

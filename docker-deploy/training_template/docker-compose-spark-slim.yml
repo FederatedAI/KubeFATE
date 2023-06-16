@@ -89,7 +89,6 @@ services:
         set -x
         sleep 5 && python fateflow/python/fate_flow/fate_flow_server.py
     environment:
-      PYTHONPATH: "$$PYTHONPATH:/data/projects/fate/fate/python:/data/projects/fate/eggroll/python:/data/projects/fate/fateflow/python:/data/projects/fate/fate/python/fate_client"
       FATE_PROJECT_BASE: "/data/projects/fate"
       FATE_FLOW_UPLOAD_MAX_NUM: "1000000"
       FATE_FLOW_UPLOAD_MAX_BYTES: "104868093952"
@@ -108,6 +107,8 @@ services:
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
     networks:
       - fate-network
+    cap_add:
+      - SYS_NICE
 
   nginx:
     image: "federatedai/nginx:${TAG}"
