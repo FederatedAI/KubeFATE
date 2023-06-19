@@ -171,44 +171,73 @@ FATE GPU的使用只有fateflow组件，所以每个Party最少需要有一个GP
 
 ### 执行部署脚本
 
+**注意：**在运行以下命令之前，所有目标主机必须
+
+* 允许使用 SSH 密钥进行无密码 SSH 访问（否则我们将需要为每个主机多次输入密码）。
+* 满足 [准备工作](#准备工作) 中指定的要求。
+
+要将 FATE 部署到所有已配置的目标主机，请使用以下命令：
+
 以下修改可在任意机器执行。
 
 进入目录`kubeFATE\docker-deploy`，然后运行：
 
 ```bash
 bash ./generate_config.sh          # 生成部署文件
-bash ./docker_deploy.sh all        # 在各个party上部署FATE
 ```
 
 脚本将会生成10000、9999两个组织(Party)的部署文件，然后打包成tar文件。接着把tar文件`confs-<party-id>.tar`、`serving-<party-id>.tar`分别复制到party对应的主机上并解包，解包后的文件默认在`/data/projects/fate`目录下。然后脚本将远程登录到这些主机并使用docker compose命令启动FATE实例。
 
-命令成功执行返回后，登录其中任意一个主机：
+默认情况下，脚本会同时启动训练和服务集群。 如果您需要单独启动它们，请将 `--training` 或 `--serving` 添加到 `docker_deploy.sh` 中，如下所示。
+
+（可选）要部署各方训练集群，请使用以下命令：
 
 ```bash
-ssh root@192.168.7.1
+bash ./docker_deploy.sh all --training
+```
+
+（可选）要部署各方服务集群，请使用以下命令：
+
+```bash
+bash ./docker_deploy.sh all --serving
+```
+
+（可选）要将 FATE 部署到单个目标主机，请使用以下命令和参与方的 ID（下例中为 10000）：
+
+```bash
+bash ./docker_deploy.sh 10000
+```
+
+（可选）要将交换节点部署到目标主机，请使用以下命令：
+
+```bash
+bash ./docker_deploy.sh exchange
+```
+
+命令完成后，登录到任何主机并使用 `docker compose ps` 来验证集群的状态。 示例输出如下：
+
+```bash
+ssh fate@192.168.7.1
 ```
 
 使用以下命令验证实例状态，
 
 ```bash
-docker ps
-````
+cd /data/projects/fate/confs-10000
+docker compose ps
+```
 
-输出显示如下，若各个组件都是运行（up）状态，说明部署成功。
+输出显示如下，若各个组件状态都是`Up`状态，并且fateflow的状态还是(healthy)，说明部署成功。
 
 ```bash
-CONTAINER ID   IMAGE                                      COMMAND                  CREATED         STATUS                   PORTS                                                                                                                                           NAMES
-5d2e84ba4c77   federatedai/serving-server:2.1.5-release   "/bin/sh -c 'java -c…"   5 minutes ago   Up 5 minutes             0.0.0.0:8000->8000/tcp, :::8000->8000/tcp                                                                                                       serving-9999_serving-server_1
-3dca43f3c9d5   federatedai/serving-admin:2.1.5-release    "/bin/sh -c 'java -c…"   5 minutes ago   Up 5 minutes             0.0.0.0:8350->8350/tcp, :::8350->8350/tcp                                                                                                       serving-9999_serving-admin_1
-fe924918509b   federatedai/serving-proxy:2.1.5-release    "/bin/sh -c 'java -D…"   5 minutes ago   Up 5 minutes             0.0.0.0:8059->8059/tcp, :::8059->8059/tcp, 0.0.0.0:8869->8869/tcp, :::8869->8869/tcp, 8879/tcp                                                  serving-9999_serving-proxy_1
-b62ed8ba42b7   bitnami/zookeeper:3.7.0                    "/opt/bitnami/script…"   5 minutes ago   Up 5 minutes             0.0.0.0:2181->2181/tcp, :::2181->2181/tcp, 8080/tcp, 0.0.0.0:49226->2888/tcp, :::49226->2888/tcp, 0.0.0.0:49225->3888/tcp, :::49225->3888/tcp   serving-9999_serving-zookeeper_1
-3c643324066f   federatedai/client:1.11.2-release           "/bin/sh -c 'flow in…"   5 minutes ago   Up 5 minutes             0.0.0.0:20000->20000/tcp, :::20000->20000/tcp                                                                                                   confs-9999_client_1
-3fe0af1ebd71   federatedai/fateboard:1.11.2-release        "/bin/sh -c 'java -D…"   5 minutes ago   Up 5 minutes             0.0.0.0:8080->8080/tcp, :::8080->8080/tcp                                                                                                       confs-9999_fateboard_1
-635b7d99357e   federatedai/fateflow:1.11.2-release         "container-entrypoin…"   5 minutes ago   Up 5 minutes (healthy)   0.0.0.0:9360->9360/tcp, :::9360->9360/tcp, 8080/tcp, 0.0.0.0:9380->9380/tcp, :::9380->9380/tcp                                                  confs-9999_fateflow_1
-8b515f08add3   federatedai/eggroll:1.11.2-release          "/tini -- bash -c 'j…"   5 minutes ago   Up 5 minutes             8080/tcp, 0.0.0.0:9370->9370/tcp, :::9370->9370/tcp                                                                                             confs-9999_rollsite_1
-108cc061c191   federatedai/eggroll:1.11.2-release          "/tini -- bash -c 'j…"   5 minutes ago   Up 5 minutes             4670/tcp, 8080/tcp                                                                                                                              confs-9999_clustermanager_1
-f10575e76899   federatedai/eggroll:1.11.2-release          "/tini -- bash -c 'j…"   5 minutes ago   Up 5 minutes             4671/tcp, 8080/tcp                                                                                                                              confs-9999_nodemanager_1
-aa0a0002de93   mysql:8.0.28                               "docker-entrypoint.s…"   5 minutes ago   Up 5 minutes             3306/tcp, 33060/tcp                                                                                                                             confs-9999_mysql_1
+NAME                           IMAGE                                  COMMAND                  SERVICE             CREATED              STATUS                        PORTS
+confs-10000-client-1           federatedai/client:1.11.2-release      "bash -c 'pipeline i…"   client              About a minute ago   Up About a minute             0.0.0.0:20000->20000/tcp, :::20000->20000/tcp
+confs-10000-clustermanager-1   federatedai/eggroll:1.11.2-release     "/tini -- bash -c 'j…"   clustermanager      About a minute ago   Up About a minute             4670/tcp
+confs-10000-fateboard-1        federatedai/fateboard:1.11.2-release   "/bin/sh -c 'java -D…"   fateboard           About a minute ago   Up About a minute             0.0.0.0:8080->8080/tcp, :::8080->8080/tcp
+confs-10000-fateflow-1         federatedai/fateflow:1.11.2-release    "/bin/bash -c 'set -…"   fateflow            About a minute ago   Up About a minute (healthy)   0.0.0.0:9360->9360/tcp, :::9360->9360/tcp, 0.0.0.0:9380->9380/tcp, :::9380->9380/tcp
+confs-10000-mysql-1            mysql:8.0.28                           "docker-entrypoint.s…"   mysql               About a minute ago   Up About a minute             3306/tcp, 33060/tcp
+confs-10000-nodemanager-1      federatedai/eggroll:1.11.2-release     "/tini -- bash -c 'j…"   nodemanager         About a minute ago   Up About a minute             4671/tcp
+confs-10000-rollsite-1         federatedai/eggroll:1.11.2-release     "/tini -- bash -c 'j…"   rollsite            About a minute ago   Up About a minute             0.0.0.0:9370->9370/tcp, :::9370->9370/tcp
 ```
 
 ### 验证部署
@@ -218,9 +247,12 @@ docker-compose上的FATE启动成功之后需要验证各个服务是否都正�
 选择192.168.7.1这个节点验证，使用以下命令验证：
 
 ```bash
-#在192.168.7.1上执行下列命令
-$ docker exec -it confs-10000_client_1 bash                        #进入client组件容器内部
-$ flow test toy --guest-party-id 10000 --host-party-id 9999        #验证
+# 在192.168.7.1上执行下列命令
+
+# 进入client组件容器内部
+$ docker compose exec client bash
+# toy 验证
+$ flow test toy --guest-party-id 10000 --host-party-id 9999        
 ```
 
 如果测试通过，屏幕将显示类似如下消息：
@@ -243,7 +275,8 @@ $ flow test toy --guest-party-id 10000 --host-party-id 9999        #验证
 ##### 进入party10000 client容器
 
 ```bash
-docker exec -it confs-10000_client_1 bash
+cd /data/projects/fate/confs-10000
+docker compose exec client bash
 ```
 
 ##### 上传host数据
@@ -257,7 +290,8 @@ flow data upload -c fateflow/examples/upload/upload_host.json
 ##### 进入party9999 client容器
 
 ```bash
-docker exec -it confs-9999_client_1 bash
+cd /data/projects/fate/confs-9999
+docker compose exec client bash
 ```
 
 ##### 上传guest数据

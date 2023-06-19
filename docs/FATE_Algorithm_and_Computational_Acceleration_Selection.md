@@ -27,7 +27,7 @@ Device selection consists of an option:
 - `CPU`
     The CPU is a computing device that uses the CPU as a FATE computing device.
 - `IPCL`
-    The CPU is a computing device that uses the CPU as a FATE computing device.
+    IPCL is to use IPCL to speed up FATE.
 - `GPU`
     The GPU is a computing device that uses the GPU as a FATE computing device.
 
@@ -36,6 +36,6 @@ Device selection consists of an option:
 Various combinations currently supported by KubeFATE.
 | Device \ Algorithm | Basic | NN | LLM | ALL |
 |---|---|---|---|---|
-| CPU | EGGROLL&Spark | EGGROLL | - | - |
-| IPCL| EGGROLL&SPark | - | - | - |
-| GPU | - | EGGROLL | - | EGGROLL |
+| CPU | EggRoll&Spark | EggRoll | - | - |
+| IPCL| EggRoll&Spark | - | - | - |
+| GPU | - | EggRoll | - | EggRoll |

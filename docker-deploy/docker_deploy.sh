@@ -243,7 +243,7 @@ DeleteCluster() {
 		done
 	fi
 	
-	echo "target_party_ip: $target_party_ip"
+	# echo "target_party_ip: $target_party_ip"
 
 	for ((i = 0; i < ${#party_list[*]}; i++)); do
 		if [ "${party_list[$i]}" = "$target_party_id" ]; then
@@ -251,8 +251,8 @@ DeleteCluster() {
 		fi
 	done
 
-		echo "target_party_ip: $target_party_ip"
-		echo "cluster_type: $cluster_type"
+	#	echo "target_party_ip: $target_party_ip"
+	#	echo "cluster_type: $cluster_type"
 
 	# delete training cluster
 	if [ "$cluster_type" == "--training" ]; then
