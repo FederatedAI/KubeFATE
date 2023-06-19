@@ -23,8 +23,11 @@ metadata:
 data:
   eggroll.properties: |
     [eggroll]
+    # core
+    #eggroll.resourcemanager.clustermanager.jdbc.driver.class.name=org.h2.Driver
     eggroll.resourcemanager.clustermanager.jdbc.driver.class.name=com.mysql.cj.jdbc.Driver
-    eggroll.resourcemanager.clustermanager.jdbc.url=jdbc:mysql://{{ .Values.externalMysqlIp | default .Values.modules.mysql.ip | default "mysql" }}:{{ .Values.externalMysqlPort | default .Values.modules.mysql.port | default "3306" }}/{{ .Values.externalMysqlDatabase | default .Values.modules.mysql.database | default "eggroll_meta" }}?useSSL=false&serverTimezone=UTC&characterEncoding=utf8&allowPublicKeyRetrieval=true
+    #eggroll.resourcemanager.clustermanager.jdbc.url=jdbc:h2:./data/meta_h2/eggroll_meta.h2;AUTO_SERVER=TRUE;MODE=MySQL;DATABASE_TO_LOWER=TRUE;SCHEMA=eggroll_meta;
+    eggroll.resourcemanager.clustermanager.jdbc.url=jdbc:mysql://{{ .Values.externalMysqlIp | default .Values.modules.mysql.ip | default "mysql" }}:{{ .Values.externalMysqlPort | default .Values.modules.mysql.port | default "3306" }}/{{ .Values.externalMysqlDatabase | default .Values.modules.mysql.database | default "eggroll_meta" }}?useSSL=false&serverTimezone={{ .Values.modules.clustermanager.mysqlServerTimezone | default "UTC" }}&characterEncoding=utf8&allowPublicKeyRetrieval=true
     eggroll.resourcemanager.clustermanager.jdbc.username={{ .Values.externalMysqlUser | default .Values.modules.mysql.user | default "fate" }}
     eggroll.resourcemanager.clustermanager.jdbc.password={{ .Values.externalMysqlPassword | default .Values.modules.mysql.password | default "fate_dev" }}
     
@@ -39,7 +42,7 @@ data:
     
     eggroll.resourcemanager.bootstrap.egg_pair.exepath=bin/roll_pair/egg_pair_bootstrap.sh
     eggroll.resourcemanager.bootstrap.egg_pair.venv=
-    eggroll.resourcemanager.bootstrap.egg_pair.pythonpath=/data/projects/fate/python:/data/projects/fate/eggroll/python
+    eggroll.resourcemanager.bootstrap.egg_pair.pythonpath=python
     eggroll.resourcemanager.bootstrap.egg_pair.filepath=python/eggroll/roll_pair/egg_pair.py
     eggroll.resourcemanager.bootstrap.egg_pair.ld_library_path=
     
@@ -95,6 +98,15 @@ data:
     eggroll.rollsite.polling.server.enabled=true
     eggroll.rollsite.polling.concurrency= {{ .Values.modules.rollsite.polling.concurrency | default 50 }}
     {{- end }}
+    # deepspeed
+    ## fallback to eggpair venv/bin/python
+    #eggroll.container.deepspeed.python.exec=
+    ## provide by submit option for now
+    #eggroll.container.deepspeed.script.path=
+    eggroll.container.deepspeed.distributed.backend=nccl
+    ## defaults to cluster manager endpoint
+    #eggroll.container.deepspeed.distributed.store.host=
+    #eggroll.container.deepspeed.distributed.store.port=
   {{- if .Values.modules.rollsite.enableTLS }}
   cert_configs: |
     eggroll.core.security.secure.cluster.enabled=true

@@ -29,7 +29,7 @@ computing: Spark
 federation: Pulsar
 # Storage: Eggroll(computing: Eggroll), HDFS(computing: Spark), LocalFS(computing: Spark_local)
 storage: HDFS
-# Algorithm: Basic, NN
+# Algorithm: Basic, NN, LLM, ALL
 algorithm: Basic
 # Device: CPU, IPCL GPU
 device: CPU

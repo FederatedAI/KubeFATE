@@ -33,7 +33,7 @@ computing: Eggroll
 federation: Eggroll
 # Storage: [Eggroll(computing: Eggroll), HDFS(computing: Spark), LocalFS(computing: Spark_local)]
 storage: Eggroll
-# Algorithm: [Basic, NN]
+# Algorithm: [Basic, NN, LLM, ALL]
 algorithm: Basic
 # Device: [IPCL, CPU, GPU]
 device: CPU
@@ -145,6 +145,7 @@ skippedKeys:
 #   nodeSelector:
 #   tolerations:
 #   affinity:
+#   mysqlServerTimezone: UTC
   # resources:
     # requests:
       # cpu: "1"

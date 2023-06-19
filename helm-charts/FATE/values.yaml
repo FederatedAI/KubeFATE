@@ -16,7 +16,7 @@ computing: Eggroll
 federation: Eggroll
 # Storage: Eggroll(computing: Eggroll), HDFS(computing: Spark), LocalFS(computing: Spark_local)
 storage: Eggroll
-# Algorithm: Basic, NN
+# Algorithm: Basic, NN, LLM, ALL
 algorithm: Basic
 # Device: CPU, IPCL, GPU
 device: IPCL
@@ -198,6 +198,7 @@ modules:
     nodeSelector:
     tolerations:
     affinity:
+    mysqlServerTimezone: UTC
   nodemanager:  
     include: true
     replicas: 2

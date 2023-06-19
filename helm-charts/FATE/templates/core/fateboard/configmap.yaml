@@ -44,6 +44,9 @@ data:
     server.compression.mime-types=application/json,application/xml,text/html,text/xml,text/plain
     server.board.login.username={{ .Values.modules.fateboard.username }}
     server.board.login.password={{ .Values.modules.fateboard.password }}
+    server.board.encrypt.private_key=
+    server.board.encrypt.enable=false
+    #only [h,m,s] is available
     server.servlet.session.timeout=4h
     server.servlet.session.cookie.max-age=4h
     management.endpoints.web.exposure.exclude=*
