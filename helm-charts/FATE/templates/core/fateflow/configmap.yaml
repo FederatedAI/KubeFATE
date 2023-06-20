@@ -49,7 +49,7 @@ data:
     encrypt_module: fate_arch.common.encrypt_utils#pwdecrypt
     private_key:
     private_key_file:
-    party_id:
+    party_id: {{ .Values.partyId }}
     hook_module:
       client_authentication: fate_flow.hook.flow.client_authentication
       site_authentication: fate_flow.hook.flow.site_authentication
@@ -186,7 +186,7 @@ data:
       host: fateboard
       port: 8080
     
-    enable_model_store: true
+    enable_model_store: false
     model_store_address:
         # use mysql as the model store engine
       # storage: mysql

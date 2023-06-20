@@ -36,9 +36,9 @@ spec:
       containers:
         - name: nodemanager-eggrollpair
         {{- if .Values.image.isThridParty }}
-          image: {{ .Values.image.registry }}/fluentd:v1.12
+          image: {{ .Values.image.registry }}/fluent-bit:2.1.4
         {{- else }}
-          image: fluent/fluentd:v1.12
+          image: fluent/fluent-bit:2.1.4
         {{- end }}
           volumeMounts:
           - name: eggroll-log

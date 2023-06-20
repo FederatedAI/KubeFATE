@@ -205,7 +205,7 @@ modules:
     nodeSelector:
     tolerations:
     affinity:
-    sessionProcessorsPerNode: 2
+    sessionProcessorsPerNode: 4
     subPath: "nodemanager"
     storageClass:
     accessMode: ReadWriteOnce
@@ -213,7 +213,7 @@ modules:
     existingClaim:
     resources:
       requests:
-        cpu: "2"
+        cpu: "4"
         memory: "4Gi"
 
   mysql: 
