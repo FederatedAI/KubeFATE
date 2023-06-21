@@ -20,7 +20,7 @@ Compose是用于定义和运行多容器Docker应用程序的工具。通过Comp
 2. 所有主机安装Docker 版本 :  19.03.0+；
 3. 所有主机安装Docker Compose 版本: 1.27.0+；
 4. 部署机可以联网，所以主机相互之间可以网络互通；
-5. 运行机已经下载FATE的各组件镜像，如果无法连接dockerhub，请考虑使用harbor（[Harbor 作为本地镜像源](../registry/README.md)）或者使用离线部署（离线构建镜像参考文档[构建镜像](https://github.com/FederatedAI/FATE/tree/master/build/docker-build)）。
+5. 运行机已经下载FATE的各组件镜像，如果无法连接dockerhub，请考虑使用harbor（[Harbor 作为本地镜像源](../registry/README.md)）或者使用离线部署（离线构建镜像参考文档[构建镜像]( https://github.com/FederatedAI/FATE-Builder/tree/main/docker-build)）。
 6. 运行FATE的主机推荐配置8CPUs和16G RAM。
 
 ### 下载部署脚本
