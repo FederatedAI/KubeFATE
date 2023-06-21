@@ -18,9 +18,6 @@
 {{- if eq .Values.algorithm "NN" -}}
 -nn
 {{- end -}}
-{{- if eq .Values.algorithm "LLM" -}}
--llm
-{{- end -}}
 {{- if eq .Values.algorithm "ALL" -}}
 -all
 {{- end -}}

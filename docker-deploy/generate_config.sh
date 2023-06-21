@@ -246,8 +246,6 @@ GenerateConfig() {
 		# algorithm 
 		if [ "$algorithm" == "NN" ]; then
 			Suffix=$Suffix"-nn"
-		elif [ "$algorithm" == "LLM" ]; then
-			Suffix=$Suffix"-llm"
 		elif [ "$algorithm" == "ALL" ]; then
 			Suffix=$Suffix"-all"
 		fi
