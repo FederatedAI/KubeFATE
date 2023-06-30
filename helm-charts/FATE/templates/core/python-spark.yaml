@@ -100,7 +100,7 @@ spec:
           - name: FATE_PROJECT_BASE
             value: "/data/projects/fate"
           - name: HUGGINGFACE_HUB_CACHE
-            value: "/data/projects/fate/llm_cache"
+            value: "/data/projects/fate/llm"
           {{- if eq .Values.computing "Spark" }}
           - name: FATE_FLOW_UPLOAD_MAX_NUM
             value: "1000000"
@@ -175,9 +175,9 @@ spec:
             - mountPath: /data/projects/fate/fateflow/model_local_cache
               name: python-data
               subPath: model-local-cache
-            - mountPath: /data/projects/fate/llm_cache
+            - mountPath: /data/projects/fate/llm
               name: python-data
-              subPath: llm-cache
+              subPath: llm
       {{- with .Values.modules.python.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}

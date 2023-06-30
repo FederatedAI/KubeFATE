@@ -98,9 +98,12 @@ data:
     eggroll.rollsite.polling.server.enabled=true
     eggroll.rollsite.polling.concurrency= {{ .Values.modules.rollsite.polling.concurrency | default 50 }}
     {{- end }}
+ 
     # deepspeed
-    ## fallback to eggpair venv/bin/python
-    #eggroll.container.deepspeed.python.exec=
+    ## where deepspeed containers locate, required for deepspeed
+    eggroll.resourcemanager.nodemanager.containers.data.dir=/data/projects/fate/eggroll/containers
+    ## which python exec that deepspeed container used, fallback to eggpair venv/bin/python
+    eggroll.container.deepspeed.python.exec=/data/projects/python/venv/bin/python
     ## provide by submit option for now
     #eggroll.container.deepspeed.script.path=
     eggroll.container.deepspeed.distributed.backend=nccl
