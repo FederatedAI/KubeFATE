@@ -92,7 +92,7 @@ spec:
           volumeMounts:
             - mountPath: /data/projects/fate/eggroll/conf/route_table/
               name: rollsite-confs
-            - mountPath: /data/projects/fate/eggroll/conf/temp_eggroll.properties
+            - mountPath: /data/projects/fate/eggroll/conf/eggroll.properties
               name: eggroll-confs
               subPath: eggroll.properties
             {{- if .Values.modules.rollsite.enableTLS }}

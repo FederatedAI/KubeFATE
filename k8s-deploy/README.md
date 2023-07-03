@@ -143,6 +143,10 @@ We support such definition for:
 3. Rabbitmq.
 4. Pulsar.
 
+### GPU support
+
+Starting from v1.11.1, KubeFATE can deploy GPU-enabled FATE clusters. Deploying GPU-enabled FATE requires some special preparation and configuration. You can check this document[KubeFATE Deploying GPU-enabled FATE](../docs/KubeFATE_deploys_GPU-enabled_FATE.md)
+
 ### Checking the status of "Installing Cluster" job
 
 After the above command has finished, a job is created for installing a FATE cluster. Run the command `kubefate job describe` to check the status of the job, until the "Status" turns to `Success`.
@@ -188,13 +192,13 @@ UUID         24bb75ff-f636-4c64-8c04-1b9073f89a2f
 Name         fate-9999                           
 NameSpace    fate-9999                           
 ChartName    fate                                
-ChartVersion v1.11.1                              
+ChartVersion v1.11.2                              
 Revision     1                                   
 Age          15m                                 
 Status       Running                             
 Spec         algorithm: Basic                    
              chartName: fate                     
-             chartVersion: v1.11.1                
+             chartVersion: v1.11.2                
              computing: Eggroll                  
              device: CPU                         
              federation: Eggroll                 

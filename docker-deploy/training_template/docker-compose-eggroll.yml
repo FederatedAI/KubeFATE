@@ -95,16 +95,19 @@ services:
       - ./shared_dir/data/nodemanager:/data/projects/fate/eggroll/data
       - /etc/localtime:/etc/localtime:ro
       - shared_dir_federatedml:/data/projects/fate/fate/python/federatedml
+    depends_on:
+      - clustermanager
     networks:
       - fate-network
+    cap_add:
+      - SYS_PTRACE
     command: ["bash", "-c", "java -Dlog4j.configurationFile=$${EGGROLL_HOME}/conf/log4j2.properties -cp $${EGGROLL_HOME}/lib/*: com.webank.eggroll.core.Bootstrap --bootstraps com.webank.eggroll.core.resourcemanager.NodeManagerBootstrap -c $${EGGROLL_HOME}/conf/eggroll.properties -p 4671 -s 'EGGROLL_DEAMON'"]
   
   fateflow:
     image: "federatedai/fateflow:${TAG}"
     environment:
-      PYTHONPATH: "$$PYTHONPATH:/data/projects/fate/fate/python:/data/projects/fate/eggroll/python:/data/projects/fate/fateflow/python:/data/projects/fate/fate/python/fate_client"
       FATE_PROJECT_BASE: "/data/projects/fate"
-      FATE_LOG_LEVEL: "INFO"
+      FATE_LOG_LEVEL: "DEBUG"
     ports:
       - "9360:9360"
       - "9380:9380"
@@ -170,6 +173,8 @@ services:
       - ./shared_dir/data/mysql:/var/lib/mysql
       - /etc/localtime:/etc/localtime:ro
     restart: always
+    cap_add:
+      - SYS_NICE
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
     networks:

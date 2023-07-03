@@ -38,6 +38,9 @@ spec:
         {{- end }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           name: mysql
+          securityContext:
+            capabilities:
+              add: ["SYS_NICE"]
           env:
             - name: MYSQL_ALLOW_EMPTY_PASSWORD 
               value: "1"
