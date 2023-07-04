@@ -2,7 +2,7 @@
 image:
   registry: federatedai
   isThridParty:
-  tag: 1.11.1-release
+  tag: 1.11.2-release
   pullPolicy: IfNotPresent
   imagePullSecrets: 
 #  - name: 
@@ -16,7 +16,7 @@ computing: Eggroll
 federation: Eggroll
 # Storage: Eggroll(computing: Eggroll), HDFS(computing: Spark), LocalFS(computing: Spark_local)
 storage: Eggroll
-# Algorithm: Basic, NN
+# Algorithm: Basic, NN, ALL
 algorithm: Basic
 # Device: CPU, IPCL, GPU
 device: IPCL
@@ -198,13 +198,14 @@ modules:
     nodeSelector:
     tolerations:
     affinity:
+    mysqlServerTimezone: UTC
   nodemanager:  
     include: true
     replicas: 2
     nodeSelector:
     tolerations:
     affinity:
-    sessionProcessorsPerNode: 2
+    sessionProcessorsPerNode: 4
     subPath: "nodemanager"
     storageClass:
     accessMode: ReadWriteOnce
@@ -212,7 +213,7 @@ modules:
     existingClaim:
     resources:
       requests:
-        cpu: "2"
+        cpu: "4"
         memory: "4Gi"
 
   mysql: 

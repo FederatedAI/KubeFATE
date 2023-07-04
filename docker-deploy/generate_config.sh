@@ -151,6 +151,7 @@ GenerateConfig() {
 		eval db_user=${mysql_user}
 		eval db_password=${mysql_password}
 		eval db_name=${mysql_db}
+		eval db_serverTimezone=${serverTimezone}
 
 		eval exchange_ip=${exchangeip}
 
@@ -173,7 +174,7 @@ GenerateConfig() {
 			# eggroll config
 			#db connect inf
 			# use the fixed db name here
-			sed -i "s#<jdbc.url>#jdbc:mysql://${db_ip}:3306/${db_name}?useSSL=false\&serverTimezone=UTC\&characterEncoding=utf8\&allowPublicKeyRetrieval=true#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
+			sed -i "s#<jdbc.url>#jdbc:mysql://${db_ip}:3306/${db_name}?useSSL=false\&serverTimezone=${db_serverTimezone}\&characterEncoding=utf8\&allowPublicKeyRetrieval=true#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
 			sed -i "s#<jdbc.username>#${db_user}#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
 			sed -i "s#<jdbc.password>#${db_password}#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
 
@@ -205,10 +206,10 @@ GenerateConfig() {
 				# federation
 				if [ "$federation" == "RabbitMQ" ]; then
 					cp -r training_template/backends/spark/rabbitmq confs-$party_id/confs/
-					sed -i '201,215d' confs-$party_id/docker-compose.yml
+					sed -i '200,214d' confs-$party_id/docker-compose.yml
 				elif [ "$federation" == "Pulsar" ]; then
 					cp -r training_template/backends/spark/pulsar confs-$party_id/confs/
-					sed -i '182,199d' confs-$party_id/docker-compose.yml
+					sed -i '181,198d' confs-$party_id/docker-compose.yml
 				fi
 			fi
 		fi
@@ -223,10 +224,10 @@ GenerateConfig() {
 				# federation
 				if [ "$federation" == "RabbitMQ" ]; then
 					cp -r training_template/backends/spark/rabbitmq confs-$party_id/confs/
-					sed -i '147,159d' confs-$party_id/docker-compose.yml
+					sed -i '146,160d' confs-$party_id/docker-compose.yml
 				elif [ "$federation" == "Pulsar" ]; then
 					cp -r training_template/backends/spark/pulsar confs-$party_id/confs/
-					sed -i '127,143d' confs-$party_id/docker-compose.yml
+					sed -i '128,144d' confs-$party_id/docker-compose.yml
 				fi
 			fi
 		fi
@@ -245,6 +246,8 @@ GenerateConfig() {
 		# algorithm 
 		if [ "$algorithm" == "NN" ]; then
 			Suffix=$Suffix"-nn"
+		elif [ "$algorithm" == "ALL" ]; then
+			Suffix=$Suffix"-all"
 		fi
 		# device
 		if [ "$device" == "IPCL" ]; then
@@ -269,7 +272,7 @@ GenerateConfig() {
 		if [ "$device" == "GPU" ]; then
       line=0 # line refers to the line number of the fateflow `command` line in docker-compose.yaml
       if [ "$computing" == "Eggroll" ]; then
-          line=137
+          line=140
       fi
       if [ "$computing" == "Spark" ]; then
           line=84
@@ -322,18 +325,13 @@ GenerateConfig() {
 		
 		echo >./confs-$party_id/confs/mysql/init/insert-node.sql
 		echo "CREATE DATABASE IF NOT EXISTS ${db_name};" >>./confs-$party_id/confs/mysql/init/insert-node.sql
+		echo "CREATE DATABASE IF NOT EXISTS fate_flow;" >>./confs-$party_id/confs/mysql/init/insert-node.sql
 		echo "CREATE USER '${db_user}'@'%' IDENTIFIED BY '${db_password}';" >>./confs-$party_id/confs/mysql/init/insert-node.sql
 		echo "GRANT ALL ON *.* TO '${db_user}'@'%';" >>./confs-$party_id/confs/mysql/init/insert-node.sql
-		
+
 		if [[ "$computing" == "Eggroll" ]]; then
 			echo 'USE `'${db_name}'`;' >>./confs-$party_id/confs/mysql/init/insert-node.sql
-			echo "INSERT INTO server_node (host, port, node_type, status) values ('${clustermanager_ip}', '${clustermanager_port_db}', 'CLUSTER_MANAGER', 'HEALTHY');" >>./confs-$party_id/confs/mysql/init/insert-node.sql
-			for ((j = 0; j < ${#nodemanager_ip[*]}; j++)); do
-				echo "INSERT INTO server_node (host, port, node_type, status) values ('${nodemanager_ip[j]}', '${nodemanager_port_db}', 'NODE_MANAGER', 'HEALTHY');" >>./confs-$party_id/confs/mysql/init/insert-node.sql
-			done
-			echo "show tables;" >>./confs-$party_id/confs/mysql/init/insert-node.sql
-			echo "select * from server_node;" >>./confs-$party_id/confs/mysql/init/insert-node.sql
-		
+			echo "show tables;" >>./confs-$party_id/confs/mysql/init/insert-node.sql		
 			sed -i "s/eggroll_meta/${db_name}/g" ./confs-$party_id/confs/mysql/init/create-eggroll-meta-tables.sql
 		else
 			rm -f ./confs-$party_id/confs/mysql/init/create-eggroll-meta-tables.sql
@@ -341,6 +339,7 @@ GenerateConfig() {
 		echo mysql module of $party_id done!
 
 		# fate_flow
+		sed -i "s/party_id:/party_id: ${party_id}/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
 		sed -i "s/name: <db_name>/name: '${db_name}'/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
 		sed -i "s/user: <db_user>/user: '${db_user}'/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
 		sed -i "s/passwd: <db_passwd>/passwd: '${db_password}'/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml

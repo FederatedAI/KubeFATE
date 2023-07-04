@@ -61,7 +61,7 @@ After Harbor has been installed, FATE docker images must be pushed to Harbor reg
 
 ## Build images from FATE source code
 
-Refer to [Build Document](https://github.com/FederatedAI/FATE/blob/master/build/docker-build/README.md) to create FATE images. Once images are built, push them to Harbor.
+Refer to [Build Document](https://github.com/FederatedAI/FATE-Builder/tree/main/docker-build/README.md) to create FATE images. Once images are built, push them to Harbor.
 
 Usually, a user does not need to take the long time to build images from source. It is recommended to use te pre-built docker images of FATE directly. Refer to te below section to for more details.
 

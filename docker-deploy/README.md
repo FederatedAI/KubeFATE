@@ -10,7 +10,7 @@ The nodes (target nodes) to install FATE must meet the following requirements:
 2. Docker: 19.03.0+
 3. Docker Compose: 1.27.0+
 4. The deployment machine have access to the Internet, so the hosts can communicate with each other;
-5. Network connection to Internet to pull container images from Docker Hub. If network connection to Internet is not available, consider to set up [Harbor as a local registry](../registry/README.md) or use [offline images](https://github.com/FederatedAI/FATE/tree/master/build/docker-build).
+5. Network connection to Internet to pull container images from Docker Hub. If network connection to Internet is not available, consider to set up [Harbor as a local registry](../registry/README.md) or use [offline images](https://github.com/FederatedAI/FATE-Builder/tree/main/docker-build).
 6. A host running FATE is recommended to be with 8 CPUs and 16G RAM.
 
 ## Deploying FATE
@@ -175,21 +175,30 @@ bash ./docker_deploy.sh 10000
 bash ./docker_deploy.sh exchange
 ```
 
-Once the commands finish, log in to any host and use `docker ps` to verify the status of the cluster. A sample output is as follows:
+Once the commands finish, log in to any host and use `docker compose ps` to verify the status of the cluster. A sample output is as follows:
 
 ```bash
-CONTAINER ID   IMAGE                                      COMMAND                  CREATED         STATUS                   PORTS                                                                                                                                           NAMES
-5d2e84ba4c77   federatedai/serving-server:2.1.5-release   "/bin/sh -c 'java -c…"   5 minutes ago   Up 5 minutes             0.0.0.0:8000->8000/tcp, :::8000->8000/tcp                                                                                                       serving-9999_serving-server_1
-3dca43f3c9d5   federatedai/serving-admin:2.1.5-release    "/bin/sh -c 'java -c…"   5 minutes ago   Up 5 minutes             0.0.0.0:8350->8350/tcp, :::8350->8350/tcp                                                                                                       serving-9999_serving-admin_1
-fe924918509b   federatedai/serving-proxy:2.1.5-release    "/bin/sh -c 'java -D…"   5 minutes ago   Up 5 minutes             0.0.0.0:8059->8059/tcp, :::8059->8059/tcp, 0.0.0.0:8869->8869/tcp, :::8869->8869/tcp, 8879/tcp                                                  serving-9999_serving-proxy_1
-b62ed8ba42b7   bitnami/zookeeper:3.7.0                    "/opt/bitnami/script…"   5 minutes ago   Up 5 minutes             0.0.0.0:2181->2181/tcp, :::2181->2181/tcp, 8080/tcp, 0.0.0.0:49226->2888/tcp, :::49226->2888/tcp, 0.0.0.0:49225->3888/tcp, :::49225->3888/tcp   serving-9999_serving-zookeeper_1
-3c643324066f   federatedai/client:1.11.1-release           "/bin/sh -c 'flow in…"   5 minutes ago   Up 5 minutes             0.0.0.0:20000->20000/tcp, :::20000->20000/tcp                                                                                                   confs-9999_client_1
-3fe0af1ebd71   federatedai/fateboard:1.11.1-release        "/bin/sh -c 'java -D…"   5 minutes ago   Up 5 minutes             0.0.0.0:8080->8080/tcp, :::8080->8080/tcp                                                                                                       confs-9999_fateboard_1
-635b7d99357e   federatedai/fateflow:1.11.1-release         "container-entrypoin…"   5 minutes ago   Up 5 minutes (healthy)   0.0.0.0:9360->9360/tcp, :::9360->9360/tcp, 8080/tcp, 0.0.0.0:9380->9380/tcp, :::9380->9380/tcp                                                  confs-9999_fateflow_1
-8b515f08add3   federatedai/eggroll:1.11.1-release          "/tini -- bash -c 'j…"   5 minutes ago   Up 5 minutes             8080/tcp, 0.0.0.0:9370->9370/tcp, :::9370->9370/tcp                                                                                             confs-9999_rollsite_1
-108cc061c191   federatedai/eggroll:1.11.1-release          "/tini -- bash -c 'j…"   5 minutes ago   Up 5 minutes             4670/tcp, 8080/tcp                                                                                                                              confs-9999_clustermanager_1
-f10575e76899   federatedai/eggroll:1.11.1-release          "/tini -- bash -c 'j…"   5 minutes ago   Up 5 minutes             4671/tcp, 8080/tcp                                                                                                                              confs-9999_nodemanager_1
-aa0a0002de93   mysql:8.0.28                               "docker-entrypoint.s…"   5 minutes ago   Up 5 minutes             3306/tcp, 33060/tcp                                                                                                                             confs-9999_mysql_1
+ssh fate@192.168.7.1
+```
+
+Verify the instance status using the following command,
+
+```bash
+cd /data/projects/fate/confs-10000
+docker compose ps
+````
+
+The output is shown as follows. If the status of each component is `Up`, and the status of fateflow is still (healthy), it means that the deployment is successful.
+
+```bash
+NAME                           IMAGE                                  COMMAND                  SERVICE             CREATED              STATUS                        PORTS
+confs-10000-client-1           federatedai/client:1.11.2-release      "bash -c 'pipeline i…"   client              About a minute ago   Up About a minute             0.0.0.0:20000->20000/tcp, :::20000->20000/tcp
+confs-10000-clustermanager-1   federatedai/eggroll:1.11.2-release     "/tini -- bash -c 'j…"   clustermanager      About a minute ago   Up About a minute             4670/tcp
+confs-10000-fateboard-1        federatedai/fateboard:1.11.2-release   "/bin/sh -c 'java -D…"   fateboard           About a minute ago   Up About a minute             0.0.0.0:8080->8080/tcp, :::8080->8080/tcp
+confs-10000-fateflow-1         federatedai/fateflow:1.11.2-release    "/bin/bash -c 'set -…"   fateflow            About a minute ago   Up About a minute (healthy)   0.0.0.0:9360->9360/tcp, :::9360->9360/tcp, 0.0.0.0:9380->9380/tcp, :::9380->9380/tcp
+confs-10000-mysql-1            mysql:8.0.28                           "docker-entrypoint.s…"   mysql               About a minute ago   Up About a minute             3306/tcp, 33060/tcp
+confs-10000-nodemanager-1      federatedai/eggroll:1.11.2-release     "/tini -- bash -c 'j…"   nodemanager         About a minute ago   Up About a minute             4671/tcp
+confs-10000-rollsite-1         federatedai/eggroll:1.11.2-release     "/tini -- bash -c 'j…"   rollsite            About a minute ago   Up About a minute             0.0.0.0:9370->9370/tcp, :::9370->9370/tcp
 ```
 
 ### Verifying the deployment
@@ -197,7 +206,7 @@ aa0a0002de93   mysql:8.0.28                               "docker-entrypoint.s�
 On the target node of each party, a container named  `confs-<party_id>_fateflow_1` should have been created and running the `fate-flow` service. For example, on Party 10000's node, run the following commands to verify the deployment:
 
 ```bash
-docker exec -it confs-10000_client_1 bash
+docker exec -it confs-10000-client-1 bash
 flow test toy --guest-party-id 10000 --host-party-id 9999
 ```
 

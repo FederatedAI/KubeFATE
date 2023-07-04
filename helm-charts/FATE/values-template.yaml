@@ -302,7 +302,7 @@ modules:
     {{- with .clustermanager }}
     ip: clustermanager
     type: "ClusterIP"
-    enableTLS: {{ .enableTLS | default false }}
+    mysqlServerTimezone: {{ .mysqlServerTimezone }}
   {{- with .nodeSelector }}
     nodeSelector: 
 {{ toYaml . | indent 6 }}

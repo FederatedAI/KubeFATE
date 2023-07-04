@@ -5,8 +5,8 @@
         "set"
     ],
     "collections": [
-        "OrderedDict",
-        "defaultdict"
+        "defaultdict",
+        "OrderedDict"
     ],
     "eggroll.core.transfer_model": [
         "ErRollSiteHeader"
@@ -20,8 +20,8 @@
         "PackingCipherTensorPackage"
     ],
     "federatedml.ensemble.basic_algorithms.decision_tree.tree_core.feature_histogram": [
-        "FeatureHistogramWeights",
-        "HistogramBag"
+        "HistogramBag",
+        "FeatureHistogramWeights"
     ],
     "federatedml.ensemble.basic_algorithms.decision_tree.tree_core.feature_importance": [
         "FeatureImportance"
@@ -44,10 +44,16 @@
     "federatedml.feature.binning.optimal_binning.bucket_info": [
         "Bucket"
     ],
+    "federatedml.feature.binning.optimal_binning.heap": [
+        "MinHeap",
+        "IvHeapNode",
+        "GiniHeapNode",
+        "ChiSquareHeapNode"
+    ],
     "federatedml.feature.binning.quantile_summaries": [
-        "QuantileSummaries",
+        "SparseQuantileSummaries",
         "Stats",
-        "SparseQuantileSummaries"
+        "QuantileSummaries"
     ],
     "federatedml.feature.fate_element_type": [
         "NoneType"
@@ -65,12 +71,12 @@
         "SparseVector"
     ],
     "federatedml.framework.weights": [
-        "TransferableWeights",
-        "DictWeights",
         "NumpyWeights",
+        "TransferableWeights",
+        "NumericWeights",
         "ListWeights",
-        "OrderDictWeights",
-        "NumericWeights"
+        "DictWeights",
+        "OrderDictWeights"
     ],
     "federatedml.linear_model.linear_model_weight": [
         "LinearModelWeights"
@@ -92,8 +98,8 @@
         "CryptoExecutor"
     ],
     "federatedml.secureprotol.symmetric_encryption.pohlig_hellman_encryption": [
-        "PohligHellmanCipherKey",
-        "PohligHellmanCiphertext"
+        "PohligHellmanCiphertext",
+        "PohligHellmanCipherKey"
     ],
     "federatedml.statistic.intersect.intersect_preprocess": [
         "BitArray"
@@ -105,12 +111,12 @@
         "from_binary"
     ],
     "numpy": [
-        "dtype",
-        "ndarray"
+        "ndarray",
+        "dtype"
     ],
     "numpy.core.multiarray": [
-        "_reconstruct",
-        "scalar"
+        "scalar",
+        "_reconstruct"
     ],
     "numpy.core.numeric": [
         "_frombuffer"
@@ -121,7 +127,11 @@
     "torch._utils": [
         "_rebuild_tensor_v2"
     ],
-    "torch.storage": [
-        "_load_from_bytes"
+    "ipcl_python.bindings.ipcl_bindings": [
+        "ipclPublicKey"
+    ],
+    "ipcl_python.ipcl_python": [
+        "PaillierPublicKey",
+        "PaillierEncryptedNumber"
     ]
 }

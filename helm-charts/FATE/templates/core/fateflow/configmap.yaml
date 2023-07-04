@@ -48,7 +48,8 @@ data:
     encrypt_password: false
     encrypt_module: fate_arch.common.encrypt_utils#pwdecrypt
     private_key:
-    party_id:
+    private_key_file:
+    party_id: {{ .Values.partyId }}
     hook_module:
       client_authentication: fate_flow.hook.flow.client_authentication
       site_authentication: fate_flow.hook.flow.site_authentication
@@ -184,16 +185,25 @@ data:
     fateboard:
       host: fateboard
       port: 8080
-    enable_model_store: true
+    
+    enable_model_store: false
     model_store_address:
-      storage: mysql
-      database: {{ .Values.externalMysqlDatabase | default .Values.modules.mysql.database | default "eggroll_meta" }}
-      host: '{{ .Values.externalMysqlIp | default .Values.modules.mysql.ip | default "mysql" }}'
-      port: {{ .Values.externalMysqlPort | default .Values.modules.mysql.port | default "3306" }}
-      user: '{{ .Values.externalMysqlUser | default .Values.modules.mysql.user | default "fate" }}'
-      password: '{{ .Values.externalMysqlPassword | default .Values.modules.mysql.password | default "fate_dev" }}'
-      max_connections: 10
-      stale_timeout: 10
+        # use mysql as the model store engine
+      # storage: mysql
+      # database: {{ .Values.externalMysqlDatabase | default .Values.modules.mysql.database | default "eggroll_meta" }}
+      # host: '{{ .Values.externalMysqlIp | default .Values.modules.mysql.ip | default "mysql" }}'
+      # port: {{ .Values.externalMysqlPort | default .Values.modules.mysql.port | default "3306" }}
+      # user: '{{ .Values.externalMysqlUser | default .Values.modules.mysql.user | default "fate" }}'
+      # password: '{{ .Values.externalMysqlPassword | default .Values.modules.mysql.password | default "fate_dev" }}'
+      # max_connections: 10
+      # stale_timeout: 10
+
+      # use tencent cos as model store engine
+      storage: tencent_cos
+      Region:
+      SecretId:
+      SecretKey:
+      Bucket:
     {{- with .Values.modules.serving }}
     servings:
       hosts:

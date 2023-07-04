@@ -80,6 +80,13 @@ func initJob(clusterArgs *modules.ClusterArgs, method, creator string) (*modules
 
 func clusterInstallRun(job *modules.Job) {
 
+	defer func() {
+		if err := recover(); err != nil {
+			log.Error().Err(err.(error)).Msg("clusterInstallRun panic")
+			job.SetStatus(modules.JobStatusFailed)
+		}
+	}()
+
 	log.Debug().Str("jobID", job.Uuid).Msg("job Running")
 	// update status Running
 	err := updateJobStatusToRunning(job)

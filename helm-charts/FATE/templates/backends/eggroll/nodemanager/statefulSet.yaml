@@ -36,9 +36,9 @@ spec:
       containers:
         - name: nodemanager-eggrollpair
         {{- if .Values.image.isThridParty }}
-          image: {{ .Values.image.registry }}/fluentd:v1.12
+          image: {{ .Values.image.registry }}/fluent-bit:2.1.4
         {{- else }}
-          image: fluent/fluentd:v1.12
+          image: fluent/fluent-bit:2.1.4
         {{- end }}
           volumeMounts:
           - name: eggroll-log
@@ -55,7 +55,13 @@ spec:
 {{ toYaml $val | indent 14 }}
           {{- end }}
           {{- end }}
+          env:
+          - name: HUGGINGFACE_HUB_CACHE
+            value: "/data/projects/fate/llm"
           name: nodemanager
+          securityContext:
+            capabilities:
+              add: ["SYS_PTRACE"]
           command:
           - bash
           - -c
@@ -103,6 +109,9 @@ spec:
             - name: data-dir
               mountPath: /data/projects/fate/eggroll/data
               subPath: {{ .Values.modules.nodemanager.subPath }}
+            - mountPath: /data/projects/fate/llm
+              name: data-dir
+              subPath: llm
       {{- with .Values.modules.nodemanager.nodeSelector }}
       nodeSelector: 
 {{ toYaml . | indent 8 }}

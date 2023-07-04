@@ -1,7 +1,7 @@
 name: fate-exchange
 namespace: fate-exchange
 chartName: fate-exchange
-chartVersion: v1.11.1
+chartVersion: v1.11.2
 partyId: 1
 registry: ""
 pullPolicy:

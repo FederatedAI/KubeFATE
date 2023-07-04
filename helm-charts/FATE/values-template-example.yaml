@@ -1,7 +1,7 @@
 name: fate-9999
 namespace: fate-9999
 chartName: fate
-chartVersion: v1.11.1
+chartVersion: v1.11.2
 partyId: 9999
 registry: ""
 pullPolicy:
@@ -33,7 +33,7 @@ computing: Eggroll
 federation: Eggroll
 # Storage: [Eggroll(computing: Eggroll), HDFS(computing: Spark), LocalFS(computing: Spark_local)]
 storage: Eggroll
-# Algorithm: [Basic, NN]
+# Algorithm: [Basic, NN, ALL]
 algorithm: Basic
 # Device: [IPCL, CPU, GPU]
 device: CPU
@@ -145,6 +145,7 @@ skippedKeys:
 #   nodeSelector:
 #   tolerations:
 #   affinity:
+#   mysqlServerTimezone: UTC
   # resources:
     # requests:
       # cpu: "1"
@@ -274,7 +275,7 @@ skippedKeys:
 # spark:
   # master:
     # Image: "federatedai/spark-master"
-    # ImageTag: "1.11.1-release"
+    # ImageTag: "1.11.2-release"
     # replicas: 1
     # resources:
       # requests:
@@ -290,7 +291,7 @@ skippedKeys:
     # nodePort: 30977
   # worker:
     # Image: "federatedai/spark-worker"
-    # ImageTag: "1.11.1-release"
+    # ImageTag: "1.11.2-release"
     # replicas: 2
     # resources:
       # requests:

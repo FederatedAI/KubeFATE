@@ -39,5 +39,7 @@
     <task:scheduler id="routineScheduler" pool-size="5"/>
     <task:scheduled-tasks scheduler="routineScheduler">
         <task:scheduled ref="confFileBasedFdnRouter" method="init" fixed-rate="60000" initial-delay="60000"/>
+        <task:scheduled ref="statsLogger" method="logStats" fixed-rate="180000" initial-delay="60000"/>
+        <task:scheduled ref="confFileBasedFdnRouter" method="init" fixed-rate="60000" initial-delay="60000"/>
     </task:scheduled-tasks>
 </beans>

@@ -144,7 +144,7 @@ create job success, job id=d92d7a56-7002-46a4-9363-da9c7346e05a
 
 ### GPU 支持
 
-从v1.11.1开始，KubeFATE可以部署支持GPU的FATE集群，部署支持GPU的FATE需要有一些特别准备工作和配置，可以查看这个文档[KubeFATE 部署支持GPU的FATE](../)
+从v1.11.1开始，KubeFATE可以部署支持GPU的FATE集群，部署支持GPU的FATE需要有一些特别准备工作和配置，可以查看这个文档[KubeFATE 部署支持GPU的FATE](../docs/KubeFATE_deploys_GPU-enabled_FATE.md)
 
 ### 检查安装集群任务的状态
 
@@ -191,13 +191,13 @@ UUID         24bb75ff-f636-4c64-8c04-1b9073f89a2f
 Name         fate-9999                           
 NameSpace    fate-9999                           
 ChartName    fate                                
-ChartVersion v1.11.1                              
+ChartVersion v1.11.2                              
 Revision     1                                   
 Age          15m                                 
 Status       Running                             
 Spec         algorithm: Basic                    
              chartName: fate                     
-             chartVersion: v1.11.1                
+             chartVersion: v1.11.2                
              computing: Eggroll                  
              device: CPU                         
              federation: Eggroll                 

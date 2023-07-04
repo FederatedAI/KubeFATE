@@ -1,7 +1,7 @@
 name: fate-9999
 namespace: fate-9999
 chartName: fate
-chartVersion: v1.11.1
+chartVersion: v1.11.2
 partyId: 9999
 registry: ""
 pullPolicy:
@@ -27,7 +27,7 @@ computing: Spark_local
 federation: Pulsar
 # Storage: Eggroll(computing: Eggroll), HDFS(computing: Spark), LocalFS(computing: Spark_local)
 storage: LocalFS
-# Algorithm: Basic, NN
+# Algorithm: Basic, NN, ALL
 algorithm: Basic
 # Device: CPU, IPCL GPU
 device: CPU
