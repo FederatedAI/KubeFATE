@@ -1,5 +1,5 @@
 #! /bin/bash
-groupadd docker
+groupadd -f docker
 useradd -s /bin/bash -g docker -d /home/fate -m fate
 passwd fate
 mkdir -p /data/projects/fate
