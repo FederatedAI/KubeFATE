@@ -64,7 +64,7 @@ func GetDeploymentStatus(deploys *v1.DeploymentList) (map[string]string, error) 
 	return status, nil
 }
 
-//GetClusterDeployStatus GetClusterDeployStatus
+// GetClusterDeployStatus GetClusterDeployStatus
 func GetClusterDeployStatus(name, namespace string) (map[string]string, error) {
 	deploymentList, err := GetDeployList(name, namespace)
 	if err != nil {

@@ -33,7 +33,7 @@ func GetClusterPodStatus(name, namespace string) (map[string]string, error) {
 	return GetPodStatus(list), nil
 }
 
-//GetPodStatus GetPodStatus
+// GetPodStatus GetPodStatus
 func GetPodStatus(pods *corev1.PodList) map[string]string {
 
 	status := make(map[string]string)
@@ -113,7 +113,7 @@ func getPodContainerList(name, namespace, container string) (map[string]string, 
 	return podContainerList, nil
 }
 
-//GetPodContainersStatus GetPodContainersStatus
+// GetPodContainersStatus GetPodContainersStatus
 func GetPodContainersStatus(ClusterName, namespace string) (map[string]string, error) {
 	list, err := KubeClient.GetPods(namespace, getLabelSelector(namespace, ClusterName))
 	if err != nil {

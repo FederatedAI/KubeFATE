@@ -38,7 +38,7 @@ type VersionResult struct {
 	Message string `json:"msg" example:"getVersion Success"`
 }
 
-//TokenResult LOgin Result
+// TokenResult LOgin Result
 type TokenResult struct {
 	Code   int    `example:"200"`
 	Expire string `example:"2021-01-28T14:48:53+08:00"`
