@@ -7,7 +7,7 @@ This guide provides information on filing issues and guidelines for open source 
 
 Before making any contributions to this repository, we kindly request that you initiate a discussion with the repository owners. You can do this by creating an issue, sending an email, or employing any other suitable communication method. This approach ensures alignment and collaboration, helping us better understand the proposed change and maintain the repository's overall coherence.
 
-Kindly be aware that we maintain a Code of Conduct, and we request your adherence to it in all your interactions with the project. Your cooperation in upholding a respectful and inclusive environment is greatly appreciated.
+Kindly be aware that we maintain a [Code of Conduct](CODE_OF_CONDUCT.md), and we request your adherence to it in all your interactions with the project. Your cooperation in upholding a respectful and inclusive environment is greatly appreciated.
 
 ## Contribution Workflow
 Pull requests (PRs) are always welcome, even if they only contain small fixes like typos or a few lines of codes. If there will be a significant effort, please:
@@ -140,7 +140,7 @@ git push --force-with-lease $user my_feature
 ```
 Then visit your fork at https://github.com/$user/KubeFATE and click on the `Compare & Pull Request` button next to your `my_feature` branch to create a new pull request (PR). The PR should:
 1. Ensure all unit tests have passed;
-2. Ensure any installatioin or build dependencies are removed before the final layer when doing a build;
+2. Ensure any installation or build dependencies are removed before the final layer when doing a build;
 3. The title of PR should hightlight what it solve briefly. The description of PR should refer to all the issues that it addresses. Ensure to put a reference to issues (such as `Close #xxx` and `Fixed #xxx`)  Please refer to the [PULL_REQUEST_TEMPLATE.md](https://github.com/FederatedAI/KubeFATE/blob/master/PULL_REQUEST_TEMPLATE.md).
 
 Once your pull request has been opened, it will be assigned to one or more reviewers. Those reviewers will do a thorough code review, looking for correctness, bugs, opportunities for improvement, documentation and comments, and style.
