@@ -163,6 +163,13 @@ spec:
       nodePort: {{ .Values.servingServer.nodePort }}
       {{- end }}
       protocol: TCP
+    - name: "8080"
+      port: 8080
+      targetPort: 8080
+      { { - if eq .Values.servingServer.type "NodePort" "LoadBalancer" } }
+      nodePort: { { .Values.servingServer.httpNodePort } }
+      { { - end } }
+      protocol: TCP
   type: {{ .Values.servingServer.type }}
   {{- if .Values.servingServer.loadBalancerIP }}
   loadBalancerIP: "{{ .Values.servingServer.loadBalancerIP }}"
