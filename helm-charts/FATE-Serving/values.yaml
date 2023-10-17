@@ -62,6 +62,7 @@ servingServer:
   include: true
   type: NodePort
   nodePort: 30209
+  httpNodePort: 30210
   loadBalancerIP:  
   fateflow:
     ip: fateflow
