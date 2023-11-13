@@ -14,19 +14,18 @@
 
 set -e
 BASEDIR=$(dirname "$0")
-cd $BASEDIR
+cd "$BASEDIR"
 WORKINGDIR=$(pwd)
 deploy_dir=/data/projects/fate
 
 # fetch fate-python image
-source ${WORKINGDIR}/.env
-source ${WORKINGDIR}/parties.conf
+source "${WORKINGDIR}"/.env
+source "${WORKINGDIR}"/parties.conf
 
 echo "Generate Config"
 echo "Info:"
+echo "  KubeFATE Version: ${KubeFATE_Version}"
 echo "  RegistryURI: ${RegistryURI}"
-echo "  Tag: ${TAG}"
-echo "  Serving_Tag: ${SERVING_TAG}"
 echo "  Computing: ${computing}"
 echo "  Federation: ${federation}"
 echo "  Storage: ${storage}"
@@ -59,10 +58,10 @@ function CheckConfig(){
 	# Check config start
 	computing_list="Eggroll Spark Spark_local"
 	spark_federation_list="RabbitMQ Pulsar"
-	algorithm_list="Basic NN"
+	algorithm_list="Basic NN ALL"
 	device_list="CPU IPCL GPU"
 
-	if ! `list_include_item "$computing_list" "$computing"`; then
+	if ! $(list_include_item "$computing_list" "$computing"); then
 		echo "[ERROR]: Please check whether computing is one of $computing_list"
 		exit 1
 	fi
@@ -75,7 +74,7 @@ function CheckConfig(){
 	fi
 
 	if [ $computing == "Spark" ]; then
-		if ! `list_include_item "$spark_federation_list" "$federation"`; then
+		if ! $(list_include_item "$spark_federation_list" "$federation"); then
 			echo "[ERROR]: If you choose the Spark computing engine, the federation component must be Pulsar or RabbitMQ!"
 			exit 1
 		fi
@@ -85,23 +84,23 @@ function CheckConfig(){
 		fi
 	fi
 
-	if [ $computing == "Spark_local" ]; then
-		if ! `list_include_item "$spark_federation_list" "$federation"`; then
+	if [ "$computing" == "Spark_local" ]; then
+		if ! $(list_include_item "$spark_federation_list" "$federation"); then
 			echo "[ERROR]: If you choose the Spark_local computing engine, the federation component must be Pulsar or RabbitMQ!"
 			exit 1
 		fi
-		if [ $storage != "LocalFS" ]; then
+		if [ "$storage" != "LocalFS" ]; then
 			echo "[ERROR]: If you choose the Spark computing engine, the storage component must be LocalFS!"
 			exit 1
 		fi
 	fi
 
-	if ! `list_include_item "$algorithm_list" "$algorithm"`; then
+	if ! $(list_include_item "$algorithm_list" "$algorithm"); then
 		echo "[ERROR]: Please check whether algorithm is one of $algorithm_list"
 		exit 1
 	fi
 
-	if ! `list_include_item "$device_list" "$device"`; then
+	if ! $(list_include_item "$device_list" "$device"); then
 		echo "[ERROR]: Please check whether algorithm is one of $device_list"
 		exit 1
 	fi
@@ -139,30 +138,30 @@ GenerateConfig() {
 
 		eval fateboard_ip=fateboard
 		eval fateboard_port=8080
-		eval fateboard_username=${fateboard_username}
-		eval fateboard_password=${fateboard_password}
+		eval fateboard_username="${fateboard_username}"
+		eval fateboard_password="${fateboard_password}"
 
 		eval fate_flow_ip=fateflow
 		eval fate_flow_grpc_port=9360
 		eval fate_flow_http_port=9380
 		eval fml_agent_port=8484
 
-		eval db_ip=${mysql_ip}
-		eval db_user=${mysql_user}
-		eval db_password=${mysql_password}
-		eval db_name=${mysql_db}
-		eval db_serverTimezone=${serverTimezone}
+		eval db_ip="${mysql_ip}"
+		eval db_user="${mysql_user}"
+		eval db_password="${mysql_password}"
+		eval db_name="${mysql_db}"
+		eval db_serverTimezone="${serverTimezone}"
 
 		eval exchange_ip=${exchangeip}
 
 		# gpu_count defaulet 1
-		eval gpu_count=${gpu_count:-1}
+		eval gpu_count="${gpu_count:-1}"
 
 		echo package $party_id start!
 
-		rm -rf confs-$party_id/
-		mkdir -p confs-$party_id/confs
-		cp -r training_template/public/* confs-$party_id/confs/
+		rm -rf confs-"$party_id"/
+		mkdir -p confs-"$party_id"/confs
+		cp -r training_template/public/* confs-"$party_id"/confs/
 
 		# Generate confs packages
 
@@ -206,10 +205,12 @@ GenerateConfig() {
 				# federation
 				if [ "$federation" == "RabbitMQ" ]; then
 					cp -r training_template/backends/spark/rabbitmq confs-$party_id/confs/
-					sed -i '200,214d' confs-$party_id/docker-compose.yml
+					# delete Pulsar spec
+					sed -i '202,216d' confs-"$party_id"/docker-compose.yml
 				elif [ "$federation" == "Pulsar" ]; then
 					cp -r training_template/backends/spark/pulsar confs-$party_id/confs/
-					sed -i '181,198d' confs-$party_id/docker-compose.yml
+					# delete RabbitMQ spec
+					sed -i '183,200d' confs-"$party_id"/docker-compose.yml
 				fi
 			fi
 		fi
@@ -261,11 +262,11 @@ GenerateConfig() {
 		
 		# eggroll or spark-worker
 		if [ "$computing" == "Eggroll" ]; then
-			sed -i "s#image: \"federatedai/fateflow:\${TAG}\"#image: \"federatedai/fateflow${Suffix}:\${TAG}\"#g" ./confs-$party_id/docker-compose.yml
-			sed -i "s#image: \"federatedai/eggroll:\${TAG}\"#image: \"federatedai/eggroll${Suffix}:\${TAG}\"#g" ./confs-$party_id/docker-compose.yml
+			sed -i "s#image: \"\${FATEFlow_IMAGE}:\${FATEFlow_IMAGE_TAG}\"#image: \"\${FATEFlow_IMAGE}${Suffix}:\${FATEFlow_IMAGE_TAG}\"#g" ./confs-"$party_id"/docker-compose.yml
+			sed -i "s#image: \"\${EGGRoll_IMAGE}:\${EGGRoll_IMAGE_TAG}\"#image: \"\${EGGRoll_IMAGE}${Suffix}:\${EGGRoll_IMAGE_TAG}\"#g" ./confs-"$party_id"/docker-compose.yml
 		elif [ "$computing" == "Spark" ] || [ "$computing" == "Spark_local" ]; then
-			sed -i "s#image: \"federatedai/fateflow:\${TAG}\"#image: \"federatedai/fateflow-spark${Suffix}:\${TAG}\"#g" ./confs-$party_id/docker-compose.yml
-			sed -i "s#image: \"federatedai/spark-worker:\${TAG}\"#image: \"federatedai/spark-worker${Suffix}:\${TAG}\"#g" ./confs-$party_id/docker-compose.yml
+			sed -i "s#image: \"\${FATEFlow_IMAGE}:\${FATEFlow_IMAGE_TAG}\"#image: \"\${FATEFlow_IMAGE}-spark${Suffix}:\${FATEFlow_IMAGE_TAG}\"#g" ./confs-"$party_id"/docker-compose.yml
+			sed -i "s#image: \"\${Spark_Worker_IMAGE}:\${Spark_Worker_IMAGE_TAG}\"#image: \"\${Spark_Worker_IMAGE}${Suffix}:\${Spark_Worker_IMAGE_TAG}\"#g" ./confs-"$party_id"/docker-compose.yml
 		fi
 
 		# GPU
@@ -287,12 +288,16 @@ GenerateConfig() {
           devices:\\
           - driver: nvidia\\
             count: $gpu_count\\
-            capabilities: [gpu]" ./confs-$party_id/docker-compose.yml
+            capabilities: [gpu]" ./confs-"$party_id"/docker-compose.yml
 		fi
 		# RegistryURI
 		if [ "$RegistryURI" != "" ]; then
-			sed -i 's#federatedai#${RegistryURI}/federatedai#g' ./confs-$party_id/docker-compose.yml
-			sed -i 's#image: "mysql:8"#image: ${RegistryURI}/federatedai/mysql:8#g' ./confs-$party_id/docker-compose.yml
+		
+			if [ "${RegistryURI: -1}" != "/" ]; then
+				RegistryURI="${RegistryURI}/"
+			fi
+			
+			sed -i "s#RegistryURI=.*#RegistryURI=${RegistryURI}/#g" ./confs-"$party_id"/.env
 		fi
 
 		# replace namenode in training_template/public/fate_flow/conf/service_conf.yaml
@@ -301,33 +306,34 @@ GenerateConfig() {
 		fi
 
 		# update serving ip
-		sed -i "s/fate-serving/${serving_ip}/g" ./confs-$party_id/docker-compose.yml
+		sed -i "s/fate-serving/${serving_ip}/g" ./confs-"$party_id"/docker-compose.yml
 
 		# update the path of shared_dir
 		shared_dir="confs-${party_id}/shared_dir"
 
 		# create directories
-		for value in "examples" "federatedml" "data"; do
-			mkdir -p ${shared_dir}/${value}
+		for value in "examples" "fate" "data"; do
+			mkdir -p "${shared_dir}"/${value}
 		done
 
-		sed -i "s|<path-to-host-dir>|${dir}/${shared_dir}|g" ./confs-$party_id/docker-compose.yml
+		sed -i "s|<path-to-host-dir>|${dir}/${shared_dir}|g" ./confs-"$party_id"/docker-compose.yml
 
 		# Start the general config rendering
 		# fateboard
-		sed -i "s#^server.port=.*#server.port=${fateboard_port}#g" ./confs-$party_id/confs/fateboard/conf/application.properties
-		sed -i "s#^fateflow.url=.*#fateflow.url=http://${fate_flow_ip}:${fate_flow_http_port}#g" ./confs-$party_id/confs/fateboard/conf/application.properties
-		sed -i "s#<fateboard.username>#${fateboard_username}#g" ./confs-$party_id/confs/fateboard/conf/application.properties
-		sed -i "s#<fateboard.password>#${fateboard_password}#g" ./confs-$party_id/confs/fateboard/conf/application.properties
-		echo fateboard module of $party_id done!
+		sed -i "s#^server.port=.*#server.port=${fateboard_port}#g" ./confs-"$party_id"/confs/fateboard/conf/application.properties
+		sed -i "s#^fateflow.url=.*#fateflow.url=http://${fate_flow_ip}:${fate_flow_http_port}#g" ./confs-"$party_id"/confs/fateboard/conf/application.properties
+		sed -i "s#<fateboard.username>#${fateboard_username}#g" ./confs-"$party_id"/confs/fateboard/conf/application.properties
+		sed -i "s#<fateboard.password>#${fateboard_password}#g" ./confs-"$party_id"/confs/fateboard/conf/application.properties
+		echo fateboard module of "$party_id" done!
 
 		# mysql
 		
-		echo >./confs-$party_id/confs/mysql/init/insert-node.sql
-		echo "CREATE DATABASE IF NOT EXISTS ${db_name};" >>./confs-$party_id/confs/mysql/init/insert-node.sql
-		echo "CREATE DATABASE IF NOT EXISTS fate_flow;" >>./confs-$party_id/confs/mysql/init/insert-node.sql
-		echo "CREATE USER '${db_user}'@'%' IDENTIFIED BY '${db_password}';" >>./confs-$party_id/confs/mysql/init/insert-node.sql
-		echo "GRANT ALL ON *.* TO '${db_user}'@'%';" >>./confs-$party_id/confs/mysql/init/insert-node.sql
+		{
+			echo "CREATE DATABASE IF NOT EXISTS ${db_name};" 
+			echo "CREATE DATABASE IF NOT EXISTS fate_flow;" 
+			echo "CREATE USER '${db_user}'@'%' IDENTIFIED BY '${db_password}';"
+			echo "GRANT ALL ON *.* TO '${db_user}'@'%';" 
+		} >> ./confs-"$party_id"/confs/mysql/init/insert-node.sql
 
 		if [[ "$computing" == "Eggroll" ]]; then
 			echo 'USE `'${db_name}'`;' >>./confs-$party_id/confs/mysql/init/insert-node.sql
@@ -339,7 +345,7 @@ GenerateConfig() {
 		echo mysql module of $party_id done!
 
 		# fate_flow
-		sed -i "s/party_id:/party_id: ${party_id}/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
+		sed -i "s/party_id:/party_id: \"${party_id}\"/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
 		sed -i "s/name: <db_name>/name: '${db_name}'/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
 		sed -i "s/user: <db_user>/user: '${db_user}'/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
 		sed -i "s/passwd: <db_passwd>/passwd: '${db_password}'/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
@@ -348,13 +354,13 @@ GenerateConfig() {
 
 
 		if [[ "$computing" == "Spark" ]] || [[ "$computing" == "Spark_local" ]] ; then
-			sed -i "s/proxy: rollsite/proxy: nginx/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
+			sed -i "s/proxy_name: rollsite/proxy_name: nginx/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
 			sed -i "s/computing: eggroll/computing: spark/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
 		fi
 		if [[ "$federation" == "Pulsar" ]]; then
-			sed -i "s/  federation: eggroll/  federation: pulsar/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
+			sed -i "s/  federation: rollsite/  federation: pulsar/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
 		elif [[ "$federation" == "RabbitMQ" ]]; then
-			sed -i "s/  federation: eggroll/  federation: RabbitMQ/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
+			sed -i "s/  federation: rollsite/  federation: rabbitmq/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
 		fi
 
 		if [[ "$storage" == "HDFS" ]]; then
@@ -497,11 +503,15 @@ $(for ((j = 0; j < ${#party_list[*]}; j++)); do
 				echo "${party_list[${j}]}:
     host: ${party_ip_list[${j}]}
     port: 6650
+    sslPort: 6651
+    proxy: ''
 "
 			done)
 ${party_id}:
     host: pulsar
     port: 6650
+    sslPort: 6651
+    proxy: ""
 EOF
 
 		fi

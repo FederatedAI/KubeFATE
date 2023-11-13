@@ -32,7 +32,7 @@ spec:
     spec:
       containers:
         - name: datanode
-          image: {{ .Values.image.registry }}/hadoop-datanode:2.0.0-hadoop3.2.1-java8
+          image: {{ .Values.image.registry }}{{ .Values.modules.datanode.image }}:{{ .Values.modules.datanode.imageTag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             - name: SERVICE_PRECONDITION

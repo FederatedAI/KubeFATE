@@ -52,7 +52,7 @@ spec:
           env:
           - name: PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION
             value: python
-          image: {{ .Values.image.registry }}/eggroll{{ include "images.eggroll.suffix" . }}:{{ .Values.image.tag }}
+          image: {{ .Values.image.registry }}{{ .Values.modules.lbrollsite.image }}:{{ .Values.modules.lbrollsite.imageTag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           {{- if .Values.modules.lbrollsite.resources}}
           resources:

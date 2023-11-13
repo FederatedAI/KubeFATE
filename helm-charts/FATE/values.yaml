@@ -88,6 +88,8 @@ modules:
   rollsite: 
     include: true
     ip: rollsite
+    image: "federatedai/eggroll"
+    imageTag: "v2.0.0-beta"
     type: ClusterIP
     nodePort: 30091
     loadBalancerIP:
@@ -111,6 +113,8 @@ modules:
   lbrollsite:
     include: true
     ip: rollsite
+    image: "federatedai/eggroll"
+    imageTag: "v2.0.0-beta"
     type: ClusterIP
     nodePort: 30091
     loadBalancerIP: 
@@ -121,6 +125,8 @@ modules:
   python: 
     include: true
     replicas: 1
+    image: "federatedai/fateflow"
+    imageTag: "v2.0.0-beta"
     type: ClusterIP
     httpNodePort: 30097
     grpcNodePort: 30092
@@ -181,6 +187,8 @@ modules:
   client:
     include: true
     ip: client
+    image: "federatedai/client"
+    imageTag: "v2.0.0-beta"
     type: ClusterIP
     nodeSelector:
     tolerations:
@@ -194,6 +202,8 @@ modules:
   clustermanager: 
     include: true
     ip: clustermanager
+    image: "federatedai/eggroll"
+    imageTag: "v2.0.0-beta"
     type: ClusterIP
     nodeSelector:
     tolerations:
@@ -202,6 +212,8 @@ modules:
   nodemanager:  
     include: true
     replicas: 2
+    image: "federatedai/eggroll"
+    imageTag: "v2.0.0-beta"
     nodeSelector:
     tolerations:
     affinity:
@@ -219,6 +231,8 @@ modules:
   mysql: 
     include: true
     type: ClusterIP
+    image: "mysql"
+    imageTag: "8.0.28"
     nodeSelector:
     tolerations:
     affinity:
@@ -248,6 +262,8 @@ modules:
   fateboard:
     include: true
     type: ClusterIP
+    image: "federatedai/fateboard"
+    imageTag: "v2.0.0-beta"
     username: admin
     password: admin
     nodeSelector:
@@ -257,8 +273,8 @@ modules:
   spark:
     include: true
     master:
-      Image: ""
-      ImageTag: ""
+      image: "federatedai/spark-master"
+      imageTag: "v2.0.0-beta"
       replicas: 1
       nodeSelector:
       tolerations:
@@ -266,8 +282,8 @@ modules:
       type: ClusterIP
       nodePort: 30977
     worker:
-      Image: ""
-      ImageTag: ""
+      image: "federatedai/spark-worker"
+      imageTag: "v2.0.0-beta"
       replicas: 2
       nodeSelector:
       tolerations:
@@ -280,6 +296,8 @@ modules:
   hdfs:
     include: true
     namenode:
+      image: "federatedai/hadoop-namenode"
+      imageTag: "2.0.0-hadoop3.2.1-java8"
       nodeSelector:
       tolerations:
       affinity:
@@ -290,6 +308,8 @@ modules:
       accessMode: ReadWriteOnce
       size: 1Gi
     datanode:
+      image: "federatedai/hadoop-datanode"
+      imageTag: "2.0.0-hadoop3.2.1-java8"
       replicas: 3
       nodeSelector:
       tolerations:
@@ -301,6 +321,8 @@ modules:
       size: 1Gi
   nginx:
     include: true
+    image: "federatedai/nginx"
+    imageTag: "v2.0.0-beta"
     nodeSelector:
     tolerations:
     affinity:
@@ -324,6 +346,8 @@ modules:
 #          grpc_port: 30102
   rabbitmq:
     include: true
+    image: "federatedai/rabbitmq"
+    imageTag: "3.8.3-management"
     nodeSelector:
     tolerations:
     affinity:
@@ -341,6 +365,8 @@ modules:
 
   pulsar:
     include: true
+    image: "federatedai/pulsar"
+    imageTag: "2.10.1"
     nodeSelector:
     tolerations:
     env:

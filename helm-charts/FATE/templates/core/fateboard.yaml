@@ -37,7 +37,7 @@ spec:
     spec:
       containers:
         {{- if .Values.modules.fateboard.include }}
-        - image: {{ .Values.image.registry }}/fateboard:{{ .Values.image.tag }}
+        - image: {{ .Values.image.registry }}{{ .Values.modules.fateboard.image }}:{{ .Values.modules.fateboard.imageTag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           name: fateboard
           ports:

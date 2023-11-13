@@ -23,7 +23,7 @@ tar -xzf confs-${target_party_id}.tar
 cd confs-${target_party_id}
 docker compose down
 docker volume rm -f confs-${target_party_id}_shared_dir_examples
-docker volume rm -f confs-${target_party_id}_shared_dir_federatedml
+docker volume rm -f confs-${target_party_id}_shared_dir_fate
 # exclude client service to save time !
 docker compose up -d
 

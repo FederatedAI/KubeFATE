@@ -37,11 +37,7 @@ spec:
       {{- if .Values.istio.enabled }}
       {{- else }}
       initContainers:
-      {{- if .Values.image.isThridParty }}
-      - image: {{ .Values.image.registry }}/mysql:8.0.28
-      {{- else }}
-      - image: mysql:8.0.28
-      {{- end }}
+      - image: {{ .Values.image.registry }}{{ .Values.modules.mysql.image }}:{{ .Values.modules.mysql.imageTag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         name: ping-mysql
         env:
@@ -79,7 +75,7 @@ spec:
       {{- end }}
       containers:
         - name: fateflow
-          image: {{ .Values.image.registry }}/fateflow{{ include "images.fateflow.suffix" . }}:{{ .Values.image.tag }}
+          image: {{ .Values.image.registry }}{{ .Values.modules.python.image }}{{ include "images.fateflow.suffix" . }}:{{ .Values.modules.python.imageTag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           {{- if .Values.modules.python.resources}}
           resources:
@@ -118,14 +114,14 @@ spec:
             - |
                 set -x
                 mkdir -p /data/projects/fate/conf/
-                cp /data/projects/fate/conf-tmp/service_conf.yaml /data/projects/fate/conf/service_conf.yaml
+                cp /data/projects/fate/conf-tmp/service_conf.yaml /data/projects/fate/fate_flow/conf/service_conf.yaml
                 # fix fateflow conf must use IP
-                sed -i "s/host: fateflow_ip/host: ${POD_IP}/g" /data/projects/fate/conf/service_conf.yaml
+                sed -i "s/host: fateflow_ip/host: ${POD_IP}/g" /data/projects/fate/fate_flow/conf/service_conf.yaml
                 
                 cp /data/projects/spark-3.1.3-bin-hadoop3.2/conf/spark-defaults-template.conf /data/projects/spark-3.1.3-bin-hadoop3.2/conf/spark-defaults.conf
                 sed -i "s/fateflow/${POD_IP}/g" /data/projects/spark-3.1.3-bin-hadoop3.2/conf/spark-defaults.conf
                 
-                sleep 5 && python fateflow/python/fate_flow/fate_flow_server.py
+                pip install cryptography && sleep 5 && python fate_flow/python/fate_flow/fate_flow_server.py
           livenessProbe:
             tcpSocket:
               port: 9380
@@ -154,7 +150,7 @@ spec:
               subPath: eggroll.properties
             {{- end }}
             - name: python-data
-              mountPath: /data/projects/fate/fateflow/logs
+              mountPath: /data/projects/fate/fate_flow/logs
               subPath: logs
             - mountPath: /data/projects/fate/conf-tmp/
               name: python-confs
@@ -169,10 +165,10 @@ spec:
             - mountPath: /data/projects/fate/conf/pulsar_route_table
               name: pulsar-route-table
             {{- end }}
-            - mountPath: /data/projects/fate/fateflow/jobs
+            - mountPath: /data/projects/fate/fate_flow/jobs
               name: python-data
               subPath: jobs
-            - mountPath: /data/projects/fate/fateflow/model_local_cache
+            - mountPath: /data/projects/fate/fate_flow/model_local_cache
               name: python-data
               subPath: model-local-cache
             - mountPath: /data/projects/fate/llm

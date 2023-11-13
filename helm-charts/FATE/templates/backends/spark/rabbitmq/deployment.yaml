@@ -33,7 +33,7 @@ spec:
     spec:
       containers:
         - name: rabbitmq
-          image: {{ .Values.image.registry }}/rabbitmq:3.8.3-management
+          image: {{ .Values.image.registry }}{{ .Values.modules.rabbitmq.image }}:{{ .Values.modules.rabbitmq.imageTag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           {{- if .Values.modules.rabbitmq.resources }}
           resources:

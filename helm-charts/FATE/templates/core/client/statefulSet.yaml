@@ -31,7 +31,7 @@ spec:
 {{ include "fate.labels" . | indent 8 }}
     spec:
       containers:
-        - image: {{ .Values.image.registry }}/client:{{ .Values.image.tag }}
+        - image: {{ .Values.image.registry }}{{ .Values.modules.client.image }}:{{ .Values.modules.client.imageTag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           name: client
           env:

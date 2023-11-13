@@ -1,6 +1,6 @@
 
 image:
-  registry: {{ .registry | default "federatedai" }}
+  registry: {{ .registry | default "" }}
   isThridParty: {{ empty .registry | ternary  "false" "true" }}
   pullPolicy: {{ .pullPolicy | default "IfNotPresent" }}
   {{- with .imagePullSecrets }}
@@ -149,6 +149,8 @@ modules:
     include: {{ has "rollsite" .modules }}
     {{- with .rollsite }}
     ip: rollsite
+    image: {{ .image | default "federatedai/eggroll" }}
+    imageTag: {{ .imageTag | default "v2.0.0-beta" }}
     type: {{ .type | default "ClusterIP" }}
     nodePort: {{ .nodePort }}
     loadBalancerIP: {{ .loadBalancerIP }}
@@ -191,6 +193,8 @@ modules:
     include: {{ has "lbrollsite" .modules }}
     {{- with .lbrollsite }}
     ip: rollsite
+    image: {{ .image | default "federatedai/eggroll" }}
+    imageTag: {{ .imageTag | default "v2.0.0-beta" }}
     type: {{ .type | default "ClusterIP" }}
     loadBalancerIP: {{ .loadBalancerIP }}
     nodePort: {{ .nodePort }}
@@ -223,6 +227,8 @@ modules:
 {{ toYaml . | indent 6 }}
     {{- end }}
     logLevel: {{ .logLevel | default "INFO" }}
+    image: {{ .image | default "federatedai/fateflow" }}
+    imageTag: {{ .imageTag | default "v2.0.0-beta" }}
     type: {{ .type | default "ClusterIP" }}
     httpNodePort: {{ .httpNodePort }}
     grpcNodePort: {{ .grpcNodePort }}
@@ -301,6 +307,8 @@ modules:
     include: {{ has "clustermanager" .modules }}
     {{- with .clustermanager }}
     ip: clustermanager
+    image: {{ .image | default "federatedai/eggroll" }}
+    imageTag: {{ .imageTag | default "v2.0.0-beta" }}
     type: "ClusterIP"
     mysqlServerTimezone: {{ .mysqlServerTimezone }}
   {{- with .nodeSelector }}
@@ -326,6 +334,8 @@ modules:
     include: {{ has "nodemanager" .modules }}
     {{- with .nodemanager }}
     sessionProcessorsPerNode: {{ .sessionProcessorsPerNode }}
+    image: {{ .image | default "federatedai/eggroll" }}
+    imageTag: {{ .imageTag | default "v2.0.0-beta" }}
     replicas: {{ .replicas | default 2 }}
     subPath: {{ .subPath }}
     storageClass: {{ .storageClass  | default "nodemanager" }}
@@ -355,6 +365,8 @@ modules:
     include: {{ has "client" .modules }}
     {{- with .client }}
     subPath: {{ .subPath }}
+    image: {{ .image | default "federatedai/client" }}
+    imageTag: {{ .imageTag | default "v2.0.0-beta" }}
     existingClaim: {{ .existingClaim }}
     storageClass: {{ .storageClass  | default "client" }}
     accessMode: {{ .accessMode  | default "ReadWriteOnce" }}
@@ -378,6 +390,8 @@ modules:
   mysql: 
     include: {{ has "mysql" .modules }}
     {{- with .mysql }}
+    image: {{ .image | default "mysql" }}
+    imageTag: {{ .imageTag | default "8.0.28" }}
     type: {{ .type  | default "ClusterIP" }}
     {{- with .nodeSelector }}
     nodeSelector: 
@@ -417,6 +431,8 @@ modules:
     include: {{ has "fateboard" .modules }}
     {{- with .fateboard }}
     type: {{ .type }}
+    image: {{ .image | default "federatedai/fateboard" }}
+    imageTag: {{ .imageTag | default "v2.0.0-beta" }}
     username: {{ .username }}
     password: {{ .password }}
     {{- with .nodeSelector }}
@@ -438,8 +454,8 @@ modules:
     {{- with .spark }}
     {{- if .master }}
     master:
-      Image: "{{ .master.Image }}"
-      ImageTag: "{{ .master.ImageTag }}"
+      image: "{{ .master.image | default "federatedai/spark-master" }}"
+      imageTag: "{{ .master.imageTag | default "v2.0.0-beta" }}"
       replicas: {{ .master.replicas }}
       {{- with .master.resources }}
       resources:
@@ -462,8 +478,8 @@ modules:
     {{- end }}
     {{- if .worker }}
     worker:
-      Image: "{{ .worker.Image }}"
-      ImageTag: "{{ .worker.ImageTag }}"
+      image: {{ .worker.image | default "federatedai/spark-worker" | quote }}
+      imageTag: {{ .worker.imageTag | default "v2.0.0-beta" | quote }}
       replicas: {{ .worker.replicas }}
       {{- with .worker.resources }}
       resources:
@@ -503,6 +519,8 @@ modules:
 {{ toYaml . | indent 8 }}
       {{- end }}
       type: {{ .namenode.type | default "ClusterIP" }}
+      image: {{ .image | default "federatedai/hadoop-namenode" | quote }}
+      imageTag: {{ .imageTag | default "2.0.0-hadoop3.2.1-java8" | quote }}
       nodePort: {{ .namenode.nodePort }}
       existingClaim: {{ .namenode.existingClaim }}
       storageClass: {{ .namenode.storageClass | default "" }}
@@ -523,6 +541,8 @@ modules:
 {{ toYaml . | indent 8 }}
       {{- end }}
       type: {{ .datanode.type | default "ClusterIP" }}
+      image: {{ .image | default "federatedai/hadoop-datanode" | quote }}
+      imageTag: {{ .imageTag | default "2.0.0-hadoop3.2.1-java8" | quote }}
       existingClaim: {{ .datanode.existingClaim }}
       storageClass: {{ .datanode.storageClass | default "" }}
       accessMode: {{ .datanode.accessMode  | default "ReadWriteOnce"  }}
@@ -546,6 +566,8 @@ modules:
 {{ toYaml . | indent 6 }}
     {{- end }}
     type: {{ .type | default "ClusterIP" }}
+    image: {{ .image | default "federatedai/nginx" | quote }}
+    imageTag: {{ .imageTag | default "v2.0.0-beta" | quote }}
     httpNodePort:  {{ .httpNodePort }}
     grpcNodePort:  {{ .grpcNodePort }}
     loadBalancerIP: {{ .loadBalancerIP }}
@@ -583,6 +605,8 @@ modules:
 {{ toYaml . | indent 6 }}
     {{- end }}
     type: {{ .type | default "ClusterIP" }}
+    image: {{ .image | default "federatedai/rabbitmq" | quote }}
+    imageTag: {{ .imageTag | default "3.8.3-management" | quote }}
     nodePort: {{ .nodePort }}
     default_user: {{ .default_user }}
     default_pass: {{ .default_pass }}
@@ -625,6 +649,8 @@ modules:
 {{ toYaml . | indent 6 }}
     {{- end }}
     type: {{ .type | default "ClusterIP" }}
+    image: {{ .image | default "federatedai/pulsar" | quote }}
+    imageTag: {{ .imageTag | default "2.10.1" | quote }}
     httpNodePort: {{ .httpNodePort }}
     httpsNodePort: {{ .httpsNodePort }}
     loadBalancerIP: {{ .loadBalancerIP }}
