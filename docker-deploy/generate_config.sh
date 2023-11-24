@@ -206,11 +206,11 @@ GenerateConfig() {
 				if [ "$federation" == "RabbitMQ" ]; then
 					cp -r training_template/backends/spark/rabbitmq confs-$party_id/confs/
 					# delete Pulsar spec
-					sed -i '202,216d' confs-"$party_id"/docker-compose.yml
+					sed -i '203,217d' confs-"$party_id"/docker-compose.yml
 				elif [ "$federation" == "Pulsar" ]; then
 					cp -r training_template/backends/spark/pulsar confs-$party_id/confs/
 					# delete RabbitMQ spec
-					sed -i '183,200d' confs-"$party_id"/docker-compose.yml
+					sed -i '184,201d' confs-"$party_id"/docker-compose.yml
 				fi
 			fi
 		fi
@@ -225,10 +225,10 @@ GenerateConfig() {
 				# federation
 				if [ "$federation" == "RabbitMQ" ]; then
 					cp -r training_template/backends/spark/rabbitmq confs-$party_id/confs/
-					sed -i '146,160d' confs-$party_id/docker-compose.yml
+					sed -i '149,163d' confs-$party_id/docker-compose.yml
 				elif [ "$federation" == "Pulsar" ]; then
 					cp -r training_template/backends/spark/pulsar confs-$party_id/confs/
-					sed -i '128,144d' confs-$party_id/docker-compose.yml
+					sed -i '131,147d' confs-$party_id/docker-compose.yml
 				fi
 			fi
 		fi
@@ -512,11 +512,7 @@ ${party_id}:
     port: 6650
     sslPort: 6651
     proxy: ""
-default:
-  proxy: "proxy.fate.org:443"
-  domain: "fate.org"
-  brokerPort: 6650
-  brokerSslPort: 6651
+
 EOF
 
 		fi

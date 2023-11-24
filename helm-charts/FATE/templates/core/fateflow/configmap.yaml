@@ -203,6 +203,18 @@ metadata:
 {{ include "fate.labels" . | indent 4 }}
 data:
   pulsar_route_table.yaml: |
+    {{- if .Values.modules.pulsar.route_table }}
+    {{- range $key, $val := .Values.modules.pulsar.route_table }}
+    {{ $key }}:
+{{ toYaml . | indent 6 }}
+    {{- end }}
+    {{- else }}
+    {{ .Values.partyId }}:
+      host: pulsar
+      port: 6650
+      sslPort: 6651
+      proxy: ""
+    {{- end}}
     {{- with .Values.modules.pulsar.exchange }}
     default:
       proxy: "{{ .ip }}:{{ .port }}"
@@ -214,18 +226,6 @@ data:
       brokerPort: 6650
       brokerSslPort: 6651
     {{- end }}
-  {{- if .Values.modules.pulsar.route_table }}
-    {{- range $key, $val := .Values.modules.pulsar.route_table }}
-    {{ $key }}:
-{{ toYaml . | indent 6 }}
-    {{- end }}
-  {{- else }}
-    {{ .Values.partyId }}:
-      host: pulsar
-      port: 6650
-      sslPort: 6651
-      proxy: ""
-  {{- end}}
 ---
 kind: ConfigMap
 apiVersion: v1

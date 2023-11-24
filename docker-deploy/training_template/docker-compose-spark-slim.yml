@@ -87,6 +87,9 @@ services:
     - "-c"
     - |
         set -x
+        sed -i "s/int(party.party_id)/str(party.party_id)/g" /data/projects/fate/fate/python/fate/arch/federation/pulsar/_federation.py
+        cp /data/projects/fate/fate_flow/conf/pulsar_route_table.yaml /data/projects/fate/fate_flow/pulsar_route_table.yaml
+        cp /data/projects/fate/fate_flow/conf/rabbitmq_route_table.yaml /data/projects/fate/fate_flow/rabbitmq_route_table.yaml
         sleep 5 && python fateflow/python/fate_flow/fate_flow_server.py
     environment:
       FATE_PROJECT_BASE: "/data/projects/fate"
@@ -144,14 +147,14 @@ services:
       - fate-network
 
   pulsar:
-    image: "federatedai/pulsar:2.7.0"
+    image: "federatedai/pulsar:2.10.2"
     ports:
       - "6650:6650"
       - "6651:6651"
       - "8001:8080"
     volumes:
       - ./confs/pulsar/standalone.conf:/pulsar/conf/standalone.conf
-      - ./shared_dir/data/pulsar:/pulsar/data
+      # - ./shared_dir/data/pulsar:/pulsar/data
       - /etc/localtime:/etc/localtime:ro
     command:
       ["/bin/bash", "-c", "bin/pulsar standalone -nss"]

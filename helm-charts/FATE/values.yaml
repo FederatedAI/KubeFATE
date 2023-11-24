@@ -366,7 +366,7 @@ modules:
   pulsar:
     include: true
     image: "federatedai/pulsar"
-    imageTag: "2.7.0"
+    imageTag: "2.10.2"
     nodeSelector:
     tolerations:
     env:
