@@ -134,7 +134,7 @@ services:
       fate-network:
         ipv4_address: 192.167.0.100
     healthcheck:
-      test: ["CMD", "curl", "-f", "-X POST", "http://192.167.0.100:9380/v1/version/get"]
+      test: ["CMD", "curl", "-f", "-X GET", "http://192.167.0.100:9380/v2/server/fateflow"]
       interval: 1m30s
       timeout: 10s
       retries: 3

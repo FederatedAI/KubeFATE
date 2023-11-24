@@ -47,8 +47,8 @@ for ((i = 1; i <= MAX_TRY; i++)); do
     result=$(docker ps | wc -l)
     if [ "${result}" -eq ${CONTAINER_NUM} ]; then
         echo "# containers are ok"
-        FATE_FLOW_STATUS=$(curl -s -X POST localhost:9380/v1/version/get)
-        success='"retmsg":"success"'
+        FATE_FLOW_STATUS=$(curl -s -X GET localhost:9380/v2/server/fateflow)
+        success='"message":"success"'
         result=$(echo $FATE_FLOW_STATUS | grep "${success}")
         if [[ "$result" != "" ]]
         then
