@@ -32,7 +32,7 @@ spec:
     spec:
       containers:
         - name: datanode
-          image: {{ .Values.image.registry }}{{ .Values.modules.datanode.image }}:{{ .Values.modules.datanode.imageTag }}
+          image: {{ .Values.image.registry }}{{ .Values.modules.hdfs.datanode.image }}:{{ .Values.modules.hdfs.datanode.imageTag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             - name: SERVICE_PRECONDITION

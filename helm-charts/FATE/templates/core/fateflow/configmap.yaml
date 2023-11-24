@@ -60,9 +60,9 @@ data:
       proxy_name: rollsite
       {{- end }}
       nginx:
-        host: fateflow
-        http_port: 9380
-        grpc_port: 9360
+        host: 
+        http_port: 
+        grpc_port: 
     database:
       engine: mysql
       # encrypt passwd key
@@ -207,6 +207,12 @@ data:
     default:
       proxy: "{{ .ip }}:{{ .port }}"
       domain: "{{ .domain }}"
+    {{- else }}
+    default:
+      proxy: "proxy.fate.org:443"
+      domain: "fate.org"
+      brokerPort: 6650
+      brokerSslPort: 6651
     {{- end }}
   {{- if .Values.modules.pulsar.route_table }}
     {{- range $key, $val := .Values.modules.pulsar.route_table }}

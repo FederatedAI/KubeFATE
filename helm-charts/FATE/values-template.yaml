@@ -650,7 +650,7 @@ modules:
     {{- end }}
     type: {{ .type | default "ClusterIP" }}
     image: {{ .image | default "federatedai/pulsar" | quote }}
-    imageTag: {{ .imageTag | default "2.10.1" | quote }}
+    imageTag: {{ .imageTag | default "2.7.0" | quote }}
     httpNodePort: {{ .httpNodePort }}
     httpsNodePort: {{ .httpsNodePort }}
     loadBalancerIP: {{ .loadBalancerIP }}

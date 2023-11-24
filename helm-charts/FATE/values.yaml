@@ -1,8 +1,8 @@
 
 image:
-  registry: federatedai
+  registry: 
   isThridParty:
-  tag: 1.11.2-release
+  tag: v2.0.0-beta
   pullPolicy: IfNotPresent
   imagePullSecrets: 
 #  - name: 
@@ -331,9 +331,9 @@ modules:
     grpcNodePort: 30098
     loadBalancerIP: 
     exchange:
-      ip: 192.168.10.1
-      httpPort: 30003
-      grpcPort: 30008
+      ip: nginx
+      httpPort: 9300
+      grpcPort: 9310
     route_table: 
 #      10000: 
 #        proxy: 
@@ -366,7 +366,7 @@ modules:
   pulsar:
     include: true
     image: "federatedai/pulsar"
-    imageTag: "2.10.1"
+    imageTag: "2.7.0"
     nodeSelector:
     tolerations:
     env:

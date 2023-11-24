@@ -512,6 +512,11 @@ ${party_id}:
     port: 6650
     sslPort: 6651
     proxy: ""
+default:
+  proxy: "proxy.fate.org:443"
+  domain: "fate.org"
+  brokerPort: 6650
+  brokerSslPort: 6651
 EOF
 
 		fi

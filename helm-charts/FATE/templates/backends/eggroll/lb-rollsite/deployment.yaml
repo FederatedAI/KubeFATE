@@ -37,7 +37,7 @@ spec:
         - "rollsite"
       containers:
         - name: exchange
-          image: {{ .Values.image.registry }}/nginx:1.17
+          image: {{ .Values.image.registry }}nginx:1.17
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - containerPort: 9390
