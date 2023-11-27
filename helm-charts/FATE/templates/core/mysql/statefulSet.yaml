@@ -31,11 +31,7 @@ spec:
 {{ include "fate.labels" . | indent 8 }}
     spec:
       containers:
-        {{- if .Values.image.isThridParty }}
-        - image: {{ .Values.image.registry }}/mysql:8.0.28
-        {{- else }}
-        - image: mysql:8.0.28
-        {{- end }}
+        - image: {{ .Values.image.registry }}{{ .Values.modules.mysql.image }}:{{ .Values.modules.mysql.imageTag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           name: mysql
           securityContext:

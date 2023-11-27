@@ -1,7 +1,7 @@
 name: fate-9999
 namespace: fate-9999
 chartName: fate
-chartVersion: v1.11.2
+chartVersion: v2.0.0-beta
 partyId: 9999
 registry: ""
 pullPolicy:
@@ -65,6 +65,8 @@ skippedKeys:
     # - name: party9999.pulsar.example.com
 
 # rollsite:
+  # image: "federatedai/eggroll"
+  # imageTag: "v2.0.0-beta"
   # type: NodePort
   # nodePort: 30091
   # loadBalancerIP:
@@ -103,6 +105,8 @@ skippedKeys:
 
 
 # lbrollsite:
+  # image: "federatedai/eggroll"
+  # imageTag: "v2.0.0-beta"
   # type: NodePort
   # nodePort: 30091
   # loadBalancerIP:
@@ -123,6 +127,8 @@ skippedKeys:
       # memory: "1Gi"
 
 # nodemanager:
+  # image: "federatedai/eggroll"
+  # imageTag: "v2.0.0-beta"
 #   replicas: 2
 #   sessionProcessorsPerNode: 4
 #   nodeSelector:
@@ -142,6 +148,8 @@ skippedKeys:
 #       memory: "8Gi"
 
 # clustermanager:
+  # image: "federatedai/eggroll"
+  # imageTag: "v2.0.0-beta"
 #   nodeSelector:
 #   tolerations:
 #   affinity:
@@ -156,6 +164,8 @@ skippedKeys:
 
 
 # python:
+  # image: "federatedai/fateflow"
+  # imageTag: "v2.0.0-beta"
 #   type: NodePort
 #   replicas: 1
 #   httpNodePort: 30097
@@ -221,6 +231,8 @@ skippedKeys:
 #     password:
 
 # fateboard:
+  # image: "federatedai/fateboard"
+  # imageTag: "v2.0.0-beta"
 #   type: ClusterIP
 #   username: admin
 #   password: admin
@@ -229,6 +241,8 @@ skippedKeys:
 #   affinity:
 
 # client:
+  # image: "federatedai/client"
+  # imageTag: "v2.0.0-beta"
   # nodeSelector:
   # subPath: ""
   # existingClaim: ""
@@ -238,6 +252,8 @@ skippedKeys:
   # notebook_hashed_password: ""
 
 # mysql:
+  # image: "mysql"
+  # imageTag: "8.0.28"
   # nodeSelector:
   # tolerations:
   # affinity:
@@ -274,8 +290,8 @@ skippedKeys:
 
 # spark:
   # master:
-    # Image: "federatedai/spark-master"
-    # ImageTag: "1.11.2-release"
+    # image: "federatedai/spark-master"
+    # imageTag: "v2.0.0-beta"
     # replicas: 1
     # resources:
       # requests:
@@ -290,8 +306,8 @@ skippedKeys:
     # type: ClusterIP
     # nodePort: 30977
   # worker:
-    # Image: "federatedai/spark-worker"
-    # ImageTag: "1.11.2-release"
+    # image: "federatedai/spark-worker"
+    # imageTag: "v2.0.0-beta"
     # replicas: 2
     # resources:
       # requests:
@@ -306,6 +322,8 @@ skippedKeys:
     # type: ClusterIP
 # hdfs:
   # namenode:
+    # image: "federatedai/hadoop-namenode"
+    # imageTag: "2.0.0-hadoop3.2.1-java8"
     # nodeSelector:
     # tolerations:
     # affinity:
@@ -316,6 +334,8 @@ skippedKeys:
     # accessMode: ReadWriteOnce
     # size: 1Gi
   # datanode:
+    # image: "federatedai/hadoop-datanode"
+    # imageTag: "2.0.0-hadoop3.2.1-java8"
     # replicas:
     # nodeSelector:
     # tolerations:
@@ -326,6 +346,8 @@ skippedKeys:
     # accessMode:
     # size:
 # nginx:
+  # image: "federatedai/nginx"
+  # imageTag: "v2.0.0-beta"
   # nodeSelector:
   # tolerations:
   # affinity:
@@ -348,6 +370,8 @@ skippedKeys:
           # http_port: 30107
           # grpc_port: 30102
 # rabbitmq:
+  # image: "federatedai/rabbitmq"
+  # imageTag: "3.8.3-management"
   # nodeSelector:
   # tolerations:
   # affinity:
@@ -374,6 +398,8 @@ skippedKeys:
       # memory: "8Gi"
 
 # pulsar:
+  # image: "federatedai/pulsar"
+  # imageTag: "2.10.2"
 #   nodeSelector:
 #   tolerations:
 #   affinity:

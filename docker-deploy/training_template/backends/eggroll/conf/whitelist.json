@@ -2,7 +2,8 @@
     "builtins": [
         "int",
         "list",
-        "set"
+        "set",
+        "slice"
     ],
     "collections": [
         "defaultdict",
@@ -81,10 +82,6 @@
     "federatedml.linear_model.linear_model_weight": [
         "LinearModelWeights"
     ],
-    "federatedml.secureprotol.fate_paillier": [
-        "PaillierPublicKey",
-        "PaillierEncryptedNumber"
-    ],
     "federatedml.secureprotol.fixedpoint": [
         "FixedPointNumber"
     ],
@@ -127,11 +124,122 @@
     "torch._utils": [
         "_rebuild_tensor_v2"
     ],
+    "torch.storage": [
+        "_load_from_bytes"
+    ],
     "ipcl_python.bindings.ipcl_bindings": [
         "ipclPublicKey"
     ],
     "ipcl_python.ipcl_python": [
         "PaillierPublicKey",
         "PaillierEncryptedNumber"
-    ]
+    ],
+    "torch": [
+        "Size"
+    ],
+    "fate.arch.tensor.storage.local.device.cpu.plain": [
+        "_TorchStorage"
+    ],
+    "fate.arch.tensor.types._dtype": [
+        "dtype"
+    ],
+    "fate.arch.tensor.types._shape": [
+        "DAxis",
+        "Shape"
+    ],
+    "pandas.core.frame": [
+        "DataFrame"
+    ],
+    "pandas.core.indexes.base": [
+        "Index",
+        "_new_Index"
+    ],
+    "pandas.core.indexes.range": [
+        "RangeIndex"
+    ],
+    "pandas.core.series": [
+        "Series"
+    ],
+    "pandas.core.internals.managers": [
+        "BlockManager",
+        "SingleBlockManager"
+    ],
+	"fate.arch.dataframe.manager.data_manager": [
+		"DataManager"
+	],
+    "fate.arch.dataframe.manager.schema_manager": [
+		"SchemaManager",
+                 "Schema"
+	],
+     "fate.arch.dataframe.manager.block_manager":[
+  		"BlockManager",
+		"IndexBlock",
+		"BlockType",
+		"Int64Block",
+		"Float32Block",
+		"Float64Block",
+		"Int32Block",
+		"BoolBlock",
+		"NPObjectBlock",
+                "PHETensorBlock"
+             ],
+     "fate.arch.tensor.inside._op_quantile":[
+		"GKSummary"
+        ],
+      "fate.arch.protocol.phe.paillier":[
+               "Coder",
+                "SK",
+                "PK",
+                "evaluator"
+         ],
+      "fate.arch.protocol.phe.ou":[
+               "Coder",
+                "SK",
+                "PK",
+                "evaluator"
+         ],
+      "fate.arch.tensor.phe._tensor":[
+              "PHETensorEncoded", "PHETensor"
+          ],
+      "fate.arch.tensor.phe._keypair":[
+              "PHETensorCoder"
+          ],
+        "fate_utils.quantile":[
+	"QuantileSummaryStream"
+        ],
+        "fate_utils.paillier":[
+		 "Coder","Coders", "FixedpointVector", "PK", "FixedpointPaillierVector", "CiphertextVector","PlaintextVector"
+          ],
+        "fate_utils.ou":[
+		"Coder", "Coders", "FixedpointVector", "PK", "FixedpointPaillierVector", "CiphertextVector","PlaintextVector"
+          ],
+       "fate.arch.unify._infra_def":[
+		"device"
+         ],
+        "fate.arch.histogram._histogram_splits": [
+                "HistogramSplits"
+        ],
+        "fate.arch.histogram.values._values": [
+           "HistogramValuesContainer"
+        ],
+        "fate.arch.histogram.values._plain": [
+           "HistogramPlainValues"
+        ],
+        "fate.arch.histogram.values._cipher":[
+                 "HistogramEncryptedValues"
+                 ],
+        "fate.arch.protocol.phe.mock": [
+           "PK", "SK", "FV", "EV", "Coder", "evaluator"
+        ],
+        "fate.arch.histogram.histogram":[
+		"HistogramSplits", "HistogramPlainValues", "HistogramEncryptedValues"
+           ],
+	"torch":[
+	"float32",
+        "int64",
+        "int32",
+        "device",
+	"float64",
+	"Size"
+	]   
 }

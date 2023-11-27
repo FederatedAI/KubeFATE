@@ -1,7 +1,7 @@
 name: fate-9999
 namespace: fate-9999
 chartName: fate
-chartVersion: v1.11.2
+chartVersion: v2.0.0-beta
 partyId: 9999
 registry: ""
 pullPolicy:
@@ -53,57 +53,88 @@ skippedKeys:
     # hosts:
     # - name: party9999.rabbitmq.example.com
 
+# fateboard:
+  # image: "federatedai/fateboard"
+  # imageTag: "v2.0.0-beta"
+#   type: ClusterIP
+#   username: admin
+#   password: admin
+#   nodeSelector:
+#   tolerations:
+#   affinity:
+
 # Specify the fateflow service's properties
 # python:
-  # type: NodePort
-  # httpNodePort: 30097
-  # grpcNodePort: 30092
-  # loadBalancerIP:
-  # serviceAccountName: ""
-  # nodeSelector:
-  # tolerations:
-  # affinity:
-  # logLevel: INFO
-  # existingClaim: ""
-  # storageClass: "python"
-  # accessMode: ReadWriteMany
-  # size: 1Gi
-  # resources:
-    # requests:
-      # cpu: "2"
-      # memory: "4Gi"
-      # nvidia.com/gpu: 1
-    # limits:
-      # cpu: "4"
-      # memory: "8Gi"
-      # nvidia.com/gpu: 1
-  # spark: 
-    # cores_per_node: 20
-    # nodes: 2
-    # master: spark://spark-master:7077
-    # Only for using external Spark
-    ## driverHost:
-    ## driverHostType:
-    ## portMaxRetries:
-    ## driverStartPort:
-    ## blockManagerStartPort:
-    ## pysparkPython:
-  # hdfs:
-    # name_node: hdfs://namenode:9000
-    # path_prefix:
-  # nginx:
-    # host: nginx
-    # http_port: 9300
-    # grpc_port: 9310
-  # rabbitmq:
-    # host: rabbitmq
-    # mng_port: 15672
-    # port: 5672
-    # user: fate
-    # password: fate
+  # image: "federatedai/fateflow"
+  # imageTag: "v2.0.0-beta"
+#   type: NodePort
+#   replicas: 1
+#   httpNodePort: 30097
+#   grpcNodePort: 30092
+#   loadBalancerIP:
+#   serviceAccountName: ""
+#   nodeSelector:
+#   tolerations:
+#   affinity:
+#   failedTaskAutoRetryTimes:
+#   failedTaskAutoRetryDelay:
+#   logLevel: INFO
+#   existingClaim: ""
+#   storageClass: "python"
+#   accessMode: ReadWriteMany
+#   dependent_distribution: false
+#   size: 1Gi
+#   resources:
+#     requests:
+#       cpu: "2"
+#       memory: "4Gi"
+#     limits:
+#       cpu: "4"
+#       memory: "8Gi"
+#   clustermanager:
+#     cores_per_node: 16
+#     nodes: 2
+#   spark:
+#     cores_per_node: 20
+#     nodes: 2
+#     master: spark://spark-master:7077
+#     driverHost:
+#     driverHostType:
+#     portMaxRetries:
+#     driverStartPort:
+#     blockManagerStartPort:
+#     pysparkPython:
+#   hdfs:
+#     name_node: hdfs://namenode:9000
+#     path_prefix:
+#   rabbitmq:
+#     host: rabbitmq
+#     mng_port: 15672
+#     port: 5672
+#     user: fate
+#     password: fate
+#   pulsar:
+#     host: pulsar
+#     mng_port: 8080
+#     port: 6650
+#     topic_ttl: 3
+#     cluster: standalone
+#     tenant: fl-tenant
+#   nginx:
+#     host: nginx
+#     http_port: 9300
+#     grpc_port: 9310
+#   hive:
+#     host: 127.0.0.1
+#     port: 10000
+#     auth_mechanism:
+#     username:
+#     password:
     
 # Specify the mysql properties
-# mysql: 
+# mysql:
+  # image: "mysql"
+  # imageTag: "8.0.28"
   # nodeSelector:
   # tolerations:
   # affinity:
@@ -128,12 +159,21 @@ skippedKeys:
 
 # servingIp: 192.168.0.1
 # servingPort: 30095
+# serving:
+#   useRegistry: false
+#   zookeeper:
+#     hosts:
+#     - serving-zookeeper.fate-serving-9999:2181
+#     use_acl: false
+#     user: fate
+#     password: fate
 
 # FATE on spark configuration
+
 # spark:
   # master:
-    # Image: "federatedai/spark-master"
-    # ImageTag: "1.6.1-release"
+    # image: "federatedai/spark-master"
+    # imageTag: "v2.0.0-beta"
     # replicas: 1
     # resources:
       # requests:
@@ -148,8 +188,8 @@ skippedKeys:
     # type: ClusterIP
     # nodePort: 30977
   # worker:
-    # Image: "federatedai/spark-worker"
-    # ImageTag: "1.6.1-release"
+    # image: "federatedai/spark-worker"
+    # imageTag: "v2.0.0-beta"
     # replicas: 2
     # resources:
       # requests:
@@ -164,6 +204,8 @@ skippedKeys:
     # type: ClusterIP
 # hdfs:
   # namenode:
+    # image: "federatedai/hadoop-namenode"
+    # imageTag: "2.0.0-hadoop3.2.1-java8"
     # nodeSelector:
     # tolerations:
     # affinity:
@@ -174,6 +216,8 @@ skippedKeys:
     # accessMode: ReadWriteOnce
     # size: 1Gi
   # datanode:
+    # image: "federatedai/hadoop-datanode"
+    # imageTag: "2.0.0-hadoop3.2.1-java8"
     # replicas:
     # nodeSelector:
     # tolerations:
@@ -184,6 +228,8 @@ skippedKeys:
     # accessMode:
     # size:
 # nginx:
+  # image: "federatedai/nginx"
+  # imageTag: "v2.0.0-beta"
   # nodeSelector:
   # tolerations:
   # affinity:
@@ -206,6 +252,8 @@ skippedKeys:
           # http_port: 30107
           # grpc_port: 30102
 # rabbitmq:
+  # image: "federatedai/rabbitmq"
+  # imageTag: "3.8.3-management"
   # nodeSelector:
   # tolerations:
   # affinity:

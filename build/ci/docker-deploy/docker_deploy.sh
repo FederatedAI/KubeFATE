@@ -23,7 +23,7 @@ tar -xzf confs-${target_party_id}.tar
 cd confs-${target_party_id}
 docker compose down
 docker volume rm -f confs-${target_party_id}_shared_dir_examples
-docker volume rm -f confs-${target_party_id}_shared_dir_federatedml
+docker volume rm -f confs-${target_party_id}_shared_dir_fate
 # exclude client service to save time !
 docker compose up -d
 
@@ -47,8 +47,8 @@ for ((i = 1; i <= MAX_TRY; i++)); do
     result=$(docker ps | wc -l)
     if [ "${result}" -eq ${CONTAINER_NUM} ]; then
         echo "# containers are ok"
-        FATE_FLOW_STATUS=$(curl -s -X POST localhost:9380/v1/version/get)
-        success='"retmsg":"success"'
+        FATE_FLOW_STATUS=$(curl -s -X GET localhost:9380/v2/server/fateflow)
+        success='"message":"success"'
         result=$(echo $FATE_FLOW_STATUS | grep "${success}")
         if [[ "$result" != "" ]]
         then
