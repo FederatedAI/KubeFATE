@@ -33,7 +33,7 @@ spec:
     spec:
       containers:
         - name: nginx
-          image: {{ .Values.image.registry }}/nginx:{{ .Values.image.tag }}
+          image: {{ .Values.image.registry }}{{ .Values.modules.nginx.image }}:{{ .Values.modules.nginx.imageTag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command:
             - /bin/bash

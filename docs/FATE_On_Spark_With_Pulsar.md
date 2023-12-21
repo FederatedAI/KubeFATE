@@ -2,7 +2,7 @@
 
 ## Overview
 
-FATE supports using [Spark](https://spark.apache.org/) as a computing engine since v1.5.0 Along with Spark, it also requires HDFS and RabbitMQ as storage and transmission service respectively, to compose a functional FATE cluster. In v1.6.0, the FATE also supports to use [Pulsar](https://pulsar.apache.org/admin-rest-api/?version=2.7.0&apiversion=v2#tag/clusters) as the transmission engine, a user can switch the transmission engine easily. Ideally, the Pulsar provides better throughput and scalability, more importantly, organizations can compose FATE clusters of star network using Pulsar. The overall architecture of "FATE on Spark with Pulsar" is as the following diagram:
+FATE supports using [Spark](https://spark.apache.org/) as a computing engine since v1.5.0 Along with Spark, it also requires HDFS and RabbitMQ as storage and transmission service respectively, to compose a functional FATE cluster. In v1.6.0, the FATE also supports to use [Pulsar](https://pulsar.apache.org/admin-rest-api/?version=2.10.2&apiversion=v2#tag/clusters) as the transmission engine, a user can switch the transmission engine easily. Ideally, the Pulsar provides better throughput and scalability, more importantly, organizations can compose FATE clusters of star network using Pulsar. The overall architecture of "FATE on Spark with Pulsar" is as the following diagram:
 
 <div style="text-align:center", align=center>
 <img src="./images/fate_on_spark_with_pulsar.png" />
@@ -86,7 +86,7 @@ When submitting a task, the user can declare in the config file to use Pulsar as
    }
 ```
 
-Generally, there is no need to set such a configuration. As for the available parameters, please refer to the [`create_producer`](https://pulsar.apache.org/api/python/2.7.0-SNAPSHOT/#pulsar.Client.create_producer) and [`subscribe`](https://pulsar.apache.org/api/python/2.7.0-SNAPSHOT/#pulsar.Client.subscribe) methods in the Pulsar python client.
+Generally, there is no need to set such a configuration. As for the available parameters, please refer to the [`create_producer`](https://pulsar.apache.org/api/python/2.10.2-SNAPSHOT/#pulsar.Client.create_producer) and [`subscribe`](https://pulsar.apache.org/api/python/2.10.2-SNAPSHOT/#pulsar.Client.subscribe) methods in the Pulsar python client.
 
 ## Deployment of Star Network
 

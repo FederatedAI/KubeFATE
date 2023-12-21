@@ -42,130 +42,61 @@ data:
     spark.pyspark.driver.python       python
     {{- end }}
   service_conf.yaml: |
-    use_registry: {{ .Values.modules.serving.useRegistry | default false }}
-    use_deserialize_safe_module: false
-    dependent_distribution: {{ .Values.modules.python.dependent_distribution | default false }}
-    encrypt_password: false
-    encrypt_module: fate_arch.common.encrypt_utils#pwdecrypt
-    private_key:
-    private_key_file:
-    party_id: {{ .Values.partyId }}
-    hook_module:
-      client_authentication: fate_flow.hook.flow.client_authentication
-      site_authentication: fate_flow.hook.flow.site_authentication
-      permission: fate_flow.hook.flow.permission
-    hook_server_name:
-    authentication:
-      client:
-        switch: false
-        http_app_key:
-        http_secret_key:
-      site:
-        switch: false
-    permission:
-      switch: false
-      component: false
-      dataset: false
+    party_id: {{ .Values.partyId | quote }}
+    use_registry: false
+    encrypt:
+      key_0:
+        module: fate_flow.hub.encrypt.password_encrypt#pwdecrypt
+        # base on: fate_flow/conf/
+        private_path: private_key.pem
     fateflow:
-      # you must set real ip address, 127.0.0.1 and 0.0.0.0 is not supported
       host: fateflow_ip
       http_port: 9380
       grpc_port: 9360
-      # when you have multiple fateflow server on one party,
-      # we suggest using nginx for load balancing.
-      nginx:
-        # under K8s mode, 'fateflow' is the service name, which will be a L4 load balancer.
-        host: fateflow
-        http_port: 9380
-        grpc_port: 9360
-      # use random instance_id instead of {host}:{http_port}
-      random_instance_id: false
-
-      # support rollsite/nginx/fateflow as a coordination proxy
-      # rollsite support fate on eggroll, use grpc protocol
-      # nginx support fate on eggroll and fate on spark, use http or grpc protocol, default is http
-      # fateflow support fate on eggroll and fate on spark, use http protocol, but not support exchange network mode
-    
-      # format(proxy: rollsite) means rollsite use the rollsite configuration of fate_one_eggroll and nginx use the nginx configuration of fate_one_spark
-      # you also can customize the config like this(set fateflow of the opposite party as proxy):
-      # proxy:
-      #   name: fateflow
-      #   host: xx
-      #   http_port: xx
-      #   grpc_port: xx 
+      # proxy_name: rollsite
       {{- if eq .Values.computing "Spark" "Spark_local" }}
-      proxy: nginx
+      proxy_name: nginx
       {{- else }}
-      proxy: rollsite
+      proxy_name: rollsite
       {{- end }}
-      # support default/http/grpc
-      protocol: default
-      # It can also be specified in the job configuration using the federated_status_collect_type parameter
-      default_federated_status_collect_type: PULL
+      nginx:
+        host: 
+        http_port: 
+        grpc_port: 
     database:
-      name: '{{ .Values.externalMysqlDatabase | default .Values.modules.mysql.database | default "eggroll_meta" }}'
-      user: '{{ .Values.externalMysqlUser | default .Values.modules.mysql.user | default "fate" }}'
-      passwd: '{{ .Values.externalMysqlPassword | default .Values.modules.mysql.password | default "fate_dev" }}'
-      host: '{{ .Values.externalMysqlIp | default .Values.modules.mysql.ip | default "mysql" }}'
-      port: {{ .Values.externalMysqlPort | default .Values.modules.mysql.port | default "3306" }}
-      max_connections: 100
-      stale_timeout: 30
+      engine: mysql
+      # encrypt passwd key
+      decrypt_key:
+      mysql:
+        name: '{{ .Values.externalMysqlDatabase | default .Values.modules.mysql.database | default "eggroll_meta" }}'
+        user: '{{ .Values.externalMysqlUser | default .Values.modules.mysql.user | default "fate" }}'
+        passwd: '{{ .Values.externalMysqlPassword | default .Values.modules.mysql.password | default "fate_dev" }}'
+        host: '{{ .Values.externalMysqlIp | default .Values.modules.mysql.ip | default "mysql" }}'
+        port: {{ .Values.externalMysqlPort | default .Values.modules.mysql.port | default "3306" }}
+        max_connections: 100
+        stale_timeout: 30
+      sqlite:
+        # default fate_flow/runtime/system_settings: SQLITE_PATH
+        # /xxx/xxx.sqlite
+        path:
     default_engines:
       {{- if eq .Values.computing "Spark_local" }}
       computing: "spark"
       {{- else }}
       computing: {{ .Values.computing | lower }}
       {{- end }}
+      {{- if eq .Values.computing "Eggroll" }}
+      federation: "rollsite"
+      {{- else }}
       federation: {{ .Values.federation | lower }}
+      {{- end }}
       storage: {{ .Values.storage | lower }}
-    fate_on_standalone:
-      standalone:
-        cores_per_node: 20
-        nodes: 1
-    fate_on_eggroll:
-      clustermanager:
-        cores_per_node: {{ .Values.modules.python.clustermanager.cores_per_node | default 16 }}
-        nodes: {{ .Values.modules.python.clustermanager.nodes | default 2 }}
-      rollsite:
-        host: {{ .Values.modules.rollsite.ip }}
-        port: 9370
-    fate_on_spark:
-      spark:
-        # default use SPARK_HOME environment variable
-        home: /data/projects/spark-3.1.3-bin-hadoop3.2/
-        cores_per_node: {{ .Values.modules.python.spark.cores_per_node }}
-        nodes: {{ .Values.modules.python.spark.nodes }}
-      linkis_spark:
-        cores_per_node: 20
-        nodes: 2
-        host: 127.0.0.1
-        port: 9001
-        token_code: MLSS
-        python_path: /data/projects/fate/python
-      hive:
-        host: {{ .Values.modules.python.hive.host }}
-        port: {{ .Values.modules.python.hive.port }}
-        auth_mechanism: {{ .Values.modules.python.hive.auth_mechanism }}
-        username: {{ .Values.modules.python.hive.username }}
-        password: {{ .Values.modules.python.hive.password }}
-      linkis_hive:
-        host: 127.0.0.1
-        port: 9001
-      hdfs:
-        name_node: {{ .Values.modules.python.hdfs.name_node | default "hdfs://namenode:9000" }}
-        # default /
-        path_prefix: {{ .Values.modules.python.hdfs.path_prefix }}
-      rabbitmq:
-        host: {{ .Values.modules.python.rabbitmq.host }}
-        mng_port: {{ .Values.modules.python.rabbitmq.mng_port }}
-        port: {{ .Values.modules.python.rabbitmq.port }}
-        user: {{ .Values.modules.python.rabbitmq.user }}
-        password: {{ .Values.modules.python.rabbitmq.password }}
-        # default conf/rabbitmq_route_table.yaml
-        route_table: conf/rabbitmq_route_table/rabbitmq_route_table.yaml
-        # mode: replication / client, default: replication
-        mode: replication
-        max_message_size: 1048576
+    default_provider:
+      name: fate
+      # version default: fateflow.env
+      version:
+      device: local
+    federation:
       pulsar:
         host: {{ .Values.modules.python.pulsar.host }}
         port: {{ .Values.modules.python.pulsar.port }}
@@ -182,28 +113,66 @@ data:
         host: {{ .Values.modules.python.nginx.host }}
         http_port: {{ .Values.modules.python.nginx.http_port }}
         grpc_port: {{ .Values.modules.python.nginx.grpc_port }}
-    fateboard:
-      host: fateboard
-      port: 8080
-    
-    enable_model_store: false
-    model_store_address:
-        # use mysql as the model store engine
-      # storage: mysql
-      # database: {{ .Values.externalMysqlDatabase | default .Values.modules.mysql.database | default "eggroll_meta" }}
-      # host: '{{ .Values.externalMysqlIp | default .Values.modules.mysql.ip | default "mysql" }}'
-      # port: {{ .Values.externalMysqlPort | default .Values.modules.mysql.port | default "3306" }}
-      # user: '{{ .Values.externalMysqlUser | default .Values.modules.mysql.user | default "fate" }}'
-      # password: '{{ .Values.externalMysqlPassword | default .Values.modules.mysql.password | default "fate_dev" }}'
-      # max_connections: 10
-      # stale_timeout: 10
-
-      # use tencent cos as model store engine
-      storage: tencent_cos
-      Region:
-      SecretId:
-      SecretKey:
-      Bucket:
+        # http or grpc
+        protocol: http
+      rabbitmq:
+        host: {{ .Values.modules.python.rabbitmq.host }}
+        mng_port: {{ .Values.modules.python.rabbitmq.mng_port }}
+        port: {{ .Values.modules.python.rabbitmq.port }}
+        user: {{ .Values.modules.python.rabbitmq.user }}
+        password: {{ .Values.modules.python.rabbitmq.password }}
+        # default conf/rabbitmq_route_table.yaml
+        route_table: conf/rabbitmq_route_table/rabbitmq_route_table.yaml
+        # mode: replication / client, default: replication
+        mode: replication
+        max_message_size: 1048576
+      rollsite:
+        host: rollsite
+        port: 9370
+      osx:
+        host: osx
+        port: 9370
+    computing:
+      standalone:
+        cores: 32
+      eggroll:
+        cores: 32
+        nodes: 2
+      spark:
+        # default use SPARK_HOME environment variable
+        home: /data/projects/spark-3.1.3-bin-hadoop3.2/
+        cores: 32
+    storage:
+      hdfs:
+        name_node: {{ .Values.modules.python.hdfs.name_node | default "hdfs://namenode:9000" }}
+    hook_module:
+      client_authentication: fate_flow.hook.flow.client_authentication
+      site_authentication: fate_flow.hook.flow.site_authentication
+      permission: fate_flow.hook.flow.permission
+    authentication:
+      client: false
+      site: false
+      permission: false
+    model_store:
+      engine: file
+      # encrypt passwd key
+      decrypt_key:
+      file:
+        # default fate_flow/runtime/system_settings: MODEL_STORE_PATH
+        path: 
+      mysql:
+        name: fate_flow
+        user: fate
+        passwd: fate
+        host: 127.0.0.1
+        port: 3306
+        max_connections: 100
+        stale_timeout: 30
+      tencent_cos:
+        Region:
+        SecretId:
+        SecretKey:
+        Bucket:
     {{- with .Values.modules.serving }}
     servings:
       hosts:
@@ -234,23 +203,29 @@ metadata:
 {{ include "fate.labels" . | indent 4 }}
 data:
   pulsar_route_table.yaml: |
-    {{- with .Values.modules.pulsar.exchange }}
-    default:
-      proxy: "{{ .ip }}:{{ .port }}"
-      domain: "{{ .domain }}"
-    {{- end }}
-  {{- if .Values.modules.pulsar.route_table }}
+    {{- if .Values.modules.pulsar.route_table }}
     {{- range $key, $val := .Values.modules.pulsar.route_table }}
     {{ $key }}:
 {{ toYaml . | indent 6 }}
     {{- end }}
-  {{- else }}
+    {{- else }}
     {{ .Values.partyId }}:
       host: pulsar
       port: 6650
       sslPort: 6651
       proxy: ""
-  {{- end}}
+    {{- end}}
+    {{- with .Values.modules.pulsar.exchange }}
+    default:
+      proxy: "{{ .ip }}:{{ .port }}"
+      domain: "{{ .domain }}"
+    {{- else }}
+    default:
+      proxy: "proxy.fate.org:443"
+      domain: "fate.org"
+      brokerPort: 6650
+      brokerSslPort: 6651
+    {{- end }}
 ---
 kind: ConfigMap
 apiVersion: v1

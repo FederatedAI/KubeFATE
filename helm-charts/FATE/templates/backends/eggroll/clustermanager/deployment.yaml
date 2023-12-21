@@ -35,7 +35,7 @@ spec:
         - env:
           - name: PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION
             value: python 
-          image: {{ .Values.image.registry }}/eggroll{{ include "images.eggroll.suffix" . }}:{{ .Values.image.tag }}
+          image: {{ .Values.image.registry }}{{ .Values.modules.clustermanager.image }}{{ include "images.eggroll.suffix" . }}:{{ .Values.modules.clustermanager.imageTag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           {{- if .Values.modules.clustermanager.resources}}
           resources:

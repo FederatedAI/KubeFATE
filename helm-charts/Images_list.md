@@ -16,7 +16,7 @@
 - nginx:1.17
 - federatedai/nginx:${version-tag}
 - federatedai/rabbitmq:3.8.3-management
-- federatedai/pulsar:2.7.0
+- federatedai/pulsar:2.10.2
 
 ## FATE-Serving
 

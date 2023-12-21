@@ -32,7 +32,7 @@ spec:
     spec:
       containers:
         - name: pulsar
-          image: {{ .Values.image.registry }}/pulsar:2.10.1
+          image: {{ .Values.image.registry }}{{ .Values.modules.pulsar.image }}:{{ .Values.modules.pulsar.imageTag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           {{- if .Values.modules.pulsar.resources}}
           resources:
