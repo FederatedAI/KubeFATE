@@ -67,8 +67,8 @@ function CheckConfig(){
 	fi
 
 	if [ $computing == "Eggroll" ]; then
-		if [ $federation != "Eggroll" ] ||  [ $storage != "Eggroll" ]; then
-			echo "[ERROR]: Please select the correct engine. When eggroll is selected as the computing engine, both Federation and storage must be eggroll engines!"
+		if [ $federation != "OSX" ] ||  [ $storage != "Eggroll" ]; then
+			echo "[ERROR]: Please select the correct engine. When eggroll is selected as the computing engine, both Federation and Storage must be osx/eggroll engines!"
 			exit 1
 		fi
 	fi
@@ -180,6 +180,7 @@ GenerateConfig() {
 			#clustermanager & nodemanager
 			sed -i "s#<clustermanager.host>#${clustermanager_ip}#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
 			sed -i "s#<clustermanager.port>#${clustermanager_port}#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
+			sed -i "s#<nodemanager.host>#${nodemanager_ip}#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
 			sed -i "s#<nodemanager.port>#${nodemanager_port}#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
 			sed -i "s#<party.id>#${party_id}#g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
 
@@ -345,7 +346,7 @@ GenerateConfig() {
 		echo mysql module of $party_id done!
 
 		# fate_flow
-		sed -i "s/party_id:/party_id: \"${party_id}\"/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
+		sed -i "s/party_id: .*/party_id: \"${party_id}\"/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
 		sed -i "s/name: <db_name>/name: '${db_name}'/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
 		sed -i "s/user: <db_user>/user: '${db_user}'/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
 		sed -i "s/passwd: <db_passwd>/passwd: '${db_password}'/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
@@ -377,7 +378,7 @@ GenerateConfig() {
 		sed -i "s/nodes: .*/nodes: 1/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
 		sed -i "s/cores_per_node: .*/cores_per_node: $compute_core/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
 
-		if [[ "$federation" == "Eggroll" ]]; then
+		if [[ "$computing" == "Eggroll" ]]; then
 			sed -i "s/eggroll.session.processors.per.node=.*/eggroll.session.processors.per.node=$compute_core/g" ./confs-$party_id/confs/eggroll/conf/eggroll.properties
 		fi
 		if [[ "$computing" == "Spark"* ]]; then
@@ -386,29 +387,14 @@ GenerateConfig() {
 		echo fate_flow module of $party_id done!
 
 		# federation config
-		# eggroll
-		if [[ "$federation" == "Eggroll" ]]; then
-			cat >./confs-$party_id/confs/eggroll/conf/route_table.json <<EOF
+		# OSX
+		sed -i "s/self.party=9999/self.party=${party_id}/g" ./confs-$party_id/confs/osx/conf/broker.properties
+		if [[ "$federation" == "OSX" ]]; then
+			cat >./confs-$party_id/confs/osx/conf/route_table.json <<EOF
 {
-	"route_table": {
-		"default": {
-			"default": [
-				{
-$(if [ "$exchange_ip" != "" ]; then
-				echo "
-				\"ip\": \"${exchange_ip}\",
-				\"port\": 9371
-	"
-			else
-				echo " 
-				\"ip\": \"${proxy_ip}\",
-				\"port\": \"${proxy_port}\"
-	"
-			fi)
-				}
-			]
-		},
-$(for ((j = 0; j < ${#party_list[*]}; j++)); do
+  "route_table":
+  {
+		$(for ((j = 0; j < ${#party_list[*]}; j++)); do
 				if [ "${party_id}" == "${party_list[${j}]}" ]; then
 					continue
 				fi
@@ -422,19 +408,19 @@ $(for ((j = 0; j < ${#party_list[*]}; j++)); do
 	"
 			done)
 		"${party_id}": {
-			"default": [{
-				"ip": "${proxy_ip}",
-				"port": ${proxy_port}
-			}],
 			"fateflow": [{
 				"ip": "${fate_flow_ip}",
 				"port": ${fate_flow_grpc_port}
 			}]
 		}
-	},
-	"permission": {
-		"default_allow": true
-	}
+  },
+	"self_party":[
+		"${party_id}"
+	],
+  "permission":
+  {
+    "default_allow": true
+  }
 }
 EOF
 		fi
