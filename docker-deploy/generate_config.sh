@@ -56,7 +56,7 @@ function list_include_item {
 
 function CheckConfig(){
 	# Check config start
-	computing_list="Eggroll Spark Spark_local"
+	computing_list="Eggroll Spark STANDALONE"
 	spark_federation_list="RabbitMQ Pulsar"
 	algorithm_list="Basic NN ALL"
 	device_list="CPU IPCL GPU"
@@ -84,13 +84,13 @@ function CheckConfig(){
 		fi
 	fi
 
-	if [ "$computing" == "Spark_local" ]; then
-		if ! $(list_include_item "$spark_federation_list" "$federation"); then
-			echo "[ERROR]: If you choose the Spark_local computing engine, the federation component must be Pulsar or RabbitMQ!"
-			exit 1
-		fi
-		if [ "$storage" != "LocalFS" ]; then
-			echo "[ERROR]: If you choose the Spark computing engine, the storage component must be LocalFS!"
+	if [ "$computing" == "STANDALONE" ]; then
+		# if ! $(list_include_item "$spark_federation_list" "$federation"); then
+		# 	echo "[ERROR]: If you choose the STANDALONE computing engine, the federation component must be Pulsar or RabbitMQ!"
+		# 	exit 1
+		# fi
+		if [ "$storage" != "STANDALONE" ]; then
+			echo "[ERROR]: If you choose the Spark computing engine, the storage component must be STANDALONE!"
 			exit 1
 		fi
 	fi
@@ -207,7 +207,7 @@ GenerateConfig() {
 				if [ "$federation" == "RabbitMQ" ]; then
 					cp -r training_template/backends/spark/rabbitmq confs-$party_id/confs/
 					# delete Pulsar spec
-					sed -i '203,217d' confs-"$party_id"/docker-compose.yml
+					sed -i '203,218d' confs-"$party_id"/docker-compose.yml
 				elif [ "$federation" == "Pulsar" ]; then
 					cp -r training_template/backends/spark/pulsar confs-$party_id/confs/
 					# delete RabbitMQ spec
@@ -216,21 +216,21 @@ GenerateConfig() {
 			fi
 		fi
 
-		if [ "$computing" == "Spark_local" ]; then
+		if [ "$computing" == "STANDALONE" ]; then
 			# computing
-			cp -r training_template/backends/spark/nginx confs-$party_id/confs/
-			cp -r training_template/backends/spark/spark confs-$party_id/confs/
+			# cp -r training_template/backends/spark/nginx confs-$party_id/confs/
+			# cp -r training_template/backends/spark/spark confs-$party_id/confs/
 			# storage
-			if  [ "$storage" == "LocalFS" ]; then
+			if  [ "$storage" == "STANDALONE" ]; then
 				cp training_template/docker-compose-spark-slim.yml confs-$party_id/docker-compose.yml
 				# federation
-				if [ "$federation" == "RabbitMQ" ]; then
-					cp -r training_template/backends/spark/rabbitmq confs-$party_id/confs/
-					sed -i '149,163d' confs-$party_id/docker-compose.yml
-				elif [ "$federation" == "Pulsar" ]; then
-					cp -r training_template/backends/spark/pulsar confs-$party_id/confs/
-					sed -i '131,147d' confs-$party_id/docker-compose.yml
-				fi
+				# if [ "$federation" == "RabbitMQ" ]; then
+				# 	cp -r training_template/backends/spark/rabbitmq confs-$party_id/confs/
+				# 	sed -i '149,163d' confs-$party_id/docker-compose.yml
+				# elif [ "$federation" == "Pulsar" ]; then
+				# 	cp -r training_template/backends/spark/pulsar confs-$party_id/confs/
+				# 	sed -i '131,147d' confs-$party_id/docker-compose.yml
+				# fi
 			fi
 		fi
 
@@ -242,7 +242,7 @@ GenerateConfig() {
 		# Images choose 
 		Suffix=""
 		# computing
-		if [ "$computing" == "Spark" ] || [ "$computing" == "Spark_local" ]; then
+		if [ "$computing" == "Spark" ]; then
 			Suffix=$Suffix""
 		fi
 		# algorithm 
@@ -265,7 +265,7 @@ GenerateConfig() {
 		if [ "$computing" == "Eggroll" ]; then
 			sed -i "s#image: \"\${FATEFlow_IMAGE}:\${FATEFlow_IMAGE_TAG}\"#image: \"\${FATEFlow_IMAGE}${Suffix}:\${FATEFlow_IMAGE_TAG}\"#g" ./confs-"$party_id"/docker-compose.yml
 			sed -i "s#image: \"\${EGGRoll_IMAGE}:\${EGGRoll_IMAGE_TAG}\"#image: \"\${EGGRoll_IMAGE}${Suffix}:\${EGGRoll_IMAGE_TAG}\"#g" ./confs-"$party_id"/docker-compose.yml
-		elif [ "$computing" == "Spark" ] || [ "$computing" == "Spark_local" ]; then
+		elif [ "$computing" == "Spark" ] ; then
 			sed -i "s#image: \"\${FATEFlow_IMAGE}:\${FATEFlow_IMAGE_TAG}\"#image: \"\${FATEFlow_IMAGE}-spark${Suffix}:\${FATEFlow_IMAGE_TAG}\"#g" ./confs-"$party_id"/docker-compose.yml
 			sed -i "s#image: \"\${Spark_Worker_IMAGE}:\${Spark_Worker_IMAGE_TAG}\"#image: \"\${Spark_Worker_IMAGE}${Suffix}:\${Spark_Worker_IMAGE_TAG}\"#g" ./confs-"$party_id"/docker-compose.yml
 		fi
@@ -274,12 +274,12 @@ GenerateConfig() {
 		if [ "$device" == "GPU" ]; then
       line=0 # line refers to the line number of the fateflow `command` line in docker-compose.yaml
       if [ "$computing" == "Eggroll" ]; then
-          line=140
+          line=141
       fi
       if [ "$computing" == "Spark" ]; then
-          line=84
+          line=85
       fi
-      if [ "$computing" == "Spark_local" ]; then
+      if [ "$computing" == "STANDALONE" ]; then
         line=85
       fi
       sed -i "${line}i\\
@@ -354,25 +354,29 @@ GenerateConfig() {
 		sed -i "s/127.0.0.1:8000/${serving_ip}:8000/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
 
 
-		if [[ "$computing" == "Spark" ]] || [[ "$computing" == "Spark_local" ]] ; then
-			sed -i "s/proxy_name: rollsite/proxy_name: nginx/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
+		if [[ "$computing" == "Spark" ]] ; then
+			sed -i "s/proxy_name: osx/proxy_name: nginx/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
 			sed -i "s/computing: eggroll/computing: spark/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
 		fi
+		if [[ "$computing" == "STANDALONE" ]] ; then
+			# sed -i "s/proxy_name: osx/proxy_name: nginx/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
+			sed -i "s/computing: eggroll/computing: standalone/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
+		fi
 		if [[ "$federation" == "Pulsar" ]]; then
-			sed -i "s/  federation: rollsite/  federation: pulsar/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
+			sed -i "s/  federation: osx/  federation: pulsar/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
 		elif [[ "$federation" == "RabbitMQ" ]]; then
-			sed -i "s/  federation: rollsite/  federation: rabbitmq/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
+			sed -i "s/  federation: osx/  federation: rabbitmq/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
 		fi
 
 		if [[ "$storage" == "HDFS" ]]; then
 			sed -i "s/  storage: eggroll/  storage: hdfs/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
-		elif [[ "$storage" == "LocalFS" ]]; then
-			sed -i "s/  storage: eggroll/  storage: localfs/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
+		elif [[ "$storage" == "STANDALONE" ]]; then
+			sed -i "s/  storage: eggroll/  storage: standalone/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml
 		fi
 
-		if [[ "$computing" == "Spark_local" ]] ; then
-			sed -i "s#spark.master .*#spark.master                      local[*]#g" ./confs-$party_id/confs/spark/spark-defaults.conf
-		fi
+		# if [[ "$computing" == "STANDALONE" ]] ; then
+		# 	sed -i "s#spark.master .*#spark.master                      local[*]#g" ./confs-$party_id/confs/spark/spark-defaults.conf
+		# fi
 
 		# compute_core
 		sed -i "s/nodes: .*/nodes: 1/g" ./confs-$party_id/confs/fate_flow/conf/service_conf.yaml

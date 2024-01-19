@@ -42,7 +42,7 @@ volumes:
 
 services:
   fateboard:
-    image: "federatedai/fateboard:${TAG}"
+    image: "${FATEBoard_IMAGE}:${FATEBoard_IMAGE_TAG}"
     ports:
       - "8080:8080"
     volumes:
@@ -56,7 +56,7 @@ services:
       - fateflow
 
   fateflow:
-    image: "federatedai/fateflow:${TAG}"
+    image: "${FATEFlow_IMAGE}:${FATEFlow_IMAGE_TAG}"
     restart: always
     ports:
       - 9380:9380
@@ -65,11 +65,11 @@ services:
       - ./confs/spark/spark-defaults.conf:/data/projects/spark-3.1.3-bin-hadoop3.2/conf/spark-defaults.conf
       - shared_dir_fate:/data/projects/fate/fate
       - shared_dir_examples:/data/projects/fate/examples
-      - download_dir:/data/projects/fate/python/download_dir
+      - download_dir:/data/projects/fate/fate/python/download_dir
       - fate_flow_logs:/data/projects/fate/fate_flow/logs
-      - ./confs/fate_flow/conf/service_conf.yaml:/data/projects/fate/conf/service_conf.yaml
-      - ./confs/fate_flow/conf/pulsar_route_table.yaml:/data/projects/fate/conf/pulsar_route_table.yaml
-      - ./confs/fate_flow/conf/rabbitmq_route_table.yaml:/data/projects/fate/conf/rabbitmq_route_table.yaml
+      - ./confs/fate_flow/conf/service_conf.yaml:/data/projects/fate/fate_flow/conf/service_conf.yaml
+      - ./confs/fate_flow/conf/pulsar_route_table.yaml:/data/projects/fate/fate_flow/conf/pulsar_route_table.yaml
+      - ./confs/fate_flow/conf/rabbitmq_route_table.yaml:/data/projects/fate/fate_flow/conf/rabbitmq_route_table.yaml
       - ./confs/eggroll/conf:/data/projects/fate/eggroll/conf
       - ./shared_dir/data/model_local_cache:/data/projects/fate/fate_flow/model_local_cache
       - /etc/localtime:/etc/localtime:ro
@@ -87,10 +87,10 @@ services:
     - "-c"
     - |
         set -x
-        sed -i "s/int(party.party_id)/str(party.party_id)/g" /data/projects/fate/fate/python/fate/arch/federation/pulsar/_federation.py
+        sed -i "s/int(party.party_id)/str(party.party_id)/g" /data/projects/fate/fate/python/fate/arch/federation/backends/pulsar/_federation.py
         cp /data/projects/fate/fate_flow/conf/pulsar_route_table.yaml /data/projects/fate/fate_flow/pulsar_route_table.yaml
         cp /data/projects/fate/fate_flow/conf/rabbitmq_route_table.yaml /data/projects/fate/fate_flow/rabbitmq_route_table.yaml
-        sleep 5 && python fateflow/python/fate_flow/fate_flow_server.py
+        sleep 5 && python fate_flow/python/fate_flow/fate_flow_server.py
     environment:
       FATE_PROJECT_BASE: "/data/projects/fate"
       FATE_FLOW_UPLOAD_MAX_NUM: "1000000"
@@ -98,7 +98,7 @@ services:
       FATE_LOG_LEVEL: "INFO"
 
   mysql:
-    image: "mysql:8.0.28"
+    image: "${MySQL_IMAGE}:${MySQL_IMAGE_TAG}"
     expose:
       - 3306
     volumes:
@@ -113,57 +113,56 @@ services:
     cap_add:
       - SYS_NICE
 
-  nginx:
-    image: "federatedai/nginx:${TAG}"
-    ports:
-      - 9300:9300
-      - 9310:9310
-    volumes:
-      - ./confs/nginx/route_table.yaml:/data/projects/fate/proxy/nginx/conf/route_table.yaml
-      - ./confs/nginx/nginx.conf:/data/projects/fate/proxy/nginx/conf/nginx.conf
-      - /etc/localtime:/etc/localtime:ro
+  osx:
+    image: "${RegistryURI}${OSX_IMAGE}:${OSX_IMAGE_TAG}"
     restart: always
-    networks:
-      - fate-network
-    depends_on:
-      - fateflow
-
-  rabbitmq:
-    image: federatedai/rabbitmq:3.8.3-management
     ports:
-      - "5672:5672"
-      - "15672:15672"
+      - "9370:9370"
     environment:
-      RABBITMQ_DEFAULT_USER: fate
-      RABBITMQ_DEFAULT_PASS: fate
-      RABBITMQ_USER: fate
-      RABBITMQ_PASSWORD: fate
-      RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: "-rabbit max_message_size 536870912"
+      PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION: python
     volumes:
-      - ./confs/rabbitmq/enabled_plugins:/etc/rabbitmq/enabled_plugins
-      - ./shared_dir/data/rabbitmq:/var/lib/rabbitmq
-    restart: always
-    networks:
-      - fate-network
-
-  pulsar:
-    image: "federatedai/pulsar:2.10.2"
-    ports:
-      - "6650:6650"
-      - "6651:6651"
-      - "8001:8080"
-    volumes:
-      - ./confs/pulsar/standalone.conf:/pulsar/conf/standalone.conf
-      # - ./shared_dir/data/pulsar:/pulsar/data
+      - ./confs/osx/conf/:/data/projects/fate/osx/conf/broker/
       - /etc/localtime:/etc/localtime:ro
-    command:
-      ["/bin/bash", "-c", "bin/pulsar standalone -nss"]
-    restart: always
     networks:
       - fate-network
+    command: ["sh", "-c", "java  -XX:+UseG1GC -XX:G1HeapRegionSize=16m -XX:G1ReservePercent=25 -XX:InitiatingHeapOccupancyPercent=30 -XX:SoftRefLRUPolicyMSPerMB=0 -verbose:gc -Xloggc:/dev/shm/rmq_srv_gc_%p_%t.log -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCApplicationStoppedTime -XX:+PrintAdaptiveSizePolicy -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=5 -XX:GCLogFileSize=30m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/oom/heapdump.hprof  -server -Xms4g -Xmx4g -XX:-OmitStackTraceInFastThrow -XX:+AlwaysPreTouch -XX:MaxDirectMemorySize=15g -XX:-UseLargePages -XX:-UseBiasedLocking  -cp conf/broker/:lib/*:extension/*:/data/projects/fate/osx/lib/osx-broker-1.0.0.jar org.fedai.osx.broker.Bootstrap -c /data/projects/fate/osx/conf"]
+
+  # rabbitmq:
+  #   image: "${RabbitMQ_IMAGE}:${RabbitMQ_IMAGE_TAG}"
+  #   ports:
+  #     - "5672:5672"
+  #     - "15672:15672"
+  #   environment:
+  #     RABBITMQ_DEFAULT_USER: fate
+  #     RABBITMQ_DEFAULT_PASS: fate
+  #     RABBITMQ_USER: fate
+  #     RABBITMQ_PASSWORD: fate
+  #     RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: "-rabbit max_message_size 536870912"
+  #   volumes:
+  #     - ./confs/rabbitmq/enabled_plugins:/etc/rabbitmq/enabled_plugins
+  #     - ./shared_dir/data/rabbitmq:/var/lib/rabbitmq
+  #   restart: always
+  #   networks:
+  #     - fate-network
+
+  # pulsar:
+  #   image: "${Pulsar_IMAGE}:${Pulsar_IMAGE_TAG}"
+  #   ports:
+  #     - "6650:6650"
+  #     - "6651:6651"
+  #     - "8001:8080"
+  #   volumes:
+  #     - ./confs/pulsar/standalone.conf:/pulsar/conf/standalone.conf
+  #     # - ./shared_dir/data/pulsar:/pulsar/data
+  #     - /etc/localtime:/etc/localtime:ro
+  #   command:
+  #     ["/bin/bash", "-c", "bin/pulsar standalone -nss"]
+  #   restart: always
+  #   networks:
+  #     - fate-network
       
   client:
-    image: "federatedai/client:${TAG}"
+    image: "${Client_IMAGE}:${Client_IMAGE_TAG}"
     ports:
       - "20000:20000"
     restart: always

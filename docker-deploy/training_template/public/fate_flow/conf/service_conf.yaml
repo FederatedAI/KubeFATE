@@ -71,6 +71,13 @@ federation:
     route_table: conf/pulsar_route_table.yaml
     # mode: replication / client, default: replication
     mode: replication
+    max_message_size: 1048576
+  nginx:
+    host: nginx
+    http_port: 9300
+    grpc_port: 9310
+    # http or grpc
+    protocol: http
   rabbitmq:
     host: rabbitmq
     mng_port: 15672
