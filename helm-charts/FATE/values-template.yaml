@@ -145,12 +145,12 @@ persistence:
   enabled: {{ .persistence | default "false" }}
 
 modules:
-  rollsite: 
-    include: {{ has "rollsite" .modules }}
+  osx: 
+    include: {{ has "osx" .modules }}
     {{- with .rollsite }}
     ip: rollsite
-    image: {{ .image | default "federatedai/eggroll" }}
-    imageTag: {{ .imageTag | default "v2.0.0-beta" }}
+    image: {{ .image | default "federatedai/osx" }}
+    imageTag: {{ .imageTag | default "2.0.0-release" }}
     type: {{ .type | default "ClusterIP" }}
     nodePort: {{ .nodePort }}
     loadBalancerIP: {{ .loadBalancerIP }}
@@ -194,7 +194,7 @@ modules:
     {{- with .lbrollsite }}
     ip: rollsite
     image: {{ .image | default "federatedai/eggroll" }}
-    imageTag: {{ .imageTag | default "v2.0.0-beta" }}
+    imageTag: {{ .imageTag | default "2.0.0-release" }}
     type: {{ .type | default "ClusterIP" }}
     loadBalancerIP: {{ .loadBalancerIP }}
     nodePort: {{ .nodePort }}
@@ -228,7 +228,7 @@ modules:
     {{- end }}
     logLevel: {{ .logLevel | default "INFO" }}
     image: {{ .image | default "federatedai/fateflow" }}
-    imageTag: {{ .imageTag | default "v2.0.0-beta" }}
+    imageTag: {{ .imageTag | default "2.0.0-release" }}
     type: {{ .type | default "ClusterIP" }}
     httpNodePort: {{ .httpNodePort }}
     grpcNodePort: {{ .grpcNodePort }}
@@ -308,7 +308,7 @@ modules:
     {{- with .clustermanager }}
     ip: clustermanager
     image: {{ .image | default "federatedai/eggroll" }}
-    imageTag: {{ .imageTag | default "v2.0.0-beta" }}
+    imageTag: {{ .imageTag | default "2.0.0-release" }}
     type: "ClusterIP"
     mysqlServerTimezone: {{ .mysqlServerTimezone }}
   {{- with .nodeSelector }}
@@ -335,7 +335,7 @@ modules:
     {{- with .nodemanager }}
     sessionProcessorsPerNode: {{ .sessionProcessorsPerNode }}
     image: {{ .image | default "federatedai/eggroll" }}
-    imageTag: {{ .imageTag | default "v2.0.0-beta" }}
+    imageTag: {{ .imageTag | default "2.0.0-release" }}
     replicas: {{ .replicas | default 2 }}
     subPath: {{ .subPath }}
     storageClass: {{ .storageClass  | default "nodemanager" }}
@@ -366,7 +366,7 @@ modules:
     {{- with .client }}
     subPath: {{ .subPath }}
     image: {{ .image | default "federatedai/client" }}
-    imageTag: {{ .imageTag | default "v2.0.0-beta" }}
+    imageTag: {{ .imageTag | default "2.0.0-release" }}
     existingClaim: {{ .existingClaim }}
     storageClass: {{ .storageClass  | default "client" }}
     accessMode: {{ .accessMode  | default "ReadWriteOnce" }}
@@ -432,7 +432,7 @@ modules:
     {{- with .fateboard }}
     type: {{ .type }}
     image: {{ .image | default "federatedai/fateboard" }}
-    imageTag: {{ .imageTag | default "v2.0.0-beta" }}
+    imageTag: {{ .imageTag | default "2.0.0-release" }}
     username: {{ .username }}
     password: {{ .password }}
     {{- with .nodeSelector }}
@@ -455,7 +455,7 @@ modules:
     {{- if .master }}
     master:
       image: "{{ .master.image | default "federatedai/spark-master" }}"
-      imageTag: "{{ .master.imageTag | default "v2.0.0-beta" }}"
+      imageTag: "{{ .master.imageTag | default "2.0.0-release" }}"
       replicas: {{ .master.replicas }}
       {{- with .master.resources }}
       resources:
@@ -479,7 +479,7 @@ modules:
     {{- if .worker }}
     worker:
       image: {{ .worker.image | default "federatedai/spark-worker" | quote }}
-      imageTag: {{ .worker.imageTag | default "v2.0.0-beta" | quote }}
+      imageTag: {{ .worker.imageTag | default "2.0.0-release" | quote }}
       replicas: {{ .worker.replicas }}
       {{- with .worker.resources }}
       resources:
@@ -567,7 +567,7 @@ modules:
     {{- end }}
     type: {{ .type | default "ClusterIP" }}
     image: {{ .image | default "federatedai/nginx" | quote }}
-    imageTag: {{ .imageTag | default "v2.0.0-beta" | quote }}
+    imageTag: {{ .imageTag | default "2.0.0-release" | quote }}
     httpNodePort:  {{ .httpNodePort }}
     grpcNodePort:  {{ .grpcNodePort }}
     loadBalancerIP: {{ .loadBalancerIP }}

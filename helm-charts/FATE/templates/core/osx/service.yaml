@@ -9,28 +9,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-{{ if .Values.modules.rollsite.include }}
+{{ if .Values.modules.osx.include }}
 apiVersion: v1
 kind: Service
 metadata:
-  name: rollsite
+  name: osx
   labels:
-    fateMoudle: rollsite
+    fateMoudle: osx
 {{ include "fate.labels" . | indent 4 }}
 spec:
   ports:
-    - name: "tcp-rollsite"
+    - name: "tcp-osx"
       port: 9370
       targetPort: 9370
-      {{- if eq .Values.modules.rollsite.type "NodePort" "LoadBalancer" }}
-      nodePort: {{ .Values.modules.rollsite.nodePort }}
+      {{- if eq .Values.modules.osx.type "NodePort" "LoadBalancer" }}
+      nodePort: {{ .Values.modules.osx.nodePort }}
       {{- end }}
       protocol: TCP
-  type: {{ .Values.modules.rollsite.type }}
-  {{- if .Values.modules.rollsite.loadBalancerIP }}
-  loadBalancerIP: "{{ .Values.modules.rollsite.loadBalancerIP }}"
+  type: {{ .Values.modules.osx.type }}
+  {{- if .Values.modules.osx.loadBalancerIP }}
+  loadBalancerIP: "{{ .Values.modules.osx.loadBalancerIP }}"
   {{- end }}
   selector:
-    fateMoudle: rollsite
+    fateMoudle: osx
 {{ include "fate.matchLabels" . | indent 4 }}
 {{ end }}

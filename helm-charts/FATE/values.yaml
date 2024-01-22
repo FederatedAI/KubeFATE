@@ -2,7 +2,7 @@
 image:
   registry: 
   isThridParty:
-  tag: v2.0.0-beta
+  tag: 2.0.0-release
   pullPolicy: IfNotPresent
   imagePullSecrets: 
 #  - name: 
@@ -12,8 +12,8 @@ partyName: fate-9999
 
 # Computing : Eggroll, Spark, Spark_local
 computing: Eggroll
-# Federation: Eggroll(computing: Eggroll), Pulsar/RabbitMQ(computing: Spark/Spark_local)
-federation: Eggroll
+# Federation: OSX(computing: Eggroll), Pulsar/RabbitMQ(computing: Spark/Spark_local)
+federation: OSX
 # Storage: Eggroll(computing: Eggroll), HDFS(computing: Spark), LocalFS(computing: Spark_local)
 storage: Eggroll
 # Algorithm: Basic, NN, ALL
@@ -85,11 +85,11 @@ persistence:
   enabled: false
 
 modules:
-  rollsite: 
+  osx: 
     include: true
-    ip: rollsite
-    image: "federatedai/eggroll"
-    imageTag: "v2.0.0-beta"
+    ip: osx
+    image: "federatedai/osx"
+    imageTag: "2.0.0-release"
     type: ClusterIP
     nodePort: 30091
     loadBalancerIP:
@@ -114,7 +114,7 @@ modules:
     include: true
     ip: rollsite
     image: "federatedai/eggroll"
-    imageTag: "v2.0.0-beta"
+    imageTag: "2.0.0-release"
     type: ClusterIP
     nodePort: 30091
     loadBalancerIP: 
@@ -126,7 +126,7 @@ modules:
     include: true
     replicas: 1
     image: "federatedai/fateflow"
-    imageTag: "v2.0.0-beta"
+    imageTag: "2.0.0-release"
     type: ClusterIP
     httpNodePort: 30097
     grpcNodePort: 30092
@@ -188,7 +188,7 @@ modules:
     include: true
     ip: client
     image: "federatedai/client"
-    imageTag: "v2.0.0-beta"
+    imageTag: "2.0.0-release"
     type: ClusterIP
     nodeSelector:
     tolerations:
@@ -203,7 +203,7 @@ modules:
     include: true
     ip: clustermanager
     image: "federatedai/eggroll"
-    imageTag: "v2.0.0-beta"
+    imageTag: "2.0.0-release"
     type: ClusterIP
     nodeSelector:
     tolerations:
@@ -213,7 +213,7 @@ modules:
     include: true
     replicas: 2
     image: "federatedai/eggroll"
-    imageTag: "v2.0.0-beta"
+    imageTag: "2.0.0-release"
     nodeSelector:
     tolerations:
     affinity:
@@ -263,7 +263,7 @@ modules:
     include: true
     type: ClusterIP
     image: "federatedai/fateboard"
-    imageTag: "v2.0.0-beta"
+    imageTag: "2.0.0-release"
     username: admin
     password: admin
     nodeSelector:
@@ -274,7 +274,7 @@ modules:
     include: true
     master:
       image: "federatedai/spark-master"
-      imageTag: "v2.0.0-beta"
+      imageTag: "2.0.0-release"
       replicas: 1
       nodeSelector:
       tolerations:
@@ -283,7 +283,7 @@ modules:
       nodePort: 30977
     worker:
       image: "federatedai/spark-worker"
-      imageTag: "v2.0.0-beta"
+      imageTag: "2.0.0-release"
       replicas: 2
       nodeSelector:
       tolerations:
@@ -322,7 +322,7 @@ modules:
   nginx:
     include: true
     image: "federatedai/nginx"
-    imageTag: "v2.0.0-beta"
+    imageTag: "2.0.0-release"
     nodeSelector:
     tolerations:
     affinity:

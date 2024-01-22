@@ -9,13 +9,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-{{ if .Values.modules.rollsite.include }}
+{{ if .Values.modules.osx.include }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: rollsite
+  name: osx
   labels:
-    fateMoudle: rollsite
+    fateMoudle: osx
 {{ include "fate.labels" . | indent 4 }}
 spec:
   replicas: 1
@@ -23,49 +23,41 @@ spec:
     type: Recreate
   selector:
     matchLabels:
-      fateMoudle: rollsite
+      fateMoudle: osx
 {{ include "fate.matchLabels" . | indent 6 }}
   template:
     metadata:
       labels:
-        fateMoudle: rollsite
+        fateMoudle: osx
 {{ include "fate.labels" . | indent 8 }}
     spec:
       hostAliases:
       - ip: "127.0.0.1"
         hostnames:
-        - "rollsite"
+        - "osx"
       containers:
-        - name: rollsite
+        - name: osx
           env:
           - name: PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION
             value: python
-          image: {{ .Values.image.registry }}{{ .Values.modules.rollsite.image }}:{{ .Values.modules.rollsite.imageTag }}
+          image: {{ .Values.image.registry }}{{ .Values.modules.osx.image }}:{{ .Values.modules.osx.imageTag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          {{- if .Values.modules.rollsite.resources}}
+          {{- if .Values.modules.osx.resources}}
           resources:
-          {{- range $key, $val := .Values.modules.rollsite.resources }}
+          {{- range $key, $val := .Values.modules.osx.resources }}
             {{ $key }}:
 {{ toYaml $val | indent 14 }}
           {{- end }}
           {{- end }}
           command:
-          - bash
+          - sh
           - -c
           - |
             set -x
-            mkdir -p /data/projects/fate/eggroll/logs/eggroll/
-            touch /data/projects/fate/eggroll/logs/eggroll/eggroll-audit.log
-            ln -sf /dev/stdout /data/projects/fate/eggroll/logs/eggroll/eggroll-audit.log
-            touch /data/projects/fate/eggroll/logs/eggroll/eggroll.jvm.log
-            ln -sf /dev/stdout /data/projects/fate/eggroll/logs/eggroll/eggroll.jvm.log
-            touch /data/projects/fate/eggroll/logs/eggroll/eggroll.jvm.err.log
-            ln -sf /dev/stderr /data/projects/fate/eggroll/logs/eggroll/eggroll.jvm.err.log
-            cp /data/projects/fate/eggroll/conf/temp_eggroll.properties /data/projects/fate/eggroll/conf/eggroll.properties
-            {{- if .Values.modules.rollsite.enableTLS }}
+            {{- if .Values.modules.osx.enableTLS }}
             cat /data/projects/fate/eggroll/conf/cert_configs >> /data/projects/fate/eggroll/conf/eggroll.properties
             {{- end}}
-            java -Dlog4j.configurationFile=$${EGGROLL_HOME}/conf/log4j2.properties -cp $${EGGROLL_HOME}/lib/*:$${EGGROLL_HOME}/conf/ com.webank.eggroll.rollsite.EggSiteBootstrap -c $${EGGROLL_HOME}/conf/eggroll.properties
+            java -XX:+UseG1GC -XX:G1HeapRegionSize=16m -XX:G1ReservePercent=25 -XX:InitiatingHeapOccupancyPercent=30 -XX:SoftRefLRUPolicyMSPerMB=0 -verbose:gc -Xloggc:/dev/shm/rmq_srv_gc_%p_%t.log -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCApplicationStoppedTime -XX:+PrintAdaptiveSizePolicy -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=5 -XX:GCLogFileSize=30m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/oom/heapdump.hprof  -server -Xms4g -Xmx4g -XX:-OmitStackTraceInFastThrow -XX:+AlwaysPreTouch -XX:MaxDirectMemorySize=15g -XX:-UseLargePages -XX:-UseBiasedLocking  -cp conf/broker/:lib/*:extension/*:/data/projects/fate/osx/lib/osx-broker-1.0.0.jar org.fedai.osx.broker.Bootstrap -c /data/projects/fate/osx/conf
           ports:
             - containerPort: 9370
           livenessProbe:
@@ -90,27 +82,24 @@ spec:
             failureThreshold: 12
             periodSeconds: 10
           volumeMounts:
-            - mountPath: /data/projects/fate/eggroll/conf/route_table/
-              name: rollsite-confs
-            - mountPath: /data/projects/fate/eggroll/conf/eggroll.properties
-              name: eggroll-confs
-              subPath: eggroll.properties
-            {{- if .Values.modules.rollsite.enableTLS }}
+            - mountPath: /data/projects/fate/osx/conf/broker/
+              name: osx-confs
+            {{- if .Values.modules.osx.enableTLS }}
             - mountPath: /data/projects/fate/eggroll/conf/cert_configs
               name: eggroll-confs
               subPath: cert_configs
             - mountPath: /data/projects/fate/eggroll/conf/cert/
               name: eggroll-certs
             {{- end }}
-      {{- with .Values.modules.rollsite.nodeSelector }}
+      {{- with .Values.modules.osx.nodeSelector }}
       nodeSelector: 
 {{ toYaml . | indent 8 }}
       {{- end }}
-      {{- with .Values.modules.rollsite.tolerations }}
+      {{- with .Values.modules.osx.tolerations }}
       tolerations:
 {{ toYaml . | indent 8 }}
       {{- end }}
-      {{- with .Values.modules.rollsite.affinity }}
+      {{- with .Values.modules.osx.affinity }}
       affinity:
 {{ toYaml . | indent 8 }}
       {{- end }}
@@ -121,13 +110,13 @@ spec:
       serviceAccountName: {{ template "serviceAccountName" . }}
       restartPolicy: Always
       volumes:
-        - name: rollsite-confs
+        - name: osx-confs
           configMap:
-            name: rollsite-config
+            name: osx-config
         - name: eggroll-confs
           configMap:
             name: eggroll-config
-        {{- if .Values.modules.rollsite.enableTLS }}
+        {{- if .Values.modules.osx.enableTLS }}
         - name: eggroll-certs
           secret:
             secretName: eggroll-certs
