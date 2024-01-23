@@ -138,7 +138,7 @@ Deploying FATE with KubeFATE can support many different engine combinations. For
 
 We support such definition for:
 
-1. Eggroll components: cluster manager, node manager and rollsite.
+1. Eggroll components: cluster manager, node manager and osx.
 2. Spark components: master and worker.
 3. Rabbitmq.
 4. Pulsar.
@@ -172,7 +172,7 @@ SubJobs   nodemanager-0        ModuleStatus: Available, SubJobStatus: Success, D
           2022-04-12 07:34:09, EndTime: 2022-04-12 07:47:18
           python               ModuleStatus: Available, SubJobStatus: Success, Duration:    14m, StartTime:
           2022-04-12 07:34:09, EndTime: 2022-04-12 07:48:14
-          rollsite             ModuleStatus: Available, SubJobStatus: Success, Duration:    13m, StartTime:
+          osx                  ModuleStatus: Available, SubJobStatus: Success, Duration:    13m, StartTime:
           2022-04-12 07:34:09, EndTime: 2022-04-12 07:47:24
           client               ModuleStatus: Available, SubJobStatus: Success, Duration:    11m, StartTime:
           2022-04-12 07:34:09, EndTime: 2022-04-12 07:45:22
@@ -192,13 +192,13 @@ UUID         24bb75ff-f636-4c64-8c04-1b9073f89a2f
 Name         fate-9999                           
 NameSpace    fate-9999                           
 ChartName    fate                                
-ChartVersion v2.0.0-beta                              
+ChartVersion v2.0.0                              
 Revision     1                                   
 Age          15m                                 
 Status       Running                             
 Spec         algorithm: Basic                    
              chartName: fate                     
-             chartVersion: v2.0.0-beta                
+             chartVersion: v2.0.0                
              computing: Eggroll                  
              device: CPU                         
              federation: Eggroll                 
@@ -208,7 +208,7 @@ Spec         algorithm: Basic
              istio:                              
                enabled: false                    
              modules:                            
-             - rollsite                          
+             - osx                          
              - clustermanager                    
              - nodemanager                       
              - mysql                             
@@ -238,10 +238,10 @@ Info         dashboard:
                  mysql: Running                  
                  nodemanager: Running            
                  nodemanager-eggrollpair: Running
-                 rollsite: Running               
+                 osx: Running               
                deployments:                      
                  clustermanager: Available       
-                 rollsite: Available
+                 osx: Available
 ```
 
 ### Access the UI of FATEBoard and Notebook
