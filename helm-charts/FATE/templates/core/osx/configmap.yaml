@@ -43,7 +43,7 @@ data:
             }
         },
         "self_party":[
-            ".Values.partyId"
+            "{{ .Values.partyId }}"
         ],
         "permission":
         {

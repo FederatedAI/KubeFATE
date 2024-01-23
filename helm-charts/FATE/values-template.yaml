@@ -116,7 +116,7 @@ podSecurityPolicy:
 ingressClassName: {{ .ingressClassName | default "nginx"}}
 
 exchange:
-{{- with .rollsite }}
+{{- with .osx }}
 {{- with .exchange }}
   partyIp: {{ .ip }}
   partyPort: {{ .port }}
@@ -133,7 +133,7 @@ exchangeList:
 {{- end }}
 
 partyList:
-{{- with .rollsite }}
+{{- with .osx }}
 {{- range .partyList }}
   - partyId: {{ .partyId }}
     partyIp: {{ .partyIp }}
@@ -147,8 +147,8 @@ persistence:
 modules:
   osx: 
     include: {{ has "osx" .modules }}
-    {{- with .rollsite }}
-    ip: rollsite
+    {{- with .osx }}
+    ip: osx
     image: {{ .image | default "federatedai/osx" }}
     imageTag: {{ .imageTag | default "2.0.0-release" }}
     type: {{ .type | default "ClusterIP" }}

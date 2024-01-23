@@ -33,11 +33,9 @@ data:
     eggroll.resourcemanager.clustermanager.jdbc.username={{ .Values.externalMysqlUser | default .Values.modules.mysql.user | default "fate" }}
     eggroll.resourcemanager.clustermanager.jdbc.password={{ .Values.externalMysqlPassword | default .Values.modules.mysql.password | default "fate_dev" }}
 
-    
-    eggroll.data.dir=data/
-    eggroll.logs.dir=logs/
     eggroll.resourcemanager.clustermanager.host=clustermanager
     eggroll.resourcemanager.clustermanager.port=4670
+    eggroll.resourcemanager.nodemanager.host=nodemanager
     eggroll.resourcemanager.nodemanager.port=4671
     eggroll.resourcemanager.process.tag={{ .Values.partyId }}
     
@@ -61,7 +59,7 @@ data:
     eggroll.resourcemanager.bootstrap.egg_pair.ld_library_path=
 
     # session
-    eggroll.session.processors.per.node={{ .Values.modules.nodemanager.sessionProcessorsPerNode | default 2 }}
+    eggroll.session.processors.per.node={{ .Values.modules.nodemanager.sessionProcessorsPerNode | default 4 }}
 
     # deepspeed
     ## where deepspeed containers locate, required for deepspeed
