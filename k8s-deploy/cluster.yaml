@@ -1,7 +1,7 @@
 name: fate-9999
 namespace: fate-9999
 chartName: fate
-chartVersion: v2.0.0-beta
+chartVersion: v2.0.0
 partyId: 9999
 registry: ""
 pullPolicy:
@@ -14,7 +14,7 @@ podSecurityPolicy:
   enabled: false
 ingressClassName: nginx
 modules:
-  - rollsite
+  - osx
   - clustermanager
   - nodemanager
   - mysql
@@ -24,8 +24,8 @@ modules:
   
 # Computing : Eggroll, Spark, Spark_local
 computing: Eggroll
-# Federation: Eggroll(computing: Eggroll), Pulsar/RabbitMQ(computing: Spark/Spark_local)
-federation: Eggroll
+# Federation: OSX(computing: Eggroll), Pulsar/RabbitMQ(computing: Spark/Spark_local)
+federation: OSX
 # Storage: Eggroll(computing: Eggroll), HDFS(computing: Spark), LocalFS(computing: Spark_local)
 storage: Eggroll
 # Algorithm: Basic, NN, ALL
@@ -56,7 +56,7 @@ skippedKeys:
     # - name: party9999.pulsar.example.com
   
 # Specify rollsite properties
-# rollsite:
+# osx:
   # type: NodePort
   # nodePort: 30091
   # loadBalancerIP:

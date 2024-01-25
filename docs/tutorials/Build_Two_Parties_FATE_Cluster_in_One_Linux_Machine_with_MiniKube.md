@@ -21,14 +21,14 @@ After the tutorial, the deployment architecture looks like the following diagram
 5. Network connectivity to dockerhub or 163 Docker Image Registry, and google gcr.
 6. Setup the global KubeFATE version using in the tutorial and create a folder for the whole tutorial.
 ```
-export fate_version=v2.0.0-beta && export kubefate_version=v1.4.5 && cd ~ && mkdir demo && cd demo
+export fate_version=v2.0.0 && export kubefate_version=v1.4.5 && cd ~ && mkdir demo && cd demo
 ```
 
 Notes:
 * When talking about KubeFATE version, usually there are 3 notions:
    * The KubeFATE CLI version, in this tutorial, it is v1.4.5.
    * The KubeFATE service version, in this tutorial, it is v1.4.5.
-   * The FATE version, in this tutorial, it is v2.0.0-beta, it also means the version of the helm chart of FATE, currently we use this version to tag the KubeFATE GitHub master branch.
+   * The FATE version, in this tutorial, it is v2.0.0, it also means the version of the helm chart of FATE, currently we use this version to tag the KubeFATE GitHub master branch.
 * **<font color="red">In this tutorial, the IP of the machine we used is 192.168.100.123. Please change it to your machine's IP in all the following commands and config files.</font></div>**
 
 # Start Tutorial
@@ -87,7 +87,7 @@ When all the pods are in the ready state, it means your Kubernetes cluster is re
 ## Setup Kubefate
 ### Install KubeFATE CLI
 Go to [KubeFATE Release](https://github.com/FederatedAI/KubeFATE/releases), and find the latest kubefate-k8s release 
-pack, which is `v2.0.0-beta` as set to ENVs before. (replace ${fate_version} with the newest version available)
+pack, which is `v2.0.0` as set to ENVs before. (replace ${fate_version} with the newest version available)
 ```
 curl -LO https://github.com/FederatedAI/KubeFATE/releases/download/${fate_version}/kubefate-k8s-${fate_version}.tar.gz && tar -xzf ./kubefate-k8s-${fate_version}.tar.gz
 ```
@@ -256,7 +256,7 @@ For `/kubefate/examples/party-9999/cluster-spark-pulsar.yaml`, modify it as foll
 name: fate-9999
 namespace: fate-9999
 chartName: fate
-chartVersion: v2.0.0-beta
+chartVersion: v2.0.0
 partyId: 9999
 registry: ""
 pullPolicy:
@@ -340,7 +340,7 @@ and for fate-10000:
 name: fate-10000
 namespace: fate-10000
 chartName: fate
-chartVersion: v2.0.0-beta
+chartVersion: v2.0.0
 partyId: 10000
 registry: ""
 pullPolicy:
@@ -440,8 +440,8 @@ or watch the clusters till their STATUS changing to `Running`:
 ```
 kubefate@machine:~/kubefate$ watch kubefate cluster ls
 UUID                                    NAME            NAMESPACE       REVISION        STATUS  CHART   ChartVERSION    AGE
-29878fa9-aeee-4ae5-a5b7-fd4e9eb7c1c3    fate-9999       fate-9999       1               Running fate    v2.0.0-beta          88s
-dacc0549-b9fc-463f-837a-4e7316db2537    fate-10000      fate-10000      1               Running fate    v2.0.0-beta          69s
+29878fa9-aeee-4ae5-a5b7-fd4e9eb7c1c3    fate-9999       fate-9999       1               Running fate    v2.0.0          88s
+dacc0549-b9fc-463f-837a-4e7316db2537    fate-10000      fate-10000      1               Running fate    v2.0.0          69s
 ```
 We have about 10G Docker images that need to be pulled, this step will take a while for the first time.
 An alternative way is offline loading the images to the local environment.
@@ -479,13 +479,13 @@ UUID        	29878fa9-aeee-4ae5-a5b7-fd4e9eb7c1c3
 Name        	fate-9999
 NameSpace   	fate-9999
 ChartName   	fate
-ChartVersion	v2.0.0-beta
+ChartVersion	v2.0.0
 Revision    	1
 Age         	54m
 Status      	Running
 Spec        	algorithm: Basic
             	chartName: fate
-            	chartVersion: v2.0.0-beta
+            	chartVersion: v2.0.0
             	computing: Spark
             	device: CPU
             	federation: Pulsar

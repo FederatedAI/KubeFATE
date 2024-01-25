@@ -1,7 +1,7 @@
 name: fate-9999
 namespace: fate-9999
 chartName: fate
-chartVersion: v2.0.0-beta
+chartVersion: v2.0.0
 partyId: 9999
 registry: ""
 pullPolicy:
@@ -54,7 +54,7 @@ skippedKeys:
 
 # python:
   # image: "federatedai/fateflow"
-  # imageTag: "v2.0.0-beta"
+  # imageTag: "2.0.0-release"
 #   type: NodePort
 #   replicas: 1
 #   httpNodePort: 30097
@@ -159,7 +159,7 @@ skippedKeys:
 
 # nginx:
   # image: "federatedai/nginx"
-  # imageTag: "v2.0.0-beta"
+  # imageTag: "2.0.0-release"
   # nodeSelector:
   # tolerations:
   # affinity:

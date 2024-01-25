@@ -44,6 +44,8 @@ data:
   service_conf.yaml: |
     party_id: {{ .Values.partyId | quote }}
     use_registry: false
+    # DEBUG 10/INFO 20
+    log_level: 20
     encrypt:
       key_0:
         module: fate_flow.hub.encrypt.password_encrypt#pwdecrypt
@@ -57,7 +59,7 @@ data:
       {{- if eq .Values.computing "Spark" "Spark_local" }}
       proxy_name: nginx
       {{- else }}
-      proxy_name: rollsite
+      proxy_name: osx
       {{- end }}
       nginx:
         host: 
@@ -85,18 +87,32 @@ data:
       {{- else }}
       computing: {{ .Values.computing | lower }}
       {{- end }}
-      {{- if eq .Values.computing "Eggroll" }}
-      federation: "rollsite"
-      {{- else }}
       federation: {{ .Values.federation | lower }}
-      {{- end }}
       storage: {{ .Values.storage | lower }}
     default_provider:
       name: fate
       # version default: fateflow.env
       version:
       device: local
+    computing:
+      standalone:
+        cores: 32
+      eggroll:
+        cores: 16
+        nodes: 2
+        # cluster manager host and port
+        host: clustermanager
+        port: 4670
+      spark:
+        # default use SPARK_HOME environment variable
+        home: /data/projects/spark-3.1.3-bin-hadoop3.2/
+        cores: 32
     federation:
+      osx:
+        host: osx
+        port: 9370
+        # stream or queue
+        mode: stream
       pulsar:
         host: {{ .Values.modules.python.pulsar.host }}
         port: {{ .Values.modules.python.pulsar.port }}
@@ -126,22 +142,6 @@ data:
         # mode: replication / client, default: replication
         mode: replication
         max_message_size: 1048576
-      rollsite:
-        host: rollsite
-        port: 9370
-      osx:
-        host: osx
-        port: 9370
-    computing:
-      standalone:
-        cores: 32
-      eggroll:
-        cores: 32
-        nodes: 2
-      spark:
-        # default use SPARK_HOME environment variable
-        home: /data/projects/spark-3.1.3-bin-hadoop3.2/
-        cores: 32
     storage:
       hdfs:
         name_node: {{ .Values.modules.python.hdfs.name_node | default "hdfs://namenode:9000" }}

@@ -192,13 +192,13 @@ The output is shown as follows. If the status of each component is `Up`, and the
 
 ```bash
 NAME                           IMAGE                                  COMMAND                  SERVICE             CREATED              STATUS                        PORTS
-confs-10000-client-1           federatedai/client:v2.0.0-beta      "bash -c 'pipeline i…"   client              About a minute ago   Up About a minute             0.0.0.0:20000->20000/tcp, :::20000->20000/tcp
-confs-10000-clustermanager-1   federatedai/eggroll:v2.0.0-beta     "/tini -- bash -c 'j…"   clustermanager      About a minute ago   Up About a minute             4670/tcp
-confs-10000-fateboard-1        federatedai/fateboard:v2.0.0-beta   "/bin/sh -c 'java -D…"   fateboard           About a minute ago   Up About a minute             0.0.0.0:8080->8080/tcp, :::8080->8080/tcp
-confs-10000-fateflow-1         federatedai/fateflow:v2.0.0-beta    "/bin/bash -c 'set -…"   fateflow            About a minute ago   Up About a minute (healthy)   0.0.0.0:9360->9360/tcp, :::9360->9360/tcp, 0.0.0.0:9380->9380/tcp, :::9380->9380/tcp
+confs-10000-client-1           federatedai/client:2.0.0-release      "bash -c 'pipeline i…"   client              About a minute ago   Up About a minute             0.0.0.0:20000->20000/tcp, :::20000->20000/tcp
+confs-10000-clustermanager-1   federatedai/eggroll:2.0.0-release     "/tini -- bash -c 'j…"   clustermanager      About a minute ago   Up About a minute             4670/tcp
+confs-10000-fateboard-1        federatedai/fateboard:2.0.0-release   "/bin/sh -c 'java -D…"   fateboard           About a minute ago   Up About a minute             0.0.0.0:8080->8080/tcp, :::8080->8080/tcp
+confs-10000-fateflow-1         federatedai/fateflow:2.0.0-release    "/bin/bash -c 'set -…"   fateflow            About a minute ago   Up About a minute (healthy)   0.0.0.0:9360->9360/tcp, :::9360->9360/tcp, 0.0.0.0:9380->9380/tcp, :::9380->9380/tcp
 confs-10000-mysql-1            mysql:8.0.28                           "docker-entrypoint.s…"   mysql               About a minute ago   Up About a minute             3306/tcp, 33060/tcp
-confs-10000-nodemanager-1      federatedai/eggroll:v2.0.0-beta     "/tini -- bash -c 'j…"   nodemanager         About a minute ago   Up About a minute             4671/tcp
-confs-10000-rollsite-1         federatedai/eggroll:v2.0.0-beta     "/tini -- bash -c 'j…"   rollsite            About a minute ago   Up About a minute             0.0.0.0:9370->9370/tcp, :::9370->9370/tcp
+confs-10000-nodemanager-1      federatedai/eggroll:2.0.0-release     "/tini -- bash -c 'j…"   nodemanager         About a minute ago   Up About a minute             4671/tcp
+confs-10000-osx-1         federatedai/osx:2.0.0-release     "/tini -- bash -c 'j…"   osx            About a minute ago   Up About a minute             0.0.0.0:9370->9370/tcp, :::9370->9370/tcp
 ```
 
 ### Verifying the deployment

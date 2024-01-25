@@ -40,20 +40,19 @@ volumes:
       device: <path-to-host-dir>/data
 
 services:
-  rollsite:
-    image: "${RegistryURI}${EGGRoll_IMAGE}:${EGGRoll_IMAGE_TAG}"
+  osx:
+    image: "${RegistryURI}${OSX_IMAGE}:${OSX_IMAGE_TAG}"
     restart: always
     ports:
       - "9370:9370"
     environment:
       PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION: python
     volumes:
-      - ./confs/eggroll/conf:/data/projects/fate/eggroll/conf/
+      - ./confs/osx/conf/:/data/projects/fate/osx/conf/broker/
       - /etc/localtime:/etc/localtime:ro
-      - shared_dir_fate:/data/projects/fate/fate
     networks:
       - fate-network
-    command: ["bash", "-c", "java -Dlog4j.configurationFile=$${EGGROLL_HOME}/conf/log4j2.properties -cp $${EGGROLL_HOME}/lib/*:$${EGGROLL_HOME}/conf/ com.webank.eggroll.rollsite.EggSiteBootstrap -c $${EGGROLL_HOME}/conf/eggroll.properties"]
+    command: ["sh", "-c", "java  -XX:+UseG1GC -XX:G1HeapRegionSize=16m -XX:G1ReservePercent=25 -XX:InitiatingHeapOccupancyPercent=30 -XX:SoftRefLRUPolicyMSPerMB=0 -verbose:gc -Xloggc:/dev/shm/rmq_srv_gc_%p_%t.log -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCApplicationStoppedTime -XX:+PrintAdaptiveSizePolicy -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=5 -XX:GCLogFileSize=30m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/oom/heapdump.hprof  -server -Xms4g -Xmx4g -XX:-OmitStackTraceInFastThrow -XX:+AlwaysPreTouch -XX:MaxDirectMemorySize=15g -XX:-UseLargePages -XX:-UseBiasedLocking  -cp conf/broker/:lib/*:extension/*:/data/projects/fate/osx/lib/osx-broker-1.0.0.jar org.fedai.osx.broker.Bootstrap -c /data/projects/fate/osx/conf"]
   
   fateboard:
     image: "${FATEBoard_IMAGE}:${FATEBoard_IMAGE_TAG}"
@@ -82,7 +81,7 @@ services:
       PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION: python
     networks:
       - fate-network
-    command: ["bash", "-c", "java -Dlog4j.configurationFile=$${EGGROLL_HOME}/conf/log4j2.properties -cp $${EGGROLL_HOME}/lib/*: com.webank.eggroll.core.Bootstrap --bootstraps com.webank.eggroll.core.resourcemanager.ClusterManagerBootstrap -c $${EGGROLL_HOME}/conf/eggroll.properties -p 4670 -s 'EGGROLL_DEAMON'"]
+    command: ["bash", "-c", "java -server -Dlog4j.configurationFile=$${EGGROLL_HOME}/conf/log4j2.xml -Dmodule=clustermanager -cp $${EGGROLL_HOME}/lib/*: org.fedai.eggroll.clustermanager.Bootstrap -p 4670 -s EGGROLL_DAEMON"]
   
   nodemanager:
     image: "${EGGRoll_IMAGE}:${EGGRoll_IMAGE_TAG}"
@@ -103,7 +102,7 @@ services:
       PYTHONPATH: /data/projects/fate/fate/python:/data/projects/fate/fate_flow/python:/data/projects/fate/fate_client/python:/data/projects/fate/eggroll/python
     cap_add:
       - SYS_PTRACE
-    command: ["bash", "-c", "java -Dlog4j.configurationFile=$${EGGROLL_HOME}/conf/log4j2.properties -cp $${EGGROLL_HOME}/lib/*: com.webank.eggroll.core.Bootstrap --bootstraps com.webank.eggroll.core.resourcemanager.NodeManagerBootstrap -c $${EGGROLL_HOME}/conf/eggroll.properties -p 4671 -s 'EGGROLL_DEAMON'"]
+    command: ["bash", "-c", "java -server -Dlog4j.configurationFile=$${EGGROLL_HOME}/conf/log4j2.xml -Dmodule=nodemanager -cp $${EGGROLL_HOME}/lib/*: org.fedai.eggroll.nodemanager.Bootstrap -p 4671 -s EGGROLL_DAEMON"]
   
   fateflow:
     image: "${FATEFlow_IMAGE}:${FATEFlow_IMAGE_TAG}"
@@ -127,7 +126,7 @@ services:
       - /etc/localtime:/etc/localtime:ro
     depends_on:
       - mysql
-      - rollsite
+      - osx
       - clustermanager
       - nodemanager
     networks:

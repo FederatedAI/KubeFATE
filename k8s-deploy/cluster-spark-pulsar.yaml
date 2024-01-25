@@ -1,7 +1,7 @@
 name: fate-9999
 namespace: fate-9999
 chartName: fate
-chartVersion: v2.0.0-beta
+chartVersion: v2.0.0
 partyId: 9999
 registry: ""
 pullPolicy:
@@ -55,7 +55,7 @@ skippedKeys:
 
 # fateboard:
   # image: "federatedai/fateboard"
-  # imageTag: "v2.0.0-beta"
+  # imageTag: "2.0.0-release"
 #   type: ClusterIP
 #   username: admin
 #   password: admin
@@ -66,7 +66,7 @@ skippedKeys:
 # Specify the fateflow service's properties
 # python:
   # image: "federatedai/fateflow"
-  # imageTag: "v2.0.0-beta"
+  # imageTag: "2.0.0-release"
 #   type: NodePort
 #   replicas: 1
 #   httpNodePort: 30097
@@ -171,7 +171,7 @@ skippedKeys:
 # spark:
   # master:
     # image: "federatedai/spark-master"
-    # imageTag: "v2.0.0-beta"
+    # imageTag: "2.0.0-release"
     # replicas: 1
     # resources:
       # requests:
@@ -187,7 +187,7 @@ skippedKeys:
     # nodePort: 30977
   # worker:
     # image: "federatedai/spark-worker"
-    # imageTag: "v2.0.0-beta"
+    # imageTag: "2.0.0-release"
     # replicas: 2
     # resources:
       # requests:
@@ -227,7 +227,7 @@ skippedKeys:
     # size:
 # nginx:
   # image: "federatedai/nginx"
-  # imageTag: "v2.0.0-beta"
+  # imageTag: "2.0.0-release"
   # nodeSelector:
   # tolerations:
   # affinity:

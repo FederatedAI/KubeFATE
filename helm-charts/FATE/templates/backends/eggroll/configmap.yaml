@@ -24,101 +24,52 @@ data:
   eggroll.properties: |
     [eggroll]
     # core
+    eggroll.resourcemanager.nodemanager.net.device=eth0
+    eggroll.resourcemanager.nodemanager.gpu.num.shell=nvidia.sh
     #eggroll.resourcemanager.clustermanager.jdbc.driver.class.name=org.h2.Driver
     eggroll.resourcemanager.clustermanager.jdbc.driver.class.name=com.mysql.cj.jdbc.Driver
     #eggroll.resourcemanager.clustermanager.jdbc.url=jdbc:h2:./data/meta_h2/eggroll_meta.h2;AUTO_SERVER=TRUE;MODE=MySQL;DATABASE_TO_LOWER=TRUE;SCHEMA=eggroll_meta;
     eggroll.resourcemanager.clustermanager.jdbc.url=jdbc:mysql://{{ .Values.externalMysqlIp | default .Values.modules.mysql.ip | default "mysql" }}:{{ .Values.externalMysqlPort | default .Values.modules.mysql.port | default "3306" }}/{{ .Values.externalMysqlDatabase | default .Values.modules.mysql.database | default "eggroll_meta" }}?useSSL=false&serverTimezone={{ .Values.modules.clustermanager.mysqlServerTimezone | default "UTC" }}&characterEncoding=utf8&allowPublicKeyRetrieval=true
     eggroll.resourcemanager.clustermanager.jdbc.username={{ .Values.externalMysqlUser | default .Values.modules.mysql.user | default "fate" }}
     eggroll.resourcemanager.clustermanager.jdbc.password={{ .Values.externalMysqlPassword | default .Values.modules.mysql.password | default "fate_dev" }}
-    
-    eggroll.data.dir=data/
-    eggroll.logs.dir=logs/
+
     eggroll.resourcemanager.clustermanager.host=clustermanager
     eggroll.resourcemanager.clustermanager.port=4670
+    eggroll.resourcemanager.nodemanager.host=nodemanager
     eggroll.resourcemanager.nodemanager.port=4671
     eggroll.resourcemanager.process.tag={{ .Values.partyId }}
     
+    # dashboard
+    eggroll.dashboard.server.port=8083
+    eggroll.security.session.expired.time=30
+    eggroll.security.login.username=admin
+    eggroll.security.login.password=admin
+    eggroll.security.encrypt.private_key=
+    eggroll.security.encrypt.enable=false
+
+    eggroll.data.dir=/data/projects/fate/eggroll/data/
+    eggroll.logs.dir=/data/projects/fate/eggroll/logs/
+
     eggroll.bootstrap.root.script=bin/eggroll_boot.sh
-    
+
     eggroll.resourcemanager.bootstrap.egg_pair.exepath=bin/roll_pair/egg_pair_bootstrap.sh
     eggroll.resourcemanager.bootstrap.egg_pair.venv=
     eggroll.resourcemanager.bootstrap.egg_pair.pythonpath=python
-    eggroll.resourcemanager.bootstrap.egg_pair.filepath=python/eggroll/roll_pair/egg_pair.py
+    eggroll.resourcemanager.bootstrap.egg_pair.filepath=python/eggroll/computing/egg_pair/egg_pair.py
     eggroll.resourcemanager.bootstrap.egg_pair.ld_library_path=
-    
-    eggroll.resourcemanager.bootstrap.egg_frame.exepath=bin/roll_pair/roll_pair_master_bootstrap.sh
-    eggroll.resourcemanager.bootstrap.egg_frame.javahome=/usr/lib/jvm/java-1.8.0-openjdk
-    eggroll.resourcemanager.bootstrap.egg_frame.classpath=conf/:lib/*
-    eggroll.resourcemanager.bootstrap.egg_frame.mainclass=com.webank.eggroll.rollframe.EggFrameBootstrap
-    eggroll.resourcemanager.bootstrap.egg_frame.jvm.options=
-    
-    eggroll.core.grpc.channel.keepalive.timeout.sec=20
-    
-    # roll_frame
-    arrow.enable_unsafe_memory_access=true
-    
-    # hadoop
-    hadoop.fs.defaultFS=file:///
-    
-    # hadoop HA mode
-    hadoop.dfs.nameservices=
-    hadoop.dfs.namenode.rpc-address.nn1=
-    hadoop.dfs.namenode.rpc-address.nn2=
-    
+
     # session
-    eggroll.session.processors.per.node={{ .Values.modules.nodemanager.sessionProcessorsPerNode | default 2 }}
-    eggroll.session.start.timeout.ms=180000
-    
-    # rollpair
-    eggroll.rollpair.transferpair.sendbuf.size=250000
-    
-    # rollsite
-    eggroll.rollsite.coordinator={{ .Values.partyName }}
-    eggroll.rollsite.host=rollsite
-    eggroll.rollsite.port=9370
-    eggroll.rollsite.party.id={{ .Values.partyId }}
-    eggroll.rollsite.route.table.path=conf/route_table/route_table.json
-    eggroll.rollsite.route.table.key=
-    eggroll.rollsite.route.table.whitelist=127.0.0.1
-    eggroll.rollsite.jvm.options=-XX:+UseG1GC -XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:logs/eggroll/rollsite.gc.log
-    
-    eggroll.rollsite.push.max.retry=3
-    eggroll.rollsite.push.long.retry=2
-    eggroll.rollsite.push.batches.per.stream=10
-    eggroll.rollsite.adapter.sendbuf.size=100000
-    # polling
-    # {{ .Values.modules.rollsite.polling.enabled }}
-    # {{ .Values.modules.rollsite.polling.type }}
-    # 
-    {{- if and .Values.modules.rollsite.polling.enabled ( eq (print .Values.modules.rollsite.polling.type) "client" )  }}
-    eggroll.rollsite.polling.client.enabled=true
-    {{- end }}
-    
-    {{- if and .Values.modules.rollsite.polling.enabled ( eq (print .Values.modules.rollsite.polling.type) "server" )  }}
-    eggroll.rollsite.polling.server.enabled=true
-    eggroll.rollsite.polling.concurrency= {{ .Values.modules.rollsite.polling.concurrency | default 50 }}
-    {{- end }}
- 
+    eggroll.session.processors.per.node={{ .Values.modules.nodemanager.sessionProcessorsPerNode | default 4 }}
+
     # deepspeed
     ## where deepspeed containers locate, required for deepspeed
-    eggroll.resourcemanager.nodemanager.containers.data.dir=/data/projects/fate/eggroll/containers
+    #eggroll.resourcemanager.nodemanager.containers.data.dir=
     ## which python exec that deepspeed container used, fallback to eggpair venv/bin/python
-    eggroll.container.deepspeed.python.exec=/data/projects/python/venv/bin/python
+    #eggroll.container.python.exec=
     ## provide by submit option for now
     #eggroll.container.deepspeed.script.path=
     eggroll.container.deepspeed.distributed.backend=nccl
     ## defaults to cluster manager endpoint
     #eggroll.container.deepspeed.distributed.store.host=
     #eggroll.container.deepspeed.distributed.store.port=
-  {{- if .Values.modules.rollsite.enableTLS }}
-  cert_configs: |
-    eggroll.core.security.secure.cluster.enabled=true
-    eggroll.core.security.secure.client.auth.enabled=true
-    eggroll.core.security.ca.crt.path=conf/cert/ca.pem
-    eggroll.core.security.crt.path=conf/cert/server.crt
-    eggroll.core.security.key.path=conf/cert/server.key
-    eggroll.core.security.client.ca.crt.path=conf/cert/ca.pem
-    eggroll.core.security.client.crt.path=conf/cert/client.crt
-    eggroll.core.security.client.key.path=conf/cert/client.key
-  {{- end }}
 {{ end }}
