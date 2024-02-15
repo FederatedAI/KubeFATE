@@ -123,8 +123,8 @@ spec:
                 
                 sed -i "s/int(party.party_id)/str(party.party_id)/g" /data/projects/fate/fate/python/fate/arch/federation/pulsar/_federation.py
 
-                cp /data/projects/fate/fate_flow/conf/pulsar_route_table/pulsar_route_table.yaml /data/projects/fate/fate_flow/pulsar_route_table.yaml
-                cp /data/projects/fate/fate_flow/conf/rabbitmq_route_table/rabbitmq_route_table.yaml /data/projects/fate/fate_flow/rabbitmq_route_table.yaml
+                cp /data/projects/fate/fate_flow/conf/pulsar_route_table/pulsar_route_table.yaml /data/projects/fate/fate_flow/conf/pulsar_route_table.yaml
+                cp /data/projects/fate/fate_flow/conf/rabbitmq_route_table/rabbitmq_route_table.yaml /data/projects/fate/fate_flow/conf/rabbitmq_route_table.yaml
         
                 pip install cryptography && sleep 5 && python fate_flow/python/fate_flow/fate_flow_server.py --debug
           livenessProbe:
