@@ -10,7 +10,7 @@
    fate.images.tar.gz
    
    # 获取docker-deploy部署脚本
-   wget https://codeload.github.com/FederatedAI/KubeFATE/zip/refs/heads/develop-2.1.0
+   wget https://codeload.github.com/FederatedAI/KubeFATE/zip/refs/heads/support-2.1.0
    ~~~
 
 #### 2. 加载镜像
