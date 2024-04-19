@@ -288,7 +288,7 @@ rm -rf ../confs-<id>/               # 删除docker-compose部署文件
 
 ##### 采用docker hub下载镜像速度可能较慢
 
-解决办法：可以自己构建镜像，自己构建镜像参考[这里](https://github.com/FederatedAI/FATE/tree/master/docker-build)。
+解决办法：可以自己构建镜像，自己构建镜像参考[这里](https://github.com/FederatedAI/FATE-builder/tree/master/docker-build)。
 
 
 
