@@ -18,35 +18,42 @@ cd $BASEDIR
 WORKINGDIR=$(pwd)
 
 # fetch fate-python image
+echo "fetch fate-python image"
 source ${WORKINGDIR}/.env
 source ${WORKINGDIR}/parties.conf
-
+echo "finished"
 cd ${WORKINGDIR}
 
 Deploy() {
 	if [ "$1" = "" ]; then
+                echo "3"
 		echo "No party id was provided, please check your arguments "
 		exit 1
 	fi
 
 	while [ "$1" != "" ]; do
+                echo "4"
 		case $1 in
 		splitting_proxy)
 			shift
+                        echo "1"
 			DeployPartyInternal $@
 			break
 			;;
 		all)
+                        echo "2"
 			for party in ${party_list[*]}; do
 				if [ "$2" != "" ]; then
 					case $2 in
 					--training)
+                                                echo "training"
 						DeployPartyInternal $party
 						if [ "${exchangeip}" != "" ]; then
 							DeployPartyInternal exchange
 						fi
 						;;
 					--serving)
+                                                echo "serving"
 						DeployPartyServing $party
 						;;
 					esac
@@ -61,18 +68,22 @@ Deploy() {
 			break
 			;;
 		*)
+                        echo "5"
 			if [ "$2" != "" ]; then
 				case $2 in
 				--training)
+                                        echo "6"
 					DeployPartyInternal $1
 					break
 					;;
 				--serving)
+                                        echo "7"
 					DeployPartyServing $1
 					break
 					;;
 				esac
 			else
+                                echo "87"
 				DeployPartyInternal $1
 				DeployPartyServing $1
 			fi
@@ -113,6 +124,7 @@ Delete() {
 }
 
 DeployPartyInternal() {
+        echo "$1"
 	target_party_id=$1
 	# should not use localhost at any case
 	target_party_ip="127.0.0.1"
@@ -130,10 +142,12 @@ DeployPartyInternal() {
 	if [ "$target_party_id" = "exchange" ]; then
 		target_party_ip=${exchangeip}
 	elif [ "$2" != "" ]; then
+                echo "$2"
 		target_party_ip="$2"
 	else
 		for ((i = 0; i < ${#party_list[*]}; i++)); do
 			if [ "${party_list[$i]}" = "$target_party_id" ]; then
+                                echo "$target_party_id"
 				target_party_ip=${party_ip_list[$i]}
 			fi
 		done
@@ -143,33 +157,35 @@ DeployPartyInternal() {
 		echo "Unable to find Party: $target_party_id, please check you input."
 		return 1
 	fi
-
+        echo "233"
 	if [ "$3" != "" ]; then
+                echo "$2"
 		user=$3
 	fi
-
+        echo "handleLocally confs"
 	handleLocally confs
+        echo "handleLocally confs finished"
 	if [ "$local_flag" == "true" ]; then
 		return 0
 	fi
-
+        echo "scp -P ${SSH_PORT} ${WORKINGDIR}/outputs/confs-$target_party_id.tar $user@$target_party_ip:~/"
 	scp -P ${SSH_PORT} ${WORKINGDIR}/outputs/confs-$target_party_id.tar $user@$target_party_ip:~/
 	#rm -f ${WORKINGDIR}/outputs/confs-$target_party_id.tar
 	echo "$target_party_ip training cluster copy is ok!"
-	ssh -p ${SSH_PORT} -tt $user@$target_party_ip <<eeooff
+	ssh -p ${SSH_PORT} -tt $user@$target_party_ip << eeooff
 mkdir -p $dir
 rm -f $dir/confs-$target_party_id.tar
 mv ~/confs-$target_party_id.tar $dir
 cd $dir
 tar -xzf confs-$target_party_id.tar
 cd confs-$target_party_id
-docker compose down
+docker-compose down
 docker volume rm -f confs-${target_party_id}_shared_dir_examples
 docker volume rm -f confs-${target_party_id}_shared_dir_fate
 docker volume rm -f confs-${target_party_id}_sdownload_dir
 docker volume rm -f confs-${target_party_id}_fate_flow_logs
 
-docker compose up -d
+docker-compose up -d
 cd ../
 rm -f confs-${target_party_id}.tar
 exit
@@ -178,6 +194,7 @@ eeooff
 }
 
 DeployPartyServing() {
+        echo "$1" 
 	target_party_id=$1
 	# should not use localhost at any case
 	target_party_serving_ip="127.0.0.1"
@@ -217,8 +234,8 @@ mv ~/serving-$target_party_id.tar $dir
 cd $dir
 tar -xzf serving-$target_party_id.tar
 cd serving-$target_party_id
-docker compose down
-docker compose up -d
+docker-compose down
+docker-compose up -d
 cd ../
 rm -f serving-$target_party_id.tar
 exit
@@ -258,7 +275,7 @@ DeleteCluster() {
 	if [ "$cluster_type" == "--training" ]; then
 		ssh -p ${SSH_PORT} -tt $user@$target_party_ip <<eeooff
 cd $dir/confs-$target_party_id
-docker compose down
+docker-compose down
 exit
 eeooff
 		echo "party $target_party_id training cluster is deleted!"
@@ -266,7 +283,7 @@ eeooff
 	elif [ "$cluster_type" == "--serving" ]; then
 		ssh -p ${SSH_PORT} -tt $user@$target_party_serving_ip <<eeooff
 cd $dir/serving-$target_party_id
-docker compose down
+docker-compose down
 exit
 eeooff
 		echo "party $target_party_id serving cluster is deleted!"
@@ -276,21 +293,21 @@ eeooff
 		if [ "$target_party_id" == "exchange" ]; then
 			ssh -p ${SSH_PORT} -tt $user@$target_party_ip <<eeooff
 cd $dir/confs-$target_party_id
-docker compose down
+docker-compose down
 exit
 eeooff
 		else
 			if [ "$target_party_serving_ip" != "" ]; then
 			ssh -p ${SSH_PORT} -tt $user@$target_party_serving_ip <<eeooff
 cd $dir/serving-$target_party_id
-docker compose down
+docker-compose down
 exit
 eeooff
 			fi
 			if [ "$target_party_ip" != "" ]; then
 			ssh -p ${SSH_PORT} -tt $user@$target_party_ip <<eeooff
 cd $dir/confs-$target_party_id
-docker compose down
+docker-compose down
 exit
 eeooff
 			fi
@@ -310,10 +327,16 @@ handleLocally() {
 	for ip in $(hostname -I); do
 		if [ "$target_party_ip" == "$ip" ]; then
 			mkdir -p $dir
+                        echo "344444"
 			tar -xf ${WORKINGDIR}/outputs/${type}-${target_party_id}.tar -C $dir
+                        echo "${dir}/${type}-${target_party_id}"
 			cd ${dir}/${type}-${target_party_id}
-			docker compose down
-			docker compose up -d
+                        echo "docker-compose down"
+			docker-compose down
+                        echo "docker-compose down finished"
+                        echo "docker-compose up"
+			docker-compose up -d
+                        echo "docker-compose up finished"
 			local_flag="true"
 			return 0
 		fi
@@ -330,6 +353,7 @@ main() {
 		shift
 		Delete $@
 	else
+                echo "deploy"
 		Deploy "$@"
 	fi
 

@@ -43,16 +43,21 @@ services:
   osx:
     image: "${RegistryURI}${OSX_IMAGE}:${OSX_IMAGE_TAG}"
     restart: always
+    expose:
+      - 9370
     ports:
       - "9370:9370"
     environment:
       PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION: python
+      JAVA_HOME: java
     volumes:
       - ./confs/osx/conf/:/data/projects/fate/osx/conf/broker/
       - /etc/localtime:/etc/localtime:ro
     networks:
       - fate-network
-    command: ["sh", "-c", "java  -XX:+UseG1GC -XX:G1HeapRegionSize=16m -XX:G1ReservePercent=25 -XX:InitiatingHeapOccupancyPercent=30 -XX:SoftRefLRUPolicyMSPerMB=0 -verbose:gc -Xloggc:/dev/shm/rmq_srv_gc_%p_%t.log -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCApplicationStoppedTime -XX:+PrintAdaptiveSizePolicy -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=5 -XX:GCLogFileSize=30m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/oom/heapdump.hprof  -server -Xms4g -Xmx4g -XX:-OmitStackTraceInFastThrow -XX:+AlwaysPreTouch -XX:MaxDirectMemorySize=15g -XX:-UseLargePages -XX:-UseBiasedLocking  -cp conf/broker/:lib/*:extension/*:/data/projects/fate/osx/lib/osx-broker-1.0.0.jar org.fedai.osx.broker.Bootstrap -c /data/projects/fate/osx/conf"]
+    #command: ["sh", "-c", "cd /data/projects/fate/osx && sh service.sh start"]
+    command: ["sh", "-c", "java -XX:+UseG1GC -XX:G1HeapRegionSize=16m -XX:G1ReservePercent=25 -XX:InitiatingHeapOccupancyPercent=30 -XX:SoftRefLRUPolicyMSPerMB=0 -verbose:gc -Xloggc:/dev/shm/rmq_srv_gc_%p_%t.log -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCApplicationStoppedTime -XX:+PrintAdaptiveSizePolicy -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=5 -XX:GCLogFileSize=30m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/oom/heapdump.hprof -server -Xms4g -Xmx4g -XX:-OmitStackTraceInFastThrow -XX:+AlwaysPreTouch -XX:MaxDirectMemorySize=15g -XX:-UseLargePages -XX:-UseBiasedLocking -cp conf/broker/:lib/*:extension/*:/data/projects/fate/osx/lib/osx-broker-1.1.0.jar:pb_lib/v3/* org.fedai.osx.broker.Bootstrap -c /data/projects/fate/osx/conf"]
+    #command: ["sh", "-c", "java  -XX:+UseG1GC -XX:G1HeapRegionSize=16m -XX:G1ReservePercent=25 -XX:InitiatingHeapOccupancyPercent=30 -XX:SoftRefLRUPolicyMSPerMB=0 -verbose:gc -Xloggc:/dev/shm/rmq_srv_gc_%p_%t.log -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCApplicationStoppedTime -XX:+PrintAdaptiveSizePolicy -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=5 -XX:GCLogFileSize=30m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/oom/heapdump.hprof  -server -Xms4g -Xmx4g -XX:-OmitStackTraceInFastThrow -XX:+AlwaysPreTouch -XX:MaxDirectMemorySize=15g -XX:-UseLargePages -XX:-UseBiasedLocking  -cp conf/broker/:lib/*:extension/*:/data/projects/fate/osx/lib/osx-broker-1.0.0.jar org.fedai.osx.broker.Bootstrap -c /data/projects/fate/osx/conf"]
   
   fateboard:
     image: "${FATEBoard_IMAGE}:${FATEBoard_IMAGE_TAG}"
@@ -60,13 +65,14 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ./confs/fateboard/conf:/data/projects/fate/fateboard/conf
+      - ./confs/fate_board/conf:/data/projects/fate/fate_board/conf
       - fate_flow_logs:/data/projects/fate/fate_flow/logs
       - /etc/localtime:/etc/localtime:ro
     networks:
       - fate-network
     depends_on:
       - fateflow
+    command: ["sh", "-c", "java -Dspring.config.location=/data/projects/fate/fate_board/conf/application.properties -Dssh_config_file=/data/projects/fate/fate_board/ssh/ -Xmx2048m -Xms2048m -XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:gc.log -XX:+HeapDumpOnOutOfMemoryError -cp /data/projects/fate/fate_board/lib/*:/data/projects/fate/fate_board/fateboard-2.1.0.jar org.fedai.fate.board.bootstrap.Bootstrap"]
   
   clustermanager:
     image: "${EGGRoll_IMAGE}:${EGGRoll_IMAGE_TAG}"

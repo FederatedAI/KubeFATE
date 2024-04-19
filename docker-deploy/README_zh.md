@@ -258,14 +258,7 @@ $ flow test toy --guest-party-id 10000 --host-party-id 9999
 如果测试通过，屏幕将显示类似如下消息：
 
 ```bash
-"2019-08-29 07:21:25,353 - secure_add_guest.py[line:96] - INFO: begin to init parameters of secure add example guest"
-"2019-08-29 07:21:25,354 - secure_add_guest.py[line:99] - INFO: begin to make guest data"
-"2019-08-29 07:21:26,225 - secure_add_guest.py[line:102] - INFO: split data into two random parts"
-"2019-08-29 07:21:29,140 - secure_add_guest.py[line:105] - INFO: share one random part data to host"
-"2019-08-29 07:21:29,237 - secure_add_guest.py[line:108] - INFO: get share of one random part data from host"
-"2019-08-29 07:21:33,073 - secure_add_guest.py[line:111] - INFO: begin to get sum of guest and host"
-"2019-08-29 07:21:33,920 - secure_add_guest.py[line:114] - INFO: receive host sum from guest"
-"2019-08-29 07:21:34,118 - secure_add_guest.py[line:121] - INFO: success to calculate secure_sum, it is 2000.0000000000002"
+toy test job xxxxx is success
 ```
 
 ### 验证Serving-Service功能
@@ -276,13 +269,29 @@ $ flow test toy --guest-party-id 10000 --host-party-id 9999
 
 ```bash
 cd /data/projects/fate/confs-10000
-docker compose exec client bash
+docker-compose exec client bash
 ```
 
 ##### 上传host数据
 
 ```bash
-flow data upload -c fateflow/examples/upload/upload_host.json
+# 上传数据（单边的， 双边需要在另一方再次执行）
+from fate_client.pipeline import FateFlowPipeline
+   
+guest_data_path="/data/projects/fate/examples/data/breast_hetero_guest.csv"
+host_data_path="/data/projects/fate/examples/data/breast_hetero_host.csv"
+   
+data_pipeline = FateFlowPipeline().set_parties(local="0")
+guest_meta = {
+       "delimiter": ",", "dtype": "float64", "label_type": "int64","label_name": "y", "match_id_name": "id"
+   }
+host_meta = {
+       "delimiter": ",", "input_format": "dense", "match_id_name": "id"
+   }
+data_pipeline.transform_local_file_to_dataframe(file=guest_data_path, namespace="experiment", name="breast_hetero_guest",
+                                                   meta=guest_meta, head=True, extend_sid=True)
+data_pipeline.transform_local_file_to_dataframe(file=host_data_path, namespace="experiment", name="breast_hetero_host",
+                                                   meta=host_meta, head=True, extend_sid=True)
 ```
 
 #### Guest方操作
@@ -291,248 +300,106 @@ flow data upload -c fateflow/examples/upload/upload_host.json
 
 ```bash
 cd /data/projects/fate/confs-9999
-docker compose exec client bash
+docker-compose exec client bash
 ```
 
 ##### 上传guest数据
 
 ```bash
-flow data upload -c fateflow/examples/upload/upload_guest.json
+# 上传数据（单边的， 双边需要在另一方再次执行）
+from fate_client.pipeline import FateFlowPipeline
+   
+guest_data_path="/data/projects/fate/examples/data/breast_hetero_guest.csv"
+host_data_path="/data/projects/fate/examples/data/breast_hetero_host.csv"
+   
+data_pipeline = FateFlowPipeline().set_parties(local="0")
+guest_meta = {
+       "delimiter": ",", "dtype": "float64", "label_type": "int64","label_name": "y", "match_id_name": "id"
+   }
+host_meta = {
+       "delimiter": ",", "input_format": "dense", "match_id_name": "id"
+   }
+data_pipeline.transform_local_file_to_dataframe(file=guest_data_path, namespace="experiment", name="breast_hetero_guest",
+                                                   meta=guest_meta, head=True, extend_sid=True)
+data_pipeline.transform_local_file_to_dataframe(file=host_data_path, namespace="experiment", name="breast_hetero_host",
+                                                   meta=host_meta, head=True, extend_sid=True)
 ```
 
 ##### 提交任务
 
 ```bash
-flow job submit -d fateflow/examples/lr/test_hetero_lr_job_dsl.json -c fateflow/examples/lr/test_hetero_lr_job_conf.json
+# 发起任务
+from fate_client.pipeline.components.fate import (
+       HeteroSecureBoost,
+       Reader,
+       PSI,
+       Evaluation
+   )
+from fate_client.pipeline import FateFlowPipeline
+   
+   
+# create pipeline for training
+pipeline = FateFlowPipeline().set_parties(guest="9999", host="10000")
+   
+# create reader task_desc
+reader_0 = Reader("reader_0")
+reader_0.guest.task_parameters(namespace="experiment", name="breast_hetero_guest")
+reader_0.hosts[0].task_parameters(namespace="experiment", name="breast_hetero_host")
+   
+# create psi component_desc
+psi_0 = PSI("psi_0", input_data=reader_0.outputs["output_data"])
+   
+# create hetero secure_boost component_desc
+hetero_secureboost_0 = HeteroSecureBoost(
+       "hetero_secureboost_0", num_trees=1, max_depth=5,
+       train_data=psi_0.outputs["output_data"],
+       validate_data=psi_0.outputs["output_data"]
+   )
+   
+# create evaluation component_desc
+evaluation_0 = Evaluation(
+       'evaluation_0', runtime_parties=dict(guest="9999"), metrics=["auc"], input_datas=[hetero_secureboost_0.outputs["train_output_data"]]
+   )
+   
+# add training task
+pipeline.add_tasks([reader_0, psi_0, hetero_secureboost_0, evaluation_0])
+   
+# compile and train
+pipeline.compile()
+pipeline.fit()
+   
+# print metric and model info
+print (pipeline.get_task_info("hetero_secureboost_0").get_output_model())
+print (pipeline.get_task_info("evaluation_0").get_output_metric())
+   
+# deploy task for inference
+pipeline.deploy([psi_0, hetero_secureboost_0])
+   
+# create pipeline for predicting
+predict_pipeline = FateFlowPipeline()
+   
+# add input to deployed_pipeline
+deployed_pipeline = pipeline.get_deployed_pipeline()
+reader_1 = Reader("reader_1")
+reader_1.guest.task_parameters(namespace="experiment", name="breast_hetero_guest")
+reader_1.hosts[0].task_parameters(namespace="experiment", name="breast_hetero_host")
+deployed_pipeline.psi_0.input_data = reader_1.outputs["output_data"]
+   
+# add task to predict pipeline
+predict_pipeline.add_tasks([reader_1, deployed_pipeline])
+   
+# compile and predict
+predict_pipeline.compile()
+predict_pipeline.predict()
 ```
 
-output：
 
-```json
-{
-    "data": {
-        "board_url": "http://fateboard:8080/index.html#/dashboard?job_id=202111230933232084530&role=guest&party_id=9999",
-        "code": 0,
-        "dsl_path": "/data/projects/fate/fate_flow/jobs/202111230933232084530/job_dsl.json",
-        "job_id": "202111230933232084530",
-        "logs_directory": "/data/projects/fate/fate_flow/logs/202111230933232084530",
-        "message": "success",
-        "model_info": {
-            "model_id": "arbiter-10000#guest-9999#host-10000#model",
-            "model_version": "202111230933232084530"
-        },
-        "pipeline_dsl_path": "/data/projects/fate/fate_flow/jobs/202111230933232084530/pipeline_dsl.json",
-        "runtime_conf_on_party_path": "/data/projects/fate/fate_flow/jobs/202111230933232084530/guest/9999/job_runtime_on_party_conf.json",
-        "runtime_conf_path": "/data/projects/fate/fate_flow/jobs/202111230933232084530/job_runtime_conf.json",
-        "train_runtime_conf_path": "/data/projects/fate/fate_flow/jobs/202111230933232084530/train_runtime_conf.json"
-    },
-    "jobId": "202111230933232084530",
-    "retcode": 0,
-    "retmsg": "success"
-}
-```
-
-##### 查看训练任务状态
-
-```bash
-flow task query -r guest -j 202111230933232084530 | grep -w f_status
-```
-
+任务成功后，屏幕将显示下方类似结果
 output:
 
 ```bash
-            "f_status": "success",
-            "f_status": "waiting",
-            "f_status": "running",
-            "f_status": "waiting",
-            "f_status": "waiting",
-            "f_status": "success",
-            "f_status": "success",
-```
-
-等到所有的`waiting`状态变为`success`.
-
-##### 部署模型
-
-```bash
-flow model deploy --model-id arbiter-10000#guest-9999#host-10000#model --model-version 202111230933232084530
-```
-
-```json
-{
-    "data": {
-        "arbiter": {
-            "10000": 0
-        },
-        "detail": {
-            "arbiter": {
-                "10000": {
-                    "retcode": 0,
-                    "retmsg": "deploy model of role arbiter 10000 success"
-                }
-            },
-            "guest": {
-                "9999": {
-                    "retcode": 0,
-                    "retmsg": "deploy model of role guest 9999 success"
-                }
-            },
-            "host": {
-                "10000": {
-                    "retcode": 0,
-                    "retmsg": "deploy model of role host 10000 success"
-                }
-            }
-        },
-        "guest": {
-            "9999": 0
-        },
-        "host": {
-            "10000": 0
-        },
-        "model_id": "arbiter-10000#guest-9999#host-10000#model",
-        "model_version": "202111230954255210490"
-    },
-    "retcode": 0,
-    "retmsg": "success"
-}
-```
-
-*后面需要用到的`model_version`都是这一步得到的`"model_version": "202111230954255210490"`*
-
-##### 修改加载模型的配置
-
-```bash
-cat > fateflow/examples/model/publish_load_model.json <<EOF
-{
-  "initiator": {
-    "party_id": "9999",
-    "role": "guest"
-  },
-  "role": {
-    "guest": [
-      "9999"
-    ],
-    "host": [
-      "10000"
-    ],
-    "arbiter": [
-      "10000"
-    ]
-  },
-  "job_parameters": {
-    "model_id": "arbiter-10000#guest-9999#host-10000#model",
-    "model_version": "202111230954255210490"
-  }
-}
-EOF
-```
-
-##### 加载模型
-
-```bash
-flow model load -c fateflow/examples/model/publish_load_model.json
-```
-
-output:
-
-```json
-{
-    "data": {
-        "detail": {
-            "guest": {
-                "9999": {
-                    "retcode": 0,
-                    "retmsg": "success"
-                }
-            },
-            "host": {
-                "10000": {
-                    "retcode": 0,
-                    "retmsg": "success"
-                }
-            }
-        },
-        "guest": {
-            "9999": 0
-        },
-        "host": {
-            "10000": 0
-        }
-    },
-    "jobId": "202111240844337394000",
-    "retcode": 0,
-    "retmsg": "success"
-}
-```
-
-##### 修改绑定模型的配置
-
-```bash
-cat > fateflow/examples/model/bind_model_service.json <<EOF
-{
-    "service_id": "test",
-    "initiator": {
-        "party_id": "9999",
-        "role": "guest"
-    },
-    "role": {
-        "guest": ["9999"],
-        "host": ["10000"],
-        "arbiter": ["10000"]
-    },
-    "job_parameters": {
-        "work_mode": 1,
-        "model_id": "arbiter-10000#guest-9999#host-10000#model",
-        "model_version": "202111230954255210490"
-    }
-}
-EOF
-```
-
-##### 绑定模型
-
-```bash
-flow model bind -c fateflow/examples/model/bind_model_service.json
-```
-
-output:
-
-```json
-{
-    "retcode": 0,
-    "retmsg": "service id is test"
-}
-```
-
-##### 在线测试
-
-发送以下信息到"GUEST"方的推理服务"{SERVING_SERVICE_IP}:8059/federation/v1/inference"
-
-```bash
-$ curl -X POST -H 'Content-Type: application/json' -i 'http://192.168.7.2:8059/federation/v1/inference' --data '{
-  "head": {
-    "serviceId": "test"
-  },
-  "body": {
-    "featureData": {
-        "x0": 1.88669,
-        "x1": -1.359293,
-        "x2": 2.303601,
-        "x3": 2.00137,
-        "x4": 1.307686
-    },
-    "sendToRemoteFeatureData": {
-        "phone_num": "122222222"
-    }
-  }
-}'
-```
-
-output:
-
-```json
-{"retcode":0,"retmsg":"","data":{"score":0.018025086161221948,"modelId":"guest#9999#arbiter-10000#guest-9999#host-10000#model","modelVersion":"202111240318516571130","timestamp":1637743473990},"flag":0}
+Job is success!!! Job id is 202404031636558952240, response_data={'apply_resource_time': 1712133417129, 'cores': 4, 'create_time': 1712133415928, 'dag': {'dag': {'conf': {'auto_retries': 0, 'computing_partitions': 8, 'cores': None, 'extra': None, 'inheritance': None, 'initiator_party_id': '9999', 'model_id': '202404031636558952240', 'model_version': '0', 'model_warehouse': {'model_id': '202404031635272687860', 'model_version': '0'}, 'priority': None, 'scheduler_party_id': '9999', 'sync_type': 'callback', 'task': None}, 'parties': [{'party_id': ['9999'], 'role': 'guest'}, {'party_id': ['10000'], 'role': 'host'}], 'party_tasks': {'guest_9999': {'conf': {}, 'parties': [{'party_id': ['9999'], 'role': 'guest'}], 'tasks': {'reader_1': {'conf': None, 'parameters': {'name': 'breast_hetero_guest', 'namespace': 'experiment'}}}}, 'host_10000': {'conf': {}, 'parties': [{'party_id': ['10000'], 'role': 'host'}], 'tasks': {'reader_1': {'conf': None, 'parameters': {'name': 'breast_hetero_host', 'namespace': 'experiment'}}}}}, 'stage': 'predict', 'tasks': {'hetero_secureboost_0': {'component_ref': 'hetero_secureboost', 'conf': None, 'dependent_tasks': ['psi_0'], 'inputs': {'data': {'test_data': {'task_output_artifact': [{'output_artifact_key': 'output_data', 'output_artifact_type_alias': None, 'parties': [{'party_id': ['9999'], 'role': 'guest'}, {'party_id': ['10000'], 'role': 'host'}], 'producer_task': 'psi_0'}]}}, 'model': {'input_model': {'model_warehouse': {'output_artifact_key': 'output_model', 'output_artifact_type_alias': None, 'parties': [{'party_id': ['9999'], 'role': 'guest'}, {'party_id': ['10000'], 'role': 'host'}], 'producer_task': 'hetero_secureboost_0'}}}}, 'outputs': None, 'parameters': {'gh_pack': True, 'goss': False, 'goss_start_iter': 0, 'hist_sub': True, 'l1': 0, 'l2': 0.1, 'learning_rate': 0.3, 'max_bin': 32, 'max_depth': 5, 'min_child_weight': 1, 'min_impurity_split': 0.01, 'min_leaf_node': 1, 'min_sample_split': 2, 'num_class': 2, 'num_trees': 1, 'objective': 'binary:bce', 'other_rate': 0.1, 'split_info_pack': True, 'top_rate': 0.2}, 'parties': None, 'stage': None}, 'psi_0': {'component_ref': 'psi', 'conf': None, 'dependent_tasks': ['reader_1'], 'inputs': {'data': {'input_data': {'task_output_artifact': {'output_artifact_key': 'output_data', 'output_artifact_type_alias': None, 'parties': [{'party_id': ['9999'], 'role': 'guest'}, {'party_id': ['10000'], 'role': 'host'}], 'producer_task': 'reader_1'}}}, 'model': None}, 'outputs': None, 'parameters': {}, 'parties': None, 'stage': 'default'}, 'reader_1': {'component_ref': 'reader', 'conf': None, 'dependent_tasks': None, 'inputs': None, 'outputs': None, 'parameters': {}, 'parties': None, 'stage': 'default'}}}, 'kind': 'fate', 'schema_version': '2.1.0'}, 'description': '', 'elapsed': 62958, 'end_time': 1712133480145, 'engine_name': 'eggroll', 'flow_id': '', 'inheritance': {}, 'initiator_party_id': '9999', 'job_id': '202404031636558952240', 'memory': 0, 'model_id': '202404031636558952240', 'model_version': '0', 'parties': [{'party_id': ['9999'], 'role': 'guest'}, {'party_id': ['10000'], 'role': 'host'}], 'party_id': '9999', 'progress': 100, 'protocol': 'fate', 'remaining_cores': 4, 'remaining_memory': 0, 'resource_in_use': False, 'return_resource_time': 1712133480016, 'role': 'guest', 'scheduler_party_id': '9999', 'start_time': 1712133417187, 'status': 'success', 'status_code': None, 'tag': 'job_end', 'update_time': 1712133480145, 'user_name': ''}
+Total time: 0:01:04
 ```
 
 ### 删除部署
