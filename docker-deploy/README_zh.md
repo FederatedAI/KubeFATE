@@ -261,7 +261,7 @@ $ flow test toy --guest-party-id 10000 --host-party-id 9999
 toy test job xxxxx is success
 ```
 
-### 验证Serving-Service功能
+### 上传数据，发起任务
 
 #### Host方操作
 
@@ -273,7 +273,7 @@ docker-compose exec client bash
 ```
 
 ##### 上传host数据
-
+执行python脚本，上传数据
 ```bash
 # 上传数据（单边的， 双边需要在另一方再次执行）
 from fate_client.pipeline import FateFlowPipeline
@@ -304,7 +304,7 @@ docker-compose exec client bash
 ```
 
 ##### 上传guest数据
-
+执行python脚本，上传数据
 ```bash
 # 上传数据（单边的， 双边需要在另一方再次执行）
 from fate_client.pipeline import FateFlowPipeline
@@ -326,7 +326,7 @@ data_pipeline.transform_local_file_to_dataframe(file=host_data_path, namespace="
 ```
 
 ##### 提交任务
-
+执行python脚本，发起任务
 ```bash
 # 发起任务
 from fate_client.pipeline.components.fate import (
