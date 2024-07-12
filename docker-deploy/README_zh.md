@@ -45,13 +45,10 @@ RegistryURI=hub.c.163.com
 如果运行机没有FATE组件的镜像，可以通过以下命令从Docker Hub获取镜像。FATE镜像的版本`<version>`可在[release页面](https://github.com/FederatedAI/FATE/releases)上查看，其中serving镜像的版本信息在[这个页面](https://github.com/FederatedAI/FATE-Serving/releases)：
 
 ```bash
-docker pull federatedai/eggroll:<version>-release
-docker pull federatedai/fateboard:<version>-release
-docker pull federatedai/fateflow:<version>-release
-docker pull federatedai/serving-server:<version>-release
-docker pull federatedai/serving-proxy:<version>-release
-docker pull federatedai/serving-admin:<version>-release
-docker pull bitnami/zookeeper:3.7.0 
+docker pull federatedai/eggroll:3.1.0-release
+docker pull federatedai/fateflow:2.1.1-release
+docker pull federatedai/osx:2.1.1-release
+docker pull federatedai/fateboard:2.1.1-release
 docker pull mysql:8.0.28
 ```
 
@@ -60,14 +57,10 @@ docker pull mysql:8.0.28
 ```bash
 $ docker images
 REPOSITORY                         TAG 
-federatedai/eggroll                <version>-release
-federatedai/fateboard              <version>-release
-federatedai/fateflow               <version>-release
-federatedai/client                 <version>-release
-federatedai/serving-server         <version>-release
-federatedai/serving-proxy          <version>-release
-federatedai/serving-admin          <version>-release
-bitnami/zookeeper                  3.7.0 
+federatedai/fateflow         2.1.1-release
+federatedai/eggroll          3.1.0-release
+federatedai/osx              2.1.1-release
+federatedai/fateboard        2.1.1-release
 mysql                              8.0.28
 ```
 
@@ -105,16 +98,36 @@ party_list=(10000 9999)
 party_ip_list=(192.168.7.1 192.168.7.2)
 serving_ip_list=(192.168.7.1 192.168.7.2)
 
+# Engines:
+# Computing : Eggroll, Spark, Spark_local
 computing=Eggroll
-federation=Eggroll
+# Federation: OSX(computing: Eggroll/Spark/Spark_local), Pulsar/RabbitMQ(computing: Spark/Spark_local)
+federation=OSX
+# Storage: Eggroll(computing: Eggroll), HDFS(computing: Spark), LocalFS(computing: Spark_local)
 storage=Eggroll
-
+# Algorithm: Basic, NN, ALL
 algorithm=Basic
-device=IPCL
-
-compute_core=4
-
-......
+# Device: CPU, IPCL, GPU
+device=CPU
+   
+# spark and eggroll 
+compute_core=16
+   
+# You only need to configure this parameter when you want to use the GPU, the default value is 1
+gpu_count=0
+   
+# modify if you are going to use an external db
+mysql_ip=mysql
+mysql_user=fate
+mysql_password=fate_dev
+mysql_db=fate_flow
+serverTimezone=UTC
+   
+name_node=hdfs://namenode:9000
+   
+# Define fateboard login information
+fateboard_username=admin
+fateboard_password=admin
 
 ```
 
@@ -231,13 +244,12 @@ docker compose ps
 
 ```bash
 NAME                           IMAGE                                  COMMAND                  SERVICE             CREATED              STATUS                        PORTS
-confs-10000-client-1           federatedai/client:2.0.0-release      "bash -c 'pipeline i…"   client              About a minute ago   Up About a minute             0.0.0.0:20000->20000/tcp, :::20000->20000/tcp
 confs-10000-clustermanager-1   federatedai/eggroll:2.0.0-release     "/tini -- bash -c 'j…"   clustermanager      About a minute ago   Up About a minute             4670/tcp
-confs-10000-fateboard-1        federatedai/fateboard:2.0.0-release   "/bin/sh -c 'java -D…"   fateboard           About a minute ago   Up About a minute             0.0.0.0:8080->8080/tcp, :::8080->8080/tcp
-confs-10000-fateflow-1         federatedai/fateflow:2.0.0-release    "/bin/bash -c 'set -…"   fateflow            About a minute ago   Up About a minute (healthy)   0.0.0.0:9360->9360/tcp, :::9360->9360/tcp, 0.0.0.0:9380->9380/tcp, :::9380->9380/tcp
-confs-10000-mysql-1            mysql:8.0.28                           "docker-entrypoint.s…"   mysql               About a minute ago   Up About a minute             3306/tcp, 33060/tcp
+confs-10000-fateflow-1         federatedai/fateflow:2.0.0-release    "/bin/bash -c 'set -…"   fateflow            About a minute ago   Up About a minute (healthy)   192.168.7.1:9360->9360/tcp, :::9360->9360/tcp, 192.168.7.1:9380->9380/tcp, :::9380->9380/tcp
+confs-10000-mysql-1            mysql:8.0.28                          "docker-entrypoint.s…"   mysql               About a minute ago   Up About a minute             3306/tcp, 33060/tcp
 confs-10000-nodemanager-1      federatedai/eggroll:2.0.0-release     "/tini -- bash -c 'j…"   nodemanager         About a minute ago   Up About a minute             4671/tcp
-confs-10000-osx-1         federatedai/osx:2.0.0-release     "/tini -- bash -c 'j…"   osx            About a minute ago   Up About a minute             0.0.0.0:9370->9370/tcp, :::9370->9370/tcp
+confs-10000-osx-1              federatedai/osx:2.0.0-release         "/tini -- bash -c 'j…"   osx                 About a minute ago   Up About a minute             192.168.7.1:9370->9370/tcp, :::9370->9370/tcp
+confs-10000-fateboard-1        federatedai/fateboard:2.1.1-release   "sh -c 'java -Dsprin…"   fateboard           About a minute ago   Up About a minute             192.168.7.1:8080->8080/tcp
 ```
 
 ### 验证部署

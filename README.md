@@ -20,7 +20,7 @@ KubeFATE
 |-- docker-deploy   
 |-- k8s-deploy   
 ```
-`docker-deploy`: The primary objective is to swiftly establish a federated learning environment. Docker Compose allows for the deployment of FATE components on a single host. Leveraging Docker Compose, FATE can be configured for multi-party environments, facilitating collaborative federated setups. For further information, kindly refer to the [Docker Compose Deployment](./docker-deploy/README.md) documentation.
+`docker-deploy`: The primary objective is to swiftly establish a federated learning environment. Docker Compose allows for the deployment of FATE components on a single host. Leveraging Docker Compose, FATE can be configured for multi-party environments, facilitating collaborative federated setups. For further information, kindly refer to the [Docker Compose Deployment](docker-deploy/README_old.md) documentation.
 
 `k8s-deploy`: The deployment approach is specifically tailored for production environments, providing a robust and scalable solution. Its design offers exceptional flexibility, enabling seamless operation of FATE clusters across various environments with ease and efficiency.
 
