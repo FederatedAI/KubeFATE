@@ -131,10 +131,6 @@ fateboard_password=admin
 
 ```
 
-* 使用Spark+Rabbitmq的部署方式的文档可以参考[这里](../docs/FATE_On_Spark.md).
-* 使用Spark+Pulsar的部署方式的文档可以参考[这里](../docs/FATE_On_Spark_With_Pulsar.md).
-* 使用Spark+local Pulsar的部署方式的文档可以参考[这里](TBD)
-
 使用Docker-compose部署FATE可以支持多种种不同的类型引擎的组合(对computing federation storage的选择)，关于不同类型的FATE的更多细节查看: [不同类型FATE的架构介绍](../docs/Introduction_to_Engine_Architecture_zh.md)。
 
 `algorithm`和`device`的配置可以查看这里[FATE_Algorithm_and_Computational_Acceleration_Selection.md](../docs/FATE_Algorithm_and_Computational_Acceleration_Selection.md)
@@ -165,23 +161,6 @@ total 0
 drwxr-xr-x. 2 fate docker 6 May 27 00:51 fate
 ```
 
-### GPU支持
-
-从v1.11.1开始docker compose部署支持使用GPU的FATE部署，如果要使用GPU，你需要先搞定GPU的docker环境。可以参考docker的官方文档（<https://docs.docker.com/config/containers/resource_constraints/#gpu>）。
-
-要使用GPU需要修改配置,这两个都需要修改
-
-```sh
-algorithm=NN
-device=GPU
-
-gpu_count=1
-```
-
-FATE GPU的使用只有fateflow组件，所以每个Party最少需要有一个GPU。
-
-*gpu_count会映射为count，参考 [Docker compose GPU support](https://docs.docker.com/compose/gpu-support/)*
-
 ### 执行部署脚本
 
 **注意：**在运行以下命令之前，所有目标主机必须
@@ -199,20 +178,14 @@ FATE GPU的使用只有fateflow组件，所以每个Party最少需要有一个GP
 bash ./generate_config.sh          # 生成部署文件
 ```
 
-脚本将会生成10000、9999两个组织(Party)的部署文件，然后打包成tar文件。接着把tar文件`confs-<party-id>.tar`、`serving-<party-id>.tar`分别复制到party对应的主机上并解包，解包后的文件默认在`/data/projects/fate`目录下。然后脚本将远程登录到这些主机并使用docker compose命令启动FATE实例。
+脚本将会生成10000、9999两个组织(Party)的部署文件，然后打包成tar文件。接着把tar文件`confs-<party-id>.tar`复制到party对应的主机上并解包，解包后的文件默认在`/data/projects/fate`目录下。然后脚本将远程登录到这些主机并使用docker compose命令启动FATE实例。
 
-默认情况下，脚本会同时启动训练和服务集群。 如果您需要单独启动它们，请将 `--training` 或 `--serving` 添加到 `docker_deploy.sh` 中，如下所示。
+默认情况下，脚本会同时启动训练和服务集群。 如果您需要单独启动它们，请将 `--training` 添加到 `docker_deploy.sh` 中，如下所示。
 
 （可选）要部署各方训练集群，请使用以下命令：
 
 ```bash
 bash ./docker_deploy.sh all --training
-```
-
-（可选）要部署各方服务集群，请使用以下命令：
-
-```bash
-bash ./docker_deploy.sh all --serving
 ```
 
 （可选）要将 FATE 部署到单个目标主机，请使用以下命令和参与方的 ID（下例中为 10000）：
@@ -261,8 +234,8 @@ docker-compose上的FATE启动成功之后需要验证各个服务是否都正�
 ```bash
 # 在192.168.7.1上执行下列命令
 
-# 进入client组件容器内部
-$ docker compose exec client bash
+# 进入fateflow组件容器内部
+$ docker-compose exec fateflow bash
 # toy 验证
 $ flow test toy --guest-party-id 10000 --host-party-id 9999        
 ```
@@ -277,11 +250,11 @@ toy test job xxxxx is success
 
 #### Host方操作
 
-##### 进入party10000 client容器
+##### 进入party10000 fateflow容器
 
 ```bash
 cd /data/projects/fate/confs-10000
-docker-compose exec client bash
+docker-compose exec fateflow bash
 ```
 
 ##### 上传host数据
@@ -308,11 +281,11 @@ data_pipeline.transform_local_file_to_dataframe(file=host_data_path, namespace="
 
 #### Guest方操作
 
-##### 进入party9999 client容器
+##### 进入party9999 fateflow容器
 
 ```bash
 cd /data/projects/fate/confs-9999
-docker-compose exec client bash
+docker-compose exec fateflow bash
 ```
 
 ##### 上传guest数据
