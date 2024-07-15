@@ -442,4 +442,4 @@ rm -rf ../confs-<id>/               # 删除docker-compose部署文件
 
 #### CPU指令集问题
 
-解决办法：查看[wiki](https://github.com/FederatedAI/KubeFATE/wiki/KubeFATE)页面的storage-service部分
+解决办法：查看[wiki](https://github.com/FederatedAI/KubeFATE/wiki/KubeFATE)页面的storage-service部分。
