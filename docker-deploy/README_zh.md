@@ -237,7 +237,7 @@ ssh fate@192.168.7.1
 
 ```bash
 cd /data/projects/fate/confs-10000
-docker compose ps
+docker-compose ps
 ```
 
 输出显示如下，若各个组件状态都是`Up`状态，并且fateflow的状态还是(healthy)，说明部署成功。
