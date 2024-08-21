@@ -45,10 +45,10 @@ RegistryURI=hub.c.163.com
 如果运行机没有FATE组件的镜像，可以通过以下命令从Docker Hub获取镜像。FATE镜像的版本`<version>`可在[release页面](https://github.com/FederatedAI/FATE/releases)上查看，其中serving镜像的版本信息在[这个页面](https://github.com/FederatedAI/FATE-Serving/releases)：
 
 ```bash
-docker pull federatedai/eggroll:3.1.0-release
-docker pull federatedai/fateflow:2.1.1-release
-docker pull federatedai/osx:2.1.1-release
-docker pull federatedai/fateboard:2.1.1-release
+docker pull federatedai/eggroll:3.2.0-release
+docker pull federatedai/fateflow:2.2.0-release
+docker pull federatedai/osx:2.2.0-release
+docker pull federatedai/fateboard:2.2.0-release
 docker pull mysql:8.0.28
 ```
 
@@ -57,10 +57,10 @@ docker pull mysql:8.0.28
 ```bash
 $ docker images
 REPOSITORY                         TAG 
-federatedai/fateflow         2.1.1-release
-federatedai/eggroll          3.1.0-release
-federatedai/osx              2.1.1-release
-federatedai/fateboard        2.1.1-release
+federatedai/fateflow         2.2.0-release
+federatedai/eggroll          3.2.0-release
+federatedai/osx              2.2.0-release
+federatedai/fateboard        2.2.0-release
 mysql                              8.0.28
 ```
 
@@ -217,12 +217,12 @@ docker-compose ps
 
 ```bash
 NAME                           IMAGE                                  COMMAND                  SERVICE             CREATED              STATUS                        PORTS
-confs-10000-clustermanager-1   federatedai/eggroll:3.1.0-release     "/tini -- bash -c 'j…"   clustermanager      About a minute ago   Up About a minute             4670/tcp
-confs-10000-fateflow-1         federatedai/fateflow:2.1.1-release    "/bin/bash -c 'set -…"   fateflow            About a minute ago   Up About a minute (healthy)   192.168.7.1:9360->9360/tcp, :::9360->9360/tcp, 192.168.7.1:9380->9380/tcp, :::9380->9380/tcp
+confs-10000-clustermanager-1   federatedai/eggroll:3.2.0-release     "/tini -- bash -c 'j…"   clustermanager      About a minute ago   Up About a minute             4670/tcp
+confs-10000-fateflow-1         federatedai/fateflow:2.2.0-release    "/bin/bash -c 'set -…"   fateflow            About a minute ago   Up About a minute (healthy)   192.168.7.1:9360->9360/tcp, :::9360->9360/tcp, 192.168.7.1:9380->9380/tcp, :::9380->9380/tcp
 confs-10000-mysql-1            mysql:8.0.28                          "docker-entrypoint.s…"   mysql               About a minute ago   Up About a minute             3306/tcp, 33060/tcp
-confs-10000-nodemanager-1      federatedai/eggroll:3.1.0-release     "/tini -- bash -c 'j…"   nodemanager         About a minute ago   Up About a minute             4671/tcp
-confs-10000-osx-1              federatedai/osx:2.1.1-release         "/tini -- bash -c 'j…"   osx                 About a minute ago   Up About a minute             192.168.7.1:9370->9370/tcp, :::9370->9370/tcp
-confs-10000-fateboard-1        federatedai/fateboard:2.1.1-release   "sh -c 'java -Dsprin…"   fateboard           About a minute ago   Up About a minute             192.168.7.1:8080->8080/tcp
+confs-10000-nodemanager-1      federatedai/eggroll:3.2.0-release     "/tini -- bash -c 'j…"   nodemanager         About a minute ago   Up About a minute             4671/tcp
+confs-10000-osx-1              federatedai/osx:2.2.0-release         "/tini -- bash -c 'j…"   osx                 About a minute ago   Up About a minute             192.168.7.1:9370->9370/tcp, :::9370->9370/tcp
+confs-10000-fateboard-1        federatedai/fateboard:2.2.0-release   "sh -c 'java -Dsprin…"   fateboard           About a minute ago   Up About a minute             192.168.7.1:8080->8080/tcp
 ```
 
 ### 验证部署
