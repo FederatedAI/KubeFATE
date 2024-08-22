@@ -48,7 +48,7 @@ RegistryURI=hub.c.163.com
 docker pull federatedai/eggroll:3.2.0-release
 docker pull federatedai/fateflow:2.2.0-release
 docker pull federatedai/osx:2.2.0-release
-docker pull federatedai/fateboard:2.2.0-release
+docker pull federatedai/fateboard:2.1.1-release
 docker pull mysql:8.0.28
 ```
 
@@ -60,7 +60,7 @@ REPOSITORY                         TAG
 federatedai/fateflow         2.2.0-release
 federatedai/eggroll          3.2.0-release
 federatedai/osx              2.2.0-release
-federatedai/fateboard        2.2.0-release
+federatedai/fateboard        2.1.1-release
 mysql                              8.0.28
 ```
 
@@ -222,7 +222,7 @@ confs-10000-fateflow-1         federatedai/fateflow:2.2.0-release    "/bin/bash 
 confs-10000-mysql-1            mysql:8.0.28                          "docker-entrypoint.s…"   mysql               About a minute ago   Up About a minute             3306/tcp, 33060/tcp
 confs-10000-nodemanager-1      federatedai/eggroll:3.2.0-release     "/tini -- bash -c 'j…"   nodemanager         About a minute ago   Up About a minute             4671/tcp
 confs-10000-osx-1              federatedai/osx:2.2.0-release         "/tini -- bash -c 'j…"   osx                 About a minute ago   Up About a minute             192.168.7.1:9370->9370/tcp, :::9370->9370/tcp
-confs-10000-fateboard-1        federatedai/fateboard:2.2.0-release   "sh -c 'java -Dsprin…"   fateboard           About a minute ago   Up About a minute             192.168.7.1:8080->8080/tcp
+confs-10000-fateboard-1        federatedai/fateboard:2.1.1-release   "sh -c 'java -Dsprin…"   fateboard           About a minute ago   Up About a minute             192.168.7.1:8080->8080/tcp
 ```
 
 ### 验证部署
