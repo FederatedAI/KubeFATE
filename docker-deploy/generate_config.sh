@@ -321,10 +321,10 @@ GenerateConfig() {
 
 		# Start the general config rendering
 		# fateboard
-		sed -i "s#^server.port=.*#server.port=${fateboard_port}#g" ./confs-"$party_id"/confs/fateboard/conf/application.properties
-		sed -i "s#^fateflow.url=.*#fateflow.url=http://${fate_flow_ip}:${fate_flow_http_port}#g" ./confs-"$party_id"/confs/fateboard/conf/application.properties
-		sed -i "s#<server.board.login.username>#${fateboard_username}#g" ./confs-"$party_id"/confs/fateboard/conf/application.properties
-		sed -i "s#<server.board.login.password>#${fateboard_password}#g" ./confs-"$party_id"/confs/fateboard/conf/application.properties
+		sed -i "s#^server.port=.*#server.port=${fateboard_port}#g" ./confs-"$party_id"/confs/fate_board/conf/application.properties
+		sed -i "s#^fateflow.url=.*#fateflow.url=http://${fate_flow_ip}:${fate_flow_http_port}#g" ./confs-"$party_id"/confs/fate_board/conf/application.properties
+		sed -i "s#<server.board.login.username>#${fateboard_username}#g" ./confs-"$party_id"/confs/fate_board/conf/application.properties
+		sed -i "s#<server.board.login.password>#${fateboard_password}#g" ./confs-"$party_id"/confs/fate_board/conf/application.properties
                 
 		echo fateboard module of "$party_id" done!
 

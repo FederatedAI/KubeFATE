@@ -146,7 +146,7 @@ services:
     - "-c"
     - |
         set -x
-        pip install cryptography && sleep 5 && python fate_flow/python/fate_flow/fate_flow_server.py --debug 
+        pkill -9 -f fate && sleep 5 && python fate_flow/python/fate_flow/fate_flow_server.py --debug 
         python /data/projects/fate/eggroll/python/setup.py install 
         sleep 10 && pipeline init --ip fateflow --port 9380 
         flow init --ip fateflow --port 9380
