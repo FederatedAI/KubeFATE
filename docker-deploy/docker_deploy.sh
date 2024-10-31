@@ -145,6 +145,7 @@ DeployPartyInternal() {
 	if [ "$3" != "" ]; then
 		user=$3
 	fi
+
 	handleLocally confs
 	if [ "$local_flag" == "true" ]; then
 		return 0
