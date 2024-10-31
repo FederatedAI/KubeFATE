@@ -145,9 +145,7 @@ DeployPartyInternal() {
 	if [ "$3" != "" ]; then
 		user=$3
 	fi
-        echo "handleLocally confs"
 	handleLocally confs
-        echo "handleLocally confs finished"
 	if [ "$local_flag" == "true" ]; then
 		return 0
 	fi
