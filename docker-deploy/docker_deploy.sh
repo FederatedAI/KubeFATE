@@ -18,10 +18,8 @@ cd $BASEDIR
 WORKINGDIR=$(pwd)
 
 # fetch fate-python image
-echo "fetch fate-python image"
 source ${WORKINGDIR}/.env
 source ${WORKINGDIR}/parties.conf
-echo "finished"
 cd ${WORKINGDIR}
 
 Deploy() {
@@ -42,14 +40,12 @@ Deploy() {
 				if [ "$2" != "" ]; then
 					case $2 in
 					--training)
-                                                echo "training"
 						DeployPartyInternal $party
 						if [ "${exchangeip}" != "" ]; then
 							DeployPartyInternal exchange
 						fi
 						;;
 					--serving)
-                                                echo "serving"
 						DeployPartyServing $party
 						;;
 					esac
@@ -155,7 +151,7 @@ DeployPartyInternal() {
 	if [ "$local_flag" == "true" ]; then
 		return 0
 	fi
-        echo "scp -P ${SSH_PORT} ${WORKINGDIR}/outputs/confs-$target_party_id.tar $user@$target_party_ip:~/"
+
 	scp -P ${SSH_PORT} ${WORKINGDIR}/outputs/confs-$target_party_id.tar $user@$target_party_ip:~/
 	#rm -f ${WORKINGDIR}/outputs/confs-$target_party_id.tar
 	echo "$target_party_ip training cluster copy is ok!"
@@ -333,7 +329,6 @@ main() {
 		shift
 		Delete $@
 	else
-                echo "deploy"
 		Deploy "$@"
 	fi
 
