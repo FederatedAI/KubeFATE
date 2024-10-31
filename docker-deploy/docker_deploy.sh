@@ -20,7 +20,6 @@ WORKINGDIR=$(pwd)
 # fetch fate-python image
 source ${WORKINGDIR}/.env
 source ${WORKINGDIR}/parties.conf
-
 cd ${WORKINGDIR}
 
 Deploy() {
@@ -143,7 +142,6 @@ DeployPartyInternal() {
 		echo "Unable to find Party: $target_party_id, please check you input."
 		return 1
 	fi
-
 	if [ "$3" != "" ]; then
 		user=$3
 	fi
@@ -156,20 +154,20 @@ DeployPartyInternal() {
 	scp -P ${SSH_PORT} ${WORKINGDIR}/outputs/confs-$target_party_id.tar $user@$target_party_ip:~/
 	#rm -f ${WORKINGDIR}/outputs/confs-$target_party_id.tar
 	echo "$target_party_ip training cluster copy is ok!"
-	ssh -p ${SSH_PORT} -tt $user@$target_party_ip <<eeooff
+	ssh -p ${SSH_PORT} -tt $user@$target_party_ip << eeooff
 mkdir -p $dir
 rm -f $dir/confs-$target_party_id.tar
 mv ~/confs-$target_party_id.tar $dir
 cd $dir
 tar -xzf confs-$target_party_id.tar
 cd confs-$target_party_id
-docker compose down
+docker-compose down
 docker volume rm -f confs-${target_party_id}_shared_dir_examples
 docker volume rm -f confs-${target_party_id}_shared_dir_fate
 docker volume rm -f confs-${target_party_id}_sdownload_dir
 docker volume rm -f confs-${target_party_id}_fate_flow_logs
 
-docker compose up -d
+docker-compose up -d
 cd ../
 rm -f confs-${target_party_id}.tar
 exit
@@ -217,8 +215,8 @@ mv ~/serving-$target_party_id.tar $dir
 cd $dir
 tar -xzf serving-$target_party_id.tar
 cd serving-$target_party_id
-docker compose down
-docker compose up -d
+docker-compose down
+docker-compose up -d
 cd ../
 rm -f serving-$target_party_id.tar
 exit
@@ -258,7 +256,7 @@ DeleteCluster() {
 	if [ "$cluster_type" == "--training" ]; then
 		ssh -p ${SSH_PORT} -tt $user@$target_party_ip <<eeooff
 cd $dir/confs-$target_party_id
-docker compose down
+docker-compose down
 exit
 eeooff
 		echo "party $target_party_id training cluster is deleted!"
@@ -266,7 +264,7 @@ eeooff
 	elif [ "$cluster_type" == "--serving" ]; then
 		ssh -p ${SSH_PORT} -tt $user@$target_party_serving_ip <<eeooff
 cd $dir/serving-$target_party_id
-docker compose down
+docker-compose down
 exit
 eeooff
 		echo "party $target_party_id serving cluster is deleted!"
@@ -276,21 +274,21 @@ eeooff
 		if [ "$target_party_id" == "exchange" ]; then
 			ssh -p ${SSH_PORT} -tt $user@$target_party_ip <<eeooff
 cd $dir/confs-$target_party_id
-docker compose down
+docker-compose down
 exit
 eeooff
 		else
 			if [ "$target_party_serving_ip" != "" ]; then
 			ssh -p ${SSH_PORT} -tt $user@$target_party_serving_ip <<eeooff
 cd $dir/serving-$target_party_id
-docker compose down
+docker-compose down
 exit
 eeooff
 			fi
 			if [ "$target_party_ip" != "" ]; then
 			ssh -p ${SSH_PORT} -tt $user@$target_party_ip <<eeooff
 cd $dir/confs-$target_party_id
-docker compose down
+docker-compose down
 exit
 eeooff
 			fi
@@ -312,8 +310,8 @@ handleLocally() {
 			mkdir -p $dir
 			tar -xf ${WORKINGDIR}/outputs/${type}-${target_party_id}.tar -C $dir
 			cd ${dir}/${type}-${target_party_id}
-			docker compose down
-			docker compose up -d
+			docker-compose down
+			docker-compose up -d
 			local_flag="true"
 			return 0
 		fi
