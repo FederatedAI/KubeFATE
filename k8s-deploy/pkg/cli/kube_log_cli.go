@@ -244,6 +244,6 @@ func GetModuleLogFollow(uuid, args string) error {
 			log.Debug().Err(err).Msg("Receive io.EOF")
 			return nil
 		}
-		fmt.Printf(msg)
+		fmt.Print(msg)
 	}
 }
